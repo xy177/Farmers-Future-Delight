@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "half=lower": { "model": "farmers_future_delight:tall_seagrass_bottom" },
+    "half=upper": { "model": "farmers_future_delight:tall_seagrass_top" }
+  }
+}

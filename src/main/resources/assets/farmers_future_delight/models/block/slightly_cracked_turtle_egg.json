@@ -1,0 +1,6 @@
+{
+  "parent": "farmers_future_delight:block/template_turtle_egg",
+  "textures": {
+    "all": "farmers_future_delight:block/turtle_egg_slightly_cracked"
+  }
+}

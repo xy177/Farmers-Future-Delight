@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "farmers_future_delight:stripped_crimson_stem"
+    },
+    "axis=z": {
+      "model": "farmers_future_delight:stripped_crimson_stem",
+      "x": 90
+    },
+    "axis=x": {
+      "model": "farmers_future_delight:stripped_crimson_stem",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

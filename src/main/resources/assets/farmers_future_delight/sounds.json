@@ -1,0 +1,2740 @@
+{
+    "block.wet_grass.break":  {
+                                  "sounds":  [
+                                                 {
+                                                     "name":  "farmers_future_delight:dig/wet_grass1",
+                                                     "volume":  0.8
+                                                 },
+                                                 {
+                                                     "name":  "farmers_future_delight:dig/wet_grass2",
+                                                     "volume":  0.8
+                                                 },
+                                                 {
+                                                     "name":  "farmers_future_delight:dig/wet_grass3",
+                                                     "volume":  0.8
+                                                 },
+                                                 {
+                                                     "name":  "farmers_future_delight:dig/wet_grass4",
+                                                     "volume":  0.8
+                                                 }
+                                             ],
+                                  "subtitle":  "subtitles.block.generic.break"
+                              },
+    "block.wet_grass.step":  {
+                                 "sounds":  [
+                                                "farmers_future_delight:step/wet_grass1",
+                                                "farmers_future_delight:step/wet_grass2",
+                                                "farmers_future_delight:step/wet_grass3",
+                                                "farmers_future_delight:step/wet_grass4",
+                                                "farmers_future_delight:step/wet_grass5",
+                                                "farmers_future_delight:step/wet_grass6"
+                                            ],
+                                 "subtitle":  "subtitles.block.generic.footsteps"
+                             },
+    "block.wet_grass.place":  {
+                                  "sounds":  [
+                                                 {
+                                                     "name":  "farmers_future_delight:dig/wet_grass1",
+                                                     "volume":  0.8
+                                                 },
+                                                 {
+                                                     "name":  "farmers_future_delight:dig/wet_grass2",
+                                                     "volume":  0.8
+                                                 },
+                                                 {
+                                                     "name":  "farmers_future_delight:dig/wet_grass3",
+                                                     "volume":  0.8
+                                                 },
+                                                 {
+                                                     "name":  "farmers_future_delight:dig/wet_grass4",
+                                                     "volume":  0.8
+                                                 }
+                                             ],
+                                  "subtitle":  "subtitles.block.generic.place"
+                              },
+    "block.wet_grass.hit":  {
+                                "sounds":  [
+                                               "farmers_future_delight:step/wet_grass1",
+                                               "farmers_future_delight:step/wet_grass2",
+                                               "farmers_future_delight:step/wet_grass3",
+                                               "farmers_future_delight:step/wet_grass4",
+                                               "farmers_future_delight:step/wet_grass5",
+                                               "farmers_future_delight:step/wet_grass6"
+                                           ],
+                                "subtitle":  "subtitles.block.generic.hit"
+                            },
+    "block.wet_grass.fall":  {
+                                 "sounds":  [
+                                                "farmers_future_delight:step/wet_grass1",
+                                                "farmers_future_delight:step/wet_grass2",
+                                                "farmers_future_delight:step/wet_grass3",
+                                                "farmers_future_delight:step/wet_grass4",
+                                                "farmers_future_delight:step/wet_grass5",
+                                                "farmers_future_delight:step/wet_grass6"
+                                            ],
+                                 "subtitle":  "subtitles.block.generic.fall"
+                             },
+    "entity.glow_squid.ambient":  {
+                                      "sounds":  [
+                                                     "farmers_future_delight:mob/glow_squid/ambient1",
+                                                     "farmers_future_delight:mob/glow_squid/ambient2",
+                                                     "farmers_future_delight:mob/glow_squid/ambient3",
+                                                     "farmers_future_delight:mob/glow_squid/ambient4",
+                                                     "farmers_future_delight:mob/glow_squid/ambient5"
+                                                 ]
+                                  },
+    "entity.glow_squid.death":  {
+                                    "sounds":  [
+                                                   "farmers_future_delight:mob/glow_squid/death1",
+                                                   "farmers_future_delight:mob/glow_squid/death2",
+                                                   "farmers_future_delight:mob/glow_squid/death3"
+                                               ]
+                                },
+    "entity.glow_squid.hurt":  {
+                                   "sounds":  [
+                                                  "farmers_future_delight:mob/glow_squid/hurt1",
+                                                  "farmers_future_delight:mob/glow_squid/hurt2",
+                                                  "farmers_future_delight:mob/glow_squid/hurt3",
+                                                  "farmers_future_delight:mob/glow_squid/hurt4"
+                                              ]
+                               },
+    "entity.glow_squid.squirt":  {
+                                     "sounds":  [
+                                                    "farmers_future_delight:mob/glow_squid/squirt1",
+                                                    "farmers_future_delight:mob/glow_squid/squirt2",
+                                                    "farmers_future_delight:mob/glow_squid/squirt3"
+                                                ]
+                                 },
+    "entity.turtle.ambient_land":  {
+                                       "sounds":  [
+                                                      {
+                                                          "name":  "farmers_future_delight:mob/turtle/idle1",
+                                                          "volume":  0.8
+                                                      },
+                                                      {
+                                                          "name":  "farmers_future_delight:mob/turtle/idle2",
+                                                          "volume":  0.7
+                                                      },
+                                                      {
+                                                          "name":  "farmers_future_delight:mob/turtle/idle3",
+                                                          "volume":  0.8
+                                                      }
+                                                  ],
+                                       "subtitle":  "subtitles.entity.turtle.ambient_land"
+                                   },
+    "entity.turtle.hurt":  {
+                               "sounds":  [
+                                              "farmers_future_delight:mob/turtle/hurt1",
+                                              "farmers_future_delight:mob/turtle/hurt2",
+                                              "farmers_future_delight:mob/turtle/hurt3",
+                                              "farmers_future_delight:mob/turtle/hurt4",
+                                              "farmers_future_delight:mob/turtle/hurt5"
+                                          ],
+                               "subtitle":  "subtitles.entity.turtle.hurt"
+                           },
+    "entity.turtle.hurt_baby":  {
+                                    "sounds":  [
+                                                   "farmers_future_delight:mob/turtle/baby/hurt1",
+                                                   "farmers_future_delight:mob/turtle/baby/hurt2"
+                                               ],
+                                    "subtitle":  "subtitles.entity.turtle.hurt_baby"
+                                },
+    "entity.turtle.death":  {
+                                "sounds":  [
+                                               "farmers_future_delight:mob/turtle/death1",
+                                               "farmers_future_delight:mob/turtle/death2",
+                                               "farmers_future_delight:mob/turtle/death3"
+                                           ],
+                                "subtitle":  "subtitles.entity.turtle.death"
+                            },
+    "entity.turtle.death_baby":  {
+                                     "sounds":  [
+                                                    "farmers_future_delight:mob/turtle/baby/death1",
+                                                    "farmers_future_delight:mob/turtle/baby/death2"
+                                                ],
+                                     "subtitle":  "subtitles.entity.turtle.death_baby"
+                                 },
+    "entity.turtle.shamble":  {
+                                  "sounds":  [
+                                                 "farmers_future_delight:mob/turtle/walk1",
+                                                 "farmers_future_delight:mob/turtle/walk2",
+                                                 "farmers_future_delight:mob/turtle/walk3",
+                                                 "farmers_future_delight:mob/turtle/walk4",
+                                                 "farmers_future_delight:mob/turtle/walk5"
+                                             ],
+                                  "subtitle":  "subtitles.entity.turtle.shamble"
+                              },
+    "entity.turtle.shamble_baby":  {
+                                       "sounds":  [
+                                                      "farmers_future_delight:mob/turtle/baby/shamble1",
+                                                      "farmers_future_delight:mob/turtle/baby/shamble2",
+                                                      "farmers_future_delight:mob/turtle/baby/shamble3",
+                                                      "farmers_future_delight:mob/turtle/baby/shamble4"
+                                                  ],
+                                       "subtitle":  "subtitles.entity.turtle.shamble_baby"
+                                   },
+    "entity.turtle.swim":  {
+                               "sounds":  [
+                                              {
+                                                  "name":  "farmers_future_delight:mob/turtle/swim/swim1",
+                                                  "volume":  0.6
+                                              },
+                                              {
+                                                  "name":  "farmers_future_delight:mob/turtle/swim/swim2",
+                                                  "volume":  0.3
+                                              },
+                                              {
+                                                  "name":  "farmers_future_delight:mob/turtle/swim/swim3",
+                                                  "volume":  0.2
+                                              },
+                                              {
+                                                  "name":  "farmers_future_delight:mob/turtle/swim/swim4",
+                                                  "volume":  0.6
+                                              },
+                                              {
+                                                  "name":  "farmers_future_delight:mob/turtle/swim/swim5",
+                                                  "volume":  0.3
+                                              }
+                                          ],
+                               "subtitle":  "subtitles.entity.turtle.swim"
+                           },
+    "entity.turtle.lay_egg":  {
+                                  "sounds":  [
+                                                 "farmers_future_delight:mob/turtle/egg/drop_egg1",
+                                                 "farmers_future_delight:mob/turtle/egg/drop_egg2"
+                                             ],
+                                  "subtitle":  "subtitles.entity.turtle.lay_egg"
+                              },
+    "entity.turtle.egg_break":  {
+                                    "sounds":  [
+                                                   "farmers_future_delight:mob/turtle/egg/egg_break1",
+                                                   "farmers_future_delight:mob/turtle/egg/egg_break2"
+                                               ],
+                                    "subtitle":  "subtitles.entity.turtle.egg_break"
+                                },
+    "entity.turtle.egg_crack":  {
+                                    "sounds":  [
+                                                   "farmers_future_delight:mob/turtle/egg/egg_crack1",
+                                                   "farmers_future_delight:mob/turtle/egg/egg_crack2",
+                                                   "farmers_future_delight:mob/turtle/egg/egg_crack3",
+                                                   "farmers_future_delight:mob/turtle/egg/egg_crack4",
+                                                   "farmers_future_delight:mob/turtle/egg/egg_crack5"
+                                               ],
+                                    "subtitle":  "subtitles.entity.turtle.egg_crack"
+                                },
+    "entity.turtle.egg_hatch":  {
+                                    "sounds":  [
+                                                   "farmers_future_delight:mob/turtle/baby/egg_hatched1",
+                                                   "farmers_future_delight:mob/turtle/baby/egg_hatched2",
+                                                   "farmers_future_delight:mob/turtle/baby/egg_hatched3"
+                                               ],
+                                    "subtitle":  "subtitles.entity.turtle.egg_hatch"
+                                },
+    "item.armor.equip_turtle":  {
+                                    "sounds":  [
+                                                   "farmers_future_delight:mob/turtle/armor",
+                                                   {
+                                                       "name":  "farmers_future_delight:mob/turtle/armor",
+                                                       "pitch":  0.85
+                                                   },
+                                                   {
+                                                       "name":  "farmers_future_delight:mob/turtle/armor",
+                                                       "pitch":  1.1
+                                                   }
+                                               ],
+                                    "subtitle":  "subtitles.item.armor.equip_turtle"
+                                },
+    "entity.zombie.destroy_egg":  {
+                                      "sounds":  [
+                                                     "farmers_future_delight:mob/turtle/egg/jump_egg1",
+                                                     "farmers_future_delight:mob/turtle/egg/jump_egg2",
+                                                     "farmers_future_delight:mob/turtle/egg/jump_egg3",
+                                                     "farmers_future_delight:mob/turtle/egg/jump_egg4"
+                                                 ],
+                                      "subtitle":  "subtitles.entity.zombie.destroy_egg"
+                                  },
+    "block.honey_block.break":  {
+                                    "sounds":  [
+                                                   "farmers_future_delight:block/honeyblock/break1",
+                                                   "farmers_future_delight:block/honeyblock/break2",
+                                                   "farmers_future_delight:block/honeyblock/break3",
+                                                   "farmers_future_delight:block/honeyblock/break4",
+                                                   "farmers_future_delight:block/honeyblock/break5"
+                                               ],
+                                    "subtitle":  "subtitles.block.generic.break"
+                                },
+    "block.honey_block.step":  {
+                                   "sounds":  [
+                                                  "farmers_future_delight:block/honeyblock/step1",
+                                                  "farmers_future_delight:block/honeyblock/step2",
+                                                  "farmers_future_delight:block/honeyblock/step3",
+                                                  "farmers_future_delight:block/honeyblock/step4",
+                                                  "farmers_future_delight:block/honeyblock/step5"
+                                              ],
+                                   "subtitle":  "subtitles.block.generic.footsteps"
+                               },
+    "block.honey_block.place":  {
+                                    "sounds":  [
+                                                   "farmers_future_delight:block/honeyblock/break1",
+                                                   "farmers_future_delight:block/honeyblock/break2",
+                                                   "farmers_future_delight:block/honeyblock/break3",
+                                                   "farmers_future_delight:block/honeyblock/break4",
+                                                   "farmers_future_delight:block/honeyblock/break5"
+                                               ],
+                                    "subtitle":  "subtitles.block.generic.place"
+                                },
+    "block.honey_block.hit":  {
+                                  "sounds":  [
+                                                 "farmers_future_delight:block/honeyblock/step1",
+                                                 "farmers_future_delight:block/honeyblock/step2",
+                                                 "farmers_future_delight:block/honeyblock/step3",
+                                                 "farmers_future_delight:block/honeyblock/step4",
+                                                 "farmers_future_delight:block/honeyblock/step5"
+                                             ],
+                                  "subtitle":  "subtitles.block.generic.hit"
+                              },
+    "block.honey_block.fall":  {
+                                   "sounds":  [
+                                                  "farmers_future_delight:block/honeyblock/step1",
+                                                  "farmers_future_delight:block/honeyblock/step2",
+                                                  "farmers_future_delight:block/honeyblock/step3",
+                                                  "farmers_future_delight:block/honeyblock/step4",
+                                                  "farmers_future_delight:block/honeyblock/step5"
+                                              ],
+                                   "subtitle":  "subtitles.block.generic.fall"
+                               },
+    "block.honey_block.slide":  {
+                                    "sounds":  [
+                                                   {
+                                                       "name":  "farmers_future_delight:block/honeyblock/slide1",
+                                                       "volume":  0.8
+                                                   },
+                                                   {
+                                                       "name":  "farmers_future_delight:block/honeyblock/slide1",
+                                                       "pitch":  0.9,
+                                                       "volume":  0.8
+                                                   },
+                                                   {
+                                                       "name":  "farmers_future_delight:block/honeyblock/slide2",
+                                                       "volume":  0.8
+                                                   },
+                                                   {
+                                                       "name":  "farmers_future_delight:block/honeyblock/slide2",
+                                                       "pitch":  0.8,
+                                                       "volume":  0.8
+                                                   },
+                                                   {
+                                                       "name":  "farmers_future_delight:block/honeyblock/slide3",
+                                                       "volume":  0.8
+                                                   },
+                                                   {
+                                                       "name":  "farmers_future_delight:block/honeyblock/slide3",
+                                                       "pitch":  0.8,
+                                                       "volume":  0.8
+                                                   },
+                                                   {
+                                                       "name":  "farmers_future_delight:block/honeyblock/slide4",
+                                                       "volume":  0.8
+                                                   },
+                                                   {
+                                                       "name":  "farmers_future_delight:block/honeyblock/slide4",
+                                                       "pitch":  0.8,
+                                                       "volume":  0.8
+                                                   }
+                                               ],
+                                    "subtitle":  "subtitles.block.honey_block.slide"
+                                },
+    "block.big_dripleaf.tilt_down":  {
+                                         "sounds":  [
+                                                        "farmers_future_delight:block/big_dripleaf/tilt_down1",
+                                                        "farmers_future_delight:block/big_dripleaf/tilt_down2",
+                                                        "farmers_future_delight:block/big_dripleaf/tilt_down3",
+                                                        "farmers_future_delight:block/big_dripleaf/tilt_down4",
+                                                        "farmers_future_delight:block/big_dripleaf/tilt_down5"
+                                                    ],
+                                         "subtitle":  "subtitles.block.big_dripleaf.tilt_down"
+                                     },
+    "block.big_dripleaf.tilt_up":  {
+                                       "sounds":  [
+                                                      "farmers_future_delight:block/big_dripleaf/tilt_up1",
+                                                      "farmers_future_delight:block/big_dripleaf/tilt_up2",
+                                                      "farmers_future_delight:block/big_dripleaf/tilt_up3",
+                                                      "farmers_future_delight:block/big_dripleaf/tilt_up4"
+                                                  ],
+                                       "subtitle":  "subtitles.block.big_dripleaf.tilt_up"
+                                   },
+    "entity.bee.ambient":  {
+                               "sounds":  [
+                                              "farmers_future_delight:mob/bee/loop1",
+                                              "farmers_future_delight:mob/bee/loop2",
+                                              "farmers_future_delight:mob/bee/loop3",
+                                              "farmers_future_delight:mob/bee/loop4",
+                                              "farmers_future_delight:mob/bee/loop5"
+                                          ],
+                               "subtitle":  "subtitles.entity.bee.ambient"
+                           },
+    "entity.bee.aggressive":  {
+                                  "sounds":  [
+                                                 "farmers_future_delight:mob/bee/aggressive1",
+                                                 "farmers_future_delight:mob/bee/aggressive2",
+                                                 "farmers_future_delight:mob/bee/aggressive3"
+                                             ],
+                                  "subtitle":  "subtitles.entity.bee.angry"
+                              },
+    "entity.bee.loop":  {
+                            "sounds":  [
+                                           "farmers_future_delight:mob/bee/loop1",
+                                           "farmers_future_delight:mob/bee/loop2",
+                                           "farmers_future_delight:mob/bee/loop3",
+                                           "farmers_future_delight:mob/bee/loop4",
+                                           "farmers_future_delight:mob/bee/loop5"
+                                       ],
+                            "subtitle":  "subtitles.entity.bee.ambient"
+                        },
+    "entity.bee.loop_aggressive":  {
+                                       "sounds":  [
+                                                      "farmers_future_delight:mob/bee/aggressive1",
+                                                      "farmers_future_delight:mob/bee/aggressive2",
+                                                      "farmers_future_delight:mob/bee/aggressive3"
+                                                  ],
+                                       "subtitle":  "subtitles.entity.bee.angry"
+                                   },
+    "entity.bee.hurt":  {
+                            "sounds":  [
+                                           "farmers_future_delight:mob/bee/hurt1",
+                                           "farmers_future_delight:mob/bee/hurt2",
+                                           "farmers_future_delight:mob/bee/hurt3"
+                                       ],
+                            "subtitle":  "subtitles.entity.bee.hurt"
+                        },
+    "entity.bee.death":  {
+                             "sounds":  [
+                                            "farmers_future_delight:mob/bee/death1",
+                                            "farmers_future_delight:mob/bee/death2"
+                                        ],
+                             "subtitle":  "subtitles.entity.bee.death"
+                         },
+    "entity.bee.pollinate":  {
+                                 "sounds":  [
+                                                "farmers_future_delight:mob/bee/pollinate1",
+                                                "farmers_future_delight:mob/bee/pollinate2",
+                                                "farmers_future_delight:mob/bee/pollinate3",
+                                                "farmers_future_delight:mob/bee/pollinate4"
+                                            ],
+                                 "subtitle":  "subtitles.entity.bee.pollinate"
+                             },
+    "entity.bee.sting":  {
+                             "sounds":  [
+                                            "farmers_future_delight:mob/bee/sting"
+                                        ],
+                             "subtitle":  "subtitles.entity.bee.sting"
+                         },
+    "block.beehive.enter":  {
+                                "sounds":  [
+                                               "farmers_future_delight:block/beehive/enter"
+                                           ],
+                                "subtitle":  "subtitles.block.beehive.enter"
+                            },
+    "block.beehive.exit":  {
+                               "sounds":  [
+                                              "farmers_future_delight:block/beehive/exit"
+                                          ],
+                               "subtitle":  "subtitles.block.beehive.exit"
+                           },
+    "block.beehive.work":  {
+                               "sounds":  [
+                                              "farmers_future_delight:block/beehive/work1",
+                                              "farmers_future_delight:block/beehive/work2",
+                                              "farmers_future_delight:block/beehive/work3",
+                                              "farmers_future_delight:block/beehive/work4"
+                                          ],
+                               "subtitle":  "subtitles.block.beehive.work"
+                           },
+    "block.beehive.shear":  {
+                                "sounds":  [
+                                               "farmers_future_delight:block/beehive/shear"
+                                           ],
+                                "subtitle":  "subtitles.block.beehive.shear"
+                            },
+    "block.sweet_berry_bush.break":  {
+                                         "sounds":  [
+                                                        {
+                                                            "name":  "farmers_future_delight:block/sweet_berry_bush/break1",
+                                                            "volume":  0.8
+                                                        },
+                                                        {
+                                                            "name":  "farmers_future_delight:block/sweet_berry_bush/break2",
+                                                            "volume":  0.8
+                                                        },
+                                                        {
+                                                            "name":  "farmers_future_delight:block/sweet_berry_bush/break3",
+                                                            "volume":  0.8
+                                                        },
+                                                        {
+                                                            "name":  "farmers_future_delight:block/sweet_berry_bush/break4",
+                                                            "volume":  0.8
+                                                        }
+                                                    ],
+                                         "subtitle":  "subtitles.block.generic.break"
+                                     },
+    "block.sweet_berry_bush.place":  {
+                                         "sounds":  [
+                                                        {
+                                                            "name":  "farmers_future_delight:block/sweet_berry_bush/place1",
+                                                            "volume":  0.8
+                                                        },
+                                                        {
+                                                            "name":  "farmers_future_delight:block/sweet_berry_bush/place2",
+                                                            "volume":  0.8
+                                                        },
+                                                        {
+                                                            "name":  "farmers_future_delight:block/sweet_berry_bush/place3",
+                                                            "volume":  0.8
+                                                        },
+                                                        {
+                                                            "name":  "farmers_future_delight:block/sweet_berry_bush/place4",
+                                                            "volume":  0.8
+                                                        },
+                                                        {
+                                                            "name":  "farmers_future_delight:block/sweet_berry_bush/place5",
+                                                            "volume":  0.8
+                                                        },
+                                                        {
+                                                            "name":  "farmers_future_delight:block/sweet_berry_bush/place6",
+                                                            "volume":  0.8
+                                                        }
+                                                    ],
+                                         "subtitle":  "subtitles.block.generic.place"
+                                     },
+    "block.sweet_berry_bush.pick_berries":  {
+                                                "sounds":  [
+                                                               "farmers_future_delight:item/sweet_berries/pick_from_bush1",
+                                                               "farmers_future_delight:item/sweet_berries/pick_from_bush2"
+                                                           ],
+                                                "subtitle":  "subtitles.block.sweet_berry_bush.pick_berries"
+                                            },
+    "block.cave_vines.break":  {
+                                   "sounds":  [
+                                                  "farmers_future_delight:block/cave_vines/break1",
+                                                  "farmers_future_delight:block/cave_vines/break2",
+                                                  "farmers_future_delight:block/cave_vines/break3",
+                                                  "farmers_future_delight:block/cave_vines/break4",
+                                                  "farmers_future_delight:block/cave_vines/break5"
+                                              ],
+                                   "subtitle":  "subtitles.block.generic.break"
+                               },
+    "block.cave_vines.step":  {
+                                  "sounds":  [
+                                                 "farmers_future_delight:block/vine/climb1",
+                                                 "farmers_future_delight:block/vine/climb2",
+                                                 "farmers_future_delight:block/vine/climb3",
+                                                 "farmers_future_delight:block/vine/climb4",
+                                                 "farmers_future_delight:block/vine/climb5"
+                                             ],
+                                  "subtitle":  "subtitles.block.generic.footsteps"
+                              },
+    "block.cave_vines.place":  {
+                                   "sounds":  [
+                                                  "farmers_future_delight:block/cave_vines/break1",
+                                                  "farmers_future_delight:block/cave_vines/break2",
+                                                  "farmers_future_delight:block/cave_vines/break3",
+                                                  "farmers_future_delight:block/cave_vines/break4",
+                                                  "farmers_future_delight:block/cave_vines/break5"
+                                              ],
+                                   "subtitle":  "subtitles.block.generic.place"
+                               },
+    "block.cave_vines.hit":  {
+                                 "sounds":  [
+                                                "farmers_future_delight:block/vine/climb1",
+                                                "farmers_future_delight:block/vine/climb2",
+                                                "farmers_future_delight:block/vine/climb3",
+                                                "farmers_future_delight:block/vine/climb4",
+                                                "farmers_future_delight:block/vine/climb5"
+                                            ],
+                                 "subtitle":  "subtitles.block.generic.hit"
+                             },
+    "block.cave_vines.fall":  {
+                                  "sounds":  [
+                                                 "farmers_future_delight:block/vine/climb1",
+                                                 "farmers_future_delight:block/vine/climb2",
+                                                 "farmers_future_delight:block/vine/climb3",
+                                                 "farmers_future_delight:block/vine/climb4",
+                                                 "farmers_future_delight:block/vine/climb5"
+                                             ],
+                                  "subtitle":  "subtitles.block.generic.fall"
+                              },
+    "block.cave_vines.pick_berries":  {
+                                          "sounds":  [
+                                                         {
+                                                             "name":  "farmers_future_delight:block.sweet_berry_bush.pick_berries",
+                                                             "type":  "event"
+                                                         }
+                                                     ],
+                                          "subtitle":  "subtitles.block.sweet_berry_bush.pick_berries"
+                                      },
+    "block.azalea.break":  {
+                               "sounds":  [
+                                              "farmers_future_delight:block/azalea/break1",
+                                              "farmers_future_delight:block/azalea/break2",
+                                              "farmers_future_delight:block/azalea/break3",
+                                              "farmers_future_delight:block/azalea/break4",
+                                              "farmers_future_delight:block/azalea/break5",
+                                              "farmers_future_delight:block/azalea/break6"
+                                          ],
+                               "subtitle":  "subtitles.block.generic.break"
+                           },
+    "block.azalea.step":  {
+                              "sounds":  [
+                                             "farmers_future_delight:block/azalea/step1",
+                                             "farmers_future_delight:block/azalea/step2",
+                                             "farmers_future_delight:block/azalea/step3",
+                                             "farmers_future_delight:block/azalea/step4",
+                                             "farmers_future_delight:block/azalea/step5",
+                                             "farmers_future_delight:block/azalea/step6"
+                                         ],
+                              "subtitle":  "subtitles.block.generic.footsteps"
+                          },
+    "block.azalea.place":  {
+                               "sounds":  [
+                                              "farmers_future_delight:block/azalea/break1",
+                                              "farmers_future_delight:block/azalea/break2",
+                                              "farmers_future_delight:block/azalea/break3",
+                                              "farmers_future_delight:block/azalea/break4",
+                                              "farmers_future_delight:block/azalea/break5",
+                                              "farmers_future_delight:block/azalea/break6"
+                                          ],
+                               "subtitle":  "subtitles.block.generic.place"
+                           },
+    "block.azalea.hit":  {
+                             "sounds":  [
+                                            "farmers_future_delight:block/azalea/step1",
+                                            "farmers_future_delight:block/azalea/step2",
+                                            "farmers_future_delight:block/azalea/step3",
+                                            "farmers_future_delight:block/azalea/step4",
+                                            "farmers_future_delight:block/azalea/step5",
+                                            "farmers_future_delight:block/azalea/step6"
+                                        ],
+                             "subtitle":  "subtitles.block.generic.hit"
+                         },
+    "block.azalea.fall":  {
+                              "sounds":  [
+                                             "farmers_future_delight:block/azalea/step1",
+                                             "farmers_future_delight:block/azalea/step2",
+                                             "farmers_future_delight:block/azalea/step3",
+                                             "farmers_future_delight:block/azalea/step4",
+                                             "farmers_future_delight:block/azalea/step5",
+                                             "farmers_future_delight:block/azalea/step6"
+                                         ],
+                              "subtitle":  "subtitles.block.generic.fall"
+                          },
+    "block.flowering_azalea.break":  {
+                                         "sounds":  [
+                                                        "farmers_future_delight:block/azalea/break1",
+                                                        "farmers_future_delight:block/azalea/break2",
+                                                        "farmers_future_delight:block/azalea/break3",
+                                                        "farmers_future_delight:block/azalea/break4",
+                                                        "farmers_future_delight:block/azalea/break5",
+                                                        "farmers_future_delight:block/azalea/break6"
+                                                    ],
+                                         "subtitle":  "subtitles.block.generic.break"
+                                     },
+    "block.flowering_azalea.step":  {
+                                        "sounds":  [
+                                                       "farmers_future_delight:block/azalea/step1",
+                                                       "farmers_future_delight:block/azalea/step2",
+                                                       "farmers_future_delight:block/azalea/step3",
+                                                       "farmers_future_delight:block/azalea/step4",
+                                                       "farmers_future_delight:block/azalea/step5",
+                                                       "farmers_future_delight:block/azalea/step6"
+                                                   ],
+                                        "subtitle":  "subtitles.block.generic.footsteps"
+                                    },
+    "block.flowering_azalea.place":  {
+                                         "sounds":  [
+                                                        "farmers_future_delight:block/azalea/break1",
+                                                        "farmers_future_delight:block/azalea/break2",
+                                                        "farmers_future_delight:block/azalea/break3",
+                                                        "farmers_future_delight:block/azalea/break4",
+                                                        "farmers_future_delight:block/azalea/break5",
+                                                        "farmers_future_delight:block/azalea/break6"
+                                                    ],
+                                         "subtitle":  "subtitles.block.generic.place"
+                                     },
+    "block.flowering_azalea.hit":  {
+                                       "sounds":  [
+                                                      "farmers_future_delight:block/azalea/step1",
+                                                      "farmers_future_delight:block/azalea/step2",
+                                                      "farmers_future_delight:block/azalea/step3",
+                                                      "farmers_future_delight:block/azalea/step4",
+                                                      "farmers_future_delight:block/azalea/step5",
+                                                      "farmers_future_delight:block/azalea/step6"
+                                                  ],
+                                       "subtitle":  "subtitles.block.generic.hit"
+                                   },
+    "block.flowering_azalea.fall":  {
+                                        "sounds":  [
+                                                       "farmers_future_delight:block/azalea/step1",
+                                                       "farmers_future_delight:block/azalea/step2",
+                                                       "farmers_future_delight:block/azalea/step3",
+                                                       "farmers_future_delight:block/azalea/step4",
+                                                       "farmers_future_delight:block/azalea/step5",
+                                                       "farmers_future_delight:block/azalea/step6"
+                                                   ],
+                                        "subtitle":  "subtitles.block.generic.fall"
+                                    },
+    "block.azalea_leaves.break":  {
+                                      "sounds":  [
+                                                     {
+                                                         "name":  "farmers_future_delight:block/azalea_leaves/break1",
+                                                         "volume":  0.85
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/azalea_leaves/break1",
+                                                         "pitch":  0.92,
+                                                         "volume":  0.85
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/azalea_leaves/break2",
+                                                         "volume":  0.85
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/azalea_leaves/break2",
+                                                         "pitch":  0.92,
+                                                         "volume":  0.85
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/azalea_leaves/break3",
+                                                         "volume":  0.85
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/azalea_leaves/break3",
+                                                         "pitch":  0.92,
+                                                         "volume":  0.85
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/azalea_leaves/break4",
+                                                         "volume":  0.85
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/azalea_leaves/break4",
+                                                         "pitch":  0.92,
+                                                         "volume":  0.85
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/azalea_leaves/break5",
+                                                         "volume":  0.85
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/azalea_leaves/break5",
+                                                         "pitch":  0.92,
+                                                         "volume":  0.85
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/azalea_leaves/break6",
+                                                         "volume":  0.85
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/azalea_leaves/break6",
+                                                         "pitch":  0.92,
+                                                         "volume":  0.85
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/azalea_leaves/break7",
+                                                         "volume":  0.85
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/azalea_leaves/break7",
+                                                         "pitch":  0.92,
+                                                         "volume":  0.85
+                                                     }
+                                                 ],
+                                      "subtitle":  "subtitles.block.generic.break"
+                                  },
+    "block.azalea_leaves.step":  {
+                                     "sounds":  [
+                                                    {
+                                                        "name":  "farmers_future_delight:block/azalea_leaves/step1",
+                                                        "volume":  0.85
+                                                    },
+                                                    {
+                                                        "name":  "farmers_future_delight:block/azalea_leaves/step2",
+                                                        "volume":  0.85
+                                                    },
+                                                    {
+                                                        "name":  "farmers_future_delight:block/azalea_leaves/step3",
+                                                        "volume":  0.85
+                                                    },
+                                                    {
+                                                        "name":  "farmers_future_delight:block/azalea_leaves/step4",
+                                                        "volume":  0.85
+                                                    },
+                                                    {
+                                                        "name":  "farmers_future_delight:block/azalea_leaves/step5",
+                                                        "volume":  0.85
+                                                    }
+                                                ],
+                                     "subtitle":  "subtitles.block.generic.footsteps"
+                                 },
+    "block.azalea_leaves.place":  {
+                                      "sounds":  [
+                                                     {
+                                                         "name":  "farmers_future_delight:block/azalea_leaves/break1",
+                                                         "volume":  0.85
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/azalea_leaves/break1",
+                                                         "pitch":  0.92,
+                                                         "volume":  0.85
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/azalea_leaves/break2",
+                                                         "volume":  0.85
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/azalea_leaves/break2",
+                                                         "pitch":  0.92,
+                                                         "volume":  0.85
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/azalea_leaves/break3",
+                                                         "volume":  0.85
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/azalea_leaves/break3",
+                                                         "pitch":  0.92,
+                                                         "volume":  0.85
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/azalea_leaves/break4",
+                                                         "volume":  0.85
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/azalea_leaves/break4",
+                                                         "pitch":  0.92,
+                                                         "volume":  0.85
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/azalea_leaves/break5",
+                                                         "volume":  0.85
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/azalea_leaves/break5",
+                                                         "pitch":  0.92,
+                                                         "volume":  0.85
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/azalea_leaves/break6",
+                                                         "volume":  0.85
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/azalea_leaves/break6",
+                                                         "pitch":  0.92,
+                                                         "volume":  0.85
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/azalea_leaves/break7",
+                                                         "volume":  0.85
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/azalea_leaves/break7",
+                                                         "pitch":  0.92,
+                                                         "volume":  0.85
+                                                     }
+                                                 ],
+                                      "subtitle":  "subtitles.block.generic.place"
+                                  },
+    "block.azalea_leaves.hit":  {
+                                    "sounds":  [
+                                                   {
+                                                       "name":  "farmers_future_delight:block/azalea_leaves/step1",
+                                                       "volume":  0.8
+                                                   },
+                                                   {
+                                                       "name":  "farmers_future_delight:block/azalea_leaves/step2",
+                                                       "volume":  0.8
+                                                   },
+                                                   {
+                                                       "name":  "farmers_future_delight:block/azalea_leaves/step3",
+                                                       "volume":  0.8
+                                                   },
+                                                   {
+                                                       "name":  "farmers_future_delight:block/azalea_leaves/step4",
+                                                       "volume":  0.8
+                                                   },
+                                                   {
+                                                       "name":  "farmers_future_delight:block/azalea_leaves/step5",
+                                                       "volume":  0.8
+                                                   }
+                                               ],
+                                    "subtitle":  "subtitles.block.generic.hit"
+                                },
+    "block.azalea_leaves.fall":  {
+                                     "sounds":  [
+                                                    "farmers_future_delight:block/azalea_leaves/step1",
+                                                    "farmers_future_delight:block/azalea_leaves/step2",
+                                                    "farmers_future_delight:block/azalea_leaves/step3",
+                                                    "farmers_future_delight:block/azalea_leaves/step4",
+                                                    "farmers_future_delight:block/azalea_leaves/step5"
+                                                ],
+                                     "subtitle":  "subtitles.block.generic.fall"
+                                 },
+    "block.moss.break":  {
+                             "sounds":  [
+                                            {
+                                                "name":  "farmers_future_delight:block/moss/break1",
+                                                "volume":  0.95
+                                            },
+                                            {
+                                                "name":  "farmers_future_delight:block/moss/break2",
+                                                "volume":  0.93
+                                            },
+                                            {
+                                                "name":  "farmers_future_delight:block/moss/break3",
+                                                "volume":  0.93
+                                            },
+                                            {
+                                                "name":  "farmers_future_delight:block/moss/break4",
+                                                "volume":  0.93
+                                            },
+                                            {
+                                                "name":  "farmers_future_delight:block/moss/break5",
+                                                "volume":  0.93
+                                            }
+                                        ],
+                             "subtitle":  "subtitles.block.generic.break"
+                         },
+    "block.moss.step":  {
+                            "sounds":  [
+                                           "farmers_future_delight:block/moss/step1",
+                                           "farmers_future_delight:block/moss/step2",
+                                           "farmers_future_delight:block/moss/step3",
+                                           "farmers_future_delight:block/moss/step4",
+                                           "farmers_future_delight:block/moss/step5",
+                                           "farmers_future_delight:block/moss/step6"
+                                       ],
+                            "subtitle":  "subtitles.block.generic.footsteps"
+                        },
+    "block.moss.place":  {
+                             "sounds":  [
+                                            {
+                                                "name":  "farmers_future_delight:block/moss/break1",
+                                                "volume":  0.93
+                                            },
+                                            {
+                                                "name":  "farmers_future_delight:block/moss/break2",
+                                                "volume":  0.93
+                                            },
+                                            {
+                                                "name":  "farmers_future_delight:block/moss/break3",
+                                                "volume":  0.93
+                                            },
+                                            {
+                                                "name":  "farmers_future_delight:block/moss/break4",
+                                                "volume":  0.93
+                                            },
+                                            {
+                                                "name":  "farmers_future_delight:block/moss/break5",
+                                                "volume":  0.93
+                                            }
+                                        ],
+                             "subtitle":  "subtitles.block.generic.place"
+                         },
+    "block.moss.hit":  {
+                           "sounds":  [
+                                          "farmers_future_delight:block/moss/step1",
+                                          "farmers_future_delight:block/moss/step2",
+                                          "farmers_future_delight:block/moss/step3",
+                                          "farmers_future_delight:block/moss/step4",
+                                          "farmers_future_delight:block/moss/step5",
+                                          "farmers_future_delight:block/moss/step6"
+                                      ],
+                           "subtitle":  "subtitles.block.generic.hit"
+                       },
+    "block.moss.fall":  {
+                            "sounds":  [
+                                           "farmers_future_delight:block/moss/step1",
+                                           "farmers_future_delight:block/moss/step2",
+                                           "farmers_future_delight:block/moss/step3",
+                                           "farmers_future_delight:block/moss/step4",
+                                           "farmers_future_delight:block/moss/step5",
+                                           "farmers_future_delight:block/moss/step6"
+                                       ],
+                            "subtitle":  "subtitles.block.generic.fall"
+                        },
+    "block.moss_carpet.break":  {
+                                    "sounds":  [
+                                                   {
+                                                       "name":  "farmers_future_delight:block/moss/break1",
+                                                       "pitch":  1.1,
+                                                       "volume":  0.9
+                                                   },
+                                                   {
+                                                       "name":  "farmers_future_delight:block/moss/break2",
+                                                       "pitch":  1.1,
+                                                       "volume":  0.9
+                                                   },
+                                                   {
+                                                       "name":  "farmers_future_delight:block/moss/break3",
+                                                       "pitch":  1.1,
+                                                       "volume":  0.9
+                                                   },
+                                                   {
+                                                       "name":  "farmers_future_delight:block/moss/break4",
+                                                       "pitch":  1.1,
+                                                       "volume":  0.9
+                                                   },
+                                                   {
+                                                       "name":  "farmers_future_delight:block/moss/break5",
+                                                       "pitch":  1.1,
+                                                       "volume":  0.9
+                                                   }
+                                               ],
+                                    "subtitle":  "subtitles.block.generic.break"
+                                },
+    "block.moss_carpet.step":  {
+                                   "sounds":  [
+                                                  {
+                                                      "name":  "farmers_future_delight:block/moss/step1",
+                                                      "pitch":  1.1,
+                                                      "volume":  0.9
+                                                  },
+                                                  {
+                                                      "name":  "farmers_future_delight:block/moss/step2",
+                                                      "pitch":  1.1,
+                                                      "volume":  0.9
+                                                  },
+                                                  {
+                                                      "name":  "farmers_future_delight:block/moss/step3",
+                                                      "pitch":  1.1,
+                                                      "volume":  0.9
+                                                  },
+                                                  {
+                                                      "name":  "farmers_future_delight:block/moss/step4",
+                                                      "pitch":  1.1,
+                                                      "volume":  0.9
+                                                  },
+                                                  {
+                                                      "name":  "farmers_future_delight:block/moss/step5",
+                                                      "pitch":  1.1,
+                                                      "volume":  0.9
+                                                  },
+                                                  {
+                                                      "name":  "farmers_future_delight:block/moss/step6",
+                                                      "pitch":  1.1,
+                                                      "volume":  0.9
+                                                  }
+                                              ],
+                                   "subtitle":  "subtitles.block.generic.footsteps"
+                               },
+    "block.moss_carpet.place":  {
+                                    "sounds":  [
+                                                   {
+                                                       "name":  "farmers_future_delight:block/moss/break1",
+                                                       "pitch":  1.1,
+                                                       "volume":  0.9
+                                                   },
+                                                   {
+                                                       "name":  "farmers_future_delight:block/moss/break2",
+                                                       "pitch":  1.1,
+                                                       "volume":  0.9
+                                                   },
+                                                   {
+                                                       "name":  "farmers_future_delight:block/moss/break3",
+                                                       "pitch":  1.1,
+                                                       "volume":  0.9
+                                                   },
+                                                   {
+                                                       "name":  "farmers_future_delight:block/moss/break4",
+                                                       "pitch":  1.1,
+                                                       "volume":  0.9
+                                                   },
+                                                   {
+                                                       "name":  "farmers_future_delight:block/moss/break5",
+                                                       "pitch":  1.1,
+                                                       "volume":  0.9
+                                                   }
+                                               ],
+                                    "subtitle":  "subtitles.block.generic.place"
+                                },
+    "block.moss_carpet.hit":  {
+                                  "sounds":  [
+                                                 {
+                                                     "name":  "farmers_future_delight:block/moss/step1",
+                                                     "pitch":  1.1,
+                                                     "volume":  0.9
+                                                 },
+                                                 {
+                                                     "name":  "farmers_future_delight:block/moss/step2",
+                                                     "pitch":  1.1,
+                                                     "volume":  0.9
+                                                 },
+                                                 {
+                                                     "name":  "farmers_future_delight:block/moss/step3",
+                                                     "pitch":  1.1,
+                                                     "volume":  0.9
+                                                 },
+                                                 {
+                                                     "name":  "farmers_future_delight:block/moss/step4",
+                                                     "pitch":  1.1,
+                                                     "volume":  0.9
+                                                 },
+                                                 {
+                                                     "name":  "farmers_future_delight:block/moss/step5",
+                                                     "pitch":  1.1,
+                                                     "volume":  0.9
+                                                 },
+                                                 {
+                                                     "name":  "farmers_future_delight:block/moss/step6",
+                                                     "pitch":  1.1,
+                                                     "volume":  0.9
+                                                 }
+                                             ],
+                                  "subtitle":  "subtitles.block.generic.hit"
+                              },
+    "block.moss_carpet.fall":  {
+                                   "sounds":  [
+                                                  {
+                                                      "name":  "farmers_future_delight:block/moss/step1",
+                                                      "pitch":  1.1,
+                                                      "volume":  0.9
+                                                  },
+                                                  {
+                                                      "name":  "farmers_future_delight:block/moss/step2",
+                                                      "pitch":  1.1,
+                                                      "volume":  0.9
+                                                  },
+                                                  {
+                                                      "name":  "farmers_future_delight:block/moss/step3",
+                                                      "pitch":  1.1,
+                                                      "volume":  0.9
+                                                  },
+                                                  {
+                                                      "name":  "farmers_future_delight:block/moss/step4",
+                                                      "pitch":  1.1,
+                                                      "volume":  0.9
+                                                  },
+                                                  {
+                                                      "name":  "farmers_future_delight:block/moss/step5",
+                                                      "pitch":  1.1,
+                                                      "volume":  0.9
+                                                  },
+                                                  {
+                                                      "name":  "farmers_future_delight:block/moss/step6",
+                                                      "pitch":  1.1,
+                                                      "volume":  0.9
+                                                  }
+                                              ],
+                                   "subtitle":  "subtitles.block.generic.fall"
+                               },
+    "block.big_dripleaf.break":  {
+                                     "sounds":  [
+                                                    "farmers_future_delight:block/big_dripleaf/break1",
+                                                    "farmers_future_delight:block/big_dripleaf/break2",
+                                                    "farmers_future_delight:block/big_dripleaf/break3",
+                                                    "farmers_future_delight:block/big_dripleaf/break4",
+                                                    "farmers_future_delight:block/big_dripleaf/break5",
+                                                    "farmers_future_delight:block/big_dripleaf/break6"
+                                                ],
+                                     "subtitle":  "subtitles.block.generic.break"
+                                 },
+    "block.big_dripleaf.step":  {
+                                    "sounds":  [
+                                                   "farmers_future_delight:block/big_dripleaf/step1",
+                                                   "farmers_future_delight:block/big_dripleaf/step2",
+                                                   "farmers_future_delight:block/big_dripleaf/step3",
+                                                   "farmers_future_delight:block/big_dripleaf/step4",
+                                                   "farmers_future_delight:block/big_dripleaf/step5",
+                                                   "farmers_future_delight:block/big_dripleaf/step6"
+                                               ],
+                                    "subtitle":  "subtitles.block.generic.footsteps"
+                                },
+    "block.big_dripleaf.place":  {
+                                     "sounds":  [
+                                                    "farmers_future_delight:block/big_dripleaf/break1",
+                                                    "farmers_future_delight:block/big_dripleaf/break2",
+                                                    "farmers_future_delight:block/big_dripleaf/break3",
+                                                    "farmers_future_delight:block/big_dripleaf/break4",
+                                                    "farmers_future_delight:block/big_dripleaf/break5",
+                                                    "farmers_future_delight:block/big_dripleaf/break6"
+                                                ],
+                                     "subtitle":  "subtitles.block.generic.place"
+                                 },
+    "block.big_dripleaf.hit":  {
+                                   "sounds":  [
+                                                  "farmers_future_delight:block/big_dripleaf/step1",
+                                                  "farmers_future_delight:block/big_dripleaf/step2",
+                                                  "farmers_future_delight:block/big_dripleaf/step3",
+                                                  "farmers_future_delight:block/big_dripleaf/step4",
+                                                  "farmers_future_delight:block/big_dripleaf/step5",
+                                                  "farmers_future_delight:block/big_dripleaf/step6"
+                                              ],
+                                   "subtitle":  "subtitles.block.generic.hit"
+                               },
+    "block.big_dripleaf.fall":  {
+                                    "sounds":  [
+                                                   "farmers_future_delight:block/big_dripleaf/step1",
+                                                   "farmers_future_delight:block/big_dripleaf/step2",
+                                                   "farmers_future_delight:block/big_dripleaf/step3",
+                                                   "farmers_future_delight:block/big_dripleaf/step4",
+                                                   "farmers_future_delight:block/big_dripleaf/step5",
+                                                   "farmers_future_delight:block/big_dripleaf/step6"
+                                               ],
+                                    "subtitle":  "subtitles.block.generic.fall"
+                                },
+    "block.small_dripleaf.break":  {
+                                       "sounds":  [
+                                                      {
+                                                          "name":  "farmers_future_delight:block/big_dripleaf/break1",
+                                                          "pitch":  1.2,
+                                                          "volume":  0.9
+                                                      },
+                                                      {
+                                                          "name":  "farmers_future_delight:block/big_dripleaf/break2",
+                                                          "pitch":  1.2,
+                                                          "volume":  0.9
+                                                      },
+                                                      {
+                                                          "name":  "farmers_future_delight:block/big_dripleaf/break3",
+                                                          "pitch":  1.2,
+                                                          "volume":  0.9
+                                                      },
+                                                      {
+                                                          "name":  "farmers_future_delight:block/big_dripleaf/break4",
+                                                          "pitch":  1.2,
+                                                          "volume":  0.9
+                                                      },
+                                                      {
+                                                          "name":  "farmers_future_delight:block/big_dripleaf/break5",
+                                                          "pitch":  1.2,
+                                                          "volume":  0.9
+                                                      },
+                                                      {
+                                                          "name":  "farmers_future_delight:block/big_dripleaf/break6",
+                                                          "pitch":  1.2,
+                                                          "volume":  0.9
+                                                      }
+                                                  ],
+                                       "subtitle":  "subtitles.block.generic.break"
+                                   },
+    "block.small_dripleaf.step":  {
+                                      "sounds":  [
+                                                     {
+                                                         "name":  "farmers_future_delight:block/big_dripleaf/step1",
+                                                         "pitch":  1.2,
+                                                         "volume":  0.9
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/big_dripleaf/step2",
+                                                         "pitch":  1.2,
+                                                         "volume":  0.9
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/big_dripleaf/step3",
+                                                         "pitch":  1.2,
+                                                         "volume":  0.9
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/big_dripleaf/step4",
+                                                         "pitch":  1.2,
+                                                         "volume":  0.9
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/big_dripleaf/step5",
+                                                         "pitch":  1.2,
+                                                         "volume":  0.9
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/big_dripleaf/step6",
+                                                         "pitch":  1.2,
+                                                         "volume":  0.9
+                                                     }
+                                                 ],
+                                      "subtitle":  "subtitles.block.generic.footsteps"
+                                  },
+    "block.small_dripleaf.place":  {
+                                       "sounds":  [
+                                                      {
+                                                          "name":  "farmers_future_delight:block/big_dripleaf/break1",
+                                                          "pitch":  1.2,
+                                                          "volume":  0.9
+                                                      },
+                                                      {
+                                                          "name":  "farmers_future_delight:block/big_dripleaf/break2",
+                                                          "pitch":  1.2,
+                                                          "volume":  0.9
+                                                      },
+                                                      {
+                                                          "name":  "farmers_future_delight:block/big_dripleaf/break3",
+                                                          "pitch":  1.2,
+                                                          "volume":  0.9
+                                                      },
+                                                      {
+                                                          "name":  "farmers_future_delight:block/big_dripleaf/break4",
+                                                          "pitch":  1.2,
+                                                          "volume":  0.9
+                                                      },
+                                                      {
+                                                          "name":  "farmers_future_delight:block/big_dripleaf/break5",
+                                                          "pitch":  1.2,
+                                                          "volume":  0.9
+                                                      },
+                                                      {
+                                                          "name":  "farmers_future_delight:block/big_dripleaf/break6",
+                                                          "pitch":  1.2,
+                                                          "volume":  0.9
+                                                      }
+                                                  ],
+                                       "subtitle":  "subtitles.block.generic.place"
+                                   },
+    "block.small_dripleaf.hit":  {
+                                     "sounds":  [
+                                                    {
+                                                        "name":  "farmers_future_delight:block/big_dripleaf/step1",
+                                                        "pitch":  1.2,
+                                                        "volume":  0.9
+                                                    },
+                                                    {
+                                                        "name":  "farmers_future_delight:block/big_dripleaf/step2",
+                                                        "pitch":  1.2,
+                                                        "volume":  0.9
+                                                    },
+                                                    {
+                                                        "name":  "farmers_future_delight:block/big_dripleaf/step3",
+                                                        "pitch":  1.2,
+                                                        "volume":  0.9
+                                                    },
+                                                    {
+                                                        "name":  "farmers_future_delight:block/big_dripleaf/step4",
+                                                        "pitch":  1.2,
+                                                        "volume":  0.9
+                                                    },
+                                                    {
+                                                        "name":  "farmers_future_delight:block/big_dripleaf/step5",
+                                                        "pitch":  1.2,
+                                                        "volume":  0.9
+                                                    },
+                                                    {
+                                                        "name":  "farmers_future_delight:block/big_dripleaf/step6",
+                                                        "pitch":  1.2,
+                                                        "volume":  0.9
+                                                    }
+                                                ],
+                                     "subtitle":  "subtitles.block.generic.hit"
+                                 },
+    "block.small_dripleaf.fall":  {
+                                      "sounds":  [
+                                                     {
+                                                         "name":  "farmers_future_delight:block/big_dripleaf/step1",
+                                                         "pitch":  1.2,
+                                                         "volume":  0.9
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/big_dripleaf/step2",
+                                                         "pitch":  1.2,
+                                                         "volume":  0.9
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/big_dripleaf/step3",
+                                                         "pitch":  1.2,
+                                                         "volume":  0.9
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/big_dripleaf/step4",
+                                                         "pitch":  1.2,
+                                                         "volume":  0.9
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/big_dripleaf/step5",
+                                                         "pitch":  1.2,
+                                                         "volume":  0.9
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/big_dripleaf/step6",
+                                                         "pitch":  1.2,
+                                                         "volume":  0.9
+                                                     }
+                                                 ],
+                                      "subtitle":  "subtitles.block.generic.fall"
+                                  },
+    "block.rooted_dirt.break":  {
+                                    "sounds":  [
+                                                   "farmers_future_delight:block/rooted_dirt/break1",
+                                                   "farmers_future_delight:block/rooted_dirt/break2",
+                                                   "farmers_future_delight:block/rooted_dirt/break3",
+                                                   "farmers_future_delight:block/rooted_dirt/break4"
+                                               ],
+                                    "subtitle":  "subtitles.block.generic.break"
+                                },
+    "block.rooted_dirt.step":  {
+                                   "sounds":  [
+                                                  "farmers_future_delight:block/rooted_dirt/step1",
+                                                  "farmers_future_delight:block/rooted_dirt/step2",
+                                                  "farmers_future_delight:block/rooted_dirt/step3",
+                                                  "farmers_future_delight:block/rooted_dirt/step4",
+                                                  "farmers_future_delight:block/rooted_dirt/step5",
+                                                  "farmers_future_delight:block/rooted_dirt/step6"
+                                              ],
+                                   "subtitle":  "subtitles.block.generic.footsteps"
+                               },
+    "block.rooted_dirt.place":  {
+                                    "sounds":  [
+                                                   "farmers_future_delight:block/rooted_dirt/break1",
+                                                   "farmers_future_delight:block/rooted_dirt/break2",
+                                                   "farmers_future_delight:block/rooted_dirt/break3",
+                                                   "farmers_future_delight:block/rooted_dirt/break4"
+                                               ],
+                                    "subtitle":  "subtitles.block.generic.place"
+                                },
+    "block.rooted_dirt.hit":  {
+                                  "sounds":  [
+                                                 {
+                                                     "name":  "farmers_future_delight:block/rooted_dirt/step1",
+                                                     "volume":  0.8
+                                                 },
+                                                 {
+                                                     "name":  "farmers_future_delight:block/rooted_dirt/step2",
+                                                     "volume":  0.8
+                                                 },
+                                                 {
+                                                     "name":  "farmers_future_delight:block/rooted_dirt/step3",
+                                                     "volume":  0.8
+                                                 },
+                                                 {
+                                                     "name":  "farmers_future_delight:block/rooted_dirt/step4",
+                                                     "volume":  0.8
+                                                 },
+                                                 {
+                                                     "name":  "farmers_future_delight:block/rooted_dirt/step5",
+                                                     "volume":  0.8
+                                                 },
+                                                 {
+                                                     "name":  "farmers_future_delight:block/rooted_dirt/step6",
+                                                     "volume":  0.8
+                                                 }
+                                             ],
+                                  "subtitle":  "subtitles.block.generic.hit"
+                              },
+    "block.rooted_dirt.fall":  {
+                                   "sounds":  [
+                                                  "farmers_future_delight:block/rooted_dirt/step1",
+                                                  "farmers_future_delight:block/rooted_dirt/step2",
+                                                  "farmers_future_delight:block/rooted_dirt/step3",
+                                                  "farmers_future_delight:block/rooted_dirt/step4",
+                                                  "farmers_future_delight:block/rooted_dirt/step5",
+                                                  "farmers_future_delight:block/rooted_dirt/step6"
+                                              ],
+                                   "subtitle":  "subtitles.block.generic.fall"
+                               },
+    "block.hanging_roots.break":  {
+                                      "sounds":  [
+                                                     "farmers_future_delight:block/hanging_roots/break1",
+                                                     "farmers_future_delight:block/hanging_roots/break2",
+                                                     "farmers_future_delight:block/hanging_roots/break3",
+                                                     "farmers_future_delight:block/hanging_roots/break4"
+                                                 ],
+                                      "subtitle":  "subtitles.block.generic.break"
+                                  },
+    "block.hanging_roots.step":  {
+                                     "sounds":  [
+                                                    "farmers_future_delight:block/hanging_roots/step1",
+                                                    "farmers_future_delight:block/hanging_roots/step2",
+                                                    "farmers_future_delight:block/hanging_roots/step3",
+                                                    "farmers_future_delight:block/hanging_roots/step4",
+                                                    "farmers_future_delight:block/hanging_roots/step5",
+                                                    "farmers_future_delight:block/hanging_roots/step6"
+                                                ],
+                                     "subtitle":  "subtitles.block.generic.footsteps"
+                                 },
+    "block.hanging_roots.place":  {
+                                      "sounds":  [
+                                                     "farmers_future_delight:block/hanging_roots/break1",
+                                                     "farmers_future_delight:block/hanging_roots/break2",
+                                                     "farmers_future_delight:block/hanging_roots/break3",
+                                                     "farmers_future_delight:block/hanging_roots/break4"
+                                                 ],
+                                      "subtitle":  "subtitles.block.generic.place"
+                                  },
+    "block.hanging_roots.hit":  {
+                                    "sounds":  [
+                                                   "farmers_future_delight:block/hanging_roots/step1",
+                                                   "farmers_future_delight:block/hanging_roots/step2",
+                                                   "farmers_future_delight:block/hanging_roots/step3",
+                                                   "farmers_future_delight:block/hanging_roots/step4",
+                                                   "farmers_future_delight:block/hanging_roots/step5",
+                                                   "farmers_future_delight:block/hanging_roots/step6"
+                                               ],
+                                    "subtitle":  "subtitles.block.generic.hit"
+                                },
+    "block.hanging_roots.fall":  {
+                                     "sounds":  [
+                                                    "farmers_future_delight:block/hanging_roots/step1",
+                                                    "farmers_future_delight:block/hanging_roots/step2",
+                                                    "farmers_future_delight:block/hanging_roots/step3",
+                                                    "farmers_future_delight:block/hanging_roots/step4",
+                                                    "farmers_future_delight:block/hanging_roots/step5",
+                                                    "farmers_future_delight:block/hanging_roots/step6"
+                                                ],
+                                     "subtitle":  "subtitles.block.generic.fall"
+                                 },
+    "block.spore_blossom.break":  {
+                                      "sounds":  [
+                                                     "farmers_future_delight:block/spore_blossom/break1",
+                                                     "farmers_future_delight:block/spore_blossom/break2",
+                                                     "farmers_future_delight:block/spore_blossom/break3",
+                                                     "farmers_future_delight:block/spore_blossom/break4",
+                                                     "farmers_future_delight:block/spore_blossom/break5"
+                                                 ],
+                                      "subtitle":  "subtitles.block.generic.break"
+                                  },
+    "block.spore_blossom.step":  {
+                                     "sounds":  [
+                                                    "farmers_future_delight:block/spore_blossom/step1",
+                                                    "farmers_future_delight:block/spore_blossom/step2",
+                                                    "farmers_future_delight:block/spore_blossom/step3",
+                                                    "farmers_future_delight:block/spore_blossom/step4",
+                                                    "farmers_future_delight:block/spore_blossom/step5",
+                                                    "farmers_future_delight:block/spore_blossom/step6"
+                                                ],
+                                     "subtitle":  "subtitles.block.generic.footsteps"
+                                 },
+    "block.spore_blossom.place":  {
+                                      "sounds":  [
+                                                     "farmers_future_delight:block/spore_blossom/break1",
+                                                     "farmers_future_delight:block/spore_blossom/break2",
+                                                     "farmers_future_delight:block/spore_blossom/break3",
+                                                     "farmers_future_delight:block/spore_blossom/break4",
+                                                     "farmers_future_delight:block/spore_blossom/break5"
+                                                 ],
+                                      "subtitle":  "subtitles.block.generic.place"
+                                  },
+    "block.spore_blossom.hit":  {
+                                    "sounds":  [
+                                                   "farmers_future_delight:block/spore_blossom/step1",
+                                                   "farmers_future_delight:block/spore_blossom/step2",
+                                                   "farmers_future_delight:block/spore_blossom/step3",
+                                                   "farmers_future_delight:block/spore_blossom/step4",
+                                                   "farmers_future_delight:block/spore_blossom/step5",
+                                                   "farmers_future_delight:block/spore_blossom/step6"
+                                               ],
+                                    "subtitle":  "subtitles.block.generic.hit"
+                                },
+    "block.spore_blossom.fall":  {
+                                     "sounds":  [
+                                                    "farmers_future_delight:block/spore_blossom/step1",
+                                                    "farmers_future_delight:block/spore_blossom/step2",
+                                                    "farmers_future_delight:block/spore_blossom/step3",
+                                                    "farmers_future_delight:block/spore_blossom/step4",
+                                                    "farmers_future_delight:block/spore_blossom/step5",
+                                                    "farmers_future_delight:block/spore_blossom/step6"
+                                                ],
+                                     "subtitle":  "subtitles.block.generic.fall"
+                                 },
+    "block.nylium.break":  {
+                               "sounds":  [
+                                              {
+                                                  "name":  "farmers_future_delight:block/nylium/break1",
+                                                  "volume":  0.85
+                                              },
+                                              {
+                                                  "name":  "farmers_future_delight:block/nylium/break2",
+                                                  "volume":  0.85
+                                              },
+                                              {
+                                                  "name":  "farmers_future_delight:block/nylium/break3",
+                                                  "volume":  0.85
+                                              },
+                                              {
+                                                  "name":  "farmers_future_delight:block/nylium/break4",
+                                                  "volume":  0.85
+                                              },
+                                              {
+                                                  "name":  "farmers_future_delight:block/nylium/break5",
+                                                  "volume":  0.85
+                                              },
+                                              {
+                                                  "name":  "farmers_future_delight:block/nylium/break6",
+                                                  "volume":  0.85
+                                              }
+                                          ],
+                               "subtitle":  "subtitles.block.generic.break"
+                           },
+    "block.nylium.step":  {
+                              "sounds":  [
+                                             "farmers_future_delight:block/nylium/step1",
+                                             "farmers_future_delight:block/nylium/step2",
+                                             "farmers_future_delight:block/nylium/step3",
+                                             "farmers_future_delight:block/nylium/step4",
+                                             "farmers_future_delight:block/nylium/step5",
+                                             "farmers_future_delight:block/nylium/step6"
+                                         ],
+                              "subtitle":  "subtitles.block.generic.footsteps"
+                          },
+    "block.nylium.place":  {
+                               "sounds":  [
+                                              {
+                                                  "name":  "farmers_future_delight:block/nylium/break1",
+                                                  "volume":  0.85
+                                              },
+                                              {
+                                                  "name":  "farmers_future_delight:block/nylium/break2",
+                                                  "volume":  0.85
+                                              },
+                                              {
+                                                  "name":  "farmers_future_delight:block/nylium/break3",
+                                                  "volume":  0.85
+                                              },
+                                              {
+                                                  "name":  "farmers_future_delight:block/nylium/break4",
+                                                  "volume":  0.85
+                                              },
+                                              {
+                                                  "name":  "farmers_future_delight:block/nylium/break5",
+                                                  "volume":  0.85
+                                              },
+                                              {
+                                                  "name":  "farmers_future_delight:block/nylium/break6",
+                                                  "volume":  0.85
+                                              }
+                                          ],
+                               "subtitle":  "subtitles.block.generic.place"
+                           },
+    "block.nylium.hit":  {
+                             "sounds":  [
+                                            "farmers_future_delight:block/nylium/step1",
+                                            "farmers_future_delight:block/nylium/step2",
+                                            "farmers_future_delight:block/nylium/step3",
+                                            "farmers_future_delight:block/nylium/step4",
+                                            "farmers_future_delight:block/nylium/step5",
+                                            "farmers_future_delight:block/nylium/step6"
+                                        ],
+                             "subtitle":  "subtitles.block.generic.hit"
+                         },
+    "block.nylium.fall":  {
+                              "sounds":  [
+                                             "farmers_future_delight:block/nylium/step1",
+                                             "farmers_future_delight:block/nylium/step2",
+                                             "farmers_future_delight:block/nylium/step3",
+                                             "farmers_future_delight:block/nylium/step4",
+                                             "farmers_future_delight:block/nylium/step5",
+                                             "farmers_future_delight:block/nylium/step6"
+                                         ],
+                              "subtitle":  "subtitles.block.generic.fall"
+                          },
+    "block.fungus.break":  {
+                               "sounds":  [
+                                              "farmers_future_delight:block/fungus/break1",
+                                              "farmers_future_delight:block/fungus/break2",
+                                              "farmers_future_delight:block/fungus/break3",
+                                              "farmers_future_delight:block/fungus/break4",
+                                              "farmers_future_delight:block/fungus/break5",
+                                              "farmers_future_delight:block/fungus/break6"
+                                          ],
+                               "subtitle":  "subtitles.block.generic.break"
+                           },
+    "block.fungus.step":  {
+                              "sounds":  [
+                                             {
+                                                 "name":  "farmers_future_delight:item/plant/netherwart1",
+                                                 "pitch":  0.9,
+                                                 "volume":  0.9
+                                             },
+                                             {
+                                                 "name":  "farmers_future_delight:item/plant/netherwart1",
+                                                 "pitch":  1.12,
+                                                 "volume":  0.9
+                                             },
+                                             {
+                                                 "name":  "farmers_future_delight:item/plant/netherwart2",
+                                                 "pitch":  0.9,
+                                                 "volume":  0.9
+                                             },
+                                             {
+                                                 "name":  "farmers_future_delight:item/plant/netherwart2",
+                                                 "pitch":  1.12,
+                                                 "volume":  0.9
+                                             },
+                                             {
+                                                 "name":  "farmers_future_delight:item/plant/netherwart3",
+                                                 "pitch":  0.9,
+                                                 "volume":  0.9
+                                             },
+                                             {
+                                                 "name":  "farmers_future_delight:item/plant/netherwart3",
+                                                 "pitch":  1.12,
+                                                 "volume":  0.9
+                                             },
+                                             {
+                                                 "name":  "farmers_future_delight:item/plant/netherwart4",
+                                                 "pitch":  0.9,
+                                                 "volume":  0.9
+                                             },
+                                             {
+                                                 "name":  "farmers_future_delight:item/plant/netherwart4",
+                                                 "pitch":  1.12,
+                                                 "volume":  0.9
+                                             },
+                                             {
+                                                 "name":  "farmers_future_delight:item/plant/netherwart5",
+                                                 "pitch":  0.9,
+                                                 "volume":  0.9
+                                             },
+                                             {
+                                                 "name":  "farmers_future_delight:item/plant/netherwart5",
+                                                 "pitch":  1.12,
+                                                 "volume":  0.9
+                                             },
+                                             {
+                                                 "name":  "farmers_future_delight:item/plant/netherwart6",
+                                                 "pitch":  0.9,
+                                                 "volume":  0.9
+                                             },
+                                             {
+                                                 "name":  "farmers_future_delight:item/plant/netherwart6",
+                                                 "pitch":  1.12,
+                                                 "volume":  0.9
+                                             }
+                                         ],
+                              "subtitle":  "subtitles.block.generic.footsteps"
+                          },
+    "block.fungus.place":  {
+                               "sounds":  [
+                                              "farmers_future_delight:block/fungus/break1",
+                                              "farmers_future_delight:block/fungus/break2",
+                                              "farmers_future_delight:block/fungus/break3",
+                                              "farmers_future_delight:block/fungus/break4",
+                                              "farmers_future_delight:block/fungus/break5",
+                                              "farmers_future_delight:block/fungus/break6"
+                                          ],
+                               "subtitle":  "subtitles.block.generic.place"
+                           },
+    "block.fungus.hit":  {
+                             "sounds":  [
+
+                                        ],
+                             "subtitle":  "subtitles.block.generic.hit"
+                         },
+    "block.fungus.fall":  {
+                              "sounds":  [
+
+                                         ]
+                          },
+    "block.roots.break":  {
+                              "sounds":  [
+                                             "farmers_future_delight:block/roots/break1",
+                                             "farmers_future_delight:block/roots/break2",
+                                             "farmers_future_delight:block/roots/break3",
+                                             "farmers_future_delight:block/roots/break4",
+                                             "farmers_future_delight:block/roots/break5",
+                                             "farmers_future_delight:block/roots/break6"
+                                         ],
+                              "subtitle":  "subtitles.block.generic.break"
+                          },
+    "block.roots.step":  {
+                             "sounds":  [
+                                            "farmers_future_delight:block/roots/step1",
+                                            "farmers_future_delight:block/roots/step2",
+                                            "farmers_future_delight:block/roots/step3",
+                                            "farmers_future_delight:block/roots/step4",
+                                            "farmers_future_delight:block/roots/step5"
+                                        ],
+                             "subtitle":  "subtitles.block.generic.footsteps"
+                         },
+    "block.roots.place":  {
+                              "sounds":  [
+                                             "farmers_future_delight:block/roots/break1",
+                                             "farmers_future_delight:block/roots/break2",
+                                             "farmers_future_delight:block/roots/break3",
+                                             "farmers_future_delight:block/roots/break4",
+                                             "farmers_future_delight:block/roots/break5",
+                                             "farmers_future_delight:block/roots/break6"
+                                         ],
+                              "subtitle":  "subtitles.block.generic.place"
+                          },
+    "block.roots.hit":  {
+                            "sounds":  [
+                                           "farmers_future_delight:block/roots/step1",
+                                           "farmers_future_delight:block/roots/step2",
+                                           "farmers_future_delight:block/roots/step3",
+                                           "farmers_future_delight:block/roots/step4",
+                                           "farmers_future_delight:block/roots/step5"
+                                       ],
+                            "subtitle":  "subtitles.block.generic.hit"
+                        },
+    "block.roots.fall":  {
+                             "sounds":  [
+                                            "farmers_future_delight:block/roots/step1",
+                                            "farmers_future_delight:block/roots/step2",
+                                            "farmers_future_delight:block/roots/step3",
+                                            "farmers_future_delight:block/roots/step4",
+                                            "farmers_future_delight:block/roots/step5"
+                                        ],
+                             "subtitle":  "subtitles.block.generic.fall"
+                         },
+    "block.nether_sprouts.break":  {
+                                       "sounds":  [
+                                                      {
+                                                          "name":  "farmers_future_delight:block/nether_sprouts/break1",
+                                                          "volume":  0.7
+                                                      },
+                                                      {
+                                                          "name":  "farmers_future_delight:block/nether_sprouts/break2",
+                                                          "volume":  0.7
+                                                      },
+                                                      {
+                                                          "name":  "farmers_future_delight:block/nether_sprouts/break3",
+                                                          "volume":  0.7
+                                                      },
+                                                      {
+                                                          "name":  "farmers_future_delight:block/nether_sprouts/break4",
+                                                          "volume":  0.7
+                                                      }
+                                                  ],
+                                       "subtitle":  "subtitles.block.generic.break"
+                                   },
+    "block.nether_sprouts.step":  {
+                                      "sounds":  [
+                                                     {
+                                                         "name":  "farmers_future_delight:block/nether_sprouts/step1",
+                                                         "volume":  0.5
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/nether_sprouts/step2",
+                                                         "volume":  0.5
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/nether_sprouts/step3",
+                                                         "volume":  0.5
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/nether_sprouts/step4",
+                                                         "volume":  0.5
+                                                     },
+                                                     {
+                                                         "name":  "farmers_future_delight:block/nether_sprouts/step5",
+                                                         "volume":  0.5
+                                                     }
+                                                 ],
+                                      "subtitle":  "subtitles.block.generic.footsteps"
+                                  },
+    "block.nether_sprouts.place":  {
+                                       "sounds":  [
+                                                      {
+                                                          "name":  "farmers_future_delight:block/nether_sprouts/break1",
+                                                          "volume":  0.7
+                                                      },
+                                                      {
+                                                          "name":  "farmers_future_delight:block/nether_sprouts/break2",
+                                                          "volume":  0.7
+                                                      },
+                                                      {
+                                                          "name":  "farmers_future_delight:block/nether_sprouts/break3",
+                                                          "volume":  0.7
+                                                      },
+                                                      {
+                                                          "name":  "farmers_future_delight:block/nether_sprouts/break4",
+                                                          "volume":  0.7
+                                                      }
+                                                  ],
+                                       "subtitle":  "subtitles.block.generic.place"
+                                   },
+    "block.nether_sprouts.hit":  {
+                                     "sounds":  [
+                                                    "farmers_future_delight:block/nether_sprouts/step1",
+                                                    "farmers_future_delight:block/nether_sprouts/step2",
+                                                    "farmers_future_delight:block/nether_sprouts/step3",
+                                                    "farmers_future_delight:block/nether_sprouts/step4",
+                                                    "farmers_future_delight:block/nether_sprouts/step5"
+                                                ],
+                                     "subtitle":  "subtitles.block.generic.hit"
+                                 },
+    "block.nether_sprouts.fall":  {
+                                      "sounds":  [
+                                                     "farmers_future_delight:block/nether_sprouts/step1",
+                                                     "farmers_future_delight:block/nether_sprouts/step2",
+                                                     "farmers_future_delight:block/nether_sprouts/step3",
+                                                     "farmers_future_delight:block/nether_sprouts/step4",
+                                                     "farmers_future_delight:block/nether_sprouts/step5"
+                                                 ],
+                                      "subtitle":  "subtitles.block.generic.fall"
+                                  },
+    "block.weeping_vines.break":  {
+                                      "sounds":  [
+                                                     "farmers_future_delight:block/roots/break1",
+                                                     "farmers_future_delight:block/roots/break2",
+                                                     "farmers_future_delight:block/roots/break3",
+                                                     "farmers_future_delight:block/roots/break4",
+                                                     "farmers_future_delight:block/roots/break5",
+                                                     "farmers_future_delight:block/roots/break6"
+                                                 ],
+                                      "subtitle":  "subtitles.block.generic.break"
+                                  },
+    "block.weeping_vines.step":  {
+                                     "sounds":  [
+                                                    "farmers_future_delight:block/roots/step1",
+                                                    "farmers_future_delight:block/roots/step2",
+                                                    "farmers_future_delight:block/roots/step3",
+                                                    "farmers_future_delight:block/roots/step4",
+                                                    "farmers_future_delight:block/roots/step5"
+                                                ],
+                                     "subtitle":  "subtitles.block.generic.footsteps"
+                                 },
+    "block.weeping_vines.place":  {
+                                      "sounds":  [
+                                                     "farmers_future_delight:block/roots/break1",
+                                                     "farmers_future_delight:block/roots/break2",
+                                                     "farmers_future_delight:block/roots/break3",
+                                                     "farmers_future_delight:block/roots/break4",
+                                                     "farmers_future_delight:block/roots/break5",
+                                                     "farmers_future_delight:block/roots/break6"
+                                                 ],
+                                      "subtitle":  "subtitles.block.generic.place"
+                                  },
+    "block.weeping_vines.hit":  {
+                                    "sounds":  [
+                                                   "farmers_future_delight:block/roots/break1",
+                                                   "farmers_future_delight:block/roots/break2",
+                                                   "farmers_future_delight:block/roots/break3",
+                                                   "farmers_future_delight:block/roots/break4",
+                                                   "farmers_future_delight:block/roots/break5",
+                                                   "farmers_future_delight:block/roots/break6"
+                                               ],
+                                    "subtitle":  "subtitles.block.generic.hit"
+                                },
+    "block.weeping_vines.fall":  {
+                                     "sounds":  [
+                                                    "farmers_future_delight:block/roots/break1",
+                                                    "farmers_future_delight:block/roots/break2",
+                                                    "farmers_future_delight:block/roots/break3",
+                                                    "farmers_future_delight:block/roots/break4",
+                                                    "farmers_future_delight:block/roots/break5",
+                                                    "farmers_future_delight:block/roots/break6"
+                                                ],
+                                     "subtitle":  "subtitles.block.generic.fall"
+                                 },
+    "block.stem.break":  {
+                             "sounds":  [
+                                            "farmers_future_delight:block/stem/break1",
+                                            "farmers_future_delight:block/stem/break2",
+                                            "farmers_future_delight:block/stem/break3",
+                                            "farmers_future_delight:block/stem/break4",
+                                            "farmers_future_delight:block/stem/break5",
+                                            "farmers_future_delight:block/stem/break6"
+                                        ],
+                             "subtitle":  "subtitles.block.generic.break"
+                         },
+    "block.stem.step":  {
+                            "sounds":  [
+                                           "farmers_future_delight:block/stem/step1",
+                                           "farmers_future_delight:block/stem/step2",
+                                           "farmers_future_delight:block/stem/step3",
+                                           "farmers_future_delight:block/stem/step4",
+                                           "farmers_future_delight:block/stem/step5",
+                                           "farmers_future_delight:block/stem/step6"
+                                       ],
+                            "subtitle":  "subtitles.block.generic.footsteps"
+                        },
+    "block.stem.place":  {
+                             "sounds":  [
+                                            {
+                                                "name":  "farmers_future_delight:block/stem/break1",
+                                                "pitch":  1.1,
+                                                "volume":  0.8
+                                            },
+                                            {
+                                                "name":  "farmers_future_delight:block/stem/break2",
+                                                "pitch":  1.1,
+                                                "volume":  0.8
+                                            },
+                                            {
+                                                "name":  "farmers_future_delight:block/stem/break3",
+                                                "pitch":  1.1,
+                                                "volume":  0.8
+                                            },
+                                            {
+                                                "name":  "farmers_future_delight:block/stem/break4",
+                                                "pitch":  1.1,
+                                                "volume":  0.8
+                                            },
+                                            {
+                                                "name":  "farmers_future_delight:block/stem/break5",
+                                                "pitch":  1.1,
+                                                "volume":  0.8
+                                            },
+                                            {
+                                                "name":  "farmers_future_delight:block/stem/break6",
+                                                "pitch":  1.1,
+                                                "volume":  0.8
+                                            }
+                                        ],
+                             "subtitle":  "subtitles.block.generic.place"
+                         },
+    "block.stem.hit":  {
+                           "sounds":  [
+                                          {
+                                              "name":  "farmers_future_delight:block/stem/step1",
+                                              "volume":  0.8
+                                          },
+                                          {
+                                              "name":  "farmers_future_delight:block/stem/step2",
+                                              "volume":  0.8
+                                          },
+                                          {
+                                              "name":  "farmers_future_delight:block/stem/step3",
+                                              "volume":  0.8
+                                          },
+                                          {
+                                              "name":  "farmers_future_delight:block/stem/step4",
+                                              "volume":  0.8
+                                          },
+                                          {
+                                              "name":  "farmers_future_delight:block/stem/step5",
+                                              "volume":  0.8
+                                          },
+                                          {
+                                              "name":  "farmers_future_delight:block/stem/step6",
+                                              "volume":  0.8
+                                          }
+                                      ],
+                           "subtitle":  "subtitles.block.generic.hit"
+                       },
+    "block.stem.fall":  {
+                            "sounds":  [
+                                           "farmers_future_delight:block/stem/step1",
+                                           "farmers_future_delight:block/stem/step2",
+                                           "farmers_future_delight:block/stem/step3",
+                                           "farmers_future_delight:block/stem/step4",
+                                           "farmers_future_delight:block/stem/step5",
+                                           "farmers_future_delight:block/stem/step6"
+                                       ],
+                            "subtitle":  "subtitles.block.generic.fall"
+                        },
+    "block.wart_block.break":  {
+                                   "sounds":  [
+                                                  {
+                                                      "name":  "farmers_future_delight:block/netherwart/break1",
+                                                      "volume":  0.8
+                                                  },
+                                                  {
+                                                      "name":  "farmers_future_delight:block/netherwart/break2",
+                                                      "volume":  0.8
+                                                  },
+                                                  {
+                                                      "name":  "farmers_future_delight:block/netherwart/break3",
+                                                      "volume":  0.8
+                                                  },
+                                                  {
+                                                      "name":  "farmers_future_delight:block/netherwart/break4",
+                                                      "volume":  0.8
+                                                  },
+                                                  {
+                                                      "name":  "farmers_future_delight:block/netherwart/break5",
+                                                      "volume":  0.8
+                                                  },
+                                                  {
+                                                      "name":  "farmers_future_delight:block/netherwart/break6",
+                                                      "volume":  0.8
+                                                  }
+                                              ],
+                                   "subtitle":  "subtitles.block.generic.break"
+                               },
+    "block.wart_block.step":  {
+                                  "sounds":  [
+                                                 "farmers_future_delight:block/netherwart/step1",
+                                                 "farmers_future_delight:block/netherwart/step2",
+                                                 "farmers_future_delight:block/netherwart/step3",
+                                                 "farmers_future_delight:block/netherwart/step4",
+                                                 "farmers_future_delight:block/netherwart/step5"
+                                             ],
+                                  "subtitle":  "subtitles.block.generic.footsteps"
+                              },
+    "block.wart_block.place":  {
+                                   "sounds":  [
+                                                  {
+                                                      "name":  "farmers_future_delight:block/netherwart/break1",
+                                                      "volume":  0.8
+                                                  },
+                                                  {
+                                                      "name":  "farmers_future_delight:block/netherwart/break2",
+                                                      "volume":  0.8
+                                                  },
+                                                  {
+                                                      "name":  "farmers_future_delight:block/netherwart/break3",
+                                                      "volume":  0.8
+                                                  },
+                                                  {
+                                                      "name":  "farmers_future_delight:block/netherwart/break4",
+                                                      "volume":  0.8
+                                                  },
+                                                  {
+                                                      "name":  "farmers_future_delight:block/netherwart/break5",
+                                                      "volume":  0.8
+                                                  },
+                                                  {
+                                                      "name":  "farmers_future_delight:block/netherwart/break6",
+                                                      "volume":  0.8
+                                                  }
+                                              ],
+                                   "subtitle":  "subtitles.block.generic.place"
+                               },
+    "block.wart_block.hit":  {
+                                 "sounds":  [
+                                                {
+                                                    "name":  "farmers_future_delight:block/netherwart/step1",
+                                                    "volume":  0.7
+                                                },
+                                                {
+                                                    "name":  "farmers_future_delight:block/netherwart/step2",
+                                                    "volume":  0.7
+                                                },
+                                                {
+                                                    "name":  "farmers_future_delight:block/netherwart/step3",
+                                                    "volume":  0.7
+                                                },
+                                                {
+                                                    "name":  "farmers_future_delight:block/netherwart/step4",
+                                                    "volume":  0.7
+                                                },
+                                                {
+                                                    "name":  "farmers_future_delight:block/netherwart/step5",
+                                                    "volume":  0.7
+                                                }
+                                            ],
+                                 "subtitle":  "subtitles.block.generic.hit"
+                             },
+    "block.wart_block.fall":  {
+                                  "sounds":  [
+                                                 "farmers_future_delight:block/netherwart/step1",
+                                                 "farmers_future_delight:block/netherwart/step2",
+                                                 "farmers_future_delight:block/netherwart/step3",
+                                                 "farmers_future_delight:block/netherwart/step4",
+                                                 "farmers_future_delight:block/netherwart/step5"
+                                             ],
+                                  "subtitle":  "subtitles.block.generic.fall"
+                              },
+    "block.shroomlight.break":  {
+                                    "sounds":  [
+                                                   "farmers_future_delight:block/shroomlight/break1",
+                                                   "farmers_future_delight:block/shroomlight/break2",
+                                                   "farmers_future_delight:block/shroomlight/break3",
+                                                   "farmers_future_delight:block/shroomlight/break4",
+                                                   "farmers_future_delight:block/shroomlight/break5"
+                                               ],
+                                    "subtitle":  "subtitles.block.generic.break"
+                                },
+    "block.shroomlight.step":  {
+                                   "sounds":  [
+                                                  "farmers_future_delight:block/shroomlight/step1",
+                                                  "farmers_future_delight:block/shroomlight/step2",
+                                                  "farmers_future_delight:block/shroomlight/step3",
+                                                  "farmers_future_delight:block/shroomlight/step4",
+                                                  "farmers_future_delight:block/shroomlight/step5",
+                                                  "farmers_future_delight:block/shroomlight/step6"
+                                              ],
+                                   "subtitle":  "subtitles.block.generic.footsteps"
+                               },
+    "block.shroomlight.place":  {
+                                    "sounds":  [
+                                                   "farmers_future_delight:block/shroomlight/break1",
+                                                   "farmers_future_delight:block/shroomlight/break2",
+                                                   "farmers_future_delight:block/shroomlight/break3",
+                                                   "farmers_future_delight:block/shroomlight/break4",
+                                                   "farmers_future_delight:block/shroomlight/break5"
+                                               ],
+                                    "subtitle":  "subtitles.block.generic.place"
+                                },
+    "block.shroomlight.hit":  {
+                                  "sounds":  [
+                                                 "farmers_future_delight:block/shroomlight/step1",
+                                                 "farmers_future_delight:block/shroomlight/step2",
+                                                 "farmers_future_delight:block/shroomlight/step3",
+                                                 "farmers_future_delight:block/shroomlight/step4",
+                                                 "farmers_future_delight:block/shroomlight/step5",
+                                                 "farmers_future_delight:block/shroomlight/step6"
+                                             ],
+                                  "subtitle":  "subtitles.block.generic.hit"
+                              },
+    "block.shroomlight.fall":  {
+                                   "sounds":  [
+                                                  "farmers_future_delight:block/shroomlight/step1",
+                                                  "farmers_future_delight:block/shroomlight/step2",
+                                                  "farmers_future_delight:block/shroomlight/step3",
+                                                  "farmers_future_delight:block/shroomlight/step4",
+                                                  "farmers_future_delight:block/shroomlight/step5",
+                                                  "farmers_future_delight:block/shroomlight/step6"
+                                              ],
+                                   "subtitle":  "subtitles.block.generic.fall"
+                               },
+    "block.nether_wood.break":  {
+                                    "sounds":  [
+                                                   "farmers_future_delight:block/nether_wood/break1",
+                                                   "farmers_future_delight:block/nether_wood/break2",
+                                                   "farmers_future_delight:block/nether_wood/break3",
+                                                   "farmers_future_delight:block/nether_wood/break4"
+                                               ],
+                                    "subtitle":  "subtitles.block.generic.break"
+                                },
+    "block.nether_wood.step":  {
+                                   "sounds":  [
+                                                  "farmers_future_delight:block/nether_wood/step1",
+                                                  "farmers_future_delight:block/nether_wood/step2",
+                                                  "farmers_future_delight:block/nether_wood/step3",
+                                                  "farmers_future_delight:block/nether_wood/step4",
+                                                  "farmers_future_delight:block/nether_wood/step5"
+                                              ],
+                                   "subtitle":  "subtitles.block.generic.footsteps"
+                               },
+    "block.nether_wood.place":  {
+                                    "sounds":  [
+                                                   "farmers_future_delight:block/nether_wood/break1",
+                                                   "farmers_future_delight:block/nether_wood/break2",
+                                                   "farmers_future_delight:block/nether_wood/break3",
+                                                   "farmers_future_delight:block/nether_wood/break4"
+                                               ],
+                                    "subtitle":  "subtitles.block.generic.place"
+                                },
+    "block.nether_wood.hit":  {
+                                  "sounds":  [
+                                                 "farmers_future_delight:block/nether_wood/step1",
+                                                 "farmers_future_delight:block/nether_wood/step2",
+                                                 "farmers_future_delight:block/nether_wood/step3",
+                                                 "farmers_future_delight:block/nether_wood/step4",
+                                                 "farmers_future_delight:block/nether_wood/step5"
+                                             ],
+                                  "subtitle":  "subtitles.block.generic.hit"
+                              },
+    "block.nether_wood.fall":  {
+                                   "sounds":  [
+                                                  "farmers_future_delight:block/nether_wood/step1",
+                                                  "farmers_future_delight:block/nether_wood/step2",
+                                                  "farmers_future_delight:block/nether_wood/step3",
+                                                  "farmers_future_delight:block/nether_wood/step4",
+                                                  "farmers_future_delight:block/nether_wood/step5"
+                                              ],
+                                   "subtitle":  "subtitles.block.generic.fall"
+                               },
+    "block.nether_wood_button.click_off":  {
+                                               "sounds":  [
+                                                              {
+                                                                  "name":  "farmers_future_delight:block/nether_wood_button/nether_wood_button",
+                                                                  "pitch":  0.5,
+                                                                  "volume":  0.3
+                                                              }
+                                                          ],
+                                               "subtitle":  "subtitles.block.button.click"
+                                           },
+    "block.nether_wood_button.click_on":  {
+                                              "sounds":  [
+                                                             {
+                                                                 "name":  "farmers_future_delight:block/nether_wood_button/nether_wood_button",
+                                                                 "pitch":  0.6,
+                                                                 "volume":  0.3
+                                                             }
+                                                         ],
+                                              "subtitle":  "subtitles.block.button.click"
+                                          },
+    "block.nether_wood_door.close":  {
+                                         "sounds":  [
+                                                        "farmers_future_delight:block/nether_wood_door/toggle1",
+                                                        "farmers_future_delight:block/nether_wood_door/toggle2",
+                                                        "farmers_future_delight:block/nether_wood_door/toggle3",
+                                                        "farmers_future_delight:block/nether_wood_door/toggle4"
+                                                    ],
+                                         "subtitle":  "subtitles.block.door.toggle"
+                                     },
+    "block.nether_wood_door.open":  {
+                                        "sounds":  [
+                                                       "farmers_future_delight:block/nether_wood_door/toggle1",
+                                                       "farmers_future_delight:block/nether_wood_door/toggle2",
+                                                       "farmers_future_delight:block/nether_wood_door/toggle3",
+                                                       "farmers_future_delight:block/nether_wood_door/toggle4"
+                                                   ],
+                                        "subtitle":  "subtitles.block.door.toggle"
+                                    },
+    "block.nether_wood_fence_gate.close":  {
+                                               "sounds":  [
+                                                              "farmers_future_delight:block/nether_wood_fence/toggle1",
+                                                              "farmers_future_delight:block/nether_wood_fence/toggle2",
+                                                              "farmers_future_delight:block/nether_wood_fence/toggle3",
+                                                              "farmers_future_delight:block/nether_wood_fence/toggle4"
+                                                          ],
+                                               "subtitle":  "subtitles.block.fence_gate.toggle"
+                                           },
+    "block.nether_wood_fence_gate.open":  {
+                                              "sounds":  [
+                                                             "farmers_future_delight:block/nether_wood_fence/toggle1",
+                                                             "farmers_future_delight:block/nether_wood_fence/toggle2",
+                                                             "farmers_future_delight:block/nether_wood_fence/toggle3",
+                                                             "farmers_future_delight:block/nether_wood_fence/toggle4"
+                                                         ],
+                                              "subtitle":  "subtitles.block.fence_gate.toggle"
+                                          },
+    "block.nether_wood_pressure_plate.click_off":  {
+                                                       "sounds":  [
+                                                                      {
+                                                                          "name":  "farmers_future_delight:random/click",
+                                                                          "pitch":  0.7,
+                                                                          "volume":  0.3
+                                                                      }
+                                                                  ],
+                                                       "subtitle":  "subtitles.block.pressure_plate.click"
+                                                   },
+    "block.nether_wood_pressure_plate.click_on":  {
+                                                      "sounds":  [
+                                                                     {
+                                                                         "name":  "farmers_future_delight:random/click",
+                                                                         "pitch":  0.8,
+                                                                         "volume":  0.3
+                                                                     }
+                                                                 ],
+                                                      "subtitle":  "subtitles.block.pressure_plate.click"
+                                                  },
+    "block.nether_wood_trapdoor.close":  {
+                                             "sounds":  [
+                                                            "farmers_future_delight:block/nether_wood_trapdoor/toggle1",
+                                                            "farmers_future_delight:block/nether_wood_trapdoor/toggle2",
+                                                            "farmers_future_delight:block/nether_wood_trapdoor/toggle3",
+                                                            "farmers_future_delight:block/nether_wood_trapdoor/toggle4"
+                                                        ],
+                                             "subtitle":  "subtitles.block.trapdoor.close"
+                                         },
+    "block.nether_wood_trapdoor.open":  {
+                                            "sounds":  [
+                                                           "farmers_future_delight:block/nether_wood_trapdoor/toggle1",
+                                                           "farmers_future_delight:block/nether_wood_trapdoor/toggle2",
+                                                           "farmers_future_delight:block/nether_wood_trapdoor/toggle3",
+                                                           "farmers_future_delight:block/nether_wood_trapdoor/toggle4"
+                                                       ],
+                                            "subtitle":  "subtitles.block.trapdoor.open"
+                                        },
+    "block.coral_block.break":  {
+                                    "sounds":  [
+                                                   "farmers_future_delight:dig/coral1",
+                                                   "farmers_future_delight:dig/coral2",
+                                                   "farmers_future_delight:dig/coral3",
+                                                   "farmers_future_delight:dig/coral4"
+                                               ],
+                                    "subtitle":  "subtitles.block.generic.break"
+                                },
+    "block.coral_block.step":  {
+                                   "sounds":  [
+                                                  "farmers_future_delight:step/coral1",
+                                                  "farmers_future_delight:step/coral2",
+                                                  "farmers_future_delight:step/coral3",
+                                                  "farmers_future_delight:step/coral4",
+                                                  "farmers_future_delight:step/coral5",
+                                                  "farmers_future_delight:step/coral6"
+                                              ],
+                                   "subtitle":  "subtitles.block.generic.footsteps"
+                               },
+    "block.coral_block.place":  {
+                                    "sounds":  [
+                                                   "farmers_future_delight:dig/coral1",
+                                                   "farmers_future_delight:dig/coral2",
+                                                   "farmers_future_delight:dig/coral3",
+                                                   "farmers_future_delight:dig/coral4"
+                                               ],
+                                    "subtitle":  "subtitles.block.generic.place"
+                                },
+    "block.coral_block.hit":  {
+                                  "sounds":  [
+                                                 "farmers_future_delight:step/coral1",
+                                                 "farmers_future_delight:step/coral2",
+                                                 "farmers_future_delight:step/coral3",
+                                                 "farmers_future_delight:step/coral4",
+                                                 "farmers_future_delight:step/coral5",
+                                                 "farmers_future_delight:step/coral6"
+                                             ],
+                                  "subtitle":  "subtitles.block.generic.hit"
+                              },
+    "block.coral_block.fall":  {
+                                   "sounds":  [
+                                                  "farmers_future_delight:step/coral1",
+                                                  "farmers_future_delight:step/coral2",
+                                                  "farmers_future_delight:step/coral3",
+                                                  "farmers_future_delight:step/coral4",
+                                                  "farmers_future_delight:step/coral5",
+                                                  "farmers_future_delight:step/coral6"
+                                              ],
+                                   "subtitle":  "subtitles.block.generic.fall"
+                               },
+    "block.beehive.drip":  {
+                               "sounds":  [
+                                              {
+                                                  "name":  "farmers_future_delight:block/beehive/drip1",
+                                                  "pitch":  0.7,
+                                                  "volume":  0.3,
+                                                  "attenuation_distance":  8
+                                              },
+                                              {
+                                                  "name":  "farmers_future_delight:block/beehive/drip1",
+                                                  "pitch":  0.9,
+                                                  "volume":  0.3,
+                                                  "attenuation_distance":  8
+                                              },
+                                              {
+                                                  "name":  "farmers_future_delight:block/beehive/drip2",
+                                                  "pitch":  0.7,
+                                                  "volume":  0.3,
+                                                  "attenuation_distance":  8
+                                              },
+                                              {
+                                                  "name":  "farmers_future_delight:block/beehive/drip2",
+                                                  "pitch":  0.9,
+                                                  "volume":  0.3,
+                                                  "attenuation_distance":  8
+                                              },
+                                              {
+                                                  "name":  "farmers_future_delight:block/beehive/drip3",
+                                                  "pitch":  0.7,
+                                                  "volume":  0.3,
+                                                  "attenuation_distance":  8
+                                              },
+                                              {
+                                                  "name":  "farmers_future_delight:block/beehive/drip3",
+                                                  "pitch":  0.9,
+                                                  "volume":  0.3,
+                                                  "attenuation_distance":  8
+                                              },
+                                              {
+                                                  "name":  "farmers_future_delight:block/beehive/drip4",
+                                                  "pitch":  0.7,
+                                                  "volume":  0.3,
+                                                  "attenuation_distance":  8
+                                              },
+                                              {
+                                                  "name":  "farmers_future_delight:block/beehive/drip4",
+                                                  "pitch":  0.9,
+                                                  "volume":  0.3,
+                                                  "attenuation_distance":  8
+                                              },
+                                              {
+                                                  "name":  "farmers_future_delight:block/beehive/drip5",
+                                                  "pitch":  0.7,
+                                                  "volume":  0.3,
+                                                  "attenuation_distance":  8
+                                              },
+                                              {
+                                                  "name":  "farmers_future_delight:block/beehive/drip5",
+                                                  "pitch":  0.9,
+                                                  "volume":  0.3,
+                                                  "attenuation_distance":  8
+                                              },
+                                              {
+                                                  "name":  "farmers_future_delight:block/beehive/drip6",
+                                                  "pitch":  0.7,
+                                                  "volume":  0.3,
+                                                  "attenuation_distance":  8
+                                              },
+                                              {
+                                                  "name":  "farmers_future_delight:block/beehive/drip6",
+                                                  "pitch":  0.9,
+                                                  "volume":  0.3,
+                                                  "attenuation_distance":  8
+                                              }
+                                          ],
+                               "subtitle":  "subtitles.block.beehive.drip"
+                           },
+    "item.honey_bottle.drink":  {
+                                    "sounds":  [
+                                                   "farmers_future_delight:item/bottle/drink_honey1",
+                                                   "farmers_future_delight:item/bottle/drink_honey2",
+                                                   {
+                                                       "name":  "farmers_future_delight:item/bottle/drink_honey3",
+                                                       "volume":  0.35
+                                                   },
+                                                   {
+                                                       "name":  "farmers_future_delight:item/bottle/drink_honey3",
+                                                       "volume":  0.75
+                                                   }
+                                               ],
+                                    "subtitle":  "subtitles.item.honey_bottle.drink"
+                                },
+    "ambient.crimson_forest.additions":  {
+                                             "sounds":  [
+                                                            {
+                                                                "name":  "farmers_future_delight:ambient/nether/crimson_forest/addition1",
+                                                                "volume":  0.4,
+                                                                "weight":  3
+                                                            },
+                                                            {
+                                                                "name":  "farmers_future_delight:ambient/nether/crimson_forest/addition2",
+                                                                "volume":  0.5,
+                                                                "weight":  3
+                                                            },
+                                                            {
+                                                                "name":  "farmers_future_delight:ambient/nether/crimson_forest/addition3",
+                                                                "volume":  0.32,
+                                                                "weight":  3
+                                                            },
+                                                            {
+                                                                "name":  "farmers_future_delight:ambient/nether/crimson_forest/particles1",
+                                                                "volume":  0.4,
+                                                                "weight":  35
+                                                            },
+                                                            {
+                                                                "name":  "farmers_future_delight:ambient/nether/crimson_forest/particles2",
+                                                                "volume":  0.4,
+                                                                "weight":  35
+                                                            },
+                                                            {
+                                                                "name":  "farmers_future_delight:ambient/nether/crimson_forest/particles3",
+                                                                "volume":  0.4,
+                                                                "weight":  35
+                                                            },
+                                                            {
+                                                                "name":  "farmers_future_delight:ambient/nether/crimson_forest/shine1",
+                                                                "pitch":  0.5,
+                                                                "volume":  0.1,
+                                                                "weight":  6
+                                                            },
+                                                            {
+                                                                "name":  "farmers_future_delight:ambient/nether/crimson_forest/shine2",
+                                                                "pitch":  0.5,
+                                                                "volume":  0.1,
+                                                                "weight":  6
+                                                            },
+                                                            {
+                                                                "name":  "farmers_future_delight:ambient/nether/crimson_forest/shine3",
+                                                                "pitch":  0.5,
+                                                                "volume":  0.1,
+                                                                "weight":  6
+                                                            },
+                                                            {
+                                                                "name":  "farmers_future_delight:ambient/nether/crimson_forest/shroom1",
+                                                                "volume":  0.25,
+                                                                "weight":  2
+                                                            },
+                                                            {
+                                                                "name":  "farmers_future_delight:ambient/nether/crimson_forest/shroom2",
+                                                                "volume":  0.25,
+                                                                "weight":  2
+                                                            },
+                                                            {
+                                                                "name":  "farmers_future_delight:ambient/nether/crimson_forest/shroom3",
+                                                                "volume":  0.25,
+                                                                "weight":  2
+                                                            },
+                                                            {
+                                                                "name":  "farmers_future_delight:ambient/nether/crimson_forest/twang1",
+                                                                "volume":  0.25,
+                                                                "weight":  2
+                                                            },
+                                                            {
+                                                                "name":  "farmers_future_delight:ambient/nether/crimson_forest/voom1",
+                                                                "volume":  0.7,
+                                                                "weight":  4
+                                                            },
+                                                            {
+                                                                "name":  "farmers_future_delight:ambient/nether/crimson_forest/voom1",
+                                                                "pitch":  0.8,
+                                                                "volume":  0.7,
+                                                                "weight":  4
+                                                            },
+                                                            {
+                                                                "name":  "farmers_future_delight:ambient/nether/crimson_forest/voom2",
+                                                                "volume":  0.7,
+                                                                "weight":  4
+                                                            },
+                                                            {
+                                                                "name":  "farmers_future_delight:ambient/nether/crimson_forest/voom2",
+                                                                "pitch":  0.8,
+                                                                "volume":  0.7,
+                                                                "weight":  4
+                                                            }
+                                                        ]
+                                         },
+    "ambient.crimson_forest.loop":  {
+                                        "sounds":  [
+                                                       {
+                                                           "name":  "farmers_future_delight:ambient/nether/crimson_forest/ambience",
+                                                           "stream":  true,
+                                                           "volume":  0.74
+                                                       }
+                                                   ]
+                                    },
+    "ambient.crimson_forest.mood":  {
+                                        "sounds":  [
+                                                       "farmers_future_delight:ambient/nether/crimson_forest/mood1",
+                                                       "farmers_future_delight:ambient/nether/crimson_forest/mood2",
+                                                       "farmers_future_delight:ambient/nether/crimson_forest/mood3",
+                                                       "farmers_future_delight:ambient/nether/crimson_forest/mood4"
+                                                   ]
+                                    },
+    "ambient.warped_forest.additions":  {
+                                            "sounds":  [
+                                                           {
+                                                               "name":  "farmers_future_delight:ambient/nether/crimson_forest/addition1",
+                                                               "volume":  0.3
+                                                           },
+                                                           {
+                                                               "name":  "farmers_future_delight:ambient/nether/crimson_forest/particles1",
+                                                               "pitch":  0.8,
+                                                               "volume":  0.4,
+                                                               "weight":  40
+                                                           },
+                                                           {
+                                                               "name":  "farmers_future_delight:ambient/nether/crimson_forest/particles2",
+                                                               "pitch":  0.8,
+                                                               "volume":  0.3,
+                                                               "weight":  40
+                                                           },
+                                                           {
+                                                               "name":  "farmers_future_delight:ambient/nether/crimson_forest/particles3",
+                                                               "pitch":  0.8,
+                                                               "volume":  0.3,
+                                                               "weight":  40
+                                                           },
+                                                           {
+                                                               "name":  "farmers_future_delight:ambient/nether/warped_forest/addition1",
+                                                               "pitch":  0.8,
+                                                               "volume":  0.06,
+                                                               "weight":  3
+                                                           },
+                                                           {
+                                                               "name":  "farmers_future_delight:ambient/nether/warped_forest/addition2",
+                                                               "pitch":  0.7,
+                                                               "volume":  0.06,
+                                                               "weight":  3
+                                                           },
+                                                           {
+                                                               "name":  "farmers_future_delight:ambient/nether/warped_forest/addition3",
+                                                               "pitch":  0.1,
+                                                               "volume":  0.06,
+                                                               "weight":  3
+                                                           },
+                                                           {
+                                                               "name":  "farmers_future_delight:ambient/nether/warped_forest/addition4",
+                                                               "volume":  0.07,
+                                                               "weight":  3
+                                                           },
+                                                           {
+                                                               "name":  "farmers_future_delight:ambient/nether/warped_forest/addition5",
+                                                               "volume":  0.07,
+                                                               "weight":  3
+                                                           },
+                                                           {
+                                                               "name":  "farmers_future_delight:ambient/nether/warped_forest/addition6",
+                                                               "volume":  0.15
+                                                           },
+                                                           {
+                                                               "name":  "farmers_future_delight:ambient/nether/warped_forest/enish1",
+                                                               "pitch":  0.2,
+                                                               "volume":  0.1,
+                                                               "weight":  10
+                                                           },
+                                                           {
+                                                               "name":  "farmers_future_delight:ambient/nether/warped_forest/enish2",
+                                                               "pitch":  0.2,
+                                                               "volume":  0.1,
+                                                               "weight":  6
+                                                           },
+                                                           {
+                                                               "name":  "farmers_future_delight:ambient/nether/warped_forest/enish3",
+                                                               "pitch":  0.2,
+                                                               "volume":  0.07,
+                                                               "weight":  6
+                                                           },
+                                                           {
+                                                               "name":  "farmers_future_delight:ambient/nether/warped_forest/help1",
+                                                               "volume":  0.2
+                                                           },
+                                                           {
+                                                               "name":  "farmers_future_delight:ambient/nether/warped_forest/help2",
+                                                               "volume":  0.2
+                                                           },
+                                                           {
+                                                               "name":  "farmers_future_delight:ambient/nether/warped_forest/here1",
+                                                               "volume":  0.1,
+                                                               "weight":  2
+                                                           },
+                                                           {
+                                                               "name":  "farmers_future_delight:ambient/nether/warped_forest/here1",
+                                                               "pitch":  0.7,
+                                                               "volume":  0.1,
+                                                               "weight":  2
+                                                           },
+                                                           {
+                                                               "name":  "farmers_future_delight:ambient/nether/warped_forest/here2",
+                                                               "volume":  0.2,
+                                                               "weight":  3
+                                                           },
+                                                           {
+                                                               "name":  "farmers_future_delight:ambient/nether/warped_forest/here2",
+                                                               "pitch":  0.7,
+                                                               "volume":  0.2,
+                                                               "weight":  3
+                                                           },
+                                                           {
+                                                               "name":  "farmers_future_delight:ambient/nether/warped_forest/here3",
+                                                               "volume":  0.2,
+                                                               "weight":  3
+                                                           }
+                                                       ]
+                                        },
+    "ambient.warped_forest.loop":  {
+                                       "sounds":  [
+                                                      {
+                                                          "name":  "farmers_future_delight:ambient/nether/warped_forest/ambience",
+                                                          "stream":  true,
+                                                          "volume":  0.71
+                                                      }
+                                                  ]
+                                   },
+    "ambient.warped_forest.mood":  {
+                                       "sounds":  [
+                                                      "farmers_future_delight:ambient/nether/warped_forest/creak1",
+                                                      "farmers_future_delight:ambient/nether/warped_forest/creak2",
+                                                      "farmers_future_delight:ambient/nether/warped_forest/creak3",
+                                                      "farmers_future_delight:ambient/nether/warped_forest/creak4",
+                                                      "farmers_future_delight:ambient/nether/warped_forest/creak5",
+                                                      "farmers_future_delight:ambient/nether/warped_forest/mood1",
+                                                      "farmers_future_delight:ambient/nether/warped_forest/mood2",
+                                                      "farmers_future_delight:ambient/nether/warped_forest/mood3",
+                                                      "farmers_future_delight:ambient/nether/warped_forest/mood4",
+                                                      "farmers_future_delight:ambient/nether/warped_forest/mood5",
+                                                      "farmers_future_delight:ambient/nether/warped_forest/mood6",
+                                                      "farmers_future_delight:ambient/nether/warped_forest/mood7"
+                                                  ]
+                                   },
+    "item.axe.strip":  {
+                           "sounds":  [
+                                          {
+                                              "name":  "farmers_future_delight:item/axe/strip1",
+                                              "volume":  0.9
+                                          },
+                                          {
+                                              "name":  "farmers_future_delight:item/axe/strip1",
+                                              "pitch":  0.85,
+                                              "volume":  0.9
+                                          },
+                                          {
+                                              "name":  "farmers_future_delight:item/axe/strip2",
+                                              "volume":  0.9
+                                          },
+                                          {
+                                              "name":  "farmers_future_delight:item/axe/strip2",
+                                              "pitch":  0.85,
+                                              "volume":  0.9
+                                          },
+                                          {
+                                              "name":  "farmers_future_delight:item/axe/strip3",
+                                              "volume":  0.9
+                                          },
+                                          {
+                                              "name":  "farmers_future_delight:item/axe/strip3",
+                                              "pitch":  0.85,
+                                              "volume":  0.9
+                                          },
+                                          {
+                                              "name":  "farmers_future_delight:item/axe/strip4",
+                                              "volume":  0.9
+                                          },
+                                          {
+                                              "name":  "farmers_future_delight:item/axe/strip4",
+                                              "pitch":  0.85,
+                                              "volume":  0.9
+                                          }
+                                      ],
+                           "subtitle":  "subtitles.item.axe.strip"
+                       }
+}

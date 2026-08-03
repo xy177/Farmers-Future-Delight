@@ -1,0 +1,6 @@
+{
+  "parent": "block/fence_post",
+  "textures": {
+    "texture": "farmers_future_delight:block/warped_planks"
+  }
+}

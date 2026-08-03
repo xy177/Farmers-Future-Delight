@@ -1,0 +1,16 @@
+[
+{
+  "modid": "farmers_future_delight",
+  "name": "Farmer's Future Delight",
+  "description": "Legacy backports of high-version Minecraft ingredients for Farmer's Delight addons.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["xy177"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

@@ -1,0 +1,6 @@
+{
+  "parent": "farmers_future_delight:block/template_seagrass",
+  "textures": {
+    "texture": "farmers_future_delight:block/tall_seagrass_top"
+  }
+}

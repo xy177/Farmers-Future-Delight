@@ -1,0 +1,6 @@
+{
+  "parent": "block/carpet",
+  "textures": {
+    "wool": "farmers_future_delight:block/moss_block"
+  }
+}

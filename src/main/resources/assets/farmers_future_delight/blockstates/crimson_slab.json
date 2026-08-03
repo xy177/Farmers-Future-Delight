@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "half=bottom,variant=default": {
+      "model": "farmers_future_delight:crimson_slab"
+    },
+    "half=top,variant=default": {
+      "model": "farmers_future_delight:crimson_slab_top"
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "parent": "block/block",
+  "ambientocclusion": true,
+  "textures": {
+    "bottom": "farmers_future_delight:block/bee_nest_bottom",
+    "top": "farmers_future_delight:block/bee_nest_top",
+    "front": "farmers_future_delight:block/bee_nest_front",
+    "side": "farmers_future_delight:block/bee_nest_side",
+    "particle": "farmers_future_delight:block/bee_nest_side"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "down": {
+          "texture": "#bottom",
+          "cullface": "down"
+        },
+        "up": {
+          "texture": "#top",
+          "cullface": "up"
+        },
+        "north": {
+          "texture": "#front",
+          "cullface": "north"
+        },
+        "south": {
+          "texture": "#side",
+          "cullface": "south"
+        },
+        "west": {
+          "texture": "#side",
+          "cullface": "west"
+        },
+        "east": {
+          "texture": "#side",
+          "cullface": "east"
+        }
+      }
+    }
+  ]
+}

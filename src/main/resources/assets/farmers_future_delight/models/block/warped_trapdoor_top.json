@@ -1,0 +1,6 @@
+{
+  "parent": "block/trapdoor_top",
+  "textures": {
+    "texture": "farmers_future_delight:block/warped_trapdoor"
+  }
+}

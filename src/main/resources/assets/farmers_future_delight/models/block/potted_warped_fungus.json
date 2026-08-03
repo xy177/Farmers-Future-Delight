@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/flower_pot_cross",
+  "textures": {
+    "plant": "farmers_future_delight:block/warped_fungus"
+  }
+}

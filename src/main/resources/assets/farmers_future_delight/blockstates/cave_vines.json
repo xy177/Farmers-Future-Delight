@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "berries=false": { "model": "farmers_future_delight:cave_vines" },
+    "berries=true": { "model": "farmers_future_delight:cave_vines_lit" }
+  }
+}

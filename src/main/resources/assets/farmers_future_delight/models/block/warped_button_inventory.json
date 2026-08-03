@@ -1,0 +1,6 @@
+{
+  "parent": "block/button_inventory",
+  "textures": {
+    "texture": "farmers_future_delight:block/warped_planks"
+  }
+}

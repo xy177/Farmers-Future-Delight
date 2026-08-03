@@ -1,0 +1,6 @@
+{
+  "parent": "block/trapdoor_open",
+  "textures": {
+    "texture": "farmers_future_delight:block/crimson_trapdoor"
+  }
+}

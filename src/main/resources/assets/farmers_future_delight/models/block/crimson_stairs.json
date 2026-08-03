@@ -1,0 +1,8 @@
+{
+  "parent": "block/stairs",
+  "textures": {
+    "bottom": "farmers_future_delight:block/crimson_planks",
+    "top": "farmers_future_delight:block/crimson_planks",
+    "side": "farmers_future_delight:block/crimson_planks"
+  }
+}

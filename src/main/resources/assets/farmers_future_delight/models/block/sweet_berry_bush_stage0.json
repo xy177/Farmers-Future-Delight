@@ -1,0 +1,4 @@
+{
+  "parent": "block/cross",
+  "textures": { "cross": "farmers_future_delight:block/sweet_berry_bush_stage0" }
+}

@@ -1,0 +1,6 @@
+{
+    "variants": {
+        "powered=false": { "model": "farmers_future_delight:warped_pressure_plate_up" },
+        "powered=true": { "model": "farmers_future_delight:warped_pressure_plate_down" }
+    }
+}

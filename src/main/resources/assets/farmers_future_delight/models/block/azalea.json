@@ -1,0 +1,7 @@
+{
+  "parent": "farmers_future_delight:block/template_azalea",
+  "textures": {
+    "side": "farmers_future_delight:block/azalea_side",
+    "top": "farmers_future_delight:block/azalea_top"
+  }
+}

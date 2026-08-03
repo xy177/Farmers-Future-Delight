@@ -1,0 +1,94 @@
+{
+  "variants": {
+    "facing=north,honey_level=0": {
+      "model": "farmers_future_delight:beehive_empty"
+    },
+    "facing=north,honey_level=1": {
+      "model": "farmers_future_delight:beehive_empty"
+    },
+    "facing=north,honey_level=2": {
+      "model": "farmers_future_delight:beehive_empty"
+    },
+    "facing=north,honey_level=3": {
+      "model": "farmers_future_delight:beehive_empty"
+    },
+    "facing=north,honey_level=4": {
+      "model": "farmers_future_delight:beehive_empty"
+    },
+    "facing=north,honey_level=5": {
+      "model": "farmers_future_delight:beehive_honey"
+    },
+    "facing=east,honey_level=0": {
+      "model": "farmers_future_delight:beehive_empty",
+      "y": 90
+    },
+    "facing=east,honey_level=1": {
+      "model": "farmers_future_delight:beehive_empty",
+      "y": 90
+    },
+    "facing=east,honey_level=2": {
+      "model": "farmers_future_delight:beehive_empty",
+      "y": 90
+    },
+    "facing=east,honey_level=3": {
+      "model": "farmers_future_delight:beehive_empty",
+      "y": 90
+    },
+    "facing=east,honey_level=4": {
+      "model": "farmers_future_delight:beehive_empty",
+      "y": 90
+    },
+    "facing=east,honey_level=5": {
+      "model": "farmers_future_delight:beehive_honey",
+      "y": 90
+    },
+    "facing=south,honey_level=0": {
+      "model": "farmers_future_delight:beehive_empty",
+      "y": 180
+    },
+    "facing=south,honey_level=1": {
+      "model": "farmers_future_delight:beehive_empty",
+      "y": 180
+    },
+    "facing=south,honey_level=2": {
+      "model": "farmers_future_delight:beehive_empty",
+      "y": 180
+    },
+    "facing=south,honey_level=3": {
+      "model": "farmers_future_delight:beehive_empty",
+      "y": 180
+    },
+    "facing=south,honey_level=4": {
+      "model": "farmers_future_delight:beehive_empty",
+      "y": 180
+    },
+    "facing=south,honey_level=5": {
+      "model": "farmers_future_delight:beehive_honey",
+      "y": 180
+    },
+    "facing=west,honey_level=0": {
+      "model": "farmers_future_delight:beehive_empty",
+      "y": 270
+    },
+    "facing=west,honey_level=1": {
+      "model": "farmers_future_delight:beehive_empty",
+      "y": 270
+    },
+    "facing=west,honey_level=2": {
+      "model": "farmers_future_delight:beehive_empty",
+      "y": 270
+    },
+    "facing=west,honey_level=3": {
+      "model": "farmers_future_delight:beehive_empty",
+      "y": 270
+    },
+    "facing=west,honey_level=4": {
+      "model": "farmers_future_delight:beehive_empty",
+      "y": 270
+    },
+    "facing=west,honey_level=5": {
+      "model": "farmers_future_delight:beehive_honey",
+      "y": 270
+    }
+  }
+}

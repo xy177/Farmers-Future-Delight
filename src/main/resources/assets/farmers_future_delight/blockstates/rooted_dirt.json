@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "normal": [
+      { "model": "farmers_future_delight:rooted_dirt" },
+      { "model": "farmers_future_delight:rooted_dirt", "y": 90 },
+      { "model": "farmers_future_delight:rooted_dirt", "y": 180 },
+      { "model": "farmers_future_delight:rooted_dirt", "y": 270 }
+    ]
+  }
+}

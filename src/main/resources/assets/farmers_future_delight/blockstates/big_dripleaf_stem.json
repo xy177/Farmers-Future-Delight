@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "farmers_future_delight:big_dripleaf_stem"
+    },
+    "facing=east": {
+      "model": "farmers_future_delight:big_dripleaf_stem",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "farmers_future_delight:big_dripleaf_stem",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "farmers_future_delight:big_dripleaf_stem",
+      "y": 270
+    }
+  }
+}

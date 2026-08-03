@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "pickles=1,waterlogged=false": [{"model":"farmers_future_delight:dead_sea_pickle"},{"model":"farmers_future_delight:dead_sea_pickle","y":90},{"model":"farmers_future_delight:dead_sea_pickle","y":180},{"model":"farmers_future_delight:dead_sea_pickle","y":270}],
+    "pickles=1,waterlogged=true": [{"model":"farmers_future_delight:sea_pickle"},{"model":"farmers_future_delight:sea_pickle","y":90},{"model":"farmers_future_delight:sea_pickle","y":180},{"model":"farmers_future_delight:sea_pickle","y":270}],
+    "pickles=2,waterlogged=false": [{"model":"farmers_future_delight:two_dead_sea_pickles"},{"model":"farmers_future_delight:two_dead_sea_pickles","y":90},{"model":"farmers_future_delight:two_dead_sea_pickles","y":180},{"model":"farmers_future_delight:two_dead_sea_pickles","y":270}],
+    "pickles=2,waterlogged=true": [{"model":"farmers_future_delight:two_sea_pickles"},{"model":"farmers_future_delight:two_sea_pickles","y":90},{"model":"farmers_future_delight:two_sea_pickles","y":180},{"model":"farmers_future_delight:two_sea_pickles","y":270}],
+    "pickles=3,waterlogged=false": [{"model":"farmers_future_delight:three_dead_sea_pickles"},{"model":"farmers_future_delight:three_dead_sea_pickles","y":90},{"model":"farmers_future_delight:three_dead_sea_pickles","y":180},{"model":"farmers_future_delight:three_dead_sea_pickles","y":270}],
+    "pickles=3,waterlogged=true": [{"model":"farmers_future_delight:three_sea_pickles"},{"model":"farmers_future_delight:three_sea_pickles","y":90},{"model":"farmers_future_delight:three_sea_pickles","y":180},{"model":"farmers_future_delight:three_sea_pickles","y":270}],
+    "pickles=4,waterlogged=false": [{"model":"farmers_future_delight:four_dead_sea_pickles"},{"model":"farmers_future_delight:four_dead_sea_pickles","y":90},{"model":"farmers_future_delight:four_dead_sea_pickles","y":180},{"model":"farmers_future_delight:four_dead_sea_pickles","y":270}],
+    "pickles=4,waterlogged=true": [{"model":"farmers_future_delight:four_sea_pickles"},{"model":"farmers_future_delight:four_sea_pickles","y":90},{"model":"farmers_future_delight:four_sea_pickles","y":180},{"model":"farmers_future_delight:four_sea_pickles","y":270}]
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "parent": "block/door_top_rh",
+  "textures": {
+    "bottom": "farmers_future_delight:block/crimson_door_bottom",
+    "top": "farmers_future_delight:block/crimson_door_top"
+  }
+}
