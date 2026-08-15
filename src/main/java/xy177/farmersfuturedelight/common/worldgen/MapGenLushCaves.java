@@ -32,6 +32,9 @@ import xy177.farmersfuturedelight.common.block.BlockSmallDripleaf;
 import xy177.farmersfuturedelight.common.block.DripleafTilt;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
+import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiome;
+import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiomeManager;
+import xy177.farmersfuturedelight.core.FFDHeightHooks;
 
 /**
  * Preserves the original cave carver, marks broad deterministic underground
@@ -46,13 +49,23 @@ public final class MapGenLushCaves extends MapGenBase {
     private static final long GLOW_LICHEN_SALT = 0x474C4F574C494348L;
     private final MapGenBase originalGenerator;
 
+    public MapGenLushCaves() {
+        this(null);
+    }
+
     public MapGenLushCaves(MapGenBase originalGenerator) {
         this.originalGenerator = originalGenerator;
     }
 
     @Override
     public void generate(World worldIn, int chunkX, int chunkZ, ChunkPrimer primer) {
-        originalGenerator.generate(worldIn, chunkX, chunkZ, primer);
+        if (originalGenerator != null) {
+            originalGenerator.generate(worldIn, chunkX, chunkZ, primer);
+        }
+        generateLushOnly(worldIn, chunkX, chunkZ, primer);
+    }
+
+    public void generateLushOnly(World worldIn, int chunkX, int chunkZ, ChunkPrimer primer) {
         if (worldIn.provider.getDimension() != 0) {
             return;
         }
@@ -70,6 +83,20 @@ public final class MapGenLushCaves extends MapGenBase {
         if (!caverns.isEmpty()) {
             decorateCaverns(worldIn.getSeed(), primer, chunkX, chunkZ, caverns);
         }
+    }
+
+    public static boolean isPositionInLushCave(World world, BlockPos pos) {
+        if (world == null || pos == null || world.provider.getDimension() != 0
+                || !FFDItems.isLushCaveEnabled()) {
+            return false;
+        }
+        if (FFDHeightHooks.isExtended(world)) {
+            return FFDVerticalBiomeManager.isBiome(world, pos, FFDVerticalBiome.LUSH_CAVES);
+        }
+        List<Cavern> caverns = collectIntersectingCaverns(world.getSeed(),
+                Math.floorDiv(pos.getX(), 16), Math.floorDiv(pos.getZ(), 16));
+        return containsCavern(caverns, pos.getX() + 0.5D, pos.getY() + 0.5D,
+                pos.getZ() + 0.5D);
     }
 
     private static List<Cavern> collectIntersectingCaverns(long worldSeed, int chunkX, int chunkZ) {
@@ -145,7 +172,8 @@ public final class MapGenLushCaves extends MapGenBase {
     private static void decorateCaverns(long worldSeed, ChunkPrimer primer, int chunkX, int chunkZ,
                                         List<Cavern> caverns) {
         Random random = regionRandom(worldSeed, chunkX, chunkZ, DECORATION_SALT);
-        if (FFDItems.isMossEnabled()) {
+        FFDLushCaveBlockProvider lushBlocks = lushBlocks();
+        if (lushBlocks.hasMoss()) {
             for (int attempt = 0; attempt < FFDConfig.lushCaveMossCeilingAttempts; attempt++) {
                 int localX = random.nextInt(16);
                 int localZ = random.nextInt(16);
@@ -156,7 +184,7 @@ public final class MapGenLushCaves extends MapGenBase {
             }
         }
 
-        if (FFDItems.isGlowBerryEnabled()) {
+        if (lushBlocks.hasCaveVines()) {
             for (int attempt = 0; attempt < FFDConfig.lushCaveVineAttempts; attempt++) {
                 int localX = random.nextInt(16);
                 int localZ = random.nextInt(16);
@@ -176,7 +204,7 @@ public final class MapGenLushCaves extends MapGenBase {
             }
         }
 
-        if (FFDItems.isMossEnabled()) {
+        if (lushBlocks.hasMoss()) {
             for (int attempt = 0; attempt < FFDConfig.lushCaveMossFloorAttempts; attempt++) {
                 int localX = random.nextInt(16);
                 int localZ = random.nextInt(16);
@@ -187,7 +215,7 @@ public final class MapGenLushCaves extends MapGenBase {
             }
         }
 
-        if (FFDItems.isAzaleaEnabled()) {
+        if (lushBlocks.hasAzalea()) {
             int attempts = between(random, FFDConfig.lushCaveAzaleaTreeMin, FFDConfig.lushCaveAzaleaTreeMax);
             for (int attempt = 0; attempt < attempts; attempt++) {
                 int localX = random.nextInt(16);
@@ -199,13 +227,13 @@ public final class MapGenLushCaves extends MapGenBase {
             }
         }
 
-        if (FFDItems.isSporeBlossomEnabled()) {
+        if (lushBlocks.hasSporeBlossom()) {
             for (int attempt = 0; attempt < FFDConfig.lushCaveSporeBlossomAttempts; attempt++) {
                 int localX = random.nextInt(16);
                 int localZ = random.nextInt(16);
                 int blossomY = findCeiling(primer, caverns, chunkX, chunkZ, localX, localZ, sampleY(random));
                 if (blossomY >= 0 && isAir(primer.getBlockState(localX, blossomY, localZ))) {
-                    primer.setBlockState(localX, blossomY, localZ, FFDBlocks.SPORE_BLOSSOM.getDefaultState());
+                    primer.setBlockState(localX, blossomY, localZ, lushBlocks.sporeBlossom());
                 }
             }
         }
@@ -471,10 +499,10 @@ public final class MapGenLushCaves extends MapGenBase {
                     if (!isMossReplaceable(primer.getBlockState(x, groundY, z))) {
                         break;
                     }
-                    primer.setBlockState(x, groundY, z, FFDBlocks.MOSS_BLOCK.getDefaultState());
+                    primer.setBlockState(x, groundY, z, lushBlocks().mossBlock());
                     placedGround = true;
                 }
-                if (placedGround && FFDItems.isGlowBerryEnabled()
+                if (placedGround && lushBlocks().hasCaveVines()
                         && random.nextFloat() < FFDConfig.lushCaveMossCeilingVineChance) {
                     placeCaveVinesInMoss(primer, x, surfaceY, z, random);
                 }
@@ -508,8 +536,7 @@ public final class MapGenLushCaves extends MapGenBase {
         for (int offset = 0; offset < placed; offset++) {
             boolean tip = offset == placed - 1;
             boolean berries = random.nextInt(5) == 0;
-            IBlockState state = tip ? FFDBlocks.CAVE_VINES.stateWithBerries(berries)
-                    : FFDBlocks.CAVE_VINES_PLANT.stateWithBerries(berries);
+            IBlockState state = lushBlocks().caveVines(tip, berries);
             primer.setBlockState(localX, startY - offset, localZ, state);
         }
     }
@@ -564,7 +591,7 @@ public final class MapGenLushCaves extends MapGenBase {
 
         int dripleafChance = waterlogged ? FFDConfig.lushCaveWaterDripleafChance
                 : FFDConfig.lushCaveDryDripleafChance;
-        if (FFDItems.isDripleafEnabled() && dripleafChance > 0) {
+        if (lushBlocks().hasDripleaf() && dripleafChance > 0) {
             for (BlockPos pos : vegetationSurface) {
                 if (random.nextInt(100) < dripleafChance) {
                     placeDripleaf(primer, pos.getX(), waterlogged ? pos.getY() : pos.getY() + 1,
@@ -627,7 +654,7 @@ public final class MapGenLushCaves extends MapGenBase {
                 if (surfaceY < 0 || !isMossReplaceable(primer.getBlockState(x, surfaceY - 1, z))) {
                     continue;
                 }
-                primer.setBlockState(x, surfaceY - 1, z, FFDBlocks.MOSS_BLOCK.getDefaultState());
+                primer.setBlockState(x, surfaceY - 1, z, lushBlocks().mossBlock());
                 if (random.nextFloat() < FFDConfig.lushCaveMossFloorVegetationChance) {
                     placeMossVegetation(primer, x, surfaceY, z, random);
                 }
@@ -690,15 +717,15 @@ public final class MapGenLushCaves extends MapGenBase {
         }
         int choice = random.nextInt(96);
         if (choice < 4) {
-            if (FFDItems.isAzaleaEnabled()) {
-                primer.setBlockState(localX, y, localZ, FFDBlocks.FLOWERING_AZALEA.getDefaultState());
+            if (lushBlocks().hasAzalea()) {
+                primer.setBlockState(localX, y, localZ, lushBlocks().azalea(true));
             }
         } else if (choice < 11) {
-            if (FFDItems.isAzaleaEnabled()) {
-                primer.setBlockState(localX, y, localZ, FFDBlocks.AZALEA.getDefaultState());
+            if (lushBlocks().hasAzalea()) {
+                primer.setBlockState(localX, y, localZ, lushBlocks().azalea(false));
             }
         } else if (choice < 36) {
-            primer.setBlockState(localX, y, localZ, FFDBlocks.MOSS_CARPET.getDefaultState());
+            primer.setBlockState(localX, y, localZ, lushBlocks().mossCarpet());
         } else if (choice < 86) {
             primer.setBlockState(localX, y, localZ, Blocks.TALLGRASS.getDefaultState()
                     .withProperty(BlockTallGrass.TYPE, BlockTallGrass.EnumType.GRASS));
@@ -715,8 +742,8 @@ public final class MapGenLushCaves extends MapGenBase {
     private static boolean isMossReplaceable(IBlockState state) {
         Block block = state.getBlock();
         return block == Blocks.STONE || block == Blocks.DIRT || block == Blocks.GRASS
-                || block == Blocks.MYCELIUM || block == FFDBlocks.MOSS_BLOCK
-                || block == FFDBlocks.ROOTED_DIRT || BlockCaveVinesBase.isCaveVine(state);
+                || block == Blocks.MYCELIUM || lushBlocks().isMossBlock(state)
+                || lushBlocks().isRootedDirt(state) || lushBlocks().isCaveVine(state);
     }
 
     private static boolean isLushGroundReplaceable(IBlockState state) {
@@ -724,7 +751,7 @@ public final class MapGenLushCaves extends MapGenBase {
         return block == Blocks.STONE || block == Blocks.DIRT || block == Blocks.GRASS
                 || block == Blocks.MYCELIUM || block == Blocks.CLAY
                 || block == Blocks.SAND || block == Blocks.GRAVEL
-                || block == FFDBlocks.MOSS_BLOCK || block == FFDBlocks.ROOTED_DIRT;
+                || lushBlocks().isMossBlock(state) || lushBlocks().isRootedDirt(state);
     }
 
     private static void placeDripleaf(ChunkPrimer primer, int localX, int baseY, int localZ, Random random) {
@@ -737,16 +764,12 @@ public final class MapGenLushCaves extends MapGenBase {
             if (!isPlantSpace(primer.getBlockState(localX, baseY + 1, localZ))) {
                 return;
             }
-            IBlockState lower = FFDBlocks.SMALL_DRIPLEAF.getDefaultState()
-                    .withProperty(BlockSmallDripleaf.FACING, facing)
-                    .withProperty(BlockSmallDripleaf.HALF, BlockDoublePlant.EnumBlockHalf.LOWER)
-                    .withProperty(BlockSmallDripleaf.WATERLOGGED,
-                            isSourceWater(primer.getBlockState(localX, baseY, localZ)));
-            IBlockState upper = FFDBlocks.SMALL_DRIPLEAF.getDefaultState()
-                    .withProperty(BlockSmallDripleaf.FACING, facing)
-                    .withProperty(BlockSmallDripleaf.HALF, BlockDoublePlant.EnumBlockHalf.UPPER)
-                    .withProperty(BlockSmallDripleaf.WATERLOGGED,
-                            isSourceWater(primer.getBlockState(localX, baseY + 1, localZ)));
+            IBlockState lower = lushBlocks().smallDripleaf(facing,
+                    BlockDoublePlant.EnumBlockHalf.LOWER,
+                    isSourceWater(primer.getBlockState(localX, baseY, localZ)));
+            IBlockState upper = lushBlocks().smallDripleaf(facing,
+                    BlockDoublePlant.EnumBlockHalf.UPPER,
+                    isSourceWater(primer.getBlockState(localX, baseY + 1, localZ)));
             primer.setBlockState(localX, baseY, localZ, lower);
             primer.setBlockState(localX, baseY + 1, localZ, upper);
             return;
@@ -764,18 +787,11 @@ public final class MapGenLushCaves extends MapGenBase {
         for (int offset = 0; offset < stemHeight; offset++) {
             IBlockState oldState = primer.getBlockState(localX, baseY + offset, localZ);
             primer.setBlockState(localX, baseY + offset, localZ,
-                    FFDBlocks.BIG_DRIPLEAF_STEM.getDefaultState()
-                            .withProperty(BlockBigDripleafStem.FACING, facing)
-                            .withProperty(BlockBigDripleafStem.WATERLOGGED,
-                                    isSourceWater(oldState)));
+                    lushBlocks().bigDripleafStem(facing, isSourceWater(oldState)));
         }
         IBlockState oldHead = primer.getBlockState(localX, baseY + stemHeight, localZ);
-        BlockBigDripleaf headBlock = isSourceWater(oldHead)
-                ? FFDBlocks.BIG_DRIPLEAF_WATERLOGGED : FFDBlocks.BIG_DRIPLEAF;
         primer.setBlockState(localX, baseY + stemHeight, localZ,
-                headBlock.getDefaultState()
-                        .withProperty(BlockBigDripleaf.FACING, facing)
-                        .withProperty(BlockBigDripleaf.TILT, DripleafTilt.NONE));
+                lushBlocks().bigDripleaf(facing, isSourceWater(oldHead)));
     }
 
     private static void placeRootedAzaleaTree(ChunkPrimer primer, List<Cavern> caverns, int chunkX,
@@ -801,7 +817,7 @@ public final class MapGenLushCaves extends MapGenBase {
 
     private static boolean isAllowedTreePosition(ChunkPrimer primer, int localX, int y, int localZ) {
         return y > 0 && y < 255 && isTreeReplaceable(primer.getBlockState(localX, y, localZ))
-                && BlockAzalea.canGrowOn(primer.getBlockState(localX, y - 1, localZ));
+                && isAzaleaGround(primer.getBlockState(localX, y - 1, localZ));
     }
 
     private static boolean hasRequiredTreeSpace(ChunkPrimer primer, int localX, int treeY, int localZ) {
@@ -853,8 +869,8 @@ public final class MapGenLushCaves extends MapGenBase {
                 return false;
             }
         }
-        if (FFDItems.isRootedDirtEnabled()) {
-            primer.setBlockState(baseX, baseY - 1, baseZ, FFDBlocks.ROOTED_DIRT.getDefaultState());
+        if (lushBlocks().hasRootedDirt()) {
+            primer.setBlockState(baseX, baseY - 1, baseZ, lushBlocks().rootedDirt());
         }
         for (BlockPos logPos : logs) {
             primer.setBlockState(logPos.getX(), logPos.getY(), logPos.getZ(), oakLog());
@@ -874,16 +890,14 @@ public final class MapGenLushCaves extends MapGenBase {
                     || !isTreeReplaceable(primer.getBlockState(x, y, z))) {
                 continue;
             }
-            IBlockState leaves = random.nextInt(4) == 0
-                    ? FFDBlocks.FLOWERING_AZALEA_LEAVES.getDefaultState()
-                    : FFDBlocks.AZALEA_LEAVES.getDefaultState();
+            IBlockState leaves = lushBlocks().azaleaLeaves(random.nextInt(4) == 0);
             primer.setBlockState(x, y, z, leaves);
         }
     }
 
     private static void placeRootedDirtColumn(ChunkPrimer primer, int originX, int originY, int originZ,
                                                int targetY, Random random) {
-        if (!FFDItems.isRootedDirtEnabled()) {
+        if (!lushBlocks().hasRootedDirt()) {
             return;
         }
         for (int y = originY; y < targetY; y++) {
@@ -893,7 +907,7 @@ public final class MapGenLushCaves extends MapGenBase {
                 int z = originZ + random.nextInt(FFDConfig.lushCaveRootRadius)
                         - random.nextInt(FFDConfig.lushCaveRootRadius);
                 if (inChunk(x, z) && isRootReplaceable(primer.getBlockState(x, y, z))) {
-                    primer.setBlockState(x, y, z, FFDBlocks.ROOTED_DIRT.getDefaultState());
+                    primer.setBlockState(x, y, z, lushBlocks().rootedDirt());
                 }
             }
         }
@@ -901,7 +915,7 @@ public final class MapGenLushCaves extends MapGenBase {
 
     private static void placeHangingRoots(ChunkPrimer primer, List<Cavern> caverns, int chunkX, int chunkZ,
                                           int originX, int originY, int originZ, Random random) {
-        if (!FFDItems.isHangingRootsEnabled()) {
+        if (!lushBlocks().hasHangingRoots()) {
             return;
         }
         for (int attempt = 0; attempt < FFDConfig.lushCaveHangingRootPlacementAttempts; attempt++) {
@@ -918,7 +932,7 @@ public final class MapGenLushCaves extends MapGenBase {
             int worldX = chunkX * 16 + x;
             int worldZ = chunkZ * 16 + z;
             if (containsCavern(caverns, worldX + 0.5D, y + 0.5D, worldZ + 0.5D)) {
-                primer.setBlockState(x, y, z, FFDBlocks.HANGING_ROOTS.getDefaultState());
+                primer.setBlockState(x, y, z, lushBlocks().hangingRoots());
             }
         }
     }
@@ -938,7 +952,7 @@ public final class MapGenLushCaves extends MapGenBase {
         Block block = state.getBlock();
         return block == Blocks.GRASS || block == Blocks.DIRT || block == Blocks.CLAY
                 || block == Blocks.MYCELIUM || block == Blocks.FARMLAND
-                || block == FFDBlocks.MOSS_BLOCK || block == FFDBlocks.ROOTED_DIRT;
+                || lushBlocks().isMossBlock(state) || lushBlocks().isRootedDirt(state);
     }
 
     private static boolean isRootReplaceable(IBlockState state) {
@@ -946,20 +960,31 @@ public final class MapGenLushCaves extends MapGenBase {
         return block == Blocks.STONE || block == Blocks.DIRT || block == Blocks.GRASS
                 || block == Blocks.SAND || block == Blocks.GRAVEL || block == Blocks.CLAY
                 || block == Blocks.HARDENED_CLAY || block == Blocks.STAINED_HARDENED_CLAY
-                || block == Blocks.SNOW || block == Blocks.MYCELIUM || block == FFDBlocks.MOSS_BLOCK
-                || block == FFDBlocks.ROOTED_DIRT;
+                || block == Blocks.SNOW || block == Blocks.MYCELIUM
+                || lushBlocks().isMossBlock(state) || lushBlocks().isRootedDirt(state);
     }
 
     private static boolean isTreeReplaceable(IBlockState state) {
         Material material = state.getMaterial();
         return material == Material.AIR || material == Material.PLANTS || material == Material.VINE
                 || material == Material.LEAVES || material == Material.WATER
-                || state.getBlock() == Blocks.SNOW_LAYER || state.getBlock() == FFDBlocks.HANGING_ROOTS
-                || BlockCaveVinesBase.isCaveVine(state);
+                || state.getBlock() == Blocks.SNOW_LAYER || lushBlocks().isHangingRoots(state)
+                || lushBlocks().isCaveVine(state);
     }
 
     private static boolean isPlantSpace(IBlockState state) {
         return isAir(state) || state.getBlock() == Blocks.WATER || state.getBlock() == Blocks.FLOWING_WATER;
+    }
+
+    private static boolean isAzaleaGround(IBlockState state) {
+        Block block = state.getBlock();
+        return block == Blocks.GRASS || block == Blocks.DIRT || block == Blocks.MYCELIUM
+                || block == Blocks.FARMLAND || block == Blocks.CLAY
+                || lushBlocks().isMossBlock(state) || lushBlocks().isRootedDirt(state);
+    }
+
+    private static FFDLushCaveBlockProvider lushBlocks() {
+        return FFDLushCaveBlockProvider.get();
     }
 
     private static boolean isSourceWater(IBlockState state) {

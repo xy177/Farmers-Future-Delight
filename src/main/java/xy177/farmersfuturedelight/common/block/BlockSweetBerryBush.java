@@ -34,6 +34,7 @@ import xy177.farmersfuturedelight.common.entity.EntityBee;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
+import xy177.farmersfuturedelight.common.worldgen.FFDLushCaveBlockProvider;
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 
 public class BlockSweetBerryBush extends BlockBush implements net.minecraft.block.IGrowable {
@@ -92,7 +93,7 @@ public class BlockSweetBerryBush extends BlockBush implements net.minecraft.bloc
         }
         if (!world.isRemote) {
             int count = 1 + world.rand.nextInt(2) + (age == 3 ? 1 : 0);
-            spawnAsEntity(world, pos, new ItemStack(FFDItems.SWEET_BERRIES, count));
+            spawnAsEntity(world, pos, FFDItems.effectiveStack(FFDItems.SWEET_BERRIES, count));
             world.setBlockState(pos, state.withProperty(AGE, 1), 2);
             world.playSound(null, pos, FFDSounds.SWEET_BERRY_BUSH_PICK_BERRIES,
                     SoundCategory.BLOCKS, 1.0F, 0.8F + world.rand.nextFloat() * 0.4F);
@@ -128,8 +129,8 @@ public class BlockSweetBerryBush extends BlockBush implements net.minecraft.bloc
     @Override
     protected boolean canSustainBush(IBlockState state) {
         return super.canSustainBush(state) || state.getBlock() == net.minecraft.init.Blocks.MYCELIUM
-                || state.getBlock() == FFDBlocks.MOSS_BLOCK
-                || state.getBlock() == FFDBlocks.ROOTED_DIRT;
+                || FFDLushCaveBlockProvider.get().isMossBlock(state)
+                || FFDLushCaveBlockProvider.get().isRootedDirt(state);
     }
 
     @Override
@@ -153,7 +154,7 @@ public class BlockSweetBerryBush extends BlockBush implements net.minecraft.bloc
     @Override
     public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world,
                                   BlockPos pos, EntityPlayer player) {
-        return new ItemStack(FFDItems.SWEET_BERRIES);
+        return FFDItems.effectiveStack(FFDItems.SWEET_BERRIES);
     }
 
     @Override
@@ -166,7 +167,7 @@ public class BlockSweetBerryBush extends BlockBush implements net.minecraft.bloc
             if (fortune > 0) {
                 count += random.nextInt(fortune + 1);
             }
-            drops.add(new ItemStack(FFDItems.SWEET_BERRIES, count));
+            drops.add(FFDItems.effectiveStack(FFDItems.SWEET_BERRIES, count));
         }
     }
 

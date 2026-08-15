@@ -1,0 +1,8 @@
+{
+  "parent": "block/half_slab",
+  "textures": {
+    "bottom": "farmers_future_delight:block/deepslate_tiles",
+    "top": "farmers_future_delight:block/deepslate_tiles",
+    "side": "farmers_future_delight:block/deepslate_tiles"
+  }
+}

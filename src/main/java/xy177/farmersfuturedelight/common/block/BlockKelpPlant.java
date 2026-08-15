@@ -115,7 +115,7 @@ public class BlockKelpPlant extends BlockUnderwaterPlant implements IGrowable {
     public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos,
                          IBlockState state, int fortune) {
         if (isFeatureEnabled()) {
-            drops.add(new ItemStack(FFDItems.KELP));
+            drops.add(FFDItems.effectiveStack(FFDItems.KELP));
         }
     }
 
@@ -131,6 +131,6 @@ public class BlockKelpPlant extends BlockUnderwaterPlant implements IGrowable {
 
     @Override
     public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
-        return new ItemStack(FFDItems.KELP);
+        return FFDItems.effectiveStack(FFDItems.KELP);
     }
 }

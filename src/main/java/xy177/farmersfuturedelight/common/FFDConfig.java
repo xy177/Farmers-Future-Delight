@@ -22,12 +22,27 @@ public final class FFDConfig {
         }
     }
 
+    public enum CloudHeightMode {
+        DISABLED,
+        CAVES_CLIFFS_ONLY,
+        ALL_WORLDS;
+
+        public static CloudHeightMode parse(String value) {
+            try {
+                return valueOf(value.trim().toUpperCase(Locale.ROOT));
+            } catch (IllegalArgumentException ex) {
+                return CAVES_CLIFFS_ONLY;
+            }
+        }
+    }
+
     private static final String CATEGORY_FEATURES = "features";
+    private static final String CATEGORY_GAMEPLAY = "gameplay";
     private static final String CATEGORY_WORLDGEN = "worldgen";
     private static final String CATEGORY_GROWTH = "growth";
     private static final String CATEGORY_PARTICLES = "particles";
     private static final String CATEGORY_INTERNAL = "internal";
-    private static final int CURRENT_CONFIG_VERSION = 2;
+    private static final int CURRENT_CONFIG_VERSION = 4;
 
     public static FeatureMode sweetBerryMode;
     public static FeatureMode honeyMode;
@@ -48,10 +63,65 @@ public final class FFDConfig {
     public static FeatureMode seagrassMode;
     public static FeatureMode seaPickleMode;
     public static FeatureMode turtleMode;
+    public static FeatureMode axolotlMode;
+    public static FeatureMode goatMode;
+    public static FeatureMode phantomMode;
+    public static FeatureMode othersideMode;
+    public static FeatureMode amethystMode;
+    public static FeatureMode deepslateMode;
+    public static FeatureMode rawOreMode;
+    public static FeatureMode copperMode;
+    public static FeatureMode dripstoneMode;
+    public static FeatureMode ironChainMode;
+    public static FeatureMode candleMode;
+    public static FeatureMode powderSnowMode;
     public static FeatureMode crimsonMode;
     public static FeatureMode warpedMode;
     public static FeatureMode crimsonWoodMode;
     public static FeatureMode warpedWoodMode;
+    public static FeatureMode glowItemFrameMode;
+    public static FeatureMode signTextMode;
+    public static FeatureMode lightBlockMode;
+
+    public static boolean hostileMobsRequireZeroBlockLight;
+    public static CloudHeightMode cloudHeightMode;
+    public static boolean smoothBiomeSkyColors;
+    public static boolean modernWorldLoadingScreen;
+    public static boolean cavesAndCliffsBackgroundMusic;
+    public static boolean shovelCreatesDirtPath;
+    public static boolean shearsStopPlantGrowth;
+    public static boolean oresDropRawMaterials;
+    public static boolean modernCauldronFeatures;
+    public static boolean enchantingTableEmitsLight;
+    public static boolean pistonBreakParticles;
+    public static boolean infestedBlocksHalfBreakTime;
+    public static boolean shulkerDuplication;
+    public static boolean experienceOrbMerging;
+    public static boolean illagersIgnoreBabyVillagers;
+    public static float goatScreamingChance;
+    public static float goatSingleHornChance;
+    public static int goatLongJumpCooldownMinTicks;
+    public static int goatLongJumpCooldownMaxTicks;
+    public static int goatLongJumpHorizontalRange;
+    public static int goatLongJumpVerticalRange;
+    public static int goatLongJumpPrepareTicks;
+    public static float goatLongJumpVelocityMultiplier;
+    public static int goatRamCooldownMinTicks;
+    public static int goatRamCooldownMaxTicks;
+    public static int screamingGoatRamCooldownMinTicks;
+    public static int screamingGoatRamCooldownMaxTicks;
+    public static int goatRamPrepareTicks;
+    public static int goatRamMinDistance;
+    public static int goatRamMaxDistance;
+    public static float goatRamSpeedMultiplier;
+    public static float goatAdultRamKnockback;
+    public static float goatBabyRamKnockback;
+
+    public static float dripstoneGrowthChance;
+    public static float dripstoneWaterTransferChance;
+    public static float dripstoneLavaTransferChance;
+    public static float cauldronRainFillChance;
+    public static float cauldronSnowFillChance;
 
     public static int sweetBerryCommonRarity;
     public static int sweetBerryRareRarity;
@@ -59,10 +129,59 @@ public final class FFDConfig {
     public static int sweetBerryHorizontalOffset;
     public static int sweetBerryVerticalOffset;
     public static int sweetBerryGrowthRoll;
+    public static int amethystGrowthRoll;
+    public static int amethystGeodeRarity;
+    public static int amethystGeodeMinY;
+    public static int amethystGeodeMaxY;
+    public static int amethystGeodeOuterWallMin;
+    public static int amethystGeodeOuterWallMax;
+    public static int amethystGeodeDistributionMin;
+    public static int amethystGeodeDistributionMax;
+    public static int amethystGeodePointOffsetMin;
+    public static int amethystGeodePointOffsetMax;
+    public static float amethystGeodeCrackChance;
+    public static float amethystGeodeBuddingChance;
+    public static float amethystGeodeBudPlacementChance;
+    public static int deepslateTransitionMinY;
+    public static int deepslateTransitionMaxY;
+    public static int modernOreVeinSizePercent;
+    public static int modernFossilRarity;
+    public static int modernVillageSpacing;
+    public static int modernCoalUpperCount;
+    public static int modernCoalLowerCount;
+    public static int modernIronUpperCount;
+    public static int modernIronMiddleCount;
+    public static int modernIronSmallCount;
+    public static int modernGoldCount;
+    public static int modernGoldLowerMaxCount;
+    public static int modernGoldExtraCount;
+    public static int modernRedstoneCount;
+    public static int modernRedstoneLowerCount;
+    public static int modernDiamondCount;
+    public static int modernDiamondBuriedCount;
+    public static int modernDiamondLargeRarity;
+    public static int modernLapisCount;
+    public static int modernLapisBuriedCount;
+    public static int modernCopperCount;
+    public static int modernCopperLargeCount;
+    public static int modernEmeraldCount;
+    public static int modernTuffCount;
+    public static int modernInfestedCount;
+    public static int modernGraniteLowerCount;
+    public static int modernGraniteUpperRarity;
+    public static int modernDioriteLowerCount;
+    public static int modernDioriteUpperRarity;
+    public static int modernAndesiteLowerCount;
+    public static int modernAndesiteUpperRarity;
+    public static int modernDirtCount;
+    public static int modernGravelCount;
     public static int glowSquidSpawnWeight;
     public static int glowSquidMinGroupSize;
     public static int glowSquidMaxGroupSize;
     public static int glowSquidDepthBelowSeaLevel;
+    public static int phantomSpawnMinIntervalSeconds;
+    public static int phantomSpawnMaxIntervalSeconds;
+    public static int phantomInsomniaThresholdTicks;
     public static int kelpColdNoiseRatio;
     public static int kelpWarmNoiseRatio;
     public static int kelpNoiseScale;
@@ -92,6 +211,14 @@ public final class FFDConfig {
     public static int turtleMinGroupSize;
     public static int turtleMaxGroupSize;
     public static float turtleEggHatchChance;
+    public static int axolotlSpawnCheckIntervalTicks;
+    public static int axolotlSpawnAttemptsPerPlayer;
+    public static int axolotlMinGroupSize;
+    public static int axolotlMaxGroupSize;
+    public static int axolotlMobCap;
+    public static int goatSpawnWeight;
+    public static int goatMinGroupSize;
+    public static int goatMaxGroupSize;
     public static float beeNestPlainsChance;
     public static float beeNestFlowerForestChance;
     public static float beeNestForestChance;
@@ -116,6 +243,12 @@ public final class FFDConfig {
     public static int lushCaveWaterPoolChance;
     public static int lushCaveMossFloorAttempts;
     public static int lushCaveMossCeilingAttempts;
+    public static float lushCaveTallGrassNoiseThreshold;
+    public static int lushCaveTallGrassAboveNoiseCount;
+    public static int lushCaveTallGrassRarity;
+    public static int lushCaveTallGrassPatchAttempts;
+    public static int lushCaveTallGrassHorizontalOffset;
+    public static int lushCaveTallGrassVerticalOffset;
     public static int lushCaveMossPatchMinRadius;
     public static int lushCaveMossPatchMaxRadius;
     public static int lushCaveMossPatchVerticalRange;
@@ -152,6 +285,12 @@ public final class FFDConfig {
     public static int lushCaveDryDripleafChance;
     public static int lushCaveWaterDripleafChance;
     public static int glowLichenSurfaceOffset;
+    public static int dripstoneLargeMinAttempts;
+    public static int dripstoneLargeMaxAttempts;
+    public static int dripstoneClusterMinAttempts;
+    public static int dripstoneClusterMaxAttempts;
+    public static int dripstonePointedMinAttempts;
+    public static int dripstonePointedMaxAttempts;
     public static int netherForestBiomeNoiseScale;
     public static float netherForestBiomeThreshold;
     public static int crimsonForestVegetationAttempts;
@@ -203,10 +342,120 @@ public final class FFDConfig {
         seagrassMode = readMode(config, "seagrassMode", "海草内容开关");
         seaPickleMode = readMode(config, "seaPickleMode", "海泡菜内容开关");
         turtleMode = readMode(config, "turtleMode", "海龟内容开关");
+        axolotlMode = readMode(config, "axolotlMode", "美西螈与美西螈桶内容开关");
+        goatMode = readMode(config, "goatMode", "山羊与山羊角内容开关");
+        phantomMode = readMode(config, "phantomMode", "幻翼与幻翼膜内容开关");
+        othersideMode = readMode(config, "othersideMode", "《otherside》音乐唱片内容开关");
+        amethystMode = readMode(config, "amethystMode", "紫水晶与紫水晶晶洞内容开关");
+        deepslateMode = readMode(config, "deepslateMode", "深板岩、凝灰岩与深层矿石内容开关");
+        rawOreMode = readMode(config, "rawOreMode", "粗铁、粗金及对应粗矿块内容开关");
+        copperMode = readMode(config, "copperMode", "铜矿石、粗铜与铜制内容开关");
+        dripstoneMode = readMode(config, "dripstoneMode", "滴水石块与滴水石锥内容开关");
+        ironChainMode = readMode(config, "ironChainMode", "铁链内容开关");
+        candleMode = readMode(config, "candleMode", "蜡烛与蜡烛蛋糕内容开关");
+        powderSnowMode = readMode(config, "powderSnowMode", "细雪与细雪桶内容开关");
         crimsonMode = readMode(config, "crimsonMode", "绯红植物内容开关");
         warpedMode = readMode(config, "warpedMode", "诡异植物内容开关");
         crimsonWoodMode = readMode(config, "crimsonWoodMode", "绯红木材内容开关");
         warpedWoodMode = readMode(config, "warpedWoodMode", "诡异木材内容开关");
+        glowItemFrameMode = readMode(config, "glowItemFrameMode", "荧光物品展示框内容开关");
+        signTextMode = readMode(config, "signTextMode", "告示牌文字染色与发光内容开关");
+        lightBlockMode = readMode(config, "lightBlockMode", "光源方块内容开关");
+
+        hostileMobsRequireZeroBlockLight = config.getBoolean(
+                "hostileMobsRequireZeroBlockLight", CATEGORY_GAMEPLAY, true,
+                "是否要求自然生成的敌对生物所在位置方块光照必须为 0。对所有世界类型生效，不影响刷怪笼。");
+        cloudHeightMode = CloudHeightMode.parse(config.getString("cloudHeightMode",
+                CATEGORY_GAMEPLAY, "CAVES_CLIFFS_ONLY",
+                "高版本云层高度的作用范围。DISABLED 关闭；CAVES_CLIFFS_ONLY 仅作用于“洞穴与山崖”世界；ALL_WORLDS 作用于所有世界类型。",
+                new String[]{"DISABLED", "CAVES_CLIFFS_ONLY", "ALL_WORLDS"}));
+        smoothBiomeSkyColors = config.getBoolean("smoothBiomeSkyColors", CATEGORY_GAMEPLAY,
+                true, "是否在群系边界平滑混合天空颜色。关闭时直接使用玩家所在位置群系的天空颜色。仅影响客户端显示。");
+        modernWorldLoadingScreen = config.getBoolean("modernWorldLoadingScreen",
+                CATEGORY_GAMEPLAY, false,
+                "是否在创建或进入世界时使用高版本风格的加载画面。关闭时所有世界类型均使用原版 1.12.2 加载画面。仅影响客户端显示。");
+        cavesAndCliffsBackgroundMusic = config.getBoolean("cavesAndCliffsBackgroundMusic",
+                CATEGORY_GAMEPLAY, true,
+                "是否将 1.18 的八首背景音乐加入所有世界类型的生存模式与主菜单音乐池。");
+        shovelCreatesDirtPath = config.getBoolean("shovelCreatesDirtPath", CATEGORY_GAMEPLAY,
+                true, "是否允许使用锹将泥土、砂土、灰化土和菌丝转化为土径。");
+        shearsStopPlantGrowth = config.getBoolean("shearsStopPlantGrowth", CATEGORY_GAMEPLAY,
+                true, "是否允许使用剪刀停止海带、洞穴藤蔓、垂泪藤和缠怨藤继续生长。");
+        oresDropRawMaterials = config.getBoolean("oresDropRawMaterials", CATEGORY_GAMEPLAY,
+                true, "是否让铁矿石、金矿石和铜矿石掉落对应粗矿并支持时运；精准采集仍获得矿石方块。对所有世界类型生效。");
+        modernCauldronFeatures = config.getBoolean("modernCauldronFeatures", CATEGORY_GAMEPLAY,
+                true, "是否启用熔岩炼药锅、细雪炼药锅、滴水石填充与降雪积累等高版本炼药锅行为。对所有世界类型生效。");
+        enchantingTableEmitsLight = config.getBoolean("enchantingTableEmitsLight", CATEGORY_GAMEPLAY,
+                true, "是否让附魔台发出 7 级方块光照。对所有世界类型生效。");
+        pistonBreakParticles = config.getBoolean("pistonBreakParticles", CATEGORY_GAMEPLAY,
+                true, "是否让活塞破坏方块时显示对应方块的破坏粒子。对所有世界类型生效。");
+        infestedBlocksHalfBreakTime = config.getBoolean("infestedBlocksHalfBreakTime", CATEGORY_GAMEPLAY,
+                true, "是否让虫蚀方块拥有对应普通方块一半的挖掘时间。对所有世界类型生效。");
+        shulkerDuplication = config.getBoolean("shulkerDuplication", CATEGORY_GAMEPLAY,
+                true, "是否允许潜影贝被潜影弹命中后按高版本规则复制。对所有世界类型生效。");
+        experienceOrbMerging = config.getBoolean("experienceOrbMerging", CATEGORY_GAMEPLAY,
+                true, "是否允许相同经验值的经验球按高版本规则合并，且拾取时不损失经验。对所有世界类型生效。");
+        illagersIgnoreBabyVillagers = config.getBoolean("illagersIgnoreBabyVillagers", CATEGORY_GAMEPLAY,
+                true, "是否让灾厄村民不再主动攻击或伤害幼年村民。对所有世界类型生效。");
+
+        goatScreamingChance = config.getFloat("goatScreamingChance", CATEGORY_GAMEPLAY,
+                0.02F, 0.0F, 1.0F, "山羊生成或繁殖时成为尖叫山羊的基础概率，26.3 默认值为 0.02。");
+        goatSingleHornChance = config.getFloat("goatSingleHornChance", CATEGORY_GAMEPLAY,
+                0.1F, 0.0F, 1.0F, "成年山羊初次生成时随机缺少一只角的概率，26.3 默认值为 0.1。");
+        goatLongJumpCooldownMinTicks = config.getInt("goatLongJumpCooldownMinTicks", CATEGORY_GAMEPLAY,
+                600, 1, 72000, "山羊两次长跳之间的最短冷却，单位为 tick；26.3 默认值为 600。");
+        goatLongJumpCooldownMaxTicks = Math.max(goatLongJumpCooldownMinTicks,
+                config.getInt("goatLongJumpCooldownMaxTicks", CATEGORY_GAMEPLAY,
+                        1200, 1, 72000, "山羊两次长跳之间的最长冷却，单位为 tick；26.3 默认值为 1200。"));
+        goatLongJumpHorizontalRange = config.getInt("goatLongJumpHorizontalRange", CATEGORY_GAMEPLAY,
+                5, 1, 16, "山羊寻找长跳落点时的最大水平范围，26.3 默认值为 5 格。");
+        goatLongJumpVerticalRange = config.getInt("goatLongJumpVerticalRange", CATEGORY_GAMEPLAY,
+                5, 1, 16, "山羊寻找长跳落点时的最大垂直范围，26.3 默认值为 5 格。");
+        goatLongJumpPrepareTicks = config.getInt("goatLongJumpPrepareTicks", CATEGORY_GAMEPLAY,
+                40, 0, 200, "山羊选定长跳落点后的准备时间，单位为 tick；26.3 默认值为 40。");
+        goatLongJumpVelocityMultiplier = config.getFloat("goatLongJumpVelocityMultiplier",
+                CATEGORY_GAMEPLAY, 3.5714288F, 0.1F, 10.0F,
+                "山羊长跳最大起跳速度相对基础跳跃强度的倍率，26.3 默认值为 3.5714288。");
+        goatRamCooldownMinTicks = config.getInt("goatRamCooldownMinTicks", CATEGORY_GAMEPLAY,
+                600, 1, 72000, "普通山羊两次冲撞之间的最短冷却，单位为 tick；26.3 默认值为 600。");
+        goatRamCooldownMaxTicks = Math.max(goatRamCooldownMinTicks,
+                config.getInt("goatRamCooldownMaxTicks", CATEGORY_GAMEPLAY,
+                        6000, 1, 72000, "普通山羊两次冲撞之间的最长冷却，单位为 tick；26.3 默认值为 6000。"));
+        screamingGoatRamCooldownMinTicks = config.getInt("screamingGoatRamCooldownMinTicks",
+                CATEGORY_GAMEPLAY, 100, 1, 72000,
+                "尖叫山羊两次冲撞之间的最短冷却，单位为 tick；26.3 默认值为 100。");
+        screamingGoatRamCooldownMaxTicks = Math.max(screamingGoatRamCooldownMinTicks,
+                config.getInt("screamingGoatRamCooldownMaxTicks", CATEGORY_GAMEPLAY,
+                        300, 1, 72000, "尖叫山羊两次冲撞之间的最长冷却，单位为 tick；26.3 默认值为 300。"));
+        goatRamPrepareTicks = config.getInt("goatRamPrepareTicks", CATEGORY_GAMEPLAY,
+                20, 0, 200, "山羊到达起跑点后低头准备冲撞的时间，单位为 tick；26.3 默认值为 20。");
+        goatRamMinDistance = config.getInt("goatRamMinDistance", CATEGORY_GAMEPLAY,
+                4, 1, 32, "山羊冲撞起跑点与目标之间的最短距离，26.3 默认值为 4 格。");
+        goatRamMaxDistance = Math.max(goatRamMinDistance,
+                config.getInt("goatRamMaxDistance", CATEGORY_GAMEPLAY,
+                        7, 1, 32, "山羊冲撞起跑点与目标之间的最长距离，26.3 默认值为 7 格。"));
+        goatRamSpeedMultiplier = config.getFloat("goatRamSpeedMultiplier", CATEGORY_GAMEPLAY,
+                3.0F, 0.1F, 10.0F, "山羊正式冲撞阶段的移动速度倍率，26.3 默认值为 3.0。");
+        goatAdultRamKnockback = config.getFloat("goatAdultRamKnockback", CATEGORY_GAMEPLAY,
+                2.5F, 0.0F, 16.0F, "成年山羊冲撞的基础击退力，26.3 默认值为 2.5。");
+        goatBabyRamKnockback = config.getFloat("goatBabyRamKnockback", CATEGORY_GAMEPLAY,
+                1.0F, 0.0F, 16.0F, "幼年山羊冲撞的基础击退力，26.3 默认值为 1.0。");
+
+        dripstoneGrowthChance = config.getFloat("dripstoneGrowthChance", CATEGORY_GROWTH,
+                0.011377778F, 0.0F, 1.0F,
+                "滴水石锥每次随机刻尝试自然生长的概率；26.3 默认值为 0.011377778。");
+        dripstoneWaterTransferChance = config.getFloat("dripstoneWaterTransferChance", CATEGORY_GROWTH,
+                0.17578125F, 0.0F, 1.0F,
+                "钟乳石每次随机刻尝试把水滴入炼药锅的概率；26.3 默认值为 0.17578125。");
+        dripstoneLavaTransferChance = config.getFloat("dripstoneLavaTransferChance", CATEGORY_GROWTH,
+                0.05859375F, 0.0F, 1.0F,
+                "钟乳石每次随机刻尝试把熔岩滴入炼药锅的概率；26.3 默认值为 0.05859375。");
+        cauldronRainFillChance = config.getFloat("cauldronRainFillChance", CATEGORY_WORLDGEN,
+                0.05F, 0.0F, 1.0F,
+                "空炼药锅每次降水处理积累一级雨水的概率；26.3 默认值为 0.05。");
+        cauldronSnowFillChance = config.getFloat("cauldronSnowFillChance", CATEGORY_WORLDGEN,
+                0.1F, 0.0F, 1.0F,
+                "空炼药锅或细雪炼药锅每次降雪处理积累一级细雪的概率；26.3 默认值为 0.1。");
 
         sweetBerryCommonRarity = config.getInt("sweetBerryCommonRarity", CATEGORY_WORLDGEN,
                 32, 1, 10000, "普通针叶林与巨型针叶林生成甜浆果丛斑块的区块触发分母，26.3 默认为 32。");
@@ -221,6 +470,83 @@ public final class FFDConfig {
         sweetBerryGrowthRoll = config.getInt("sweetBerryGrowthRoll", CATEGORY_GROWTH,
                 5, 1, 1000, "甜浆果丛每次随机刻尝试生长的分母，默认与高版本的 1/5 尝试概率一致。");
 
+        amethystGrowthRoll = config.getInt("amethystGrowthRoll", CATEGORY_GROWTH,
+                5, 1, 1000, "紫水晶母岩每次随机刻尝试生长晶芽的分母，26.3 默认值为 5。");
+        amethystGeodeRarity = config.getInt("amethystGeodeRarity", CATEGORY_WORLDGEN,
+                24, 1, 100000, "紫水晶晶洞的区块触发分母，26.3 默认值为 24。");
+        amethystGeodeMinY = config.getInt("amethystGeodeMinY", CATEGORY_WORLDGEN,
+                -58, -64, 319, "紫水晶晶洞中心的最低生成高度，26.3 默认值为 -58。");
+        amethystGeodeMaxY = config.getInt("amethystGeodeMaxY", CATEGORY_WORLDGEN,
+                30, -64, 319, "紫水晶晶洞中心的最高生成高度，26.3 默认值为 30。");
+        amethystGeodeMaxY = Math.max(amethystGeodeMinY, amethystGeodeMaxY);
+        amethystGeodeOuterWallMin = config.getInt("amethystGeodeOuterWallMin", CATEGORY_WORLDGEN,
+                4, 1, 20, "晶洞分布点到中心的最小外墙距离，26.3 默认值为 4。");
+        amethystGeodeOuterWallMax = config.getInt("amethystGeodeOuterWallMax", CATEGORY_WORLDGEN,
+                6, 1, 20, "晶洞分布点到中心的最大外墙距离，26.3 默认值为 6。");
+        amethystGeodeOuterWallMax = Math.max(amethystGeodeOuterWallMin, amethystGeodeOuterWallMax);
+        amethystGeodeDistributionMin = config.getInt("amethystGeodeDistributionMin", CATEGORY_WORLDGEN,
+                3, 1, 20, "单个晶洞使用的最少分布点数量，26.3 默认值为 3。");
+        amethystGeodeDistributionMax = config.getInt("amethystGeodeDistributionMax", CATEGORY_WORLDGEN,
+                4, 1, 20, "单个晶洞使用的最多分布点数量，26.3 默认值为 4。");
+        amethystGeodeDistributionMax = Math.max(amethystGeodeDistributionMin,
+                amethystGeodeDistributionMax);
+        amethystGeodePointOffsetMin = config.getInt("amethystGeodePointOffsetMin", CATEGORY_WORLDGEN,
+                1, 0, 10, "晶洞分布点的最小形状偏移，26.3 默认值为 1。");
+        amethystGeodePointOffsetMax = config.getInt("amethystGeodePointOffsetMax", CATEGORY_WORLDGEN,
+                2, 0, 10, "晶洞分布点的最大形状偏移，26.3 默认值为 2。");
+        amethystGeodePointOffsetMax = Math.max(amethystGeodePointOffsetMin, amethystGeodePointOffsetMax);
+        amethystGeodeCrackChance = config.getFloat("amethystGeodeCrackChance", CATEGORY_WORLDGEN,
+                0.95F, 0.0F, 1.0F, "紫水晶晶洞生成裂缝的概率，26.3 默认值为 0.95。");
+        amethystGeodeBuddingChance = config.getFloat("amethystGeodeBuddingChance", CATEGORY_WORLDGEN,
+                0.083F, 0.0F, 1.0F, "晶洞内层方块替换为紫水晶母岩的概率，26.3 默认值为 0.083。");
+        amethystGeodeBudPlacementChance = config.getFloat("amethystGeodeBudPlacementChance",
+                CATEGORY_WORLDGEN, 0.35F, 0.0F, 1.0F,
+                "每个紫水晶母岩候选面生成晶芽或晶簇的概率，26.3 默认值为 0.35。");
+
+        deepslateTransitionMinY = config.getInt("deepslateTransitionMinY", CATEGORY_WORLDGEN,
+                0, -64, 319, "石头完全替换为深板岩的最高高度；默认在 Y=0 及以下全部使用深板岩。");
+        deepslateTransitionMaxY = config.getInt("deepslateTransitionMaxY", CATEGORY_WORLDGEN,
+                8, -64, 319, "石头与深板岩渐变过渡的最高高度；默认 Y=0 至 Y=8 逐渐减少深板岩。");
+        deepslateTransitionMaxY = Math.max(deepslateTransitionMinY, deepslateTransitionMaxY);
+        modernOreVeinSizePercent = config.getInt("modernOreVeinSizePercent", CATEGORY_WORLDGEN,
+                100, 1, 1000, "现代矿脉和地下石材团簇尺寸的百分比；100 为 26.3 默认尺寸。");
+        modernFossilRarity = config.getInt("modernFossilRarity", CATEGORY_WORLDGEN,
+                64, 1, 100000, "ffd_cac 深层化石的区块触发分母；26.3 默认值为 64。");
+        modernVillageSpacing = config.getInt("modernVillageSpacing", CATEGORY_WORLDGEN,
+                34, 9, 256, "ffd_cac 村庄随机扩散间距（区块）；26.3 默认值为 34，分离距离固定为 8。");
+        modernCoalUpperCount = oreCount(config, "modernCoalUpperCount", 30, "高层煤矿");
+        modernCoalLowerCount = oreCount(config, "modernCoalLowerCount", 20, "低层煤矿");
+        modernIronUpperCount = oreCount(config, "modernIronUpperCount", 90, "高层铁矿");
+        modernIronMiddleCount = oreCount(config, "modernIronMiddleCount", 10, "中层铁矿");
+        modernIronSmallCount = oreCount(config, "modernIronSmallCount", 10, "小型铁矿");
+        modernGoldCount = oreCount(config, "modernGoldCount", 4, "金矿");
+        modernGoldLowerMaxCount = oreCount(config, "modernGoldLowerMaxCount", 1, "底层额外金矿最大次数");
+        modernGoldExtraCount = oreCount(config, "modernGoldExtraCount", 50, "恶地额外金矿");
+        modernRedstoneCount = oreCount(config, "modernRedstoneCount", 4, "红石矿");
+        modernRedstoneLowerCount = oreCount(config, "modernRedstoneLowerCount", 8, "底层额外红石矿");
+        modernDiamondCount = oreCount(config, "modernDiamondCount", 7, "小型钻石矿");
+        modernDiamondBuriedCount = oreCount(config, "modernDiamondBuriedCount", 4, "埋藏钻石矿");
+        modernDiamondLargeRarity = config.getInt("modernDiamondLargeRarity", CATEGORY_WORLDGEN,
+                9, 1, 100000, "大型钻石矿脉的区块触发分母；26.3 默认值为 9。");
+        modernLapisCount = oreCount(config, "modernLapisCount", 2, "青金石矿");
+        modernLapisBuriedCount = oreCount(config, "modernLapisBuriedCount", 4, "埋藏青金石矿");
+        modernCopperCount = oreCount(config, "modernCopperCount", 16, "铜矿");
+        modernCopperLargeCount = oreCount(config, "modernCopperLargeCount", 16, "滴水石洞穴大型铜矿");
+        modernEmeraldCount = oreCount(config, "modernEmeraldCount", 100, "山地绿宝石矿");
+        modernTuffCount = oreCount(config, "modernTuffCount", 2, "凝灰岩团簇");
+        modernInfestedCount = oreCount(config, "modernInfestedCount", 14, "山地虫蚀石材");
+        modernGraniteLowerCount = oreCount(config, "modernGraniteLowerCount", 2, "低层花岗岩团簇");
+        modernGraniteUpperRarity = config.getInt("modernGraniteUpperRarity", CATEGORY_WORLDGEN,
+                6, 1, 100000, "高层花岗岩团簇的区块触发分母；26.3 默认值为 6。");
+        modernDioriteLowerCount = oreCount(config, "modernDioriteLowerCount", 2, "低层闪长岩团簇");
+        modernDioriteUpperRarity = config.getInt("modernDioriteUpperRarity", CATEGORY_WORLDGEN,
+                6, 1, 100000, "高层闪长岩团簇的区块触发分母；26.3 默认值为 6。");
+        modernAndesiteLowerCount = oreCount(config, "modernAndesiteLowerCount", 2, "低层安山岩团簇");
+        modernAndesiteUpperRarity = config.getInt("modernAndesiteUpperRarity", CATEGORY_WORLDGEN,
+                6, 1, 100000, "高层安山岩团簇的区块触发分母；26.3 默认值为 6。");
+        modernDirtCount = oreCount(config, "modernDirtCount", 7, "地下泥土团簇");
+        modernGravelCount = oreCount(config, "modernGravelCount", 14, "地下沙砾团簇");
+
         glowSquidSpawnWeight = config.getInt("glowSquidSpawnWeight", CATEGORY_WORLDGEN,
                 10, 0, 1000, "荧光鱿鱼生成权重，26.3 默认值为 10。");
         glowSquidMinGroupSize = config.getInt("glowSquidMinGroupSize", CATEGORY_WORLDGEN,
@@ -230,6 +556,16 @@ public final class FFDConfig {
         glowSquidMaxGroupSize = Math.max(glowSquidMinGroupSize, glowSquidMaxGroupSize);
         glowSquidDepthBelowSeaLevel = config.getInt("glowSquidDepthBelowSeaLevel", CATEGORY_WORLDGEN,
                 33, 0, 255, "荧光鱿鱼最高生成位置低于海平面的格数，26.3 默认值为 33。");
+
+        phantomSpawnMinIntervalSeconds = config.getInt("phantomSpawnMinIntervalSeconds",
+                CATEGORY_WORLDGEN, 60, 1, 3600,
+                "幻翼生成器两次检查之间的最短秒数，26.3 默认为 60 秒。");
+        phantomSpawnMaxIntervalSeconds = config.getInt("phantomSpawnMaxIntervalSeconds",
+                CATEGORY_WORLDGEN, 119, 1, 3600,
+                "幻翼生成器两次检查之间的最长秒数，26.3 默认为 119 秒。");
+        phantomInsomniaThresholdTicks = config.getInt("phantomInsomniaThresholdTicks",
+                CATEGORY_WORLDGEN, 72000, 0, Integer.MAX_VALUE,
+                "幻翼开始获得生成概率前所需的未休息时间，单位为 tick；26.3 默认为 72000 tick。");
 
         kelpColdNoiseRatio = config.getInt("kelpColdNoiseRatio", CATEGORY_WORLDGEN,
                 120, 0, 1000, "海带冷水海洋噪声密度比例，26.3 默认为 120。");
@@ -277,6 +613,29 @@ public final class FFDConfig {
                 5, 1, 64, "海龟生成群体最大数量，26.3 默认为 5。");
         turtleEggHatchChance = config.getFloat("turtleEggHatchChance", CATEGORY_GROWTH,
                 0.002F, 0.0F, 1.0F, "海龟蛋每次随机刻推进裂纹的概率，26.3 默认为 0.002。 ");
+
+        axolotlSpawnCheckIntervalTicks = config.getInt("axolotlSpawnCheckIntervalTicks",
+                CATEGORY_WORLDGEN, 400, 1, 72000,
+                "美西螈自然生成器两次检查之间的 tick 数；默认 400，与高版本友好生物生成节奏一致。");
+        axolotlSpawnAttemptsPerPlayer = config.getInt("axolotlSpawnAttemptsPerPlayer",
+                CATEGORY_WORLDGEN, 16, 0, 128,
+                "每名玩家每次美西螈生成检查选择繁茂洞穴位置的尝试次数。默认 16。");
+        axolotlMinGroupSize = config.getInt("axolotlMinGroupSize", CATEGORY_WORLDGEN,
+                4, 1, 64, "美西螈自然生成群体的最小数量，26.3 默认值为 4。");
+        axolotlMaxGroupSize = Math.max(axolotlMinGroupSize, config.getInt(
+                "axolotlMaxGroupSize", CATEGORY_WORLDGEN, 6, 1, 64,
+                "美西螈自然生成群体的最大数量，26.3 默认值为 6。"));
+        axolotlMobCap = config.getInt("axolotlMobCap", CATEGORY_WORLDGEN,
+                5, 0, 256,
+                "每 289 个有效区块允许自然存在的美西螈上限，26.3 默认值为 5；不占用 1.12 水生生物上限。");
+
+        goatSpawnWeight = config.getInt("goatSpawnWeight", CATEGORY_WORLDGEN,
+                5, 0, 1000, "山羊在现代山地群系中的生成权重，26.3 默认值为 5。");
+        goatMinGroupSize = config.getInt("goatMinGroupSize", CATEGORY_WORLDGEN,
+                1, 1, 64, "山羊自然生成群体的最小数量，26.3 默认值为 1。");
+        goatMaxGroupSize = Math.max(goatMinGroupSize, config.getInt(
+                "goatMaxGroupSize", CATEGORY_WORLDGEN, 3, 1, 64,
+                "山羊自然生成群体的最大数量，26.3 默认值为 3。"));
 
         beeNestPlainsChance = config.getFloat("beeNestPlainsChance", CATEGORY_WORLDGEN,
                 0.05F, 0.0F, 1.0F, "平原和向日葵平原中每棵合适树木生成蜂巢的概率，26.3 默认值为 0.05。");
@@ -331,6 +690,23 @@ public final class FFDConfig {
                 125, 0, 1000, "每个繁茂洞穴生成区域的地面苔藓装饰尝试次数，26.3 默认值为 125。");
         lushCaveMossCeilingAttempts = config.getInt("lushCaveMossCeilingAttempts", CATEGORY_WORLDGEN,
                 125, 0, 1000, "每个繁茂洞穴生成区域的顶部苔藓装饰尝试次数，26.3 默认值为 125。");
+        lushCaveTallGrassNoiseThreshold = config.getFloat("lushCaveTallGrassNoiseThreshold",
+                CATEGORY_WORLDGEN, -0.8F, -1.0F, 1.0F,
+                "繁茂洞穴地表高草斑块的群系信息噪声阈值，26.3 默认值为 -0.8；低于阈值时不生成。");
+        lushCaveTallGrassAboveNoiseCount = config.getInt("lushCaveTallGrassAboveNoiseCount",
+                CATEGORY_WORLDGEN, 7, 0, 256,
+                "噪声达到阈值时，每个源区块的高草斑块候选次数，26.3 默认值为 7。");
+        lushCaveTallGrassRarity = config.getInt("lushCaveTallGrassRarity", CATEGORY_WORLDGEN,
+                32, 1, 10000, "每个高草斑块候选通过稀有度筛选的分母，26.3 默认值为 32。");
+        lushCaveTallGrassPatchAttempts = config.getInt("lushCaveTallGrassPatchAttempts",
+                CATEGORY_WORLDGEN, 96, 0, 4000,
+                "每个繁茂洞穴地表高草斑块的放置尝试次数，26.3 默认值为 96。");
+        lushCaveTallGrassHorizontalOffset = config.getInt("lushCaveTallGrassHorizontalOffset",
+                CATEGORY_WORLDGEN, 7, 0, 64,
+                "繁茂洞穴地表高草斑块的三角分布水平偏移半径，26.3 默认值为 7。");
+        lushCaveTallGrassVerticalOffset = config.getInt("lushCaveTallGrassVerticalOffset",
+                CATEGORY_WORLDGEN, 3, 0, 32,
+                "繁茂洞穴地表高草斑块的三角分布垂直偏移半径，26.3 默认值为 3。");
         lushCaveMossPatchMinRadius = config.getInt("lushCaveMossPatchMinRadius", CATEGORY_WORLDGEN,
                 4, 1, 32, "繁茂洞穴苔藓斑块的最小基础半径，26.3 默认范围为 4-7，实际生成时再加 1。");
         lushCaveMossPatchMaxRadius = Math.max(lushCaveMossPatchMinRadius,
@@ -406,6 +782,21 @@ public final class FFDConfig {
                 10, 0, 100, "浅水黏土斑块中每个候选位置生成垂滴叶的百分比，26.3 默认值为 10。");
         glowLichenSurfaceOffset = config.getInt("glowLichenSurfaceOffset", CATEGORY_WORLDGEN,
                 13, 0, 255, "发光地衣候选位置必须低于当地海床或地表的最小格数，26.3 默认值为 13。");
+        dripstoneLargeMinAttempts = config.getInt("dripstoneLargeMinAttempts", CATEGORY_WORLDGEN,
+                10, 0, 4000, "每个滴水石洞穴区块生成大型滴水石的最少尝试次数，26.3 默认范围为 10-48。");
+        dripstoneLargeMaxAttempts = Math.max(dripstoneLargeMinAttempts,
+                config.getInt("dripstoneLargeMaxAttempts", CATEGORY_WORLDGEN,
+                        48, 0, 4000, "每个滴水石洞穴区块生成大型滴水石的最多尝试次数，26.3 默认范围为 10-48。"));
+        dripstoneClusterMinAttempts = config.getInt("dripstoneClusterMinAttempts", CATEGORY_WORLDGEN,
+                48, 0, 4000, "每个滴水石洞穴区块生成滴水石簇的最少尝试次数，26.3 默认范围为 48-96。");
+        dripstoneClusterMaxAttempts = Math.max(dripstoneClusterMinAttempts,
+                config.getInt("dripstoneClusterMaxAttempts", CATEGORY_WORLDGEN,
+                        96, 0, 4000, "每个滴水石洞穴区块生成滴水石簇的最多尝试次数，26.3 默认范围为 48-96。"));
+        dripstonePointedMinAttempts = config.getInt("dripstonePointedMinAttempts", CATEGORY_WORLDGEN,
+                192, 0, 4000, "每个滴水石洞穴区块生成零散滴水石锥的最少尝试次数，26.3 默认范围为 192-256。");
+        dripstonePointedMaxAttempts = Math.max(dripstonePointedMinAttempts,
+                config.getInt("dripstonePointedMaxAttempts", CATEGORY_WORLDGEN,
+                        256, 0, 4000, "每个滴水石洞穴区块生成零散滴水石锥的最多尝试次数，26.3 默认范围为 192-256。"));
 
         netherForestBiomeNoiseScale = config.getInt("netherForestBiomeNoiseScale", CATEGORY_WORLDGEN,
                 192, 32, 4096, "绯红森林与诡异森林区域噪声的水平尺度。1.12 无多噪声下界，默认以约 192 格尺度近似 26.3 的连续下界群系分布。");
@@ -452,6 +843,10 @@ public final class FFDConfig {
     }
 
     private static void migrateLegacyDefaults(Configuration config, int loadedConfigVersion) {
+        if (loadedConfigVersion < 4 && axolotlSpawnAttemptsPerPlayer == 3) {
+            axolotlSpawnAttemptsPerPlayer = 16;
+            config.get(CATEGORY_WORLDGEN, "axolotlSpawnAttemptsPerPlayer", 16).set(16);
+        }
         if (loadedConfigVersion < 2
                 && lushCaveMinVerticalRadius == 4 && lushCaveMaxVerticalRadius == 8) {
             lushCaveMinVerticalRadius = 8;
@@ -490,6 +885,9 @@ public final class FFDConfig {
         if (CATEGORY_FEATURES.equals(category)) {
             return "内容开关。\nFeature toggles for the backported content.";
         }
+        if (CATEGORY_GAMEPLAY.equals(category)) {
+            return "通用玩法规则。\nGeneral gameplay rules.";
+        }
         if (CATEGORY_WORLDGEN.equals(category)) {
             return "世界生成设置。\nWorld-generation settings.";
         }
@@ -521,16 +919,175 @@ public final class FFDConfig {
     private static String englishDescription(String category, String key) {
         if (CATEGORY_FEATURES.equals(category)) {
             return "Feature mode for " + humanizeKey(key.replace("Mode", ""))
-                    + ". ENABLED uses this mod's implementation; DISABLED turns it off; AUTO turns it off only when a compatible non-Delight external mod is detected.";
+                    + ". ENABLED uses this mod's implementation; DISABLED turns it off; AUTO resolves each compatible content unit independently and fills only missing units locally.";
         }
         if ("sporeBlossomParticlesEnabled".equals(key)) {
             return "Enable falling spore particles from spore blossoms. Disabled by default.";
+        }
+        if ("lightBlockMode".equals(key)) {
+            return "Feature mode for the invisible administrator light block. ENABLED uses this mod's implementation; DISABLED turns it off; AUTO is enabled unless a compatible provider is added.";
         }
         if ("sporeBlossomParticleFrequency".equals(key)) {
             return "Emission frequency denominator per random display tick. 1 emits every display tick; larger values reduce the frequency.";
         }
         if ("sporeBlossomParticleDensity".equals(key)) {
             return "Number of falling spore particles emitted per burst. The default of 15 matches one primary particle plus fourteen ambient particles.";
+        }
+        if ("phantomSpawnMinIntervalSeconds".equals(key)) {
+            return "Minimum delay in seconds between phantom spawn checks. The 26.3 default is 60 seconds.";
+        }
+        if ("phantomSpawnMaxIntervalSeconds".equals(key)) {
+            return "Maximum delay in seconds between phantom spawn checks. The 26.3 default is 119 seconds.";
+        }
+        if ("phantomInsomniaThresholdTicks".equals(key)) {
+            return "Time without rest before phantoms begin to gain a spawn chance, in ticks. The 26.3 default is 72000 ticks.";
+        }
+        if ("hostileMobsRequireZeroBlockLight".equals(key)) {
+            return "Require block light level 0 for natural hostile mob spawning in every world type. Mob spawners are not affected.";
+        }
+        if ("cloudHeightMode".equals(key)) {
+            return "Scope for the modern cloud height. DISABLED keeps the original height; CAVES_CLIFFS_ONLY changes only Caves & Cliffs worlds; ALL_WORLDS changes every world type.";
+        }
+        if ("smoothBiomeSkyColors".equals(key)) {
+            return "Smoothly blend sky colors across biome borders. When disabled, use the sky color of the biome at the player's position. Client-side display only.";
+        }
+        if ("modernWorldLoadingScreen".equals(key)) {
+            return "Use the modern-style loading screen while creating or entering a world. Disabled by default; when disabled, every world type uses the original 1.12.2 loading screen. Client-side display only.";
+        }
+        if ("cavesAndCliffsBackgroundMusic".equals(key)) {
+            return "Add the eight Minecraft 1.18 background tracks to the survival and main-menu music pools in every world type.";
+        }
+        if ("shovelCreatesDirtPath".equals(key)) {
+            return "Allow shovels to turn dirt, coarse dirt, podzol, and mycelium into dirt paths.";
+        }
+        if ("shearsStopPlantGrowth".equals(key)) {
+            return "Allow shears to set kelp, cave vines, weeping vines, and twisting vines to their maximum growth age.";
+        }
+        if ("oresDropRawMaterials".equals(key)) {
+            return "Make iron, gold, and copper ores drop raw materials with Fortune support in every world type; Silk Touch still drops the ore block.";
+        }
+        if ("modernCauldronFeatures".equals(key)) {
+            return "Enable lava and powder snow cauldrons, pointed dripstone filling, and precipitation accumulation in every world type.";
+        }
+        if ("modernFossilRarity".equals(key)) {
+            return "Chunk trigger denominator for lower fossils in ffd_cac. The 26.3 default is 64.";
+        }
+        if ("modernVillageSpacing".equals(key)) {
+            return "Village random-spread spacing in chunks for ffd_cac. The 26.3 default is 34; separation remains 8.";
+        }
+        if ("enchantingTableEmitsLight".equals(key)) {
+            return "Make enchanting tables emit modern light level 7 in every world type.";
+        }
+        if ("pistonBreakParticles".equals(key)) {
+            return "Show the destroyed block's break particles when a piston destroys a block in every world type.";
+        }
+        if ("infestedBlocksHalfBreakTime".equals(key)) {
+            return "Give infested blocks half the breaking time of their corresponding ordinary host blocks in every world type.";
+        }
+        if ("shulkerDuplication".equals(key)) {
+            return "Allow shulkers hit by shulker bullets to duplicate using the modern nearby-shulker chance in every world type.";
+        }
+        if ("experienceOrbMerging".equals(key)) {
+            return "Merge nearby experience orbs with the same value without losing experience, and pick up merged units one at a time.";
+        }
+        if ("illagersIgnoreBabyVillagers".equals(key)) {
+            return "Prevent illagers from targeting or damaging baby villagers in every world type.";
+        }
+        if ("goatScreamingChance".equals(key)) {
+            return "Base chance for a spawned or bred goat to be a screaming goat. The 26.3 default is 0.02.";
+        }
+        if ("goatSingleHornChance".equals(key)) {
+            return "Chance for a newly spawned adult goat to be missing one random horn. The 26.3 default is 0.1.";
+        }
+        if ("goatLongJumpCooldownMinTicks".equals(key)) {
+            return "Minimum delay between goat long jumps, in ticks. The 26.3 default is 600.";
+        }
+        if ("goatLongJumpCooldownMaxTicks".equals(key)) {
+            return "Maximum delay between goat long jumps, in ticks. The 26.3 default is 1200.";
+        }
+        if ("goatLongJumpHorizontalRange".equals(key)) {
+            return "Maximum horizontal search range for goat long-jump landing positions. The 26.3 default is 5 blocks.";
+        }
+        if ("goatLongJumpVerticalRange".equals(key)) {
+            return "Maximum vertical search range for goat long-jump landing positions. The 26.3 default is 5 blocks.";
+        }
+        if ("goatLongJumpPrepareTicks".equals(key)) {
+            return "Preparation time after a goat selects a long-jump landing position, in ticks. The 26.3 default is 40.";
+        }
+        if ("goatLongJumpVelocityMultiplier".equals(key)) {
+            return "Maximum long-jump launch velocity multiplier relative to the base jump strength. The 26.3 default is 3.5714288.";
+        }
+        if ("goatRamCooldownMinTicks".equals(key)) {
+            return "Minimum delay between rams for a regular goat, in ticks. The 26.3 default is 600.";
+        }
+        if ("goatRamCooldownMaxTicks".equals(key)) {
+            return "Maximum delay between rams for a regular goat, in ticks. The 26.3 default is 6000.";
+        }
+        if ("screamingGoatRamCooldownMinTicks".equals(key)) {
+            return "Minimum delay between rams for a screaming goat, in ticks. The 26.3 default is 100.";
+        }
+        if ("screamingGoatRamCooldownMaxTicks".equals(key)) {
+            return "Maximum delay between rams for a screaming goat, in ticks. The 26.3 default is 300.";
+        }
+        if ("goatRamPrepareTicks".equals(key)) {
+            return "Time a goat lowers its head at the starting position before ramming, in ticks. The 26.3 default is 20.";
+        }
+        if ("goatRamMinDistance".equals(key)) {
+            return "Minimum distance between a goat's ram starting position and its target. The 26.3 default is 4 blocks.";
+        }
+        if ("goatRamMaxDistance".equals(key)) {
+            return "Maximum distance between a goat's ram starting position and its target. The 26.3 default is 7 blocks.";
+        }
+        if ("goatRamSpeedMultiplier".equals(key)) {
+            return "Movement-speed multiplier used during the active ram. The 26.3 default is 3.0.";
+        }
+        if ("goatAdultRamKnockback".equals(key)) {
+            return "Base knockback force applied by an adult goat's ram. The 26.3 default is 2.5.";
+        }
+        if ("goatBabyRamKnockback".equals(key)) {
+            return "Base knockback force applied by a baby goat's ram. The 26.3 default is 1.0.";
+        }
+        if ("goatSpawnWeight".equals(key)) {
+            return "Goat spawn weight in modern mountain biomes. The 26.3 default is 5.";
+        }
+        if ("goatMinGroupSize".equals(key)) {
+            return "Minimum number of goats in a natural spawn group. The 26.3 default is 1.";
+        }
+        if ("goatMaxGroupSize".equals(key)) {
+            return "Maximum number of goats in a natural spawn group. The 26.3 default is 3.";
+        }
+        if ("dripstoneGrowthChance".equals(key)) {
+            return "Chance per random tick for pointed dripstone to attempt natural growth. The 26.3 default is 0.011377778.";
+        }
+        if ("dripstoneWaterTransferChance".equals(key)) {
+            return "Chance per random tick for a stalactite to schedule water transfer into a cauldron. The 26.3 default is 0.17578125.";
+        }
+        if ("dripstoneLavaTransferChance".equals(key)) {
+            return "Chance per random tick for a stalactite to schedule lava transfer into a cauldron. The 26.3 default is 0.05859375.";
+        }
+        if ("cauldronRainFillChance".equals(key)) {
+            return "Chance per precipitation update for rain to add one water level to a cauldron. The 26.3 default is 0.05.";
+        }
+        if ("cauldronSnowFillChance".equals(key)) {
+            return "Chance per precipitation update for snow to add one powder snow level to a cauldron. The 26.3 default is 0.1.";
+        }
+        if ("dripstoneLargeMinAttempts".equals(key)) {
+            return "Minimum large-dripstone placement attempts per dripstone-cave chunk. The 26.3 default range is 10 to 48.";
+        }
+        if ("dripstoneLargeMaxAttempts".equals(key)) {
+            return "Maximum large-dripstone placement attempts per dripstone-cave chunk. The 26.3 default range is 10 to 48.";
+        }
+        if ("dripstoneClusterMinAttempts".equals(key)) {
+            return "Minimum dripstone-cluster placement attempts per dripstone-cave chunk. The 26.3 default range is 48 to 96.";
+        }
+        if ("dripstoneClusterMaxAttempts".equals(key)) {
+            return "Maximum dripstone-cluster placement attempts per dripstone-cave chunk. The 26.3 default range is 48 to 96.";
+        }
+        if ("dripstonePointedMinAttempts".equals(key)) {
+            return "Minimum scattered pointed-dripstone placement attempts per dripstone-cave chunk. The 26.3 default range is 192 to 256.";
+        }
+        if ("dripstonePointedMaxAttempts".equals(key)) {
+            return "Maximum scattered pointed-dripstone placement attempts per dripstone-cave chunk. The 26.3 default range is 192 to 256.";
         }
         String prefix = CATEGORY_WORLDGEN.equals(category) ? "World-generation setting: "
                 : CATEGORY_GROWTH.equals(category) ? "Growth setting: "
@@ -583,7 +1140,7 @@ public final class FFDConfig {
 
     private static FeatureMode readMode(Configuration config, String key, String comment) {
         String value = config.getString(key, CATEGORY_FEATURES, "AUTO",
-                comment + "。可选值：ENABLED、DISABLED、AUTO。AUTO 会在检测到对应非乐事类外部模组时关闭本地内容。",
+                comment + "。可选值：ENABLED、DISABLED、AUTO。AUTO 会逐个识别外部内容单元，并仅由本模组补齐缺失内容。",
                 new String[]{"ENABLED", "DISABLED", "AUTO"});
         return FeatureMode.parse(value);
     }
@@ -596,5 +1153,10 @@ public final class FFDConfig {
     private static int readTallPercent(Configuration config, String key, int defaultValue, String biome) {
         return config.getInt(key, CATEGORY_WORLDGEN, defaultValue, 0, 100,
                 biome + "生成高海草的百分比，26.3 默认为 " + defaultValue + "% 。");
+    }
+
+    private static int oreCount(Configuration config, String key, int defaultValue, String feature) {
+        return config.getInt(key, CATEGORY_WORLDGEN, defaultValue, 0, 1000,
+                feature + "每区块生成尝试次数；26.3 默认值为 " + defaultValue + "。");
     }
 }

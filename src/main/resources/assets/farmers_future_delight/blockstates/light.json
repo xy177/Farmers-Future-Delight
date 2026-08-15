@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "level=0": { "model": "farmers_future_delight:light" },
+    "level=1": { "model": "farmers_future_delight:light" },
+    "level=2": { "model": "farmers_future_delight:light" },
+    "level=3": { "model": "farmers_future_delight:light" },
+    "level=4": { "model": "farmers_future_delight:light" },
+    "level=5": { "model": "farmers_future_delight:light" },
+    "level=6": { "model": "farmers_future_delight:light" },
+    "level=7": { "model": "farmers_future_delight:light" },
+    "level=8": { "model": "farmers_future_delight:light" },
+    "level=9": { "model": "farmers_future_delight:light" },
+    "level=10": { "model": "farmers_future_delight:light" },
+    "level=11": { "model": "farmers_future_delight:light" },
+    "level=12": { "model": "farmers_future_delight:light" },
+    "level=13": { "model": "farmers_future_delight:light" },
+    "level=14": { "model": "farmers_future_delight:light" },
+    "level=15": { "model": "farmers_future_delight:light" }
+  }
+}

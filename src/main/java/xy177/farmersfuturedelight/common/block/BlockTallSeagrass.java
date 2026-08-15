@@ -21,6 +21,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.property.ExtendedBlockState;
 
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
@@ -40,7 +41,9 @@ public class BlockTallSeagrass extends BlockUnderwaterPlant {
 
     @Override
     protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, BlockLiquid.LEVEL, HALF);
+        return new ExtendedBlockState(this,
+                new net.minecraft.block.properties.IProperty<?>[] {BlockLiquid.LEVEL, HALF},
+                WaterloggedPlantFluid.extendedProperties());
     }
 
     @Override
@@ -137,7 +140,7 @@ public class BlockTallSeagrass extends BlockUnderwaterPlant {
         player.addStat(StatList.getBlockStats(this));
         player.addExhaustion(0.005F);
         if (!world.isRemote && isFeatureEnabled() && tool.getItem() == Items.SHEARS) {
-            spawnAsEntity(world, pos, new ItemStack(FFDItems.SEAGRASS, 2));
+            spawnAsEntity(world, pos, FFDItems.effectiveStack(FFDItems.SEAGRASS, 2));
         }
     }
 
@@ -155,6 +158,6 @@ public class BlockTallSeagrass extends BlockUnderwaterPlant {
 
     @Override
     public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
-        return new ItemStack(FFDItems.SEAGRASS);
+        return FFDItems.effectiveStack(FFDItems.SEAGRASS);
     }
 }

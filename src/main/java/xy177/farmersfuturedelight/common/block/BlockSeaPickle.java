@@ -32,6 +32,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.BiomeDictionary;
 
 import xy177.farmersfuturedelight.FarmerFutureDelight;
@@ -63,7 +64,15 @@ public class BlockSeaPickle extends BlockBush implements IGrowable {
 
     @Override
     protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, BlockLiquid.LEVEL, PICKLES, WATERLOGGED);
+        return new ExtendedBlockState(this,
+                new net.minecraft.block.properties.IProperty<?>[] {
+                        BlockLiquid.LEVEL, PICKLES, WATERLOGGED},
+                WaterloggedPlantFluid.extendedProperties());
+    }
+
+    @Override
+    public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
+        return WaterloggedPlantFluid.getExtendedState(state, world, pos);
     }
 
     @Override
@@ -245,7 +254,8 @@ public class BlockSeaPickle extends BlockBush implements IGrowable {
     public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos,
                          IBlockState state, int fortune) {
         if (FFDItems.isSeaPickleEnabled()) {
-            drops.add(new ItemStack(FFDItems.SEA_PICKLE, state.getValue(PICKLES)));
+            drops.add(FFDItems.effectiveStack(FFDItems.SEA_PICKLE,
+                    state.getValue(PICKLES)));
         }
     }
 
@@ -329,6 +339,6 @@ public class BlockSeaPickle extends BlockBush implements IGrowable {
 
     @Override
     public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
-        return new ItemStack(FFDItems.SEA_PICKLE);
+        return FFDItems.effectiveStack(FFDItems.SEA_PICKLE);
     }
 }

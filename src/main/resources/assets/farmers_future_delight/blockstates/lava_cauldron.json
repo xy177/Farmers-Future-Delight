@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "level=0": { "model": "farmers_future_delight:lava_cauldron" },
+    "level=1": { "model": "farmers_future_delight:lava_cauldron" },
+    "level=2": { "model": "farmers_future_delight:lava_cauldron" },
+    "level=3": { "model": "farmers_future_delight:lava_cauldron" }
+  }
+}

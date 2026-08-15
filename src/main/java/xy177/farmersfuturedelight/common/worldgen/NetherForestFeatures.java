@@ -2,7 +2,6 @@ package xy177.farmersfuturedelight.common.worldgen;
 
 import java.util.Random;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -12,8 +11,8 @@ import net.minecraft.world.World;
 
 import xy177.farmersfuturedelight.common.FFDConfig;
 import xy177.farmersfuturedelight.common.block.BlockNetherVine;
-import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
+import xy177.farmersfuturedelight.core.FFDHeightHooks;
 
 public final class NetherForestFeatures {
     private static final int MIN_NYLIUM_Y = 32;
@@ -27,6 +26,9 @@ public final class NetherForestFeatures {
     public static void generateForest(World world, Random random, int chunkX, int chunkZ,
                                       boolean warped, float[] columnStrengths) {
         if (warped ? !FFDItems.isWarpedEnabled() : !FFDItems.isCrimsonEnabled()) {
+            return;
+        }
+        if (blocks().nylium(warped) == null) {
             return;
         }
 
@@ -84,9 +86,8 @@ public final class NetherForestFeatures {
 
     private static void convertExposedNetherrack(World world, Random random, int chunkX, int chunkZ,
                                                   boolean warped, float[] columnStrengths) {
-        IBlockState nylium = (warped ? FFDBlocks.WARPED_NYLIUM : FFDBlocks.CRIMSON_NYLIUM)
-                .getDefaultState();
-        int topY = getNetherTopY(world) - 1;
+        IBlockState nylium = blocks().nylium(warped);
+        int topY = getNetherTopY(world) - 2;
         for (int localX = 0; localX < 16; localX++) {
             for (int localZ = 0; localZ < 16; localZ++) {
                 if (!acceptColumn(random, columnStrengths, localX, localZ)) {
@@ -120,7 +121,7 @@ public final class NetherForestFeatures {
                 }
                 int x = chunkX * 16 + localX;
                 int z = chunkZ * 16 + localZ;
-                int y = findOnGroundYPosition(world, x, getNetherTopY(world), z, layer);
+                int y = findOnGroundYPosition(world, x, getNetherTopY(world) - 1, z, layer);
                 if (y == POSITION_NOT_FOUND) {
                     continue;
                 }
@@ -183,7 +184,8 @@ public final class NetherForestFeatures {
                     random.nextInt(spreadHeight) - random.nextInt(spreadHeight),
                     random.nextInt(spreadWidth) - random.nextInt(spreadWidth));
             IBlockState state = selectVegetationState(random, warped);
-            if (state != null && isLoadedArea(world, candidate, 1) && world.isAirBlock(candidate)
+            if (state != null && isInsideWorld(world, candidate)
+                    && isLoadedArea(world, candidate, 1) && world.isAirBlock(candidate)
                     && state.getBlock().canPlaceBlockAt(world, candidate)) {
                 world.setBlockState(candidate, state, updateFlags);
             }
@@ -194,30 +196,31 @@ public final class NetherForestFeatures {
         if (!warped) {
             int roll = random.nextInt(99);
             if (roll < 87) {
-                return FFDItems.isCrimsonEnabled() ? FFDBlocks.CRIMSON_ROOTS.getDefaultState() : null;
+                return blocks().roots(false);
             }
             if (roll < 98) {
-                return FFDItems.isCrimsonEnabled() ? FFDBlocks.CRIMSON_FUNGUS.getDefaultState() : null;
+                return blocks().fungus(false);
             }
-            return FFDItems.isWarpedEnabled() ? FFDBlocks.WARPED_FUNGUS.getDefaultState() : null;
+            return blocks().fungus(true);
         }
 
         int roll = random.nextInt(100);
         if (roll < 85) {
-            return FFDItems.isWarpedEnabled() ? FFDBlocks.WARPED_ROOTS.getDefaultState() : null;
+            return blocks().roots(true);
         }
         if (roll == 85) {
-            return FFDItems.isCrimsonEnabled() ? FFDBlocks.CRIMSON_ROOTS.getDefaultState() : null;
+            return blocks().roots(false);
         }
         if (roll < 99) {
-            return FFDItems.isWarpedEnabled() ? FFDBlocks.WARPED_FUNGUS.getDefaultState() : null;
+            return blocks().fungus(true);
         }
-        return FFDItems.isCrimsonEnabled() ? FFDBlocks.CRIMSON_FUNGUS.getDefaultState() : null;
+        return blocks().fungus(false);
     }
 
     private static void placeNetherSproutsFeature(World world, Random random, BlockPos origin,
                                                   int spreadWidth, int spreadHeight, int updateFlags) {
-        if (!FFDItems.isWarpedEnabled() || !isLoadedArea(world, origin, 1)
+        IBlockState sprouts = blocks().sprouts();
+        if (sprouts == null || !isLoadedArea(world, origin, 1)
                 || !isAnyNylium(world.getBlockState(origin.down()))
                 || !isInsideWorld(world, origin)) {
             return;
@@ -226,9 +229,10 @@ public final class NetherForestFeatures {
             BlockPos candidate = origin.add(random.nextInt(spreadWidth) - random.nextInt(spreadWidth),
                     random.nextInt(spreadHeight) - random.nextInt(spreadHeight),
                     random.nextInt(spreadWidth) - random.nextInt(spreadWidth));
-            if (isLoadedArea(world, candidate, 1) && world.isAirBlock(candidate)
-                    && FFDBlocks.NETHER_SPROUTS.canPlaceBlockAt(world, candidate)) {
-                world.setBlockState(candidate, FFDBlocks.NETHER_SPROUTS.getDefaultState(), updateFlags);
+            if (isInsideWorld(world, candidate) && isLoadedArea(world, candidate, 1)
+                    && world.isAirBlock(candidate)
+                    && sprouts.getBlock().canPlaceBlockAt(world, candidate)) {
+                world.setBlockState(candidate, sprouts, updateFlags);
             }
         }
     }
@@ -247,11 +251,17 @@ public final class NetherForestFeatures {
 
     private static void placeWeepingVinesFeature(World world, Random random, BlockPos origin,
                                                  int updateFlags) {
-        if (!isLoadedArea(world, origin, 1) || !world.isAirBlock(origin)
+        if (!isInsideWorld(world, origin) || !isLoadedArea(world, origin, 1)
+                || !world.isAirBlock(origin)
                 || !isWeepingVinesSupport(world.getBlockState(origin.up()))) {
             return;
         }
-        world.setBlockState(origin, FFDBlocks.NETHER_WART_BLOCK.getDefaultState(), updateFlags);
+        IBlockState wart = blocks().wart(false);
+        if (wart == null || blocks().vine(false, true) == null
+                || blocks().vine(false, false) == null) {
+            return;
+        }
+        world.setBlockState(origin, wart, updateFlags);
         placeRoofNetherWart(world, random, origin, updateFlags);
         placeRoofWeepingVines(world, random, origin, updateFlags);
     }
@@ -262,7 +272,8 @@ public final class NetherForestFeatures {
             BlockPos candidate = origin.add(random.nextInt(6) - random.nextInt(6),
                     random.nextInt(2) - random.nextInt(5),
                     random.nextInt(6) - random.nextInt(6));
-            if (!isLoadedArea(world, candidate, 1) || !world.isAirBlock(candidate)) {
+            if (!isInsideWorld(world, candidate) || !isLoadedArea(world, candidate, 1)
+                    || !world.isAirBlock(candidate)) {
                 continue;
             }
             int neighbours = 0;
@@ -275,7 +286,7 @@ public final class NetherForestFeatures {
                 }
             }
             if (neighbours == 1) {
-                world.setBlockState(candidate, FFDBlocks.NETHER_WART_BLOCK.getDefaultState(), updateFlags);
+                world.setBlockState(candidate, blocks().wart(false), updateFlags);
             }
         }
     }
@@ -286,7 +297,8 @@ public final class NetherForestFeatures {
             BlockPos candidate = origin.add(random.nextInt(8) - random.nextInt(8),
                     random.nextInt(2) - random.nextInt(7),
                     random.nextInt(8) - random.nextInt(8));
-            if (!isLoadedArea(world, candidate, 1) || !world.isAirBlock(candidate)
+            if (!isInsideWorld(world, candidate) || !isLoadedArea(world, candidate, 1)
+                    || !world.isAirBlock(candidate)
                     || !isWeepingVinesSupport(world.getBlockState(candidate.up()))) {
                 continue;
             }
@@ -306,17 +318,29 @@ public final class NetherForestFeatures {
                                                int updateFlags) {
         BlockPos cursor = start;
         for (int height = 0; height <= totalHeight; height++) {
-            if (!isLoadedArea(world, cursor, 1)) {
+            if (FFDHeightHooks.isOutsideBuildHeight(world, cursor)
+                    || (updateFlags == WORLDGEN_FLAGS && !isInsideWorld(world, cursor))
+                    || !isLoadedArea(world, cursor, 1)) {
                 break;
             }
             if (world.isAirBlock(cursor)) {
                 if (height == totalHeight || !world.isAirBlock(cursor.down())) {
-                    world.setBlockState(cursor, FFDBlocks.WEEPING_VINES.getDefaultState(), updateFlags);
-                    BlockNetherVine.setAge(world, cursor,
-                            randomBetweenInclusive(random, minAge, maxAge));
+                    IBlockState tip = blocks().vine(false, true);
+                    if (tip == null) {
+                        break;
+                    }
+                    world.setBlockState(cursor, tip, updateFlags);
+                    if (tip.getBlock() instanceof BlockNetherVine) {
+                        BlockNetherVine.setAge(world, cursor,
+                                randomBetweenInclusive(random, minAge, maxAge));
+                    }
                     break;
                 }
-                world.setBlockState(cursor, FFDBlocks.WEEPING_VINES_PLANT.getDefaultState(), updateFlags);
+                IBlockState plant = blocks().vine(false, false);
+                if (plant == null) {
+                    break;
+                }
+                world.setBlockState(cursor, plant, updateFlags);
             }
             cursor = cursor.down();
         }
@@ -348,7 +372,7 @@ public final class NetherForestFeatures {
         BlockPos cursor = start;
         do {
             cursor = cursor.down();
-            if (cursor.getY() < 0) {
+            if (cursor.getY() < FFDHeightHooks.minY(world)) {
                 return null;
             }
         } while (world.isAirBlock(cursor));
@@ -360,17 +384,29 @@ public final class NetherForestFeatures {
                                                  int updateFlags) {
         BlockPos cursor = start;
         for (int height = 1; height <= totalHeight; height++) {
-            if (!isLoadedArea(world, cursor, 1)) {
+            if (FFDHeightHooks.isOutsideBuildHeight(world, cursor)
+                    || (updateFlags == WORLDGEN_FLAGS && !isInsideWorld(world, cursor))
+                    || !isLoadedArea(world, cursor, 1)) {
                 break;
             }
             if (world.isAirBlock(cursor)) {
                 if (height == totalHeight || !world.isAirBlock(cursor.up())) {
-                    world.setBlockState(cursor, FFDBlocks.TWISTING_VINES.getDefaultState(), updateFlags);
-                    BlockNetherVine.setAge(world, cursor,
-                            randomBetweenInclusive(random, minAge, maxAge));
+                    IBlockState tip = blocks().vine(true, true);
+                    if (tip == null) {
+                        break;
+                    }
+                    world.setBlockState(cursor, tip, updateFlags);
+                    if (tip.getBlock() instanceof BlockNetherVine) {
+                        BlockNetherVine.setAge(world, cursor,
+                                randomBetweenInclusive(random, minAge, maxAge));
+                    }
                     break;
                 }
-                world.setBlockState(cursor, FFDBlocks.TWISTING_VINES_PLANT.getDefaultState(), updateFlags);
+                IBlockState plant = blocks().vine(true, false);
+                if (plant == null) {
+                    break;
+                }
+                world.setBlockState(cursor, plant, updateFlags);
             }
             cursor = cursor.up();
         }
@@ -395,19 +431,17 @@ public final class NetherForestFeatures {
         if (!isInsideWorld(world, pos) || !isLoadedArea(world, pos, 1) || !world.isAirBlock(pos)) {
             return false;
         }
-        Block below = world.getBlockState(pos.down()).getBlock();
-        return below == Blocks.NETHERRACK || below == FFDBlocks.WARPED_NYLIUM
-                || below == FFDBlocks.WARPED_WART_BLOCK;
+        IBlockState below = world.getBlockState(pos.down());
+        return below.getBlock() == Blocks.NETHERRACK || blocks().isNylium(below, true)
+                || blocks().isWart(below, true);
     }
 
     private static boolean isWeepingVinesSupport(IBlockState state) {
-        return state.getBlock() == Blocks.NETHERRACK
-                || state.getBlock() == FFDBlocks.NETHER_WART_BLOCK;
+        return state.getBlock() == Blocks.NETHERRACK || blocks().isWart(state, false);
     }
 
     private static boolean isAnyNylium(IBlockState state) {
-        return state.getBlock() == FFDBlocks.CRIMSON_NYLIUM
-                || state.getBlock() == FFDBlocks.WARPED_NYLIUM;
+        return blocks().isNylium(state);
     }
 
     private static boolean isPlacementEmpty(IBlockState state) {
@@ -416,15 +450,22 @@ public final class NetherForestFeatures {
     }
 
     private static boolean isInsideWorld(World world, BlockPos pos) {
-        return pos.getY() > 0 && pos.getY() < getNetherTopY(world);
+        if (world.provider.getDimension() == -1) {
+            return pos.getY() > 0 && pos.getY() < getNetherTopY(world);
+        }
+        return !FFDHeightHooks.isOutsideBuildHeight(world, pos);
     }
 
     private static boolean isLoadedArea(World world, BlockPos pos, int radius) {
         return world.isAreaLoaded(pos, radius);
     }
 
-    private static int getNetherTopY(World world) {
+    static int getNetherTopY(World world) {
         return Math.min(128, world.getActualHeight());
+    }
+
+    private static FFDNetherBlockProvider blocks() {
+        return FFDNetherBlockProvider.get();
     }
 
     private interface PositionAction {

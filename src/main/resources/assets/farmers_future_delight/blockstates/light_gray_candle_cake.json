@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=false": {
+      "model": "farmers_future_delight:light_gray_candle_cake"
+    },
+    "lit=true": {
+      "model": "farmers_future_delight:light_gray_candle_cake_lit"
+    }
+  }
+}

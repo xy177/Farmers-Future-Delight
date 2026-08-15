@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "lit=false": { "model": "farmers_future_delight:deepslate_redstone_ore" },
+    "lit=true": { "model": "farmers_future_delight:deepslate_redstone_ore" }
+  }
+}

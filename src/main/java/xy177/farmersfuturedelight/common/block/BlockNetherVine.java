@@ -29,7 +29,9 @@ import xy177.farmersfuturedelight.common.FFDCreativeTab;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
+import xy177.farmersfuturedelight.common.worldgen.FFDNetherBlockProvider;
 import xy177.farmersfuturedelight.common.tile.TileEntityNetherVines;
+import xy177.farmersfuturedelight.core.FFDHeightHooks;
 
 public class BlockNetherVine extends Block implements IGrowable, IShearable {
     private static final int MAX_AGE = 25;
@@ -66,8 +68,10 @@ public class BlockNetherVine extends Block implements IGrowable, IShearable {
     public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing,
                                             float hitX, float hitY, float hitZ, int meta,
                                             EntityLivingBase placer, EnumHand hand) {
-        return isVineSegment(world.getBlockState(pos.offset(growthDirection())), growsUpward)
-                ? bodyBlock().getDefaultState() : getDefaultState();
+        IBlockState body = bodyState();
+        return body != null && isVineSegment(
+                world.getBlockState(pos.offset(growthDirection())), growsUpward)
+                ? body : getDefaultState();
     }
 
     @Override
@@ -88,7 +92,10 @@ public class BlockNetherVine extends Block implements IGrowable, IShearable {
             world.destroyBlock(pos, true);
         } else if (isVineSegment(world.getBlockState(pos.offset(growthDirection())),
                 growsUpward)) {
-            world.setBlockState(pos, bodyBlock().getDefaultState(), 2);
+            IBlockState body = bodyState();
+            if (body != null) {
+                world.setBlockState(pos, body, 2);
+            }
         }
     }
 
@@ -99,8 +106,10 @@ public class BlockNetherVine extends Block implements IGrowable, IShearable {
         }
         int age = getOrInitializeAge(world, pos, random);
         BlockPos next = pos.offset(growthDirection());
-        if (age < MAX_AGE && random.nextDouble() < GROWTH_CHANCE && world.isAirBlock(next)) {
-            world.setBlockState(pos, bodyBlock().getDefaultState(), 2);
+        IBlockState body = bodyState();
+        if (body != null && age < MAX_AGE && random.nextDouble() < GROWTH_CHANCE
+                && world.isAirBlock(next)) {
+            world.setBlockState(pos, body, 2);
             world.setBlockState(next, getDefaultState(), 2);
             setAge(world, next, age + 1);
         }
@@ -109,14 +118,14 @@ public class BlockNetherVine extends Block implements IGrowable, IShearable {
     @Override
     public boolean canGrow(World world, BlockPos pos, IBlockState state, boolean isClient) {
         BlockPos growthPos = pos.offset(growthDirection());
-        return isEnabled() && growthPos.getY() >= 0 && growthPos.getY() < world.getHeight()
+        return isEnabled() && !FFDHeightHooks.isOutsideBuildHeight(world, growthPos)
                 && world.isAirBlock(growthPos);
     }
 
     @Override
     public boolean canUseBonemeal(World world, Random random, BlockPos pos, IBlockState state) {
         BlockPos growthPos = pos.offset(growthDirection());
-        return isEnabled() && growthPos.getY() >= 0 && growthPos.getY() < world.getHeight()
+        return isEnabled() && !FFDHeightHooks.isOutsideBuildHeight(world, growthPos)
                 && world.isAirBlock(growthPos);
     }
 
@@ -128,13 +137,17 @@ public class BlockNetherVine extends Block implements IGrowable, IShearable {
         int age = getOrInitializeAge(world, pos, random);
         int blocksToGrow = getBlocksToGrowWhenBonemealed(random);
         BlockPos current = pos;
+        IBlockState body = bodyState();
+        if (body == null) {
+            return;
+        }
         for (int i = 0; i < blocksToGrow; i++) {
             BlockPos next = current.offset(growthDirection());
-            if (next.getY() < 0 || next.getY() >= world.getHeight()
+            if (FFDHeightHooks.isOutsideBuildHeight(world, next)
                     || !world.isAirBlock(next)) {
                 break;
             }
-            world.setBlockState(current, bodyBlock().getDefaultState(), 2);
+            world.setBlockState(current, body, 2);
             world.setBlockState(next, getDefaultState(), 2);
             age = Math.min(age + 1, MAX_AGE);
             setAge(world, next, age);
@@ -151,10 +164,7 @@ public class BlockNetherVine extends Block implements IGrowable, IShearable {
     }
 
     public static boolean isVineSegment(IBlockState state, boolean growsUpward) {
-        Block block = state.getBlock();
-        return growsUpward
-                ? block == FFDBlocks.TWISTING_VINES || block == FFDBlocks.TWISTING_VINES_PLANT
-                : block == FFDBlocks.WEEPING_VINES || block == FFDBlocks.WEEPING_VINES_PLANT;
+        return FFDNetherBlockProvider.get().isVine(state, growsUpward);
     }
 
     public static void setAge(World world, BlockPos pos, int age) {
@@ -164,6 +174,16 @@ public class BlockNetherVine extends Block implements IGrowable, IShearable {
             world.setTileEntity(pos, tile);
         }
         ((TileEntityNetherVines) tile).setAge(age);
+    }
+
+    public static boolean stopGrowth(World world, BlockPos pos) {
+        TileEntity tile = world.getTileEntity(pos);
+        if (tile instanceof TileEntityNetherVines
+                && ((TileEntityNetherVines) tile).getAge() >= MAX_AGE) {
+            return false;
+        }
+        setAge(world, pos, MAX_AGE);
+        return true;
     }
 
     public static boolean shouldDrop(Random random, int fortune) {
@@ -280,8 +300,8 @@ public class BlockNetherVine extends Block implements IGrowable, IShearable {
         return growsUpward ? EnumFacing.UP : EnumFacing.DOWN;
     }
 
-    private Block bodyBlock() {
-        return growsUpward ? FFDBlocks.TWISTING_VINES_PLANT : FFDBlocks.WEEPING_VINES_PLANT;
+    private IBlockState bodyState() {
+        return FFDNetherBlockProvider.get().vine(growsUpward, false);
     }
 
     private boolean isEnabled() {

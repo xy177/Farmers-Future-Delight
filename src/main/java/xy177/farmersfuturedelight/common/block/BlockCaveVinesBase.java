@@ -100,7 +100,7 @@ public abstract class BlockCaveVinesBase extends Block implements IGrowable {
             return false;
         }
         if (!world.isRemote) {
-            spawnAsEntity(world, pos, new ItemStack(FFDItems.GLOW_BERRIES));
+            spawnAsEntity(world, pos, FFDItems.effectiveStack(FFDItems.GLOW_BERRIES));
             world.setBlockState(pos, stateWithBerries(false), 2);
             world.playSound(null, pos, FFDSounds.CAVE_VINES_PICK_BERRIES,
                     SoundCategory.BLOCKS, 1.0F, 0.8F + world.rand.nextFloat() * 0.4F);
@@ -135,13 +135,13 @@ public abstract class BlockCaveVinesBase extends Block implements IGrowable {
     public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos,
                          IBlockState state, int fortune) {
         if (hasBerries(state) && FFDItems.isGlowBerryEnabled()) {
-            drops.add(new ItemStack(FFDItems.GLOW_BERRIES));
+            drops.add(FFDItems.effectiveStack(FFDItems.GLOW_BERRIES));
         }
     }
 
     @Override
     public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
-        return new ItemStack(FFDItems.GLOW_BERRIES);
+        return FFDItems.effectiveStack(FFDItems.GLOW_BERRIES);
     }
 
     @Override

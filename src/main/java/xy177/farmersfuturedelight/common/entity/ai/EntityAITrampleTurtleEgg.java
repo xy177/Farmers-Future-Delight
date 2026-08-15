@@ -1,5 +1,6 @@
 package xy177.farmersfuturedelight.common.entity.ai;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.ai.EntityAIMoveToBlock;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.init.Items;
@@ -10,6 +11,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.event.ForgeEventFactory;
 
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
+import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
 
 public class EntityAITrampleTurtleEgg extends EntityAIMoveToBlock {
@@ -65,8 +67,9 @@ public class EntityAITrampleTurtleEgg extends EntityAIMoveToBlock {
                         SoundCategory.HOSTILE, 0.5F, 0.9F + zombie.getRNG().nextFloat() * 0.2F);
             }
         }
-        if (ticksSinceReachedGoal++ > DESTROY_TICKS
-                && zombie.world.getBlockState(destinationBlock).getBlock() == FFDBlocks.TURTLE_EGG) {
+        Block turtleEgg = FFDItems.effectiveBlock(FFDBlocks.TURTLE_EGG);
+        if (ticksSinceReachedGoal++ > DESTROY_TICKS && turtleEgg != null
+                && zombie.world.getBlockState(destinationBlock).getBlock() == turtleEgg) {
             zombie.world.setBlockToAir(destinationBlock);
             zombie.world.playSound(null, destinationBlock, FFDSounds.TURTLE_EGG_BREAK,
                     SoundCategory.BLOCKS, 0.7F, 0.9F + zombie.getRNG().nextFloat() * 0.2F);
@@ -75,7 +78,8 @@ public class EntityAITrampleTurtleEgg extends EntityAIMoveToBlock {
 
     @Override
     protected boolean shouldMoveTo(World world, BlockPos pos) {
-        return world.getBlockState(pos).getBlock() == FFDBlocks.TURTLE_EGG
+        Block turtleEgg = FFDItems.effectiveBlock(FFDBlocks.TURTLE_EGG);
+        return turtleEgg != null && world.getBlockState(pos).getBlock() == turtleEgg
                 && world.isAirBlock(pos.up()) && world.isAirBlock(pos.up(2));
     }
 

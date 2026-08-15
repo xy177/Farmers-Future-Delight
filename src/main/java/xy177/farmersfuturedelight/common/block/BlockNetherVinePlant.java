@@ -25,6 +25,8 @@ import net.minecraftforge.common.IShearable;
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
+import xy177.farmersfuturedelight.common.worldgen.FFDNetherBlockProvider;
+import xy177.farmersfuturedelight.core.FFDHeightHooks;
 
 public class BlockNetherVinePlant extends Block implements IGrowable, IShearable {
     private static final AxisAlignedBB TWISTING_BODY_AABB =
@@ -56,16 +58,22 @@ public class BlockNetherVinePlant extends Block implements IGrowable, IShearable
         }
         if (!BlockNetherVine.isVineSegment(world.getBlockState(pos.offset(growthDirection())),
                 growsUpward)) {
-            world.setBlockState(pos, headBlock().getDefaultState(), 2);
-            BlockNetherVine.setAge(world, pos, world.rand.nextInt(25));
+            IBlockState head = headState();
+            if (head != null) {
+                world.setBlockState(pos, head, 2);
+                if (head.getBlock() instanceof BlockNetherVine) {
+                    BlockNetherVine.setAge(world, pos, world.rand.nextInt(25));
+                }
+            }
         }
     }
 
     @Override
     public boolean canGrow(World world, BlockPos pos, IBlockState state, boolean isClient) {
         BlockPos headPos = findHead(world, pos);
-        return headPos != null && headBlock().canGrow(world, headPos,
-                world.getBlockState(headPos), isClient);
+        IBlockState head = headPos == null ? null : world.getBlockState(headPos);
+        return head != null && head.getBlock() instanceof IGrowable
+                && ((IGrowable) head.getBlock()).canGrow(world, headPos, head, isClient);
     }
 
     @Override
@@ -78,13 +86,17 @@ public class BlockNetherVinePlant extends Block implements IGrowable, IShearable
         BlockPos headPos = findHead(world, pos);
         if (headPos != null) {
             IBlockState headState = world.getBlockState(headPos);
-            headBlock().grow(world, random, headPos, headState);
+            if (headState.getBlock() instanceof IGrowable) {
+                ((IGrowable) headState.getBlock()).grow(world, random, headPos, headState);
+            }
         }
     }
 
     @Override
     public Item getItemDropped(IBlockState state, Random random, int fortune) {
-        return Item.getItemFromBlock(headBlock());
+        IBlockState head = headState();
+        return head == null ? Item.getItemFromBlock(net.minecraft.init.Blocks.AIR)
+                : Item.getItemFromBlock(head.getBlock());
     }
 
     @Override
@@ -104,7 +116,7 @@ public class BlockNetherVinePlant extends Block implements IGrowable, IShearable
 
     @Override
     protected ItemStack getSilkTouchDrop(IBlockState state) {
-        return new ItemStack(Item.getItemFromBlock(headBlock()));
+        return new ItemStack(getItemDropped(state, new Random(), 0));
     }
 
     @Override
@@ -115,12 +127,13 @@ public class BlockNetherVinePlant extends Block implements IGrowable, IShearable
     @Override
     public List<ItemStack> onSheared(ItemStack item, IBlockAccess world, BlockPos pos,
                                     int fortune) {
-        return Collections.singletonList(new ItemStack(Item.getItemFromBlock(headBlock())));
+        return Collections.singletonList(new ItemStack(getItemDropped(stateAt(world, pos),
+                new Random(), fortune)));
     }
 
     @Override
     public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
-        return new ItemStack(Item.getItemFromBlock(headBlock()));
+        return new ItemStack(getItemDropped(state, world.rand, 0));
     }
 
     @Override
@@ -157,10 +170,14 @@ public class BlockNetherVinePlant extends Block implements IGrowable, IShearable
 
     private BlockPos findHead(World world, BlockPos start) {
         BlockPos cursor = start;
-        int limit = world.getActualHeight();
+        int limit = FFDHeightHooks.maxYExclusive(world) - FFDHeightHooks.minY(world);
         for (int distance = 0; distance < limit; distance++) {
+            if (FFDHeightHooks.isOutsideBuildHeight(world, cursor)) {
+                return null;
+            }
             IBlockState state = world.getBlockState(cursor);
-            if (state.getBlock() == headBlock()) {
+            IBlockState head = headState();
+            if (head != null && state.getBlock() == head.getBlock()) {
                 return cursor;
             }
             if (state.getBlock() != this) {
@@ -182,7 +199,11 @@ public class BlockNetherVinePlant extends Block implements IGrowable, IShearable
         return growsUpward ? EnumFacing.UP : EnumFacing.DOWN;
     }
 
-    private BlockNetherVine headBlock() {
-        return growsUpward ? FFDBlocks.TWISTING_VINES : FFDBlocks.WEEPING_VINES;
+    private IBlockState headState() {
+        return FFDNetherBlockProvider.get().vine(growsUpward, true);
+    }
+
+    private static IBlockState stateAt(IBlockAccess world, BlockPos pos) {
+        return world.getBlockState(pos);
     }
 }

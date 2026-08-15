@@ -22,6 +22,7 @@ import xy177.farmersfuturedelight.common.FFDCreativeTab;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
+import xy177.farmersfuturedelight.common.worldgen.FFDLushCaveBlockProvider;
 
 public class BlockMoss extends Block implements IGrowable {
     private static final int VERTICAL_RANGE = 5;
@@ -100,17 +101,21 @@ public class BlockMoss extends Block implements IGrowable {
             return;
         }
         int roll = random.nextInt(96);
+        FFDLushCaveBlockProvider blocks = FFDLushCaveBlockProvider.get();
         if (roll < 4) {
-            if (FFDItems.isAzaleaEnabled() && FFDBlocks.FLOWERING_AZALEA.canPlaceBlockAt(world, pos)) {
-                world.setBlockState(pos, FFDBlocks.FLOWERING_AZALEA.getDefaultState(), 3);
+            IBlockState flowering = blocks.azalea(true);
+            if (flowering != null && flowering.getBlock().canPlaceBlockAt(world, pos)) {
+                world.setBlockState(pos, flowering, 3);
             }
         } else if (roll < 11) {
-            if (FFDItems.isAzaleaEnabled() && FFDBlocks.AZALEA.canPlaceBlockAt(world, pos)) {
-                world.setBlockState(pos, FFDBlocks.AZALEA.getDefaultState(), 3);
+            IBlockState azalea = blocks.azalea(false);
+            if (azalea != null && azalea.getBlock().canPlaceBlockAt(world, pos)) {
+                world.setBlockState(pos, azalea, 3);
             }
         } else if (roll < 36) {
-            if (FFDItems.isMossEnabled() && FFDBlocks.MOSS_CARPET.canPlaceBlockAt(world, pos)) {
-                world.setBlockState(pos, FFDBlocks.MOSS_CARPET.getDefaultState(), 3);
+            IBlockState carpet = blocks.mossCarpet();
+            if (carpet != null && carpet.getBlock().canPlaceBlockAt(world, pos)) {
+                world.setBlockState(pos, carpet, 3);
             }
         } else if (roll < 86) {
             world.setBlockState(pos, Blocks.TALLGRASS.getDefaultState()
@@ -122,9 +127,10 @@ public class BlockMoss extends Block implements IGrowable {
 
     public static boolean isMossReplaceable(IBlockState state) {
         Block block = state.getBlock();
+        FFDLushCaveBlockProvider blocks = FFDLushCaveBlockProvider.get();
         return block == Blocks.STONE || block == Blocks.DIRT || block == Blocks.GRASS
-                || block == Blocks.MYCELIUM || block == FFDBlocks.ROOTED_DIRT
-                || block == FFDBlocks.MOSS_BLOCK || BlockCaveVinesBase.isCaveVine(state);
+                || block == Blocks.MYCELIUM || blocks.isRootedDirt(state)
+                || blocks.isMossBlock(state) || blocks.isCaveVine(state);
     }
 
     @Override

@@ -1,9 +1,11 @@
 package xy177.farmersfuturedelight.common.registry;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import net.minecraft.init.Items;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
@@ -12,19 +14,24 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.registry.EntityEntry;
+import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 
 import xy177.farmersfuturedelight.FarmerFutureDelight;
+import xy177.farmersfuturedelight.common.FFDCompat;
+import xy177.farmersfuturedelight.common.block.CopperWeathering;
 
 @Mod.EventBusSubscriber(modid = FarmerFutureDelight.MODID)
 public final class FFDRegistryEvents {
     private FFDRegistryEvents() {
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void registerBlocks(RegistryEvent.Register<net.minecraft.block.Block> event) {
         List<net.minecraft.block.Block> blocks = new ArrayList<>();
         if (FFDItems.isSweetBerryEnabled()) {
@@ -41,6 +48,8 @@ public final class FFDRegistryEvents {
         if (FFDItems.isAzaleaEnabled()) {
             blocks.add(FFDBlocks.AZALEA);
             blocks.add(FFDBlocks.FLOWERING_AZALEA);
+            blocks.add(FFDBlocks.POTTED_AZALEA_BUSH);
+            blocks.add(FFDBlocks.POTTED_FLOWERING_AZALEA_BUSH);
             blocks.add(FFDBlocks.AZALEA_LEAVES);
             blocks.add(FFDBlocks.FLOWERING_AZALEA_LEAVES);
         }
@@ -62,6 +71,62 @@ public final class FFDRegistryEvents {
         if (FFDItems.isGlowLichenEnabled()) {
             for (net.minecraft.block.Block block : FFDBlocks.GLOW_LICHEN_VARIANTS) {
                 blocks.add(block);
+            }
+        }
+        if (FFDItems.isAmethystEnabled()) {
+            blocks.add(FFDBlocks.AMETHYST_BLOCK);
+            blocks.add(FFDBlocks.BUDDING_AMETHYST);
+            blocks.add(FFDBlocks.SMALL_AMETHYST_BUD);
+            blocks.add(FFDBlocks.MEDIUM_AMETHYST_BUD);
+            blocks.add(FFDBlocks.LARGE_AMETHYST_BUD);
+            blocks.add(FFDBlocks.AMETHYST_CLUSTER);
+            blocks.add(FFDBlocks.CALCITE);
+            blocks.add(FFDBlocks.SMOOTH_BASALT);
+            blocks.add(FFDBlocks.TINTED_GLASS);
+        }
+        if (FFDItems.isDripstoneEnabled()) {
+            blocks.add(FFDBlocks.DRIPSTONE_BLOCK);
+            blocks.add(FFDBlocks.POINTED_DRIPSTONE);
+        }
+        if (FFDItems.isIronChainEnabled()) {
+            blocks.add(FFDBlocks.IRON_CHAIN);
+        }
+        if (FFDItems.isLightEnabled()) {
+            blocks.add(FFDBlocks.LIGHT);
+        }
+        if (FFDItems.isCandleEnabled()) {
+            Collections.addAll(blocks, FFDBlocks.CANDLES);
+            Collections.addAll(blocks, FFDBlocks.CANDLE_CAKES);
+        }
+        if (FFDItems.isPowderSnowEnabled()) {
+            blocks.add(FFDBlocks.POWDER_SNOW);
+        }
+        blocks.add(FFDBlocks.LAVA_CAULDRON);
+        blocks.add(FFDBlocks.POWDER_SNOW_CAULDRON);
+        if (FFDItems.isDeepslateEnabled()) {
+            addDeepslateBlocks(blocks);
+        }
+        if (FFDItems.isRawOreEnabled()) {
+            blocks.add(FFDBlocks.RAW_IRON_BLOCK);
+            blocks.add(FFDBlocks.RAW_GOLD_BLOCK);
+        }
+        if (FFDItems.isCopperEnabled()) {
+            blocks.add(FFDBlocks.COPPER_ORE);
+            blocks.add(FFDBlocks.RAW_COPPER_BLOCK);
+            Collections.addAll(blocks, FFDBlocks.COPPER_BLOCKS);
+            Collections.addAll(blocks, FFDBlocks.WAXED_COPPER_BLOCKS);
+            Collections.addAll(blocks, FFDBlocks.CUT_COPPER_BLOCKS);
+            Collections.addAll(blocks, FFDBlocks.WAXED_CUT_COPPER_BLOCKS);
+            Collections.addAll(blocks, FFDBlocks.CUT_COPPER_STAIRS);
+            Collections.addAll(blocks, FFDBlocks.WAXED_CUT_COPPER_STAIRS);
+            Collections.addAll(blocks, FFDBlocks.CUT_COPPER_SLABS);
+            Collections.addAll(blocks, FFDBlocks.WAXED_CUT_COPPER_SLABS);
+            Collections.addAll(blocks, FFDBlocks.CUT_COPPER_DOUBLE_SLABS);
+            Collections.addAll(blocks, FFDBlocks.WAXED_CUT_COPPER_DOUBLE_SLABS);
+            Collections.addAll(blocks, FFDBlocks.LIGHTNING_RODS);
+            Collections.addAll(blocks, FFDBlocks.WAXED_LIGHTNING_RODS);
+            if (FFDItems.isDeepslateEnabled()) {
+                blocks.add(FFDBlocks.DEEPSLATE_COPPER_ORE);
             }
         }
         if (FFDItems.isKelpEnabled()) {
@@ -142,43 +207,164 @@ public final class FFDRegistryEvents {
         if (FFDItems.isCrimsonWoodEnabled() || FFDItems.isWarpedWoodEnabled()) {
             blocks.add(FFDBlocks.SHROOMLIGHT);
         }
+        blocks.removeIf(block -> !FFDItems.shouldRegisterBlock(block));
         event.getRegistry().registerAll(blocks.toArray(new net.minecraft.block.Block[0]));
+        CopperWeathering.rebuildEffectiveMappings();
         registerFlammability();
     }
 
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void registerEntities(RegistryEvent.Register<EntityEntry> event) {
+        List<EntityEntry> entities = new ArrayList<>();
+        if (FFDEntities.isLocalGlowSquidEnabled()) {
+            entities.add(entity(FFDEntities.GLOW_SQUID_ID,
+                    xy177.farmersfuturedelight.common.entity.EntityGlowSquid.class,
+                    "glow_squid", 0, 64, 1, 0x095B71, 0x85F1FF));
+            net.minecraft.entity.EntitySpawnPlacementRegistry.setPlacementType(
+                    xy177.farmersfuturedelight.common.entity.EntityGlowSquid.class,
+                    net.minecraft.entity.EntityLiving.SpawnPlacementType.IN_WATER);
+        }
+        if (FFDEntities.isLocalTurtleEnabled()) {
+            entities.add(entity(FFDEntities.TURTLE_ID,
+                    xy177.farmersfuturedelight.common.entity.EntityTurtle.class,
+                    "turtle", 1, 80, 3, 0x3B6C55, 0xA6E8AD));
+            net.minecraft.entity.EntitySpawnPlacementRegistry.setPlacementType(
+                    xy177.farmersfuturedelight.common.entity.EntityTurtle.class,
+                    net.minecraft.entity.EntityLiving.SpawnPlacementType.ON_GROUND);
+        }
+        if (FFDEntities.isLocalAxolotlEnabled()) {
+            entities.add(entity(FFDEntities.AXOLOTL_ID,
+                    xy177.farmersfuturedelight.common.entity.EntityAxolotl.class,
+                    "axolotl", 5, 80, 3, 0xFBC1E3, 0xA62D74));
+            net.minecraft.entity.EntitySpawnPlacementRegistry.setPlacementType(
+                    xy177.farmersfuturedelight.common.entity.EntityAxolotl.class,
+                    net.minecraft.entity.EntityLiving.SpawnPlacementType.IN_WATER);
+        }
+        if (FFDEntities.isLocalGoatEnabled()) {
+            entities.add(entity(FFDEntities.GOAT_ID,
+                    xy177.farmersfuturedelight.common.entity.EntityGoat.class,
+                    "goat", 6, 80, 3, 0xAFAFAD, 0x876C57));
+            net.minecraft.entity.EntitySpawnPlacementRegistry.setPlacementType(
+                    xy177.farmersfuturedelight.common.entity.EntityGoat.class,
+                    net.minecraft.entity.EntityLiving.SpawnPlacementType.ON_GROUND);
+        }
+        if (FFDEntities.isLocalBeeEnabled()) {
+            entities.add(entity(FFDEntities.BEE_ID,
+                    xy177.farmersfuturedelight.common.entity.EntityBee.class,
+                    "bee", 2, 64, 3, 0xE5D5A0, 0xA45E32));
+        }
+        if (FFDEntities.isLocalPhantomEnabled()) {
+            entities.add(entity(FFDEntities.PHANTOM_ID,
+                    xy177.farmersfuturedelight.common.entity.EntityPhantom.class,
+                    "phantom", 3, 80, 1, 0x43518A, 0x88FF00));
+        }
+        if (FFDEntities.isLocalGlowItemFrameEnabled()) {
+            entities.add(entity(FFDEntities.GLOW_ITEM_FRAME_ID,
+                    xy177.farmersfuturedelight.common.entity.EntityGlowItemFrame.class,
+                    "glow_item_frame", 4, 64, 1));
+        }
+        event.getRegistry().registerAll(entities.toArray(new EntityEntry[0]));
+    }
+
+    private static <E extends net.minecraft.entity.Entity> EntityEntry entity(
+            ResourceLocation id, Class<? extends E> type, String name, int networkId,
+            int trackingRange, int updateFrequency) {
+        return EntityEntryBuilder.<E>create()
+                .entity(type)
+                .id(id, networkId)
+                .name(FarmerFutureDelight.MODID + "." + name)
+                .tracker(trackingRange, updateFrequency, true)
+                .build();
+    }
+
+    private static <E extends net.minecraft.entity.Entity> EntityEntry entity(
+            ResourceLocation id, Class<? extends E> type, String name, int networkId,
+            int trackingRange, int updateFrequency, int primaryEgg, int secondaryEgg) {
+        return EntityEntryBuilder.<E>create()
+                .entity(type)
+                .id(id, networkId)
+                .name(FarmerFutureDelight.MODID + "." + name)
+                .tracker(trackingRange, updateFrequency, true)
+                .egg(primaryEgg, secondaryEgg)
+                .build();
+    }
+
+    private static void addDeepslateBlocks(List<net.minecraft.block.Block> blocks) {
+        blocks.add(FFDBlocks.DEEPSLATE);
+        blocks.add(FFDBlocks.COBBLED_DEEPSLATE);
+        blocks.add(FFDBlocks.POLISHED_DEEPSLATE);
+        blocks.add(FFDBlocks.DEEPSLATE_BRICKS);
+        blocks.add(FFDBlocks.CRACKED_DEEPSLATE_BRICKS);
+        blocks.add(FFDBlocks.DEEPSLATE_TILES);
+        blocks.add(FFDBlocks.CRACKED_DEEPSLATE_TILES);
+        blocks.add(FFDBlocks.CHISELED_DEEPSLATE);
+        blocks.add(FFDBlocks.TUFF);
+        blocks.add(FFDBlocks.INFESTED_DEEPSLATE);
+        blocks.add(FFDBlocks.COBBLED_DEEPSLATE_STAIRS);
+        blocks.add(FFDBlocks.POLISHED_DEEPSLATE_STAIRS);
+        blocks.add(FFDBlocks.DEEPSLATE_BRICK_STAIRS);
+        blocks.add(FFDBlocks.DEEPSLATE_TILE_STAIRS);
+        blocks.add(FFDBlocks.COBBLED_DEEPSLATE_SLAB);
+        blocks.add(FFDBlocks.COBBLED_DEEPSLATE_DOUBLE_SLAB);
+        blocks.add(FFDBlocks.POLISHED_DEEPSLATE_SLAB);
+        blocks.add(FFDBlocks.POLISHED_DEEPSLATE_DOUBLE_SLAB);
+        blocks.add(FFDBlocks.DEEPSLATE_BRICK_SLAB);
+        blocks.add(FFDBlocks.DEEPSLATE_BRICK_DOUBLE_SLAB);
+        blocks.add(FFDBlocks.DEEPSLATE_TILE_SLAB);
+        blocks.add(FFDBlocks.DEEPSLATE_TILE_DOUBLE_SLAB);
+        blocks.add(FFDBlocks.COBBLED_DEEPSLATE_WALL);
+        blocks.add(FFDBlocks.POLISHED_DEEPSLATE_WALL);
+        blocks.add(FFDBlocks.DEEPSLATE_BRICK_WALL);
+        blocks.add(FFDBlocks.DEEPSLATE_TILE_WALL);
+        blocks.add(FFDBlocks.DEEPSLATE_COAL_ORE);
+        blocks.add(FFDBlocks.DEEPSLATE_IRON_ORE);
+        blocks.add(FFDBlocks.DEEPSLATE_GOLD_ORE);
+        blocks.add(FFDBlocks.DEEPSLATE_REDSTONE_ORE);
+        blocks.add(FFDBlocks.DEEPSLATE_LAPIS_ORE);
+        blocks.add(FFDBlocks.DEEPSLATE_DIAMOND_ORE);
+        blocks.add(FFDBlocks.DEEPSLATE_EMERALD_ORE);
+    }
+
     private static void registerFlammability() {
-        if (FFDItems.isSweetBerryEnabled()) {
-            net.minecraft.init.Blocks.FIRE.setFireInfo(FFDBlocks.SWEET_BERRY_BUSH, 60, 100);
-        }
-        if (FFDItems.isGlowBerryEnabled()) {
-            net.minecraft.init.Blocks.FIRE.setFireInfo(FFDBlocks.CAVE_VINES, 15, 60);
-            net.minecraft.init.Blocks.FIRE.setFireInfo(FFDBlocks.CAVE_VINES_PLANT, 15, 60);
-        }
-        if (FFDItems.isAzaleaEnabled()) {
-            net.minecraft.init.Blocks.FIRE.setFireInfo(FFDBlocks.AZALEA, 30, 60);
-            net.minecraft.init.Blocks.FIRE.setFireInfo(FFDBlocks.FLOWERING_AZALEA, 30, 60);
-            net.minecraft.init.Blocks.FIRE.setFireInfo(FFDBlocks.AZALEA_LEAVES, 30, 60);
-            net.minecraft.init.Blocks.FIRE.setFireInfo(FFDBlocks.FLOWERING_AZALEA_LEAVES, 30, 60);
-        }
-        if (FFDItems.isDripleafEnabled()) {
-            net.minecraft.init.Blocks.FIRE.setFireInfo(FFDBlocks.SMALL_DRIPLEAF, 60, 100);
-            net.minecraft.init.Blocks.FIRE.setFireInfo(FFDBlocks.BIG_DRIPLEAF_STEM, 60, 100);
-            net.minecraft.init.Blocks.FIRE.setFireInfo(FFDBlocks.BIG_DRIPLEAF, 60, 100);
-        }
-        if (FFDItems.isHangingRootsEnabled()) {
-            net.minecraft.init.Blocks.FIRE.setFireInfo(FFDBlocks.HANGING_ROOTS, 30, 60);
-        }
-        if (FFDItems.isSporeBlossomEnabled()) {
-            net.minecraft.init.Blocks.FIRE.setFireInfo(FFDBlocks.SPORE_BLOSSOM, 60, 100);
-        }
-        if (FFDItems.isHoneyEnabled()) {
-            net.minecraft.init.Blocks.FIRE.setFireInfo(FFDBlocks.BEE_NEST, 30, 20);
-            net.minecraft.init.Blocks.FIRE.setFireInfo(FFDBlocks.BEEHIVE, 5, 20);
+        setFireInfoIfRegistered(FFDBlocks.SWEET_BERRY_BUSH, 60, 100);
+        setFireInfoIfRegistered(FFDBlocks.CAVE_VINES, 15, 60);
+        setFireInfoIfRegistered(FFDBlocks.CAVE_VINES_PLANT, 15, 60);
+        setFireInfoIfRegistered(FFDBlocks.AZALEA, 30, 60);
+        setFireInfoIfRegistered(FFDBlocks.FLOWERING_AZALEA, 30, 60);
+        setFireInfoIfRegistered(FFDBlocks.AZALEA_LEAVES, 30, 60);
+        setFireInfoIfRegistered(FFDBlocks.FLOWERING_AZALEA_LEAVES, 30, 60);
+        setFireInfoIfRegistered(FFDBlocks.SMALL_DRIPLEAF, 60, 100);
+        setFireInfoIfRegistered(FFDBlocks.BIG_DRIPLEAF_STEM, 60, 100);
+        setFireInfoIfRegistered(FFDBlocks.BIG_DRIPLEAF, 60, 100);
+        setFireInfoIfRegistered(FFDBlocks.HANGING_ROOTS, 30, 60);
+        setFireInfoIfRegistered(FFDBlocks.SPORE_BLOSSOM, 60, 100);
+        setFireInfoIfRegistered(FFDBlocks.BEE_NEST, 30, 20);
+        setFireInfoIfRegistered(FFDBlocks.BEEHIVE, 5, 20);
+    }
+
+    private static void setFireInfoIfRegistered(net.minecraft.block.Block block,
+                                                int encouragement, int flammability) {
+        if (FFDItems.isBlockRegistered(block)) {
+            net.minecraft.init.Blocks.FIRE.setFireInfo(block, encouragement, flammability);
         }
     }
 
     @SubscribeEvent
     public static void registerBiomes(RegistryEvent.Register<Biome> event) {
+        event.getRegistry().registerAll(FFDBiomes.MOUNTAIN_BIOMES);
+        BiomeDictionary.addTypes(FFDBiomes.MEADOW, BiomeDictionary.Type.MOUNTAIN,
+                BiomeDictionary.Type.PLAINS, BiomeDictionary.Type.LUSH);
+        BiomeDictionary.addTypes(FFDBiomes.GROVE, BiomeDictionary.Type.MOUNTAIN,
+                BiomeDictionary.Type.FOREST, BiomeDictionary.Type.CONIFEROUS,
+                BiomeDictionary.Type.COLD, BiomeDictionary.Type.SNOWY);
+        BiomeDictionary.addTypes(FFDBiomes.SNOWY_SLOPES, BiomeDictionary.Type.MOUNTAIN,
+                BiomeDictionary.Type.COLD, BiomeDictionary.Type.SNOWY, BiomeDictionary.Type.SPARSE);
+        BiomeDictionary.addTypes(FFDBiomes.JAGGED_PEAKS, BiomeDictionary.Type.MOUNTAIN,
+                BiomeDictionary.Type.COLD, BiomeDictionary.Type.SNOWY, BiomeDictionary.Type.SPARSE);
+        BiomeDictionary.addTypes(FFDBiomes.FROZEN_PEAKS, BiomeDictionary.Type.MOUNTAIN,
+                BiomeDictionary.Type.COLD, BiomeDictionary.Type.SNOWY, BiomeDictionary.Type.SPARSE);
+        BiomeDictionary.addTypes(FFDBiomes.STONY_PEAKS, BiomeDictionary.Type.MOUNTAIN,
+                BiomeDictionary.Type.HOT, BiomeDictionary.Type.DRY, BiomeDictionary.Type.SPARSE);
         if (FFDItems.isCrimsonEnabled()) {
             event.getRegistry().register(FFDBiomes.CRIMSON_FOREST);
             BiomeDictionary.addTypes(FFDBiomes.CRIMSON_FOREST, BiomeDictionary.Type.NETHER,
@@ -191,7 +377,7 @@ public final class FFDRegistryEvents {
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void registerItems(RegistryEvent.Register<net.minecraft.item.Item> event) {
         List<net.minecraft.item.Item> items = new ArrayList<>();
         if (FFDItems.isSweetBerryEnabled()) {
@@ -229,6 +415,9 @@ public final class FFDRegistryEvents {
         if (FFDEntities.isGlowSquidEnabled()) {
             items.add(FFDItems.GLOW_INK_SAC);
         }
+        if (FFDItems.isGlowItemFrameEnabled()) {
+            items.add(FFDItems.GLOW_ITEM_FRAME);
+        }
         if (FFDItems.isKelpEnabled()) {
             items.add(FFDItems.KELP);
             items.add(FFDItems.DRIED_KELP);
@@ -244,6 +433,76 @@ public final class FFDRegistryEvents {
             items.add(FFDItems.TURTLE_EGG);
             items.add(FFDItems.TURTLE_SCUTE);
             items.add(FFDItems.TURTLE_HELMET);
+        }
+        if (FFDItems.isAxolotlEnabled()) {
+            items.add(FFDItems.AXOLOTL_BUCKET);
+        }
+        if (FFDItems.isGoatEnabled()) {
+            items.add(FFDItems.GOAT_HORN);
+        }
+        if (FFDItems.isPhantomEnabled()) {
+            items.add(FFDItems.PHANTOM_MEMBRANE);
+        }
+        if (FFDItems.isOthersideEnabled()) {
+            items.add(FFDItems.MUSIC_DISC_OTHERSIDE);
+        }
+        if (FFDItems.isAmethystEnabled()) {
+            items.add(FFDItems.AMETHYST_BLOCK);
+            items.add(FFDItems.BUDDING_AMETHYST);
+            items.add(FFDItems.SMALL_AMETHYST_BUD);
+            items.add(FFDItems.MEDIUM_AMETHYST_BUD);
+            items.add(FFDItems.LARGE_AMETHYST_BUD);
+            items.add(FFDItems.AMETHYST_CLUSTER);
+            items.add(FFDItems.CALCITE);
+            items.add(FFDItems.SMOOTH_BASALT);
+            items.add(FFDItems.TINTED_GLASS);
+            items.add(FFDItems.AMETHYST_SHARD);
+        }
+        if (FFDItems.isDripstoneEnabled()) {
+            items.add(FFDItems.DRIPSTONE_BLOCK);
+            items.add(FFDItems.POINTED_DRIPSTONE);
+        }
+        if (FFDItems.isIronChainEnabled()) {
+            items.add(FFDItems.IRON_CHAIN);
+        }
+        if (FFDItems.isLightEnabled()) {
+            items.add(FFDItems.LIGHT);
+        }
+        if (FFDItems.isCandleEnabled()) {
+            Collections.addAll(items, FFDItems.CANDLE_ITEMS);
+        }
+        if (FFDItems.isPowderSnowEnabled()) {
+            items.add(FFDItems.POWDER_SNOW);
+            items.add(FFDItems.POWDER_SNOW_BUCKET);
+        }
+        if (FFDItems.isDeepslateEnabled()) {
+            addDeepslateItems(items);
+        }
+        if (FFDItems.isRawOreEnabled()) {
+            items.add(FFDItems.RAW_IRON);
+            items.add(FFDItems.RAW_GOLD);
+            items.add(FFDItems.RAW_IRON_BLOCK);
+            items.add(FFDItems.RAW_GOLD_BLOCK);
+        }
+        if (FFDItems.isCopperEnabled()) {
+            items.add(FFDItems.COPPER_ORE);
+            items.add(FFDItems.RAW_COPPER);
+            items.add(FFDItems.RAW_COPPER_BLOCK);
+            items.add(FFDItems.COPPER_INGOT);
+            Collections.addAll(items, FFDItems.COPPER_BLOCK_ITEMS);
+            Collections.addAll(items, FFDItems.WAXED_COPPER_BLOCK_ITEMS);
+            Collections.addAll(items, FFDItems.CUT_COPPER_ITEMS);
+            Collections.addAll(items, FFDItems.WAXED_CUT_COPPER_ITEMS);
+            Collections.addAll(items, FFDItems.CUT_COPPER_STAIR_ITEMS);
+            Collections.addAll(items, FFDItems.WAXED_CUT_COPPER_STAIR_ITEMS);
+            Collections.addAll(items, FFDItems.CUT_COPPER_SLAB_ITEMS);
+            Collections.addAll(items, FFDItems.WAXED_CUT_COPPER_SLAB_ITEMS);
+            Collections.addAll(items, FFDItems.LIGHTNING_ROD_ITEMS);
+            Collections.addAll(items, FFDItems.WAXED_LIGHTNING_ROD_ITEMS);
+            items.add(FFDItems.SPYGLASS);
+            if (FFDItems.isDeepslateEnabled()) {
+                items.add(FFDItems.DEEPSLATE_COPPER_ORE);
+            }
         }
         if (FFDItems.isHoneyEnabled()) {
             items.add(FFDItems.HONEY_BOTTLE);
@@ -301,17 +560,123 @@ public final class FFDRegistryEvents {
         if (FFDItems.isCrimsonWoodEnabled() || FFDItems.isWarpedWoodEnabled()) {
             items.add(FFDItems.SHROOMLIGHT);
         }
+        items.removeIf(item -> !FFDItems.shouldRegisterItem(item));
         event.getRegistry().registerAll(items.toArray(new net.minecraft.item.Item[0]));
         if (FFDItems.isSweetBerryEnabled()) {
-            OreDictionary.registerOre("cropSweetBerry", FFDItems.SWEET_BERRIES);
-            OreDictionary.registerOre("cropBerrySweet", FFDItems.SWEET_BERRIES);
-            OreDictionary.registerOre("processedFruit", FFDItems.SWEET_BERRIES);
+            registerOre("seedSweetBerry", FFDItems.SWEET_BERRIES);
+            registerOre("cropSweetBerry", FFDItems.SWEET_BERRIES);
+            registerOre("cropBerrySweet", FFDItems.SWEET_BERRIES);
+            registerOre("processedFruit", FFDItems.SWEET_BERRIES);
+            registerOre("listAllfruit", FFDItems.SWEET_BERRIES);
+            registerOre("listAllberry", FFDItems.SWEET_BERRIES);
+        }
+        if (FFDItems.isGlowBerryEnabled()) {
+            registerOre("cropGlowBerry", FFDItems.GLOW_BERRIES);
+            registerOre("cropGlowberry", FFDItems.GLOW_BERRIES);
+            registerOre("listAllfruit", FFDItems.GLOW_BERRIES);
+            registerOre("listAllberry", FFDItems.GLOW_BERRIES);
+        }
+        if (FFDItems.isAzaleaEnabled()) {
+            registerOre("listAllflower", FFDItems.FLOWERING_AZALEA);
+        }
+        if (FFDItems.isSporeBlossomEnabled()) {
+            registerOre("listAllflower", FFDItems.SPORE_BLOSSOM);
+        }
+        if (FFDItems.isKelpEnabled()) {
+            registerOre("cropKelp", FFDItems.KELP);
+            registerOre("cropSeaweed", FFDItems.KELP);
+            registerOre("listAllveggie", FFDItems.KELP);
+            registerOre("foodKelp", FFDItems.DRIED_KELP);
+            registerOre("foodSeaweed", FFDItems.DRIED_KELP);
+            registerOre("listAllveggie", FFDItems.DRIED_KELP);
+        }
+        if (FFDItems.isSeagrassEnabled()) {
+            registerOre("cropSeaweed", FFDItems.SEAGRASS);
+        }
+        if (FFDItems.isHoneyEnabled()) {
+            registerOre("wax", FFDItems.HONEYCOMB);
         }
         if (FFDItems.isCrimsonWoodEnabled()) {
             registerNetherWoodOreDictionary(true);
         }
         if (FFDItems.isWarpedWoodEnabled()) {
             registerNetherWoodOreDictionary(false);
+        }
+        registerModernOreDictionary();
+    }
+
+    private static void addDeepslateItems(List<net.minecraft.item.Item> items) {
+        items.add(FFDItems.DEEPSLATE);
+        items.add(FFDItems.COBBLED_DEEPSLATE);
+        items.add(FFDItems.POLISHED_DEEPSLATE);
+        items.add(FFDItems.DEEPSLATE_BRICKS);
+        items.add(FFDItems.CRACKED_DEEPSLATE_BRICKS);
+        items.add(FFDItems.DEEPSLATE_TILES);
+        items.add(FFDItems.CRACKED_DEEPSLATE_TILES);
+        items.add(FFDItems.CHISELED_DEEPSLATE);
+        items.add(FFDItems.TUFF);
+        items.add(FFDItems.INFESTED_DEEPSLATE);
+        items.add(FFDItems.COBBLED_DEEPSLATE_STAIRS);
+        items.add(FFDItems.POLISHED_DEEPSLATE_STAIRS);
+        items.add(FFDItems.DEEPSLATE_BRICK_STAIRS);
+        items.add(FFDItems.DEEPSLATE_TILE_STAIRS);
+        items.add(FFDItems.COBBLED_DEEPSLATE_SLAB);
+        items.add(FFDItems.POLISHED_DEEPSLATE_SLAB);
+        items.add(FFDItems.DEEPSLATE_BRICK_SLAB);
+        items.add(FFDItems.DEEPSLATE_TILE_SLAB);
+        items.add(FFDItems.COBBLED_DEEPSLATE_WALL);
+        items.add(FFDItems.POLISHED_DEEPSLATE_WALL);
+        items.add(FFDItems.DEEPSLATE_BRICK_WALL);
+        items.add(FFDItems.DEEPSLATE_TILE_WALL);
+        items.add(FFDItems.DEEPSLATE_COAL_ORE);
+        items.add(FFDItems.DEEPSLATE_IRON_ORE);
+        items.add(FFDItems.DEEPSLATE_GOLD_ORE);
+        items.add(FFDItems.DEEPSLATE_REDSTONE_ORE);
+        items.add(FFDItems.DEEPSLATE_LAPIS_ORE);
+        items.add(FFDItems.DEEPSLATE_DIAMOND_ORE);
+        items.add(FFDItems.DEEPSLATE_EMERALD_ORE);
+    }
+
+    private static void registerModernOreDictionary() {
+        if (FFDItems.isAmethystEnabled()) {
+            registerOre("gemAmethyst", FFDItems.AMETHYST_SHARD);
+            registerOre("blockAmethyst", FFDItems.AMETHYST_BLOCK);
+            registerOre("blockCalcite", FFDItems.CALCITE);
+            registerOre("stoneCalcite", FFDItems.CALCITE);
+        }
+        if (FFDItems.isDeepslateEnabled()) {
+            registerOre("blockDeepslate", FFDItems.DEEPSLATE);
+            registerOre("stoneDeepslate", FFDItems.DEEPSLATE);
+            registerOre("stone", FFDItems.DEEPSLATE);
+            registerOre("cobblestoneDeepslate", FFDItems.COBBLED_DEEPSLATE);
+            registerOre("cobblestone", FFDItems.COBBLED_DEEPSLATE);
+            registerOre("blockTuff", FFDItems.TUFF);
+            registerOre("stoneTuff", FFDItems.TUFF);
+            registerOre("stone", FFDItems.TUFF);
+            registerOre("oreCoal", FFDItems.DEEPSLATE_COAL_ORE);
+            registerOre("oreIron", FFDItems.DEEPSLATE_IRON_ORE);
+            registerOre("oreGold", FFDItems.DEEPSLATE_GOLD_ORE);
+            registerOre("oreRedstone", FFDItems.DEEPSLATE_REDSTONE_ORE);
+            registerOre("oreLapis", FFDItems.DEEPSLATE_LAPIS_ORE);
+            registerOre("oreDiamond", FFDItems.DEEPSLATE_DIAMOND_ORE);
+            registerOre("oreEmerald", FFDItems.DEEPSLATE_EMERALD_ORE);
+        }
+        if (FFDItems.isRawOreEnabled()) {
+            registerOre("rawIron", FFDItems.RAW_IRON);
+            registerOre("rawGold", FFDItems.RAW_GOLD);
+            registerOre("blockRawIron", FFDItems.RAW_IRON_BLOCK);
+            registerOre("blockRawGold", FFDItems.RAW_GOLD_BLOCK);
+        }
+        if (FFDItems.isCopperEnabled()) {
+            registerOre("oreCopper", FFDItems.COPPER_ORE);
+            registerOre("ingotCopper", FFDItems.COPPER_INGOT);
+            registerOre("rawCopper", FFDItems.RAW_COPPER);
+            registerOre("blockRawCopper", FFDItems.RAW_COPPER_BLOCK);
+            registerOre("blockCopper", FFDItems.COPPER_BLOCK);
+            registerOre("blockCopperCut", FFDItems.CUT_COPPER);
+            if (FFDItems.isDeepslateEnabled()) {
+                registerOre("oreCopper", FFDItems.DEEPSLATE_COPPER_ORE);
+            }
         }
     }
 
@@ -322,22 +687,29 @@ public final class FFDRegistryEvents {
         net.minecraft.item.Item hyphae = crimson ? FFDItems.CRIMSON_HYPHAE : FFDItems.WARPED_HYPHAE;
         net.minecraft.item.Item strippedHyphae = crimson ? FFDItems.STRIPPED_CRIMSON_HYPHAE
                 : FFDItems.STRIPPED_WARPED_HYPHAE;
-        OreDictionary.registerOre("logWood", stem);
-        OreDictionary.registerOre("logWood", strippedStem);
-        OreDictionary.registerOre("logWood", hyphae);
-        OreDictionary.registerOre("logWood", strippedHyphae);
-        OreDictionary.registerOre("plankWood", crimson ? FFDItems.CRIMSON_PLANKS : FFDItems.WARPED_PLANKS);
-        OreDictionary.registerOre("stairWood", crimson ? FFDItems.CRIMSON_STAIRS : FFDItems.WARPED_STAIRS);
-        OreDictionary.registerOre("slabWood", crimson ? FFDItems.CRIMSON_SLAB : FFDItems.WARPED_SLAB);
-        OreDictionary.registerOre("fenceWood", crimson ? FFDItems.CRIMSON_FENCE : FFDItems.WARPED_FENCE);
-        OreDictionary.registerOre("fenceGateWood",
+        registerOre("logWood", stem);
+        registerOre("logWood", strippedStem);
+        registerOre("logWood", hyphae);
+        registerOre("logWood", strippedHyphae);
+        registerOre("plankWood", crimson ? FFDItems.CRIMSON_PLANKS : FFDItems.WARPED_PLANKS);
+        registerOre("stairWood", crimson ? FFDItems.CRIMSON_STAIRS : FFDItems.WARPED_STAIRS);
+        registerOre("slabWood", crimson ? FFDItems.CRIMSON_SLAB : FFDItems.WARPED_SLAB);
+        registerOre("fenceWood", crimson ? FFDItems.CRIMSON_FENCE : FFDItems.WARPED_FENCE);
+        registerOre("fenceGateWood",
                 crimson ? FFDItems.CRIMSON_FENCE_GATE : FFDItems.WARPED_FENCE_GATE);
-        OreDictionary.registerOre("doorWood", crimson ? FFDItems.CRIMSON_DOOR : FFDItems.WARPED_DOOR);
-        OreDictionary.registerOre("trapdoorWood",
+        registerOre("doorWood", crimson ? FFDItems.CRIMSON_DOOR : FFDItems.WARPED_DOOR);
+        registerOre("trapdoorWood",
                 crimson ? FFDItems.CRIMSON_TRAPDOOR : FFDItems.WARPED_TRAPDOOR);
-        OreDictionary.registerOre("buttonWood", crimson ? FFDItems.CRIMSON_BUTTON : FFDItems.WARPED_BUTTON);
-        OreDictionary.registerOre("pressurePlateWood",
+        registerOre("buttonWood", crimson ? FFDItems.CRIMSON_BUTTON : FFDItems.WARPED_BUTTON);
+        registerOre("pressurePlateWood",
                 crimson ? FFDItems.CRIMSON_PRESSURE_PLATE : FFDItems.WARPED_PRESSURE_PLATE);
+    }
+
+    private static void registerOre(String name, net.minecraft.item.Item local) {
+        ItemStack stack = FFDItems.effectiveStack(local);
+        if (!stack.isEmpty()) {
+            OreDictionary.registerOre(name, stack);
+        }
     }
 
     @SubscribeEvent
@@ -347,55 +719,143 @@ public final class FFDRegistryEvents {
 
     @SubscribeEvent
     public static void registerRecipes(RegistryEvent.Register<IRecipe> event) {
+        FFDCompat.registerHoneycombCompatibility();
+        FFDCompat.registerGlowInkCompatibility();
         List<IRecipe> recipes = new ArrayList<>();
         if (FFDItems.isMossEnabled()) {
             ResourceLocation mossGroup = new ResourceLocation(FarmerFutureDelight.MODID, "moss");
-            recipes.add(new ShapedOreRecipe(mossGroup, new ItemStack(FFDItems.MOSS_CARPET, 3),
-                    "##", '#', FFDItems.MOSS_BLOCK)
-                    .setRegistryName(FarmerFutureDelight.MODID, "moss_carpet"));
-            recipes.add(new ShapelessOreRecipe(mossGroup,
-                    new ItemStack(net.minecraft.init.Blocks.MOSSY_COBBLESTONE),
-                    net.minecraft.init.Blocks.COBBLESTONE, FFDItems.MOSS_BLOCK)
-                    .setRegistryName(FarmerFutureDelight.MODID, "mossy_cobblestone"));
-            recipes.add(new ShapelessOreRecipe(mossGroup,
-                    new ItemStack(net.minecraft.init.Blocks.STONEBRICK, 1, 1),
-                    new ItemStack(net.minecraft.init.Blocks.STONEBRICK), FFDItems.MOSS_BLOCK)
-                    .setRegistryName(FarmerFutureDelight.MODID, "mossy_stone_bricks"));
+            ItemStack moss = FFDItems.effectiveStack(FFDItems.MOSS_BLOCK);
+            if (!moss.isEmpty() && FFDItems.isItemRegistered(FFDItems.MOSS_CARPET)) {
+                recipes.add(new ShapedOreRecipe(mossGroup,
+                        new ItemStack(FFDItems.MOSS_CARPET, 3), "##", '#', moss)
+                        .setRegistryName(FarmerFutureDelight.MODID, "moss_carpet"));
+            }
+            if (!moss.isEmpty()) {
+                recipes.add(new ShapelessOreRecipe(mossGroup,
+                        new ItemStack(net.minecraft.init.Blocks.MOSSY_COBBLESTONE),
+                        net.minecraft.init.Blocks.COBBLESTONE, moss)
+                        .setRegistryName(FarmerFutureDelight.MODID, "mossy_cobblestone"));
+                recipes.add(new ShapelessOreRecipe(mossGroup,
+                        new ItemStack(net.minecraft.init.Blocks.STONEBRICK, 1, 1),
+                        new ItemStack(net.minecraft.init.Blocks.STONEBRICK), moss)
+                        .setRegistryName(FarmerFutureDelight.MODID, "mossy_stone_bricks"));
+            }
+        }
+        if (FFDItems.isAmethystEnabled()) {
+            ResourceLocation amethystGroup = new ResourceLocation(FarmerFutureDelight.MODID, "amethyst");
+            if (FFDItems.isItemRegistered(FFDItems.AMETHYST_BLOCK)) {
+                recipes.add(new ShapedOreRecipe(amethystGroup,
+                        new ItemStack(FFDItems.AMETHYST_BLOCK), "##", "##", '#', "gemAmethyst")
+                        .setRegistryName(FarmerFutureDelight.MODID, "amethyst_block"));
+            }
+            if (FFDItems.isItemRegistered(FFDItems.TINTED_GLASS)) {
+                recipes.add(new ShapedOreRecipe(amethystGroup,
+                        new ItemStack(FFDItems.TINTED_GLASS, 2),
+                        " S ", "SGS", " S ", 'S', "gemAmethyst",
+                        'G', net.minecraft.init.Blocks.GLASS)
+                        .setRegistryName(FarmerFutureDelight.MODID, "tinted_glass"));
+            }
+        }
+        if (FFDItems.isDripstoneEnabled()) {
+            ResourceLocation dripstoneGroup =
+                    new ResourceLocation(FarmerFutureDelight.MODID, "dripstone");
+            ItemStack pointed = FFDItems.effectiveStack(FFDItems.POINTED_DRIPSTONE);
+            if (FFDItems.isItemRegistered(FFDItems.DRIPSTONE_BLOCK) && !pointed.isEmpty()) {
+                recipes.add(new ShapedOreRecipe(dripstoneGroup,
+                        new ItemStack(FFDItems.DRIPSTONE_BLOCK),
+                        "##", "##", '#', pointed)
+                        .setRegistryName(FarmerFutureDelight.MODID, "dripstone_block"));
+            }
+        }
+        if (FFDItems.isItemRegistered(FFDItems.IRON_CHAIN)) {
+            ResourceLocation chainGroup =
+                    new ResourceLocation(FarmerFutureDelight.MODID, "iron_chain");
+            recipes.add(new ShapedOreRecipe(chainGroup, new ItemStack(FFDItems.IRON_CHAIN),
+                    "N", "I", "N", 'N', Items.IRON_NUGGET, 'I', Items.IRON_INGOT)
+                    .setRegistryName(FarmerFutureDelight.MODID, "iron_chain"));
+        }
+        if (FFDItems.isCandleEnabled()) {
+            addCandleRecipes(recipes);
+        }
+        if (FFDItems.isItemRegistered(FFDItems.GLOW_ITEM_FRAME)
+                && FFDCompat.hasCompatibleGlowInkSac()) {
+            ResourceLocation frameGroup = new ResourceLocation(
+                    FarmerFutureDelight.MODID, "glow_item_frame");
+            recipes.add(new ShapelessOreRecipe(frameGroup,
+                    new ItemStack(FFDItems.GLOW_ITEM_FRAME), Items.ITEM_FRAME,
+                    FFDCompat.GLOW_INK_SAC_ORE_DICTIONARY)
+                    .setRegistryName(FarmerFutureDelight.MODID, "glow_item_frame"));
+        }
+        if (FFDItems.isDeepslateEnabled()) {
+            addDeepslateRecipes(recipes);
+        }
+        if (FFDItems.isRawOreEnabled()) {
+            addRawMaterialRecipes(recipes, "iron", FFDItems.RAW_IRON, FFDItems.RAW_IRON_BLOCK);
+            addRawMaterialRecipes(recipes, "gold", FFDItems.RAW_GOLD, FFDItems.RAW_GOLD_BLOCK);
+        }
+        if (FFDItems.isCopperEnabled()) {
+            addRawMaterialRecipes(recipes, "copper", FFDItems.RAW_COPPER, FFDItems.RAW_COPPER_BLOCK);
+            addCopperRecipes(recipes);
         }
         if (FFDItems.isKelpEnabled()) {
             ResourceLocation kelpGroup = new ResourceLocation(FarmerFutureDelight.MODID, "kelp");
-            recipes.add(new ShapedOreRecipe(kelpGroup,
-                    new ItemStack(FFDItems.DRIED_KELP_BLOCK),
-                    "###", "###", "###", '#', FFDItems.DRIED_KELP)
-                    .setRegistryName(FarmerFutureDelight.MODID, "dried_kelp_block"));
-            recipes.add(new ShapelessOreRecipe(kelpGroup,
-                    new ItemStack(FFDItems.DRIED_KELP, 9), FFDItems.DRIED_KELP_BLOCK)
-                    .setRegistryName(FarmerFutureDelight.MODID, "dried_kelp"));
+            ItemStack dried = FFDItems.effectiveStack(FFDItems.DRIED_KELP);
+            ItemStack driedBlock = FFDItems.effectiveStack(FFDItems.DRIED_KELP_BLOCK);
+            if (FFDItems.isItemRegistered(FFDItems.DRIED_KELP_BLOCK) && !dried.isEmpty()) {
+                recipes.add(new ShapedOreRecipe(kelpGroup,
+                        new ItemStack(FFDItems.DRIED_KELP_BLOCK),
+                        "###", "###", "###", '#', dried)
+                        .setRegistryName(FarmerFutureDelight.MODID, "dried_kelp_block"));
+            }
+            if (FFDItems.isItemRegistered(FFDItems.DRIED_KELP) && !driedBlock.isEmpty()) {
+                recipes.add(new ShapelessOreRecipe(kelpGroup,
+                        new ItemStack(FFDItems.DRIED_KELP, 9), driedBlock)
+                        .setRegistryName(FarmerFutureDelight.MODID, "dried_kelp"));
+            }
         }
         if (FFDItems.isHoneyEnabled()) {
             ResourceLocation honeyGroup = new ResourceLocation(FarmerFutureDelight.MODID, "honey");
-            recipes.add(new ShapedOreRecipe(honeyGroup, new ItemStack(FFDItems.HONEY_BLOCK),
-                    "##", "##", '#', FFDItems.HONEY_BOTTLE)
-                    .setRegistryName(FarmerFutureDelight.MODID, "honey_block"));
-            recipes.add(new ShapelessOreRecipe(honeyGroup, new ItemStack(FFDItems.HONEY_BOTTLE, 4),
-                    FFDItems.HONEY_BLOCK, Items.GLASS_BOTTLE, Items.GLASS_BOTTLE,
-                    Items.GLASS_BOTTLE, Items.GLASS_BOTTLE)
-                    .setRegistryName(FarmerFutureDelight.MODID, "honey_bottles"));
-            recipes.add(new ShapedOreRecipe(honeyGroup, new ItemStack(FFDItems.HONEYCOMB_BLOCK),
-                    "##", "##", '#', FFDItems.HONEYCOMB)
-                    .setRegistryName(FarmerFutureDelight.MODID, "honeycomb_block"));
-            recipes.add(new ShapelessOreRecipe(honeyGroup, new ItemStack(Items.SUGAR, 3),
-                    FFDItems.HONEY_BOTTLE)
-                    .setRegistryName(FarmerFutureDelight.MODID, "sugar_from_honey_bottle"));
-            recipes.add(new ShapedOreRecipe(honeyGroup, new ItemStack(FFDItems.BEEHIVE),
-                    "PPP", "HHH", "PPP", 'P', "plankWood", 'H', FFDItems.HONEYCOMB)
-                    .setRegistryName(FarmerFutureDelight.MODID, "beehive"));
+            ItemStack bottle = FFDItems.effectiveStack(FFDItems.HONEY_BOTTLE);
+            ItemStack honeyBlock = FFDItems.effectiveStack(FFDItems.HONEY_BLOCK);
+            ItemStack honeycomb = FFDItems.effectiveStack(FFDItems.HONEYCOMB);
+            if (FFDItems.isItemRegistered(FFDItems.HONEY_BLOCK) && !bottle.isEmpty()) {
+                recipes.add(new ShapedOreRecipe(honeyGroup, new ItemStack(FFDItems.HONEY_BLOCK),
+                        "##", "##", '#', bottle)
+                        .setRegistryName(FarmerFutureDelight.MODID, "honey_block"));
+            }
+            if (FFDItems.isItemRegistered(FFDItems.HONEY_BOTTLE) && !honeyBlock.isEmpty()) {
+                recipes.add(new ShapelessOreRecipe(honeyGroup,
+                        new ItemStack(FFDItems.HONEY_BOTTLE, 4), honeyBlock,
+                        Items.GLASS_BOTTLE, Items.GLASS_BOTTLE,
+                        Items.GLASS_BOTTLE, Items.GLASS_BOTTLE)
+                        .setRegistryName(FarmerFutureDelight.MODID, "honey_bottles"));
+            }
+            if (FFDItems.isItemRegistered(FFDItems.HONEYCOMB_BLOCK) && !honeycomb.isEmpty()) {
+                recipes.add(new ShapedOreRecipe(honeyGroup,
+                        new ItemStack(FFDItems.HONEYCOMB_BLOCK),
+                        "##", "##", '#', honeycomb)
+                        .setRegistryName(FarmerFutureDelight.MODID, "honeycomb_block"));
+            }
+            if (!bottle.isEmpty()) {
+                recipes.add(new ShapelessOreRecipe(honeyGroup, new ItemStack(Items.SUGAR, 3),
+                        bottle).setRegistryName(FarmerFutureDelight.MODID,
+                        "sugar_from_honey_bottle"));
+            }
+            if (FFDItems.isItemRegistered(FFDItems.BEEHIVE) && !honeycomb.isEmpty()) {
+                recipes.add(new ShapedOreRecipe(honeyGroup, new ItemStack(FFDItems.BEEHIVE),
+                        "PPP", "HHH", "PPP", 'P', "plankWood", 'H', honeycomb)
+                        .setRegistryName(FarmerFutureDelight.MODID, "beehive"));
+            }
         }
-        if (FFDItems.isTurtleEnabled()) {
+        if (FFDItems.isItemRegistered(FFDItems.TURTLE_HELMET)) {
             ResourceLocation turtleGroup = new ResourceLocation(FarmerFutureDelight.MODID, "turtle_helmet");
-            recipes.add(new ShapedOreRecipe(turtleGroup, new ItemStack(FFDItems.TURTLE_HELMET),
-                    "XXX", "X X", 'X', FFDItems.TURTLE_SCUTE)
-                    .setRegistryName(FarmerFutureDelight.MODID, "turtle_helmet"));
+            ItemStack scute = FFDItems.effectiveStack(FFDItems.TURTLE_SCUTE);
+            if (!scute.isEmpty()) {
+                recipes.add(new ShapedOreRecipe(turtleGroup,
+                        new ItemStack(FFDItems.TURTLE_HELMET),
+                        "XXX", "X X", 'X', scute)
+                        .setRegistryName(FarmerFutureDelight.MODID, "turtle_helmet"));
+            }
         }
         if (FFDItems.isCrimsonWoodEnabled()) {
             addNetherWoodRecipes(recipes, "crimson", FFDItems.CRIMSON_STEM,
@@ -418,6 +878,220 @@ public final class FFDRegistryEvents {
         }
     }
 
+    private static void addCandleRecipes(List<IRecipe> recipes) {
+        ResourceLocation group = new ResourceLocation(FarmerFutureDelight.MODID, "candle");
+        if (FFDItems.isItemRegistered(FFDItems.CANDLE)) {
+            recipes.add(new ShapedOreRecipe(group, new ItemStack(FFDItems.CANDLE),
+                    "S", "H", 'S', Items.STRING,
+                    'H', FFDCompat.HONEYCOMB_ORE_DICTIONARY)
+                    .setRegistryName(FarmerFutureDelight.MODID, "candle"));
+        }
+
+        EnumDyeColor[] colors = {
+                EnumDyeColor.WHITE, EnumDyeColor.ORANGE, EnumDyeColor.MAGENTA,
+                EnumDyeColor.LIGHT_BLUE, EnumDyeColor.YELLOW, EnumDyeColor.LIME,
+                EnumDyeColor.PINK, EnumDyeColor.GRAY, EnumDyeColor.SILVER,
+                EnumDyeColor.CYAN, EnumDyeColor.PURPLE, EnumDyeColor.BLUE,
+                EnumDyeColor.BROWN, EnumDyeColor.GREEN, EnumDyeColor.RED,
+                EnumDyeColor.BLACK
+        };
+        ItemStack candle = FFDItems.effectiveStack(FFDItems.CANDLE);
+        for (int i = 1; i < FFDItems.CANDLE_ITEMS.length; i++) {
+            if (!FFDItems.isItemRegistered(FFDItems.CANDLE_ITEMS[i]) || candle.isEmpty()) {
+                continue;
+            }
+            recipes.add(new ShapelessOreRecipe(group,
+                    new ItemStack(FFDItems.CANDLE_ITEMS[i]), candle,
+                    new ItemStack(Items.DYE, 1, colors[i - 1].getDyeDamage()))
+                    .setRegistryName(FarmerFutureDelight.MODID, FFDBlocks.CANDLE_NAMES[i]));
+        }
+    }
+
+    private static void addDeepslateRecipes(List<IRecipe> recipes) {
+        ResourceLocation group = new ResourceLocation(FarmerFutureDelight.MODID, "deepslate");
+        addTwoByTwoRecipe(recipes, group, "polished_deepslate", FFDItems.COBBLED_DEEPSLATE,
+                FFDItems.POLISHED_DEEPSLATE);
+        addTwoByTwoRecipe(recipes, group, "deepslate_bricks", FFDItems.POLISHED_DEEPSLATE,
+                FFDItems.DEEPSLATE_BRICKS);
+        addTwoByTwoRecipe(recipes, group, "deepslate_tiles", FFDItems.DEEPSLATE_BRICKS,
+                FFDItems.DEEPSLATE_TILES);
+        ItemStack cobbledSlab = FFDItems.effectiveStack(FFDItems.COBBLED_DEEPSLATE_SLAB);
+        if (FFDItems.isItemRegistered(FFDItems.CHISELED_DEEPSLATE)
+                && !cobbledSlab.isEmpty()) {
+            recipes.add(new ShapedOreRecipe(group,
+                    new ItemStack(FFDItems.CHISELED_DEEPSLATE),
+                    "S", "S", 'S', cobbledSlab)
+                    .setRegistryName(FarmerFutureDelight.MODID, "chiseled_deepslate"));
+        }
+        addStoneFamilyRecipes(recipes, group, "cobbled_deepslate", FFDItems.COBBLED_DEEPSLATE,
+                FFDItems.COBBLED_DEEPSLATE_STAIRS, FFDItems.COBBLED_DEEPSLATE_SLAB,
+                FFDItems.COBBLED_DEEPSLATE_WALL);
+        addStoneFamilyRecipes(recipes, group, "polished_deepslate", FFDItems.POLISHED_DEEPSLATE,
+                FFDItems.POLISHED_DEEPSLATE_STAIRS, FFDItems.POLISHED_DEEPSLATE_SLAB,
+                FFDItems.POLISHED_DEEPSLATE_WALL);
+        addStoneFamilyRecipes(recipes, group, "deepslate_brick", FFDItems.DEEPSLATE_BRICKS,
+                FFDItems.DEEPSLATE_BRICK_STAIRS, FFDItems.DEEPSLATE_BRICK_SLAB,
+                FFDItems.DEEPSLATE_BRICK_WALL);
+        addStoneFamilyRecipes(recipes, group, "deepslate_tile", FFDItems.DEEPSLATE_TILES,
+                FFDItems.DEEPSLATE_TILE_STAIRS, FFDItems.DEEPSLATE_TILE_SLAB,
+                FFDItems.DEEPSLATE_TILE_WALL);
+    }
+
+    private static void addTwoByTwoRecipe(List<IRecipe> recipes, ResourceLocation group,
+                                           String name, net.minecraft.item.Item input,
+                                           net.minecraft.item.Item output) {
+        ItemStack effectiveInput = FFDItems.effectiveStack(input);
+        if (FFDItems.isItemRegistered(output) && !effectiveInput.isEmpty()) {
+            recipes.add(new ShapedOreRecipe(group, new ItemStack(output, 4),
+                    "##", "##", '#', effectiveInput)
+                    .setRegistryName(FarmerFutureDelight.MODID, name));
+        }
+    }
+
+    private static void addStoneFamilyRecipes(List<IRecipe> recipes, ResourceLocation group,
+                                               String name, net.minecraft.item.Item material,
+                                               net.minecraft.item.Item stairs,
+                                               net.minecraft.item.Item slab,
+                                               net.minecraft.item.Item wall) {
+        ItemStack effectiveMaterial = FFDItems.effectiveStack(material);
+        if (effectiveMaterial.isEmpty()) {
+            return;
+        }
+        if (FFDItems.isItemRegistered(stairs)) {
+            recipes.add(new ShapedOreRecipe(group, new ItemStack(stairs, 4),
+                    "#  ", "## ", "###", '#', effectiveMaterial)
+                    .setRegistryName(FarmerFutureDelight.MODID, name + "_stairs"));
+        }
+        if (FFDItems.isItemRegistered(slab)) {
+            recipes.add(new ShapedOreRecipe(group, new ItemStack(slab, 6),
+                    "###", '#', effectiveMaterial)
+                    .setRegistryName(FarmerFutureDelight.MODID, name + "_slab"));
+        }
+        if (FFDItems.isItemRegistered(wall)) {
+            recipes.add(new ShapedOreRecipe(group, new ItemStack(wall, 6),
+                    "###", "###", '#', effectiveMaterial)
+                    .setRegistryName(FarmerFutureDelight.MODID, name + "_wall"));
+        }
+    }
+
+    private static void addRawMaterialRecipes(List<IRecipe> recipes, String metal,
+                                               net.minecraft.item.Item raw,
+                                               net.minecraft.item.Item block) {
+        ResourceLocation group = new ResourceLocation(FarmerFutureDelight.MODID, "raw_materials");
+        ItemStack effectiveRaw = FFDItems.effectiveStack(raw);
+        ItemStack effectiveBlock = FFDItems.effectiveStack(block);
+        if (FFDItems.isItemRegistered(block) && !effectiveRaw.isEmpty()) {
+            recipes.add(new ShapedOreRecipe(group, new ItemStack(block),
+                    "###", "###", "###", '#', effectiveRaw)
+                    .setRegistryName(FarmerFutureDelight.MODID,
+                            "raw_" + metal + "_block"));
+        }
+        if (FFDItems.isItemRegistered(raw) && !effectiveBlock.isEmpty()) {
+            recipes.add(new ShapelessOreRecipe(group, new ItemStack(raw, 9), effectiveBlock)
+                    .setRegistryName(FarmerFutureDelight.MODID, "raw_" + metal));
+        }
+    }
+
+    private static void addCopperRecipes(List<IRecipe> recipes) {
+        ResourceLocation group = new ResourceLocation(FarmerFutureDelight.MODID, "copper");
+        if (FFDItems.isItemRegistered(FFDItems.COPPER_BLOCK)) {
+            recipes.add(new ShapedOreRecipe(group, new ItemStack(FFDItems.COPPER_BLOCK),
+                    "###", "###", "###", '#', "ingotCopper")
+                    .setRegistryName(FarmerFutureDelight.MODID, "copper_block"));
+        }
+        ItemStack copperBlock = FFDItems.effectiveStack(FFDItems.COPPER_BLOCK);
+        ItemStack waxedCopperBlock = FFDItems.effectiveStack(
+                FFDItems.WAXED_COPPER_BLOCK_ITEMS[0]);
+        if (FFDItems.isItemRegistered(FFDItems.COPPER_INGOT) && !copperBlock.isEmpty()) {
+            recipes.add(new ShapelessOreRecipe(group,
+                    new ItemStack(FFDItems.COPPER_INGOT, 9), copperBlock)
+                    .setRegistryName(FarmerFutureDelight.MODID, "copper_ingot"));
+        }
+        if (FFDItems.isItemRegistered(FFDItems.COPPER_INGOT)
+                && !waxedCopperBlock.isEmpty()) {
+            recipes.add(new ShapelessOreRecipe(group,
+                    new ItemStack(FFDItems.COPPER_INGOT, 9), waxedCopperBlock)
+                    .setRegistryName(FarmerFutureDelight.MODID,
+                            "copper_ingot_from_waxed_copper_block"));
+        }
+
+        for (int i = 0; i < FFDItems.COPPER_BLOCK_ITEMS.length; i++) {
+            addCutCopperRecipes(recipes, group, FFDItems.COPPER_BLOCK_ITEMS[i],
+                    FFDItems.CUT_COPPER_ITEMS[i], FFDItems.CUT_COPPER_STAIR_ITEMS[i],
+                    FFDItems.CUT_COPPER_SLAB_ITEMS[i]);
+            addCutCopperRecipes(recipes, group, FFDItems.WAXED_COPPER_BLOCK_ITEMS[i],
+                    FFDItems.WAXED_CUT_COPPER_ITEMS[i],
+                    FFDItems.WAXED_CUT_COPPER_STAIR_ITEMS[i],
+                    FFDItems.WAXED_CUT_COPPER_SLAB_ITEMS[i]);
+        }
+
+        if (FFDItems.isItemRegistered(FFDItems.LIGHTNING_ROD)) {
+            recipes.add(new ShapedOreRecipe(group, new ItemStack(FFDItems.LIGHTNING_ROD),
+                    "#", "#", "#", '#', "ingotCopper")
+                    .setRegistryName(FarmerFutureDelight.MODID, "lightning_rod"));
+        }
+        if (FFDItems.isItemRegistered(FFDItems.SPYGLASS)) {
+            recipes.add(new ShapedOreRecipe(group, new ItemStack(FFDItems.SPYGLASS),
+                    " A ", " C ", " C ", 'A', "gemAmethyst", 'C', "ingotCopper")
+                    .setRegistryName(FarmerFutureDelight.MODID, "spyglass"));
+        }
+
+        if (FFDCompat.hasCompatibleHoneycomb()) {
+            addWaxingRecipes(recipes, group, FFDItems.COPPER_BLOCK_ITEMS,
+                    FFDItems.WAXED_COPPER_BLOCK_ITEMS);
+            addWaxingRecipes(recipes, group, FFDItems.CUT_COPPER_ITEMS,
+                    FFDItems.WAXED_CUT_COPPER_ITEMS);
+            addWaxingRecipes(recipes, group, FFDItems.CUT_COPPER_STAIR_ITEMS,
+                    FFDItems.WAXED_CUT_COPPER_STAIR_ITEMS);
+            addWaxingRecipes(recipes, group, FFDItems.CUT_COPPER_SLAB_ITEMS,
+                    FFDItems.WAXED_CUT_COPPER_SLAB_ITEMS);
+            addWaxingRecipes(recipes, group, FFDItems.LIGHTNING_ROD_ITEMS,
+                    FFDItems.WAXED_LIGHTNING_ROD_ITEMS);
+        }
+    }
+
+    private static void addCutCopperRecipes(List<IRecipe> recipes, ResourceLocation group,
+                                             net.minecraft.item.Item block,
+                                             net.minecraft.item.Item cut,
+                                             net.minecraft.item.Item stairs,
+                                             net.minecraft.item.Item slab) {
+        ItemStack effectiveBlock = FFDItems.effectiveStack(block);
+        ItemStack effectiveCut = FFDItems.effectiveStack(cut);
+        if (FFDItems.isItemRegistered(cut) && !effectiveBlock.isEmpty()) {
+            recipes.add(new ShapedOreRecipe(group, new ItemStack(cut, 4),
+                    "##", "##", '#', effectiveBlock)
+                    .setRegistryName(FarmerFutureDelight.MODID,
+                            cut.getRegistryName().getResourcePath()));
+        }
+        if (FFDItems.isItemRegistered(stairs) && !effectiveCut.isEmpty()) {
+            recipes.add(new ShapedOreRecipe(group, new ItemStack(stairs, 4),
+                    "#  ", "## ", "###", '#', effectiveCut)
+                    .setRegistryName(FarmerFutureDelight.MODID,
+                            stairs.getRegistryName().getResourcePath()));
+        }
+        if (FFDItems.isItemRegistered(slab) && !effectiveCut.isEmpty()) {
+            recipes.add(new ShapedOreRecipe(group, new ItemStack(slab, 6),
+                    "###", '#', effectiveCut)
+                    .setRegistryName(FarmerFutureDelight.MODID,
+                            slab.getRegistryName().getResourcePath()));
+        }
+    }
+
+    private static void addWaxingRecipes(List<IRecipe> recipes, ResourceLocation group,
+                                          net.minecraft.item.Item[] unwaxed,
+                                          net.minecraft.item.Item[] waxed) {
+        for (int i = 0; i < unwaxed.length; i++) {
+            ItemStack effectiveUnwaxed = FFDItems.effectiveStack(unwaxed[i]);
+            if (FFDItems.isItemRegistered(waxed[i]) && !effectiveUnwaxed.isEmpty()) {
+                recipes.add(new ShapelessOreRecipe(group, new ItemStack(waxed[i]),
+                        effectiveUnwaxed, FFDCompat.HONEYCOMB_ORE_DICTIONARY)
+                        .setRegistryName(FarmerFutureDelight.MODID,
+                                waxed[i].getRegistryName().getResourcePath()
+                                        + "_from_honeycomb"));
+            }
+        }
+    }
+
     private static void addNetherWoodRecipes(List<IRecipe> recipes, String prefix,
                                               net.minecraft.item.Item stem,
                                               net.minecraft.item.Item strippedStem,
@@ -433,45 +1107,100 @@ public final class FFDRegistryEvents {
                                               net.minecraft.item.Item button,
                                               net.minecraft.item.Item pressurePlate) {
         ResourceLocation group = new ResourceLocation(FarmerFutureDelight.MODID, prefix + "_wood");
-        recipes.add(new ShapelessOreRecipe(group, new ItemStack(planks, 4), stem)
-                .setRegistryName(FarmerFutureDelight.MODID, prefix + "_planks_from_stem"));
-        recipes.add(new ShapelessOreRecipe(group, new ItemStack(planks, 4), strippedStem)
-                .setRegistryName(FarmerFutureDelight.MODID, prefix + "_planks_from_stripped_stem"));
-        recipes.add(new ShapelessOreRecipe(group, new ItemStack(planks, 4), hyphae)
-                .setRegistryName(FarmerFutureDelight.MODID, prefix + "_planks_from_hyphae"));
-        recipes.add(new ShapelessOreRecipe(group, new ItemStack(planks, 4), strippedHyphae)
-                .setRegistryName(FarmerFutureDelight.MODID, prefix + "_planks_from_stripped_hyphae"));
-        recipes.add(new ShapedOreRecipe(group, new ItemStack(hyphae, 3),
-                "SS", "SS", 'S', stem)
-                .setRegistryName(FarmerFutureDelight.MODID, prefix + "_hyphae"));
-        recipes.add(new ShapedOreRecipe(group, new ItemStack(strippedHyphae, 3),
-                "SS", "SS", 'S', strippedStem)
-                .setRegistryName(FarmerFutureDelight.MODID, "stripped_" + prefix + "_hyphae"));
+        ItemStack stemStack = FFDItems.effectiveStack(stem);
+        ItemStack strippedStemStack = FFDItems.effectiveStack(strippedStem);
+        ItemStack hyphaeStack = FFDItems.effectiveStack(hyphae);
+        ItemStack strippedHyphaeStack = FFDItems.effectiveStack(strippedHyphae);
+        ItemStack plankStack = FFDItems.effectiveStack(planks);
+        if (FFDItems.isItemRegistered(planks)) {
+            addShapelessConversion(recipes, group, planks, 4, stemStack,
+                    prefix + "_planks_from_stem");
+            addShapelessConversion(recipes, group, planks, 4, strippedStemStack,
+                    prefix + "_planks_from_stripped_stem");
+            addShapelessConversion(recipes, group, planks, 4, hyphaeStack,
+                    prefix + "_planks_from_hyphae");
+            addShapelessConversion(recipes, group, planks, 4, strippedHyphaeStack,
+                    prefix + "_planks_from_stripped_hyphae");
+        }
+        if (FFDItems.isItemRegistered(hyphae) && !stemStack.isEmpty()) {
+            recipes.add(new ShapedOreRecipe(group, new ItemStack(hyphae, 3),
+                    "SS", "SS", 'S', stemStack)
+                    .setRegistryName(FarmerFutureDelight.MODID, prefix + "_hyphae"));
+        }
+        if (FFDItems.isItemRegistered(strippedHyphae) && !strippedStemStack.isEmpty()) {
+            recipes.add(new ShapedOreRecipe(group, new ItemStack(strippedHyphae, 3),
+                    "SS", "SS", 'S', strippedStemStack)
+                    .setRegistryName(FarmerFutureDelight.MODID,
+                            "stripped_" + prefix + "_hyphae"));
+        }
+        if (plankStack.isEmpty()) {
+            return;
+        }
         recipes.add(new ShapedOreRecipe(group, new ItemStack(Items.STICK, 4),
-                "P", "P", 'P', planks)
+                "P", "P", 'P', plankStack)
                 .setRegistryName(FarmerFutureDelight.MODID, prefix + "_sticks"));
-        recipes.add(new ShapedOreRecipe(group, new ItemStack(stairs, 4),
-                "P  ", "PP ", "PPP", 'P', planks)
-                .setRegistryName(FarmerFutureDelight.MODID, prefix + "_stairs"));
-        recipes.add(new ShapedOreRecipe(group, new ItemStack(slab, 6),
-                "PPP", 'P', planks)
-                .setRegistryName(FarmerFutureDelight.MODID, prefix + "_slab"));
-        recipes.add(new ShapedOreRecipe(group, new ItemStack(fence, 3),
-                "PSP", "PSP", 'P', planks, 'S', Items.STICK)
-                .setRegistryName(FarmerFutureDelight.MODID, prefix + "_fence"));
-        recipes.add(new ShapedOreRecipe(group, new ItemStack(fenceGate),
-                "SPS", "SPS", 'P', planks, 'S', Items.STICK)
-                .setRegistryName(FarmerFutureDelight.MODID, prefix + "_fence_gate"));
-        recipes.add(new ShapedOreRecipe(group, new ItemStack(door, 3),
-                "PP", "PP", "PP", 'P', planks)
-                .setRegistryName(FarmerFutureDelight.MODID, prefix + "_door"));
-        recipes.add(new ShapedOreRecipe(group, new ItemStack(trapdoor, 2),
-                "PPP", "PPP", 'P', planks)
-                .setRegistryName(FarmerFutureDelight.MODID, prefix + "_trapdoor"));
-        recipes.add(new ShapelessOreRecipe(group, new ItemStack(button), planks)
-                .setRegistryName(FarmerFutureDelight.MODID, prefix + "_button"));
-        recipes.add(new ShapedOreRecipe(group, new ItemStack(pressurePlate),
-                "PP", 'P', planks)
-                .setRegistryName(FarmerFutureDelight.MODID, prefix + "_pressure_plate"));
+        addWoodShapeRecipes(recipes, group, prefix, plankStack, stairs, slab, fence,
+                fenceGate, door, trapdoor, button, pressurePlate);
+    }
+
+    private static void addShapelessConversion(List<IRecipe> recipes, ResourceLocation group,
+                                                net.minecraft.item.Item output, int count,
+                                                ItemStack input, String name) {
+        if (!input.isEmpty()) {
+            recipes.add(new ShapelessOreRecipe(group, new ItemStack(output, count), input)
+                    .setRegistryName(FarmerFutureDelight.MODID, name));
+        }
+    }
+
+    private static void addWoodShapeRecipes(List<IRecipe> recipes, ResourceLocation group,
+                                            String prefix, ItemStack planks,
+                                            net.minecraft.item.Item stairs,
+                                            net.minecraft.item.Item slab,
+                                            net.minecraft.item.Item fence,
+                                            net.minecraft.item.Item fenceGate,
+                                            net.minecraft.item.Item door,
+                                            net.minecraft.item.Item trapdoor,
+                                            net.minecraft.item.Item button,
+                                            net.minecraft.item.Item pressurePlate) {
+        if (FFDItems.isItemRegistered(stairs)) {
+            recipes.add(new ShapedOreRecipe(group, new ItemStack(stairs, 4),
+                    "P  ", "PP ", "PPP", 'P', planks)
+                    .setRegistryName(FarmerFutureDelight.MODID, prefix + "_stairs"));
+        }
+        if (FFDItems.isItemRegistered(slab)) {
+            recipes.add(new ShapedOreRecipe(group, new ItemStack(slab, 6),
+                    "PPP", 'P', planks)
+                    .setRegistryName(FarmerFutureDelight.MODID, prefix + "_slab"));
+        }
+        if (FFDItems.isItemRegistered(fence)) {
+            recipes.add(new ShapedOreRecipe(group, new ItemStack(fence, 3),
+                    "PSP", "PSP", 'P', planks, 'S', Items.STICK)
+                    .setRegistryName(FarmerFutureDelight.MODID, prefix + "_fence"));
+        }
+        if (FFDItems.isItemRegistered(fenceGate)) {
+            recipes.add(new ShapedOreRecipe(group, new ItemStack(fenceGate),
+                    "SPS", "SPS", 'P', planks, 'S', Items.STICK)
+                    .setRegistryName(FarmerFutureDelight.MODID, prefix + "_fence_gate"));
+        }
+        if (FFDItems.isItemRegistered(door)) {
+            recipes.add(new ShapedOreRecipe(group, new ItemStack(door, 3),
+                    "PP", "PP", "PP", 'P', planks)
+                    .setRegistryName(FarmerFutureDelight.MODID, prefix + "_door"));
+        }
+        if (FFDItems.isItemRegistered(trapdoor)) {
+            recipes.add(new ShapedOreRecipe(group, new ItemStack(trapdoor, 2),
+                    "PPP", "PPP", 'P', planks)
+                    .setRegistryName(FarmerFutureDelight.MODID, prefix + "_trapdoor"));
+        }
+        if (FFDItems.isItemRegistered(button)) {
+            recipes.add(new ShapelessOreRecipe(group, new ItemStack(button), planks)
+                    .setRegistryName(FarmerFutureDelight.MODID, prefix + "_button"));
+        }
+        if (FFDItems.isItemRegistered(pressurePlate)) {
+            recipes.add(new ShapedOreRecipe(group, new ItemStack(pressurePlate),
+                    "PP", 'P', planks)
+                    .setRegistryName(FarmerFutureDelight.MODID,
+                            prefix + "_pressure_plate"));
+        }
     }
 }

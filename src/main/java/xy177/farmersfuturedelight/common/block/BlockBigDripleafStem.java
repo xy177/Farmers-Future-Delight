@@ -30,11 +30,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.property.ExtendedBlockState;
 
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
+import xy177.farmersfuturedelight.common.worldgen.FFDLushCaveBlockProvider;
 
 public class BlockBigDripleafStem extends Block implements IGrowable {
     public static final PropertyDirection FACING = BlockHorizontal.FACING;
@@ -63,7 +65,15 @@ public class BlockBigDripleafStem extends Block implements IGrowable {
 
     @Override
     protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, BlockLiquid.LEVEL, FACING, WATERLOGGED);
+        return new ExtendedBlockState(this,
+                new net.minecraft.block.properties.IProperty<?>[] {
+                        BlockLiquid.LEVEL, FACING, WATERLOGGED},
+                WaterloggedPlantFluid.extendedProperties());
+    }
+
+    @Override
+    public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
+        return WaterloggedPlantFluid.getExtendedState(state, world, pos);
     }
 
     @Override
@@ -96,10 +106,11 @@ public class BlockBigDripleafStem extends Block implements IGrowable {
     private static boolean canStay(World world, BlockPos pos) {
         IBlockState below = world.getBlockState(pos.down());
         IBlockState above = world.getBlockState(pos.up());
-        boolean supportedBelow = below.getBlock() == FFDBlocks.BIG_DRIPLEAF_STEM
+        FFDLushCaveBlockProvider blocks = FFDLushCaveBlockProvider.get();
+        boolean supportedBelow = blocks.isBigDripleafStem(below)
                 || DripleafPlacement.isBigDripleafGround(below);
-        return supportedBelow && (above.getBlock() == FFDBlocks.BIG_DRIPLEAF_STEM
-                || BlockBigDripleaf.isBigDripleaf(above));
+        return supportedBelow && (blocks.isBigDripleafStem(above)
+                || blocks.isBigDripleaf(above));
     }
 
     @Override
@@ -139,10 +150,11 @@ public class BlockBigDripleafStem extends Block implements IGrowable {
 
     private static BlockPos findHead(World world, BlockPos pos) {
         BlockPos cursor = pos;
-        while (world.getBlockState(cursor).getBlock() == FFDBlocks.BIG_DRIPLEAF_STEM) {
+        FFDLushCaveBlockProvider blocks = FFDLushCaveBlockProvider.get();
+        while (blocks.isBigDripleafStem(world.getBlockState(cursor))) {
             cursor = cursor.up();
         }
-        return BlockBigDripleaf.isBigDripleaf(world.getBlockState(cursor)) ? cursor : null;
+        return blocks.isBigDripleaf(world.getBlockState(cursor)) ? cursor : null;
     }
 
     @Override
@@ -169,7 +181,7 @@ public class BlockBigDripleafStem extends Block implements IGrowable {
     public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos,
                          IBlockState state, int fortune) {
         if (FFDItems.isDripleafEnabled()) {
-            drops.add(new ItemStack(FFDItems.BIG_DRIPLEAF));
+            drops.add(FFDItems.effectiveStack(FFDItems.BIG_DRIPLEAF));
         }
     }
 
@@ -180,7 +192,7 @@ public class BlockBigDripleafStem extends Block implements IGrowable {
 
     @Override
     public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
-        return new ItemStack(FFDItems.BIG_DRIPLEAF);
+        return FFDItems.effectiveStack(FFDItems.BIG_DRIPLEAF);
     }
 
     private static IBlockState replacementState(IBlockState state) {

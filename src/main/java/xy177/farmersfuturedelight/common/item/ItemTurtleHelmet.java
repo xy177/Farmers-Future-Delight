@@ -26,7 +26,8 @@ public class ItemTurtleHelmet extends ItemArmor {
 
     @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return repair.getItem() == FFDItems.TURTLE_SCUTE || super.getIsRepairable(toRepair, repair);
+        net.minecraft.item.Item scute = FFDItems.effectiveItem(FFDItems.TURTLE_SCUTE);
+        return scute != null && repair.getItem() == scute || super.getIsRepairable(toRepair, repair);
     }
 
     @Override

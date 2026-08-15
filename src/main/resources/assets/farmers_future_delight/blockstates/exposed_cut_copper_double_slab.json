@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "variant=default": {
+      "model": "farmers_future_delight:exposed_cut_copper"
+    }
+  }
+}

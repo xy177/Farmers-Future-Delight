@@ -15,6 +15,7 @@ public final class FFDCreativeTab extends CreativeTabs {
 
     @Override
     public ItemStack getTabIconItem() {
-        return new ItemStack(FFDItems.isSweetBerryEnabled() ? FFDItems.SWEET_BERRIES : Items.APPLE);
+        ItemStack berries = FFDItems.effectiveStack(FFDItems.SWEET_BERRIES);
+        return berries.isEmpty() ? new ItemStack(Items.APPLE) : berries;
     }
 }

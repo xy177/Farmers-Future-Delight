@@ -13,17 +13,11 @@ public final class FFDTileEntities {
     }
 
     public static void register() {
-        if (FFDItems.isHoneyEnabled()) {
-            GameRegistry.registerTileEntity(TileEntityBeehive.class,
-                    new ResourceLocation(FarmerFutureDelight.MODID, "beehive"));
-        }
-        if (FFDItems.isGlowBerryEnabled()) {
-            GameRegistry.registerTileEntity(TileEntityCaveVines.class,
-                    new ResourceLocation(FarmerFutureDelight.MODID, "cave_vines"));
-        }
-        if (FFDItems.isCrimsonEnabled() || FFDItems.isWarpedEnabled()) {
-            GameRegistry.registerTileEntity(TileEntityNetherVines.class,
-                    new ResourceLocation(FarmerFutureDelight.MODID, "nether_vines"));
-        }
+        GameRegistry.registerTileEntity(TileEntityBeehive.class,
+                new ResourceLocation(FarmerFutureDelight.MODID, "beehive"));
+        GameRegistry.registerTileEntity(TileEntityCaveVines.class,
+                new ResourceLocation(FarmerFutureDelight.MODID, "cave_vines"));
+        GameRegistry.registerTileEntity(TileEntityNetherVines.class,
+                new ResourceLocation(FarmerFutureDelight.MODID, "nether_vines"));
     }
 }

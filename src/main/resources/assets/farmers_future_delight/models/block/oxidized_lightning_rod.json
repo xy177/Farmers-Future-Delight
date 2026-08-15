@@ -1,0 +1,6 @@
+{
+  "parent": "farmers_future_delight:block/template_lightning_rod",
+  "textures": {
+    "texture": "farmers_future_delight:block/oxidized_lightning_rod"
+  }
+}

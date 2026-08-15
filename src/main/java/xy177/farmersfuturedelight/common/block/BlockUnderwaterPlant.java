@@ -18,6 +18,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
 
 /** Common water-material behavior for backported aquatic blocks. */
@@ -37,7 +40,14 @@ public abstract class BlockUnderwaterPlant extends BlockBush {
 
     @Override
     protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, BlockLiquid.LEVEL);
+        return new ExtendedBlockState(this,
+                new net.minecraft.block.properties.IProperty<?>[] {BlockLiquid.LEVEL},
+                WaterloggedPlantFluid.extendedProperties());
+    }
+
+    @Override
+    public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
+        return WaterloggedPlantFluid.getExtendedState(state, world, pos);
     }
 
     @Override
@@ -138,6 +148,12 @@ public abstract class BlockUnderwaterPlant extends BlockBush {
             return false;
         }
         return super.shouldSideBeRendered(state, world, pos, side);
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public int getPackedLightmapCoords(IBlockState state, IBlockAccess source, BlockPos pos) {
+        return Blocks.WATER.getPackedLightmapCoords(Blocks.WATER.getDefaultState(), source, pos);
     }
 
     @Override

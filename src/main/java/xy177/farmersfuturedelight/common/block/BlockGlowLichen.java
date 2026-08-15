@@ -38,6 +38,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.property.ExtendedBlockState;
 
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
@@ -90,7 +91,15 @@ public class BlockGlowLichen extends Block implements IGrowable {
 
     @Override
     protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, BlockLiquid.LEVEL, DOWN, UP, NORTH, SOUTH);
+        return new ExtendedBlockState(this,
+                new net.minecraft.block.properties.IProperty<?>[] {
+                        BlockLiquid.LEVEL, DOWN, UP, NORTH, SOUTH},
+                WaterloggedPlantFluid.extendedProperties());
+    }
+
+    @Override
+    public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
+        return WaterloggedPlantFluid.getExtendedState(state, world, pos);
     }
 
     @Override

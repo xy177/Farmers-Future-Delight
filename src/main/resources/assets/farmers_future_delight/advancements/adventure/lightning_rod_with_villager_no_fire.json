@@ -1,0 +1,20 @@
+{
+  "conditions": [
+    {"type": "farmers_future_delight:feature_enabled", "feature": "copper"}
+  ],
+  "parent": "minecraft:adventure/root",
+  "display": {
+    "icon": {"item": "minecraft:blaze_rod"},
+    "title": {"translate": "advancements.farmers_future_delight.adventure.lightning_rod_with_villager_no_fire.title"},
+    "description": {"translate": "advancements.farmers_future_delight.adventure.lightning_rod_with_villager_no_fire.description"},
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "lightning_rod_with_villager_no_fire": {
+      "trigger": "farmers_future_delight:lightning_rod_with_villager_no_fire"
+    }
+  }
+}

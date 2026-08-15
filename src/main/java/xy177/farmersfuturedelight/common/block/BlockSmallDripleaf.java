@@ -35,6 +35,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.property.ExtendedBlockState;
 
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.FFDCreativeTab;
@@ -65,7 +66,15 @@ public class BlockSmallDripleaf extends Block implements IGrowable {
 
     @Override
     protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, BlockLiquid.LEVEL, FACING, HALF, WATERLOGGED);
+        return new ExtendedBlockState(this,
+                new net.minecraft.block.properties.IProperty<?>[] {
+                        BlockLiquid.LEVEL, FACING, HALF, WATERLOGGED},
+                WaterloggedPlantFluid.extendedProperties());
+    }
+
+    @Override
+    public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
+        return WaterloggedPlantFluid.getExtendedState(state, world, pos);
     }
 
     @Override
@@ -257,13 +266,13 @@ public class BlockSmallDripleaf extends Block implements IGrowable {
         player.addStat(StatList.getBlockStats(this));
         player.addExhaustion(0.005F);
         if (!world.isRemote && FFDItems.isDripleafEnabled() && tool.getItem() == Items.SHEARS) {
-            spawnAsEntity(world, pos, new ItemStack(FFDItems.SMALL_DRIPLEAF));
+            spawnAsEntity(world, pos, FFDItems.effectiveStack(FFDItems.SMALL_DRIPLEAF));
         }
     }
 
     @Override
     public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
-        return new ItemStack(FFDItems.SMALL_DRIPLEAF);
+        return FFDItems.effectiveStack(FFDItems.SMALL_DRIPLEAF);
     }
 
     @Override

@@ -9,7 +9,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import xy177.farmersfuturedelight.common.registry.FFDBlocks;
+import xy177.farmersfuturedelight.common.worldgen.FFDLushCaveBlockProvider;
 
 public final class DripleafPlacement {
     private DripleafPlacement() {
@@ -18,25 +18,26 @@ public final class DripleafPlacement {
     public static boolean canReplace(World world, BlockPos pos) {
         IBlockState state = world.getBlockState(pos);
         return world.isAirBlock(pos) || WaterloggedPlantFluid.isSourceWater(state)
-                || state.getBlock() == FFDBlocks.SMALL_DRIPLEAF;
+                || FFDLushCaveBlockProvider.get().isSmallDripleaf(state);
     }
 
     public static boolean isSmallDripleafGround(IBlockState state) {
-        Block block = state.getBlock();
-        return block == Blocks.CLAY || block == FFDBlocks.MOSS_BLOCK;
+        return state.getBlock() == Blocks.CLAY
+                || FFDLushCaveBlockProvider.get().isMossBlock(state);
     }
 
     public static boolean isBigDripleafGround(IBlockState state) {
         Block block = state.getBlock();
         return isSmallDripleafGround(state) || block == Blocks.GRASS || block == Blocks.DIRT
                 || block == Blocks.MYCELIUM || block == Blocks.FARMLAND
-                || block == FFDBlocks.ROOTED_DIRT;
+                || FFDLushCaveBlockProvider.get().isRootedDirt(state);
     }
 
     public static boolean canPlaceHead(World world, BlockPos pos) {
         IBlockState below = world.getBlockState(pos.down());
-        return canReplace(world, pos) && (BlockBigDripleaf.isBigDripleaf(below)
-                || below.getBlock() == FFDBlocks.BIG_DRIPLEAF_STEM
+        return headState(world, pos, EnumFacing.NORTH) != null && canReplace(world, pos)
+                && (FFDLushCaveBlockProvider.get().isBigDripleaf(below)
+                || FFDLushCaveBlockProvider.get().isBigDripleafStem(below)
                 || isBigDripleafGround(below));
     }
 
@@ -48,7 +49,9 @@ public final class DripleafPlacement {
     }
 
     public static boolean canPlaceBig(World world, BlockPos pos, int stemHeight) {
-        if (stemHeight < 0 || !isBigDripleafGround(world.getBlockState(pos.down()))) {
+        if (stemHeight < 0 || headState(world, pos.up(stemHeight), EnumFacing.NORTH) == null
+                || stemHeight > 0 && stemState(world, pos, EnumFacing.NORTH) == null
+                || !isBigDripleafGround(world.getBlockState(pos.down()))) {
             return false;
         }
         for (int y = 0; y <= stemHeight; y++) {
@@ -74,7 +77,8 @@ public final class DripleafPlacement {
 
     public static boolean placeWithRandomHeight(World world, Random random, BlockPos pos,
                                                 EnumFacing facing) {
-        if (!isBigDripleafGround(world.getBlockState(pos.down()))) {
+        if (headState(world, pos, facing) == null || stemState(world, pos, facing) == null
+                || !isBigDripleafGround(world.getBlockState(pos.down()))) {
             return false;
         }
         int desiredHeight = 2 + random.nextInt(4);
@@ -95,28 +99,27 @@ public final class DripleafPlacement {
     }
 
     public static boolean growHead(World world, BlockPos headPos, EnumFacing facing) {
-        if (!BlockBigDripleaf.isBigDripleaf(world.getBlockState(headPos))
+        if (!FFDLushCaveBlockProvider.get().isBigDripleaf(world.getBlockState(headPos))
                 || !canReplace(world, headPos.up())) {
             return false;
         }
         IBlockState stem = stemState(world, headPos, facing);
         IBlockState head = headState(world, headPos.up(), facing);
+        if (stem == null || head == null) {
+            return false;
+        }
         world.setBlockState(headPos, stem, 2);
         world.setBlockState(headPos.up(), head, 3);
         return true;
     }
 
     public static IBlockState stemState(World world, BlockPos pos, EnumFacing facing) {
-        return FFDBlocks.BIG_DRIPLEAF_STEM.getDefaultState()
-                .withProperty(BlockBigDripleafStem.FACING, facing)
-                .withProperty(BlockBigDripleafStem.WATERLOGGED,
-                        WaterloggedPlantFluid.isSourceWater(world, pos));
+        return FFDLushCaveBlockProvider.get().bigDripleafStem(facing,
+                WaterloggedPlantFluid.isSourceWater(world, pos));
     }
 
     public static IBlockState headState(World world, BlockPos pos, EnumFacing facing) {
-        BlockBigDripleaf block = WaterloggedPlantFluid.isSourceWater(world, pos)
-                ? FFDBlocks.BIG_DRIPLEAF_WATERLOGGED : FFDBlocks.BIG_DRIPLEAF;
-        return block.getDefaultState().withProperty(BlockBigDripleaf.FACING, facing)
-                .withProperty(BlockBigDripleaf.TILT, DripleafTilt.NONE);
+        return FFDLushCaveBlockProvider.get().bigDripleaf(facing,
+                WaterloggedPlantFluid.isSourceWater(world, pos));
     }
 }

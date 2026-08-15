@@ -1,0 +1,6 @@
+{
+  "parent": "farmers_future_delight:block/template_chain",
+  "textures": {
+    "texture": "farmers_future_delight:blocks/iron_chain"
+  }
+}

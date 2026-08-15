@@ -1,0 +1,5 @@
+{
+  "conditions": {
+    "feature_enabled": "xy177.farmersfuturedelight.common.advancement.FFDFeatureConditionFactory"
+  }
+}

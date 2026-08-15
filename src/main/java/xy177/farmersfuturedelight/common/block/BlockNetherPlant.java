@@ -12,8 +12,9 @@ import net.minecraft.world.World;
 
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.FFDCreativeTab;
-import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
+import xy177.farmersfuturedelight.common.worldgen.FFDLushCaveBlockProvider;
+import xy177.farmersfuturedelight.common.worldgen.FFDNetherBlockProvider;
 
 /** Shared placement rules for plants rooted in Nether vegetation. */
 public class BlockNetherPlant extends BlockBush {
@@ -77,7 +78,7 @@ public class BlockNetherPlant extends BlockBush {
     }
 
     public static boolean canSustainNylium(IBlockState state, boolean warped) {
-        return state.getBlock() == (warped ? FFDBlocks.WARPED_NYLIUM : FFDBlocks.CRIMSON_NYLIUM);
+        return FFDNetherBlockProvider.get().isNylium(state, warped);
     }
 
     public static boolean canSustainNetherVegetation(IBlockState state) {
@@ -94,10 +95,9 @@ public class BlockNetherPlant extends BlockBush {
         return block == net.minecraft.init.Blocks.DIRT
                 || block == net.minecraft.init.Blocks.GRASS
                 || block == net.minecraft.init.Blocks.FARMLAND
-                || block == FFDBlocks.MOSS_BLOCK
-                || block == FFDBlocks.ROOTED_DIRT
-                || block == FFDBlocks.CRIMSON_NYLIUM
-                || block == FFDBlocks.WARPED_NYLIUM
+                || FFDLushCaveBlockProvider.get().isMossBlock(state)
+                || FFDLushCaveBlockProvider.get().isRootedDirt(state)
+                || FFDNetherBlockProvider.get().isNylium(state)
                 || supportsMycelium && block == net.minecraft.init.Blocks.MYCELIUM;
     }
 }

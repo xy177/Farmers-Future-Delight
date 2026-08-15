@@ -1,0 +1,8 @@
+{
+  "parent": "farmers_future_delight:block/template_potted_azalea_bush",
+  "textures": {
+    "plant": "farmers_future_delight:block/potted_azalea_bush_plant",
+    "side": "farmers_future_delight:block/potted_azalea_bush_side",
+    "top": "farmers_future_delight:block/potted_azalea_bush_top"
+  }
+}

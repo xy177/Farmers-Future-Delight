@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "farmers_future_delight:iron_chain",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y": {
+      "model": "farmers_future_delight:iron_chain"
+    },
+    "axis=z": {
+      "model": "farmers_future_delight:iron_chain",
+      "x": 90
+    }
+  }
+}

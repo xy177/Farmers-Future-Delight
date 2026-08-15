@@ -1,0 +1,18 @@
+{
+  "conditions": [
+    {"type": "farmers_future_delight:feature_enabled", "feature": "copper"}
+  ],
+  "parent": "farmers_future_delight:husbandry/wax_on",
+  "display": {
+    "icon": {"item": "minecraft:stone_axe"},
+    "title": {"translate": "advancements.farmers_future_delight.husbandry.wax_off.title"},
+    "description": {"translate": "advancements.farmers_future_delight.husbandry.wax_off.description"},
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "wax_off": {"trigger": "farmers_future_delight:wax_off"}
+  }
+}

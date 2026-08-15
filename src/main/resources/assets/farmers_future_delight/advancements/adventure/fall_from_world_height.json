@@ -1,0 +1,17 @@
+{
+  "parent": "minecraft:adventure/root",
+  "display": {
+    "icon": {"item": "minecraft:water_bucket"},
+    "title": {"translate": "advancements.farmers_future_delight.adventure.fall_from_world_height.title"},
+    "description": {"translate": "advancements.farmers_future_delight.adventure.fall_from_world_height.description"},
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "fall_from_world_height": {
+      "trigger": "farmers_future_delight:fall_from_world_height"
+    }
+  }
+}

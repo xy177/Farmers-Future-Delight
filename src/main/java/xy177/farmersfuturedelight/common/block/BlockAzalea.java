@@ -24,6 +24,8 @@ import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
 import xy177.farmersfuturedelight.common.worldgen.WorldGenAzaleaTree;
+import xy177.farmersfuturedelight.common.worldgen.FFDLushCaveBlockProvider;
+import xy177.farmersfuturedelight.core.FFDHeightHooks;
 
 public class BlockAzalea extends BlockBush implements IGrowable {
     private static final AxisAlignedBB AZALEA_AABB =
@@ -59,7 +61,8 @@ public class BlockAzalea extends BlockBush implements IGrowable {
 
     @Override
     public boolean canGrow(World world, BlockPos pos, IBlockState state, boolean isClient) {
-        return FFDItems.isAzaleaEnabled() && pos.getY() + 6 < world.getHeight()
+        return FFDItems.isAzaleaEnabled()
+                && pos.getY() + 6 < FFDHeightHooks.maxYExclusive(world)
                 && !world.getBlockState(pos.up()).getMaterial().isLiquid();
     }
 
@@ -80,7 +83,8 @@ public class BlockAzalea extends BlockBush implements IGrowable {
         Block block = state.getBlock();
         return block == Blocks.GRASS || block == Blocks.DIRT || block == Blocks.MYCELIUM
                 || block == Blocks.FARMLAND || block == Blocks.CLAY
-                || block == FFDBlocks.MOSS_BLOCK || block == FFDBlocks.ROOTED_DIRT;
+                || FFDLushCaveBlockProvider.get().isMossBlock(state)
+                || FFDLushCaveBlockProvider.get().isRootedDirt(state);
     }
 
     @Override

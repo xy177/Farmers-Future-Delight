@@ -1,0 +1,7 @@
+{
+  "parent": "farmers_future_delight:block/template_candle",
+  "textures": {
+    "all": "farmers_future_delight:block/black_candle",
+    "particle": "farmers_future_delight:block/black_candle"
+  }
+}

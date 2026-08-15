@@ -1,0 +1,11 @@
+{
+  "parent": "farmers_future_delight:item/amethyst_bud",
+  "textures": {
+    "layer0": "farmers_future_delight:block/large_amethyst_bud"
+  },
+  "display": {
+    "fixed": {
+      "translation": [ 0, 4, 0 ]
+    }
+  }
+}

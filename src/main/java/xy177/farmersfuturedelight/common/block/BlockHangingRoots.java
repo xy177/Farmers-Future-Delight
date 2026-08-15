@@ -32,6 +32,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.property.ExtendedBlockState;
 
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.FFDCreativeTab;
@@ -58,7 +59,15 @@ public class BlockHangingRoots extends Block {
 
     @Override
     protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, BlockLiquid.LEVEL, WATERLOGGED);
+        return new ExtendedBlockState(this,
+                new net.minecraft.block.properties.IProperty<?>[] {
+                        BlockLiquid.LEVEL, WATERLOGGED},
+                WaterloggedPlantFluid.extendedProperties());
+    }
+
+    @Override
+    public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
+        return WaterloggedPlantFluid.getExtendedState(state, world, pos);
     }
 
     @Override
@@ -165,13 +174,13 @@ public class BlockHangingRoots extends Block {
         player.addStat(StatList.getBlockStats(this));
         player.addExhaustion(0.005F);
         if (!world.isRemote && FFDItems.isHangingRootsEnabled() && tool.getItem() == Items.SHEARS) {
-            spawnAsEntity(world, pos, new ItemStack(FFDItems.HANGING_ROOTS));
+            spawnAsEntity(world, pos, FFDItems.effectiveStack(FFDItems.HANGING_ROOTS));
         }
     }
 
     @Override
     public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
-        return new ItemStack(FFDItems.HANGING_ROOTS);
+        return FFDItems.effectiveStack(FFDItems.HANGING_ROOTS);
     }
 
     @Override

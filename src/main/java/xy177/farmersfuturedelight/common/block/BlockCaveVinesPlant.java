@@ -5,7 +5,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import xy177.farmersfuturedelight.common.registry.FFDBlocks;
+import xy177.farmersfuturedelight.common.worldgen.FFDLushCaveBlockProvider;
 
 public class BlockCaveVinesPlant extends BlockCaveVinesBase {
     public BlockCaveVinesPlant() {
@@ -23,8 +23,13 @@ public class BlockCaveVinesPlant extends BlockCaveVinesBase {
             return;
         }
         if (!isCaveVine(world.getBlockState(pos.down()))) {
-            world.setBlockState(pos, FFDBlocks.CAVE_VINES.stateWithBerries(hasBerries(state)), 2);
-            BlockCaveVines.setAge(world, pos, world.rand.nextInt(25));
+            IBlockState tip = FFDLushCaveBlockProvider.get().caveVines(true, hasBerries(state));
+            if (tip != null) {
+                world.setBlockState(pos, tip, 2);
+                if (tip.getBlock() instanceof BlockCaveVines) {
+                    BlockCaveVines.setAge(world, pos, world.rand.nextInt(25));
+                }
+            }
         }
     }
 }

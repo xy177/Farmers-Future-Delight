@@ -27,6 +27,7 @@ import xy177.farmersfuturedelight.common.block.BlockSweetBerryBush;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.tile.TileEntityBeehive;
+import xy177.farmersfuturedelight.core.FFDHeightHooks;
 
 public class FFDWorldGenerator implements IWorldGenerator {
     private static final int WORLDGEN_FLAGS = 2 | 16;
@@ -40,37 +41,41 @@ public class FFDWorldGenerator implements IWorldGenerator {
         if (world.provider.getDimension() != 0) {
             return;
         }
-        BlockPos chunkOrigin = new BlockPos(chunkX * 16, 0, chunkZ * 16);
-        Biome biome = world.getBiome(chunkOrigin);
-        if (FFDItems.isSweetBerryEnabled()
-                && BiomeDictionary.hasType(biome, BiomeDictionary.Type.CONIFEROUS)) {
-            int rarity = BiomeDictionary.hasType(biome, BiomeDictionary.Type.SNOWY)
-                    ? FFDConfig.sweetBerryRareRarity : FFDConfig.sweetBerryCommonRarity;
-            if (random.nextInt(rarity) == 0) {
-                generateSweetBerryPatch(random, chunkX, chunkZ, world,
-                        BiomeDictionary.hasType(biome, BiomeDictionary.Type.SNOWY));
+        try (FFDHeightHooks.WorldgenHeightScope ignored = FFDHeightHooks.enterExtendedWorldgenHeight()) {
+            BlockPos chunkOrigin = new BlockPos(chunkX * 16, 0, chunkZ * 16);
+            Biome biome = world.getBiome(chunkOrigin);
+            if (FFDItems.isBlockRegistered(FFDBlocks.SWEET_BERRY_BUSH)
+                    && BiomeDictionary.hasType(biome, BiomeDictionary.Type.CONIFEROUS)) {
+                int rarity = BiomeDictionary.hasType(biome, BiomeDictionary.Type.SNOWY)
+                        ? FFDConfig.sweetBerryRareRarity : FFDConfig.sweetBerryCommonRarity;
+                if (random.nextInt(rarity) == 0) {
+                    generateSweetBerryPatch(random, chunkX, chunkZ, world,
+                            BiomeDictionary.hasType(biome, BiomeDictionary.Type.SNOWY));
+                }
             }
-        }
 
-        Biome aquaticBiome = world.getBiome(new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8));
-        if (FFDItems.isKelpEnabled()
-                && BiomeDictionary.hasType(aquaticBiome, BiomeDictionary.Type.OCEAN)
-                && !isFrozenOcean(aquaticBiome)) {
-            generateKelp(random, chunkX, chunkZ, world, aquaticBiome);
-        }
+            Biome aquaticBiome = world.getBiome(new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8));
+            if (FFDItems.isBlockRegistered(FFDBlocks.KELP)
+                    && BiomeDictionary.hasType(aquaticBiome, BiomeDictionary.Type.OCEAN)
+                    && !isFrozenOcean(aquaticBiome)) {
+                generateKelp(random, chunkX, chunkZ, world, aquaticBiome);
+            }
 
-        SeagrassSettings seagrass = getSeagrassSettings(aquaticBiome);
-        if (FFDItems.isSeagrassEnabled() && seagrass != null && !isFrozenOcean(aquaticBiome)) {
-            generateSeagrass(random, chunkX, chunkZ, world, seagrass);
-        }
+            SeagrassSettings seagrass = getSeagrassSettings(aquaticBiome);
+            if (FFDItems.isBlockRegistered(FFDBlocks.SEAGRASS)
+                    && seagrass != null && !isFrozenOcean(aquaticBiome)) {
+                generateSeagrass(random, chunkX, chunkZ, world, seagrass);
+            }
 
-        if (FFDItems.isSeaPickleEnabled() && BlockSeaPickle.isSeaPickleBiome(aquaticBiome)
-                && random.nextInt(FFDConfig.seaPickleRarity) == 0) {
-            generateSeaPickles(random, chunkX, chunkZ, world);
-        }
+            if (FFDItems.isBlockRegistered(FFDBlocks.SEA_PICKLE)
+                    && BlockSeaPickle.isSeaPickleBiome(aquaticBiome)
+                    && random.nextInt(FFDConfig.seaPickleRarity) == 0) {
+                generateSeaPickles(random, chunkX, chunkZ, world);
+            }
 
-        if (FFDItems.isHoneyEnabled()) {
-            generateBeeNests(random, chunkX, chunkZ, world, biome);
+            if (FFDItems.isBlockRegistered(FFDBlocks.BEE_NEST)) {
+                generateBeeNests(random, chunkX, chunkZ, world, biome);
+            }
         }
     }
 
@@ -108,7 +113,7 @@ public class FFDWorldGenerator implements IWorldGenerator {
         for (int x = minX; x < minX + 16; x++) {
             for (int z = minZ; z < minZ + 16; z++) {
                 int topY = world.getHeight(x, z) - 1;
-                int bottomY = Math.max(1, topY - 32);
+                int bottomY = Math.max(FFDHeightHooks.minY(world) + 1, topY - 32);
                 for (int y = topY; y >= bottomY; y--) {
                     BlockPos trunkTop = new BlockPos(x, y, z);
                     if (!isVerticalLog(world.getBlockState(trunkTop))
@@ -215,6 +220,20 @@ public class FFDWorldGenerator implements IWorldGenerator {
         return false;
     }
 
+    public static boolean addGuaranteedBeeNest(Random random, World world, BlockPos trunkBase) {
+        if (!FFDItems.isBlockRegistered(FFDBlocks.BEE_NEST)
+                || !isVerticalLog(world.getBlockState(trunkBase))) {
+            return false;
+        }
+        BlockPos trunkTop = trunkBase;
+        while (trunkTop.getY() + 1 < FFDHeightHooks.maxYExclusive(world)
+                && isVerticalLog(world.getBlockState(trunkTop.up()))) {
+            trunkTop = trunkTop.up();
+        }
+        return placeBeeNest(random, world, trunkTop,
+                trunkBase.getX() >> 4, trunkBase.getZ() >> 4);
+    }
+
     private void generateKelp(Random random, int chunkX, int chunkZ, World world, Biome biome) {
         int ratio = isWarmOcean(biome) ? FFDConfig.kelpWarmNoiseRatio : FFDConfig.kelpColdNoiseRatio;
         double noise = KELP_NOISE.getValue(chunkX * 16.0D / FFDConfig.kelpNoiseScale,
@@ -233,7 +252,8 @@ public class FFDWorldGenerator implements IWorldGenerator {
             if (pos == null) {
                 continue;
             }
-            if (pos.getY() <= 0 || !isSourceWater(world, pos) || !isSourceWater(world, pos.up())
+            if (pos.getY() <= FFDHeightHooks.minY(world)
+                    || !isSourceWater(world, pos) || !isSourceWater(world, pos.up())
                     || !FFDBlocks.KELP.canPlaceBlockAt(world, pos)) {
                 continue;
             }
@@ -265,7 +285,8 @@ public class FFDWorldGenerator implements IWorldGenerator {
 
     private static BlockPos findWaterPlantBase(World world, int x, int z) {
         BlockPos cursor = world.getTopSolidOrLiquidBlock(new BlockPos(x, 0, z));
-        while (cursor.getY() > 0 && !isSourceWater(world, cursor)) {
+        int minY = FFDHeightHooks.minY(world);
+        while (cursor.getY() > minY && !isSourceWater(world, cursor)) {
             if (world.getBlockState(cursor).getMaterial() != Material.WATER) {
                 return null;
             }
@@ -274,7 +295,7 @@ public class FFDWorldGenerator implements IWorldGenerator {
         if (!isSourceWater(world, cursor)) {
             return null;
         }
-        while (cursor.getY() > 0 && isSourceWater(world, cursor.down())) {
+        while (cursor.getY() > minY && isSourceWater(world, cursor.down())) {
             cursor = cursor.down();
         }
         return cursor;

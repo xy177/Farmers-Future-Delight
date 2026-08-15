@@ -1,0 +1,6 @@
+{
+  "parent": "block/wall_inventory",
+  "textures": {
+    "wall": "farmers_future_delight:block/deepslate_bricks"
+  }
+}

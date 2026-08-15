@@ -16,6 +16,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.property.ExtendedBlockState;
 
 import xy177.farmersfuturedelight.common.FFDConfig;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
@@ -65,9 +66,20 @@ public abstract class BlockKelpHead extends BlockUnderwaterPlant implements IGro
                 : FFDBlocks.KELP.stateForAge(age);
     }
 
+    public static boolean stopGrowth(World world, BlockPos pos, IBlockState state) {
+        if (!isKelpHead(state) || getAgeValue(state) >= 25) {
+            return false;
+        }
+        world.setBlockState(pos, stateForAgeValue(25), 3);
+        return true;
+    }
+
     @Override
     protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, BlockLiquid.LEVEL, getAgeProperty());
+        return new ExtendedBlockState(this,
+                new net.minecraft.block.properties.IProperty<?>[] {
+                        BlockLiquid.LEVEL, getAgeProperty()},
+                WaterloggedPlantFluid.extendedProperties());
     }
 
     @Override
@@ -150,7 +162,7 @@ public abstract class BlockKelpHead extends BlockUnderwaterPlant implements IGro
     public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos,
                          IBlockState state, int fortune) {
         if (isFeatureEnabled()) {
-            drops.add(new ItemStack(FFDItems.KELP));
+            drops.add(FFDItems.effectiveStack(FFDItems.KELP));
         }
     }
 
@@ -166,6 +178,6 @@ public abstract class BlockKelpHead extends BlockUnderwaterPlant implements IGro
 
     @Override
     public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
-        return new ItemStack(FFDItems.KELP);
+        return FFDItems.effectiveStack(FFDItems.KELP);
     }
 }

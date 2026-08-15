@@ -13,11 +13,22 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.common.property.IUnlistedProperty;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 
 /** Bridges 1.12's block-only liquid system with modern waterlogged plant states. */
 public final class WaterloggedPlantFluid {
     private static final int WATER_TICK_RATE = 5;
+    public static final IUnlistedProperty<Boolean> WATER_ABOVE = new BooleanProperty("water_above");
+    public static final IUnlistedProperty<Float> WATER_NORTH_WEST =
+            new FloatProperty("water_north_west");
+    public static final IUnlistedProperty<Float> WATER_SOUTH_WEST =
+            new FloatProperty("water_south_west");
+    public static final IUnlistedProperty<Float> WATER_SOUTH_EAST =
+            new FloatProperty("water_south_east");
+    public static final IUnlistedProperty<Float> WATER_NORTH_EAST =
+            new FloatProperty("water_north_east");
 
     private WaterloggedPlantFluid() {
     }
@@ -41,11 +52,76 @@ public final class WaterloggedPlantFluid {
                 || BlockBigDripleafStem.isWaterlogged(state)
                 || BlockBigDripleaf.isWaterlogged(state)
                 || BlockHangingRoots.isWaterlogged(state)
-                || BlockGlowLichen.isWaterlogged(state);
+                || BlockGlowLichen.isWaterlogged(state)
+                || BlockAmethystCluster.isWaterlogged(state);
     }
 
     public static boolean isWaterlogged(IBlockState state) {
         return isSourceWater(state);
+    }
+
+    public static boolean hasWaterAbove(IBlockAccess world, BlockPos pos) {
+        return isWaterState(world.getBlockState(pos.up()));
+    }
+
+    public static IUnlistedProperty<?>[] extendedProperties() {
+        return new IUnlistedProperty<?>[] {
+                WATER_ABOVE, WATER_NORTH_WEST, WATER_SOUTH_WEST,
+                WATER_SOUTH_EAST, WATER_NORTH_EAST};
+    }
+
+    public static IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
+        if (!(state instanceof IExtendedBlockState)) {
+            return state;
+        }
+        IExtendedBlockState extended = (IExtendedBlockState) state;
+        if (!isSourceWater(state)) {
+            return extended;
+        }
+        float northWest = getFluidHeight(world, pos);
+        float southWest = getFluidHeight(world, pos.south());
+        float southEast = getFluidHeight(world, pos.east().south());
+        float northEast = getFluidHeight(world, pos.east());
+        return extended
+                .withProperty(WATER_ABOVE, hasWaterAbove(world, pos))
+                .withProperty(WATER_NORTH_WEST, northWest)
+                .withProperty(WATER_SOUTH_WEST, southWest)
+                .withProperty(WATER_SOUTH_EAST, southEast)
+                .withProperty(WATER_NORTH_EAST, northEast);
+    }
+
+    private static float getFluidHeight(IBlockAccess world, BlockPos pos) {
+        int count = 0;
+        float total = 0.0F;
+        for (int index = 0; index < 4; index++) {
+            BlockPos sample = pos.add(-(index & 1), 0, -((index >> 1) & 1));
+            if (isWaterState(world.getBlockState(sample.up()))) {
+                return 1.0F;
+            }
+            IBlockState state = world.getBlockState(sample);
+            Material material = state.getMaterial();
+            if (!isWaterState(state)) {
+                if (!material.isSolid()) {
+                    total += 1.0F;
+                    count++;
+                }
+                continue;
+            }
+            int level = state.getPropertyKeys().contains(BlockLiquid.LEVEL)
+                    ? state.getValue(BlockLiquid.LEVEL) : 0;
+            float height = BlockLiquid.getLiquidHeightPercent(level);
+            if (level >= 8 || level == 0) {
+                total += height * 10.0F;
+                count += 10;
+            }
+            total += height;
+            count++;
+        }
+        return count == 0 ? 0.0F : 1.0F - total / count;
+    }
+
+    private static boolean isWaterState(IBlockState state) {
+        return state.getMaterial() == Material.WATER;
     }
 
     static void onBlockAdded(World world, BlockPos pos, Block block) {
@@ -59,7 +135,7 @@ public final class WaterloggedPlantFluid {
             }
             return;
         }
-        IBlockState state = waterlogFromNeighbors(world, pos);
+        IBlockState state = world.getBlockState(pos);
         if (isSourceWater(state)) {
             Block currentBlock = state.getBlock();
             world.scheduleUpdate(pos, currentBlock, WATER_TICK_RATE);
@@ -71,7 +147,7 @@ public final class WaterloggedPlantFluid {
         if (world.isRemote) {
             return;
         }
-        IBlockState state = waterlogFromNeighbors(world, pos);
+        IBlockState state = world.getBlockState(pos);
         if (isSourceWater(state)) {
             world.scheduleUpdate(pos, state.getBlock(), WATER_TICK_RATE);
         }
@@ -117,29 +193,10 @@ public final class WaterloggedPlantFluid {
         if (BlockGlowLichen.isGlowLichen(state)) {
             return BlockGlowLichen.stateFor(BlockGlowLichen.getFaceMask(state), waterlogged);
         }
+        if (block instanceof BlockAmethystCluster) {
+            return state.withProperty(BlockAmethystCluster.WATERLOGGED, waterlogged);
+        }
         return null;
-    }
-
-    private static IBlockState waterlogFromNeighbors(World world, BlockPos pos) {
-        IBlockState state = world.getBlockState(pos);
-        IBlockState wetState = withWaterlogged(state, true);
-        if (wetState == null || isSourceWater(state) || !hasIncomingWater(world, pos)) {
-            return state;
-        }
-        world.setBlockState(pos, wetState, 3);
-        return world.getBlockState(pos);
-    }
-
-    private static boolean hasIncomingWater(World world, BlockPos pos) {
-        if (world.getBlockState(pos.up()).getMaterial() == Material.WATER) {
-            return true;
-        }
-        for (EnumFacing direction : EnumFacing.Plane.HORIZONTAL) {
-            if (world.getBlockState(pos.offset(direction)).getMaterial() == Material.WATER) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private static Set<EnumFacing> getPossibleFlowDirections(World world, BlockPos pos) {
@@ -188,10 +245,11 @@ public final class WaterloggedPlantFluid {
     private static boolean canFlowInto(World world, BlockPos pos) {
         IBlockState state = world.getBlockState(pos);
         Material material = state.getMaterial();
-        if (material == Material.WATER || material == Material.LAVA || isFlowBlocked(world, pos)) {
+        if (material == Material.WATER || material == Material.LAVA) {
             return false;
         }
-        return true;
+        IBlockState wetState = withWaterlogged(state, true);
+        return wetState == null && !isFlowBlocked(world, pos);
     }
 
     private static boolean isFlowBlocked(World world, BlockPos pos) {
@@ -211,16 +269,67 @@ public final class WaterloggedPlantFluid {
         if (!canFlowInto(world, pos)) {
             return;
         }
-        IBlockState wetState = withWaterlogged(oldState, true);
-        if (wetState != null) {
-            world.setBlockState(pos, wetState, 3);
-            world.scheduleUpdate(pos, wetState.getBlock(), WATER_TICK_RATE);
-            return;
-        }
         if (oldState.getMaterial() != Material.AIR && oldState.getBlock() != Blocks.SNOW_LAYER) {
             oldState.getBlock().dropBlockAsItem(world, pos, oldState, 0);
         }
         world.setBlockState(pos, Blocks.FLOWING_WATER.getDefaultState()
                 .withProperty(BlockLiquid.LEVEL, level), 3);
+    }
+
+    private static final class BooleanProperty implements IUnlistedProperty<Boolean> {
+        private final String name;
+
+        private BooleanProperty(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public boolean isValid(Boolean value) {
+            return value != null;
+        }
+
+        @Override
+        public Class<Boolean> getType() {
+            return Boolean.class;
+        }
+
+        @Override
+        public String valueToString(Boolean value) {
+            return String.valueOf(value);
+        }
+    }
+
+    private static final class FloatProperty implements IUnlistedProperty<Float> {
+        private final String name;
+
+        private FloatProperty(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public boolean isValid(Float value) {
+            return value != null && !value.isNaN() && !value.isInfinite()
+                    && value >= 0.0F && value <= 1.0F;
+        }
+
+        @Override
+        public Class<Float> getType() {
+            return Float.class;
+        }
+
+        @Override
+        public String valueToString(Float value) {
+            return String.valueOf(value);
+        }
     }
 }

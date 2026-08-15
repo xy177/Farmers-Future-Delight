@@ -1,0 +1,10 @@
+{
+  "parent": "farmers_future_delight:block/template_cake_with_candle",
+  "textures": {
+    "bottom": "minecraft:blocks/cake_bottom",
+    "candle": "farmers_future_delight:block/white_candle",
+    "particle": "minecraft:blocks/cake_side",
+    "side": "minecraft:blocks/cake_side",
+    "top": "minecraft:blocks/cake_top"
+  }
+}

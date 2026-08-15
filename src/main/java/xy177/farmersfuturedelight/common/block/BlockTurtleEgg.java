@@ -14,6 +14,7 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityAgeable;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntityBat;
 import net.minecraft.entity.monster.EntityZombie;
@@ -35,11 +36,14 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.fml.common.registry.EntityEntry;
 
 import xy177.farmersfuturedelight.FarmerFutureDelight;
+import xy177.farmersfuturedelight.common.FFDCompat;
 import xy177.farmersfuturedelight.common.FFDCreativeTab;
 import xy177.farmersfuturedelight.common.FFDConfig;
 import xy177.farmersfuturedelight.common.entity.EntityTurtle;
+import xy177.farmersfuturedelight.common.registry.FFDEntities;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
 
@@ -132,13 +136,30 @@ public class BlockTurtleEgg extends Block {
         world.setBlockToAir(pos);
         for (int index = 0; index < eggs; index++) {
             world.playEvent(2001, pos, Block.getStateId(state));
-            EntityTurtle turtle = new EntityTurtle(world);
-            turtle.setGrowingAge(-24000);
-            turtle.setHomePos(pos);
+            Entity turtle = createTurtle(world);
+            if (turtle == null) {
+                continue;
+            }
+            if (turtle instanceof EntityAgeable) {
+                ((EntityAgeable) turtle).setGrowingAge(-24000);
+            }
+            if (turtle instanceof EntityTurtle) {
+                ((EntityTurtle) turtle).setHomePos(pos);
+            }
             turtle.setLocationAndAngles(pos.getX() + 0.3D + index * 0.2D, pos.getY(),
                     pos.getZ() + 0.3D, 0.0F, 0.0F);
             world.spawnEntity(turtle);
         }
+    }
+
+    @Nullable
+    private static Entity createTurtle(World world) {
+        if (FFDEntities.isLocalTurtleEnabled()) {
+            return new EntityTurtle(world);
+        }
+        EntityEntry external = FFDCompat.getExternalEntityEntry(
+                FFDCompat.Feature.TURTLE, "turtle");
+        return external == null ? null : external.newInstance(world);
     }
 
     private static boolean shouldUpdateHatchLevel(World world, Random random) {
@@ -176,7 +197,7 @@ public class BlockTurtleEgg extends Block {
         player.addExhaustion(0.005F);
         if (!world.isRemote && FFDItems.isTurtleEnabled()
                 && EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
-            spawnAsEntity(world, pos, new ItemStack(FFDItems.TURTLE_EGG));
+            spawnAsEntity(world, pos, FFDItems.effectiveStack(FFDItems.TURTLE_EGG));
         }
     }
 
@@ -201,7 +222,7 @@ public class BlockTurtleEgg extends Block {
 
     @Override
     public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
-        return new ItemStack(FFDItems.TURTLE_EGG);
+        return FFDItems.effectiveStack(FFDItems.TURTLE_EGG);
     }
 
     @Override

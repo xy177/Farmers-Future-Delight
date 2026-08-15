@@ -32,6 +32,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.property.ExtendedBlockState;
 
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
@@ -76,7 +77,14 @@ public class BlockBigDripleaf extends Block implements IGrowable {
 
     @Override
     protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, BlockLiquid.LEVEL, FACING, TILT);
+        return new ExtendedBlockState(this,
+                new net.minecraft.block.properties.IProperty<?>[] {BlockLiquid.LEVEL, FACING, TILT},
+                WaterloggedPlantFluid.extendedProperties());
+    }
+
+    @Override
+    public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
+        return WaterloggedPlantFluid.getExtendedState(state, world, pos);
     }
 
     @Override
@@ -234,7 +242,7 @@ public class BlockBigDripleaf extends Block implements IGrowable {
     public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos,
                          IBlockState state, int fortune) {
         if (FFDItems.isDripleafEnabled()) {
-            drops.add(new ItemStack(FFDItems.BIG_DRIPLEAF));
+            drops.add(FFDItems.effectiveStack(FFDItems.BIG_DRIPLEAF));
         }
     }
 
@@ -245,7 +253,7 @@ public class BlockBigDripleaf extends Block implements IGrowable {
 
     @Override
     public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
-        return new ItemStack(FFDItems.BIG_DRIPLEAF);
+        return FFDItems.effectiveStack(FFDItems.BIG_DRIPLEAF);
     }
 
     private IBlockState replacementState() {

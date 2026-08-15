@@ -7,7 +7,10 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityAgeable;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IEntityLivingData;
@@ -49,6 +52,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 import xy177.farmersfuturedelight.FarmerFutureDelight;
+import xy177.farmersfuturedelight.common.advancement.FFDAdvancements;
 import xy177.farmersfuturedelight.common.block.BlockTurtleEgg;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
@@ -225,7 +229,10 @@ public class EntityTurtle extends net.minecraft.entity.passive.EntityAnimal {
         super.onGrowingAdult();
         if (!world.isRemote && FFDItems.isTurtleEnabled()
                 && world.getGameRules().getBoolean("doMobLoot")) {
-            entityDropItem(new net.minecraft.item.ItemStack(FFDItems.TURTLE_SCUTE), 0.0F);
+            net.minecraft.item.ItemStack scute = FFDItems.effectiveStack(FFDItems.TURTLE_SCUTE);
+            if (!scute.isEmpty()) {
+                entityDropItem(scute, 0.0F);
+            }
         }
     }
 
@@ -500,6 +507,7 @@ public class EntityTurtle extends net.minecraft.entity.passive.EntityAnimal {
             if (player != null) {
                 player.addStat(StatList.ANIMALS_BRED);
                 CriteriaTriggers.BRED_ANIMALS.trigger(player, turtle, mate, null);
+                FFDAdvancements.BRED_TURTLE.trigger(player);
             }
             if (!turtle.world.isRemote && turtle.world.getGameRules().getBoolean("doMobLoot")) {
                 turtle.world.spawnEntity(new EntityXPOrb(turtle.world, turtle.posX, turtle.posY,
@@ -620,10 +628,15 @@ public class EntityTurtle extends net.minecraft.entity.passive.EntityAnimal {
                 turtle.setLayingEgg(true);
             } else if (turtle.layEggCounter > 200) {
                 BlockPos eggPos = destinationBlock.up();
+                Block eggBlock = FFDItems.effectiveBlock(FFDBlocks.TURTLE_EGG);
+                if (eggBlock == null) {
+                    turtle.setLayingEgg(false);
+                    return;
+                }
                 turtle.world.playSound(null, turtle.getPosition(), FFDSounds.TURTLE_LAY_EGG,
                         SoundCategory.BLOCKS, 0.3F, 0.9F + turtle.rand.nextFloat() * 0.2F);
-                turtle.world.setBlockState(eggPos, FFDBlocks.TURTLE_EGG.getDefaultState()
-                        .withProperty(BlockTurtleEgg.EGGS, turtle.rand.nextInt(4) + 1), 3);
+                turtle.world.setBlockState(eggPos, withEggCount(eggBlock.getDefaultState(),
+                        turtle.rand.nextInt(4) + 1), 3);
                 turtle.setHasEgg(false);
                 turtle.setLayingEgg(false);
                 turtle.setInLove(null);
@@ -637,6 +650,27 @@ public class EntityTurtle extends net.minecraft.entity.passive.EntityAnimal {
         protected boolean shouldMoveTo(World world, BlockPos pos) {
             return BlockTurtleEgg.isSand(world, pos) && world.isAirBlock(pos.up());
         }
+    }
+
+    private static IBlockState withEggCount(IBlockState state, int eggs) {
+        for (IProperty<?> property : state.getPropertyKeys()) {
+            if ("eggs".equals(property.getName())) {
+                return withIntegerProperty(state, property, eggs);
+            }
+        }
+        return state;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T extends Comparable<T>> IBlockState withIntegerProperty(
+            IBlockState state, IProperty<?> rawProperty, int value) {
+        IProperty<T> property = (IProperty<T>) rawProperty;
+        for (T allowed : property.getAllowedValues()) {
+            if (allowed instanceof Integer && ((Integer) allowed) == value) {
+                return state.withProperty(property, allowed);
+            }
+        }
+        return state;
     }
 
     private static final class TurtleGoToWaterGoal extends EntityAIBase {

@@ -1,0 +1,18 @@
+{
+  "conditions": [
+    {"type": "farmers_future_delight:feature_enabled", "feature": "copper"}
+  ],
+  "parent": "minecraft:adventure/root",
+  "display": {
+    "icon": {"item": "minecraft:compass"},
+    "title": {"translate": "advancements.farmers_future_delight.adventure.spyglass_at_parrot.title"},
+    "description": {"translate": "advancements.farmers_future_delight.adventure.spyglass_at_parrot.description"},
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "spyglass_at_parrot": {"trigger": "farmers_future_delight:spyglass_at_parrot"}
+  }
+}

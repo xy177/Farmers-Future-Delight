@@ -2,7 +2,6 @@ package xy177.farmersfuturedelight.common.worldgen;
 
 import java.util.Random;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
@@ -10,7 +9,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenerator;
 
 import xy177.farmersfuturedelight.common.block.BlockNetherPlant;
-import xy177.farmersfuturedelight.common.registry.FFDBlocks;
+import xy177.farmersfuturedelight.core.FFDHeightHooks;
 
 public class WorldGenHugeFungus extends WorldGenerator {
     private static final float HUGE_PROBABILITY = 0.06F;
@@ -30,14 +29,17 @@ public class WorldGenHugeFungus extends WorldGenerator {
     }
 
     public static boolean canGenerateAt(World world, BlockPos pos, boolean warped) {
-        Block validBase = warped ? FFDBlocks.WARPED_NYLIUM : FFDBlocks.CRIMSON_NYLIUM;
-        return pos.getY() > 0 && pos.getY() < world.getHeight()
-                && world.getBlockState(pos.down()).getBlock() == validBase;
+        return pos.getY() > FFDHeightHooks.minY(world)
+                && pos.getY() < FFDHeightHooks.maxYExclusive(world)
+                && blocks().isNylium(world.getBlockState(pos.down()), warped);
     }
 
     @Override
     public boolean generate(World world, Random random, BlockPos pos) {
-        if (!canGenerateAt(world, pos, warped)) {
+        if (!canGenerateAt(world, pos, warped)
+                || !planted && pos.getY() >= NetherForestFeatures.getNetherTopY(world)
+                || blocks().stem(warped) == null
+                || blocks().wart(warped) == null || blocks().shroomlight() == null) {
             return false;
         }
 
@@ -45,7 +47,8 @@ public class WorldGenHugeFungus extends WorldGenerator {
         if (random.nextInt(12) == 0) {
             height *= 2;
         }
-        if (!planted && pos.getY() + height + 1 >= world.getHeight()) {
+        if (!planted && pos.getY() + height + 1
+                >= NetherForestFeatures.getNetherTopY(world)) {
             return false;
         }
 
@@ -57,8 +60,7 @@ public class WorldGenHugeFungus extends WorldGenerator {
     }
 
     private void placeStem(World world, Random random, BlockPos origin, int height, boolean huge) {
-        IBlockState stem = (warped ? FFDBlocks.WARPED_STEM : FFDBlocks.CRIMSON_STEM)
-                .getDefaultState();
+        IBlockState stem = blocks().stem(warped);
         int radius = huge ? 1 : 0;
         for (int x = -radius; x <= radius; x++) {
             for (int z = -radius; z <= radius; z++) {
@@ -76,9 +78,8 @@ public class WorldGenHugeFungus extends WorldGenerator {
     }
 
     private void placeHat(World world, Random random, BlockPos origin, int height, boolean huge) {
-        IBlockState wart = (warped ? FFDBlocks.WARPED_WART_BLOCK : FFDBlocks.NETHER_WART_BLOCK)
-                .getDefaultState();
-        IBlockState shroomlight = FFDBlocks.SHROOMLIGHT.getDefaultState();
+        IBlockState wart = blocks().wart(warped);
+        IBlockState shroomlight = blocks().shroomlight();
         boolean placeVines = !warped;
         int hatHeight = Math.min(random.nextInt(1 + height / 3) + 5, height);
         int hatStartY = height - hatHeight;
@@ -162,7 +163,7 @@ public class WorldGenHugeFungus extends WorldGenerator {
     }
 
     private static boolean isReplaceable(World world, BlockPos pos, boolean includePlants) {
-        if (pos.getY() < 0 || pos.getY() >= world.getHeight()) {
+        if (FFDHeightHooks.isOutsideBuildHeight(world, pos)) {
             return false;
         }
         IBlockState state = world.getBlockState(pos);
@@ -187,5 +188,9 @@ public class WorldGenHugeFungus extends WorldGenerator {
         } else {
             world.setBlockState(pos, state, WORLDGEN_FLAGS);
         }
+    }
+
+    private static FFDNetherBlockProvider blocks() {
+        return FFDNetherBlockProvider.get();
     }
 }

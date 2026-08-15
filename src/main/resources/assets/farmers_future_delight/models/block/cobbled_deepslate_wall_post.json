@@ -1,0 +1,6 @@
+{
+  "parent": "block/wall_post",
+  "textures": {
+    "wall": "farmers_future_delight:block/cobbled_deepslate"
+  }
+}

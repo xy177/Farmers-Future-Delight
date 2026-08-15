@@ -20,6 +20,7 @@ import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.FFDCreativeTab;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
+import xy177.farmersfuturedelight.common.registry.FFDItems;
 
 public abstract class BlockNetherSlab extends BlockSlab {
     public static final PropertyEnum<Variant> VARIANT = PropertyEnum.create("variant", Variant.class);
@@ -75,12 +76,15 @@ public abstract class BlockNetherSlab extends BlockSlab {
 
     @Override
     public Item getItemDropped(IBlockState state, Random random, int fortune) {
-        return Item.getItemFromBlock(isCrimson() ? FFDBlocks.CRIMSON_SLAB : FFDBlocks.WARPED_SLAB);
+        Item item = FFDItems.effectiveItem(isCrimson()
+                ? FFDItems.CRIMSON_SLAB : FFDItems.WARPED_SLAB);
+        return item == null ? Item.getItemFromBlock(net.minecraft.init.Blocks.AIR) : item;
     }
 
     @Override
     public ItemStack getItem(net.minecraft.world.World world, BlockPos pos, IBlockState state) {
-        return new ItemStack(isCrimson() ? FFDBlocks.CRIMSON_SLAB : FFDBlocks.WARPED_SLAB);
+        return FFDItems.effectiveStack(isCrimson()
+                ? FFDItems.CRIMSON_SLAB : FFDItems.WARPED_SLAB);
     }
 
     @Override

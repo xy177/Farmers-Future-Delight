@@ -1,0 +1,20 @@
+{
+  "conditions": [
+    {"type": "farmers_future_delight:feature_enabled", "feature": "goat"}
+  ],
+  "parent": "minecraft:husbandry/root",
+  "display": {
+    "icon": {"item": "minecraft:boat"},
+    "title": {"translate": "advancements.farmers_future_delight.husbandry.ride_a_boat_with_a_goat.title"},
+    "description": {"translate": "advancements.farmers_future_delight.husbandry.ride_a_boat_with_a_goat.description"},
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "ride_a_boat_with_a_goat": {
+      "trigger": "farmers_future_delight:ride_a_boat_with_a_goat"
+    }
+  }
+}

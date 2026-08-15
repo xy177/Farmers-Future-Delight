@@ -1,0 +1,18 @@
+{
+  "conditions": [
+    {"type": "farmers_future_delight:feature_enabled", "feature": "copper"}
+  ],
+  "parent": "minecraft:husbandry/root",
+  "display": {
+    "icon": {"item": "minecraft:slime_ball"},
+    "title": {"translate": "advancements.farmers_future_delight.husbandry.wax_on.title"},
+    "description": {"translate": "advancements.farmers_future_delight.husbandry.wax_on.description"},
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "wax_on": {"trigger": "farmers_future_delight:wax_on"}
+  }
+}

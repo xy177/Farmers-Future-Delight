@@ -66,6 +66,7 @@ import xy177.farmersfuturedelight.common.block.BlockCaveVinesBase;
 import xy177.farmersfuturedelight.common.tile.TileEntityBeehive;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
+import xy177.farmersfuturedelight.common.worldgen.FFDLushCaveBlockProvider;
 
 public class EntityBee extends EntityAnimal implements EntityFlying {
     private static final DataParameter<Byte> FLAGS = EntityDataManager.createKey(EntityBee.class,
@@ -198,6 +199,10 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
             attackEntityFrom(DamageSource.DROWN, 1.0F);
         }
         EntityLivingBase attackTarget = getAttackTarget();
+        if (attackTarget != null && !canBecomeAngryAt(attackTarget)) {
+            stopBeingAngry();
+            attackTarget = null;
+        }
         setRolling(getAnger() > 0 && !hasStung() && attackTarget != null
                 && attackTarget.getDistanceSq(this) < 4.0D);
         if (getAnger() > 0) {
@@ -243,13 +248,18 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
             setPollinating(false);
         }
         if (hurt && attacker instanceof EntityLivingBase && !hasStung()) {
-            setBeeAttacker((EntityLivingBase) attacker, 400 + rand.nextInt(380));
+            EntityLivingBase livingAttacker = (EntityLivingBase) attacker;
+            if (canBecomeAngryAt(livingAttacker)) {
+                setBeeAttacker(livingAttacker, 400 + rand.nextInt(380));
+            } else if (getRevengeTarget() == livingAttacker) {
+                setRevengeTarget(null);
+            }
         }
         return hurt;
     }
 
     public boolean setBeeAttacker(EntityLivingBase target, int duration) {
-        if (target == null) {
+        if (!canBecomeAngryAt(target)) {
             return false;
         }
         angerTarget = target.getUniqueID();
@@ -261,8 +271,12 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
 
     private void restoreAngerTarget() {
         EntityPlayer player = world.getPlayerEntityByUUID(angerTarget);
-        if (player != null && player.isEntityAlive()) {
-            setAttackTarget(player);
+        if (player != null) {
+            if (player.isEntityAlive() && canBecomeAngryAt(player)) {
+                setAttackTarget(player);
+            } else if (!canBecomeAngryAt(player)) {
+                stopBeingAngry();
+            }
             return;
         }
         for (EntityLivingBase candidate : world.getEntitiesWithinAABB(EntityLivingBase.class,
@@ -272,6 +286,17 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
                 return;
             }
         }
+    }
+
+    private static boolean canBecomeAngryAt(@Nullable EntityLivingBase target) {
+        if (target == null) {
+            return false;
+        }
+        if (target instanceof EntityPlayer) {
+            EntityPlayer player = (EntityPlayer) target;
+            return !player.capabilities.isCreativeMode && !player.isSpectator();
+        }
+        return true;
     }
 
     private void stopBeingAngry() {
@@ -407,7 +432,8 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
                     || type == BlockDoublePlant.EnumPlantType.ROSE
                     || type == BlockDoublePlant.EnumPlantType.PAEONIA;
         }
-        return isBeeAttractiveBlock(block);
+        return block != Blocks.AIR
+                && isBeeAttractiveBlock(block.getStateFromMeta(stack.getMetadata()));
     }
 
     @Override
@@ -504,14 +530,14 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
                     || type == BlockDoublePlant.EnumPlantType.ROSE
                     || type == BlockDoublePlant.EnumPlantType.PAEONIA;
         }
-        return isBeeAttractiveBlock(state.getBlock());
+        return isBeeAttractiveBlock(state);
     }
 
-    private static boolean isBeeAttractiveBlock(Block block) {
+    private static boolean isBeeAttractiveBlock(IBlockState state) {
+        Block block = state.getBlock();
         return block instanceof BlockFlower || block == Blocks.CHORUS_FLOWER
-                || block == FFDBlocks.FLOWERING_AZALEA
-                || block == FFDBlocks.FLOWERING_AZALEA_LEAVES
-                || block == FFDBlocks.SPORE_BLOSSOM;
+                || FFDLushCaveBlockProvider.get().isFloweringAzalea(state)
+                || FFDLushCaveBlockProvider.get().isSporeBlossom(state);
     }
 
     @Nullable
@@ -672,6 +698,11 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
         }
 
         @Override
+        public boolean shouldExecute() {
+            return canBecomeAngryAt(bee.getRevengeTarget()) && super.shouldExecute();
+        }
+
+        @Override
         public void startExecuting() {
             super.startExecuting();
             EntityLivingBase target = bee.getAttackTarget();
@@ -700,12 +731,15 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
 
         @Override
         public boolean shouldExecute() {
-            return bee.getAnger() > 0 && !bee.hasStung() && super.shouldExecute();
+            return bee.getAnger() > 0 && !bee.hasStung()
+                    && canBecomeAngryAt(bee.getAttackTarget()) && super.shouldExecute();
         }
 
         @Override
         public boolean shouldContinueExecuting() {
-            return bee.getAnger() > 0 && !bee.hasStung() && super.shouldContinueExecuting();
+            return bee.getAnger() > 0 && !bee.hasStung()
+                    && canBecomeAngryAt(bee.getAttackTarget())
+                    && super.shouldContinueExecuting();
         }
     }
 
@@ -715,7 +749,8 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
         private BeeTargetGoal(EntityBee bee) {
             super(bee, EntityPlayer.class, 10, true, false,
                     player -> bee.angerTarget != null
-                            && bee.angerTarget.equals(player.getUniqueID()));
+                            && bee.angerTarget.equals(player.getUniqueID())
+                            && canBecomeAngryAt(player));
             this.bee = bee;
         }
 
@@ -726,7 +761,9 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
 
         @Override
         public boolean shouldContinueExecuting() {
-            return bee.getAnger() > 0 && !bee.hasStung() && super.shouldContinueExecuting();
+            return bee.getAnger() > 0 && !bee.hasStung()
+                    && canBecomeAngryAt(bee.getAttackTarget())
+                    && super.shouldContinueExecuting();
         }
     }
 

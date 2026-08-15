@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "variant=default": { "model": "farmers_future_delight:deepslate_tiles" }
+  }
+}

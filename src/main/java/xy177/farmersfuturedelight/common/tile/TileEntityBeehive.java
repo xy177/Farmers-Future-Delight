@@ -30,6 +30,7 @@ import net.minecraft.util.ITickable;
 import xy177.farmersfuturedelight.common.block.BlockBeehive;
 import xy177.farmersfuturedelight.common.entity.EntityBee;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
+import xy177.farmersfuturedelight.common.registry.FFDEntities;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
 
@@ -106,7 +107,7 @@ public class TileEntityBeehive extends TileEntity implements ITickable {
     }
 
     public void addNewBees(int count) {
-        if (world == null || world.isRemote) {
+        if (world == null || world.isRemote || !FFDEntities.isLocalBeeEnabled()) {
             return;
         }
         for (int i = 0; i < count && !isFullOfBees(); i++) {
@@ -153,7 +154,8 @@ public class TileEntityBeehive extends TileEntity implements ITickable {
                 held.damageItem(1, player);
                 world.playSound(null, pos, FFDSounds.BEEHIVE_SHEAR, SoundCategory.BLOCKS, 1.0F, 1.0F);
                 for (int i = 0; i < 3; i++) {
-                    Block.spawnAsEntity(world, pos, new ItemStack(FFDItems.HONEYCOMB));
+                    Block.spawnAsEntity(world, pos,
+                            FFDItems.effectiveStack(FFDItems.HONEYCOMB));
                 }
                 player.addStat(StatList.getObjectUseStats(Items.SHEARS));
                 setHoneyLevel(0);
@@ -167,7 +169,7 @@ public class TileEntityBeehive extends TileEntity implements ITickable {
         if (held.getItem() == Items.GLASS_BOTTLE) {
             if (!world.isRemote) {
                 held.shrink(1);
-                ItemStack honeyBottle = new ItemStack(FFDItems.HONEY_BOTTLE);
+                ItemStack honeyBottle = FFDItems.effectiveStack(FFDItems.HONEY_BOTTLE);
                 if (held.isEmpty()) {
                     player.setHeldItem(hand, honeyBottle);
                 } else if (!player.inventory.addItemStackToInventory(honeyBottle)) {

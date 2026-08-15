@@ -92,12 +92,12 @@ public class BlockSeagrass extends BlockUnderwaterPlant implements IGrowable {
         player.addStat(StatList.getBlockStats(this));
         player.addExhaustion(0.005F);
         if (!world.isRemote && isFeatureEnabled() && tool.getItem() == Items.SHEARS) {
-            spawnAsEntity(world, pos, new ItemStack(FFDItems.SEAGRASS));
+            spawnAsEntity(world, pos, FFDItems.effectiveStack(FFDItems.SEAGRASS));
         }
     }
 
     @Override
     public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
-        return new ItemStack(FFDItems.SEAGRASS);
+        return FFDItems.effectiveStack(FFDItems.SEAGRASS);
     }
 }

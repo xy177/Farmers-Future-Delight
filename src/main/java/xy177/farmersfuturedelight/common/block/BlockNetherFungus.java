@@ -8,6 +8,8 @@ import net.minecraft.world.World;
 
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.worldgen.WorldGenHugeFungus;
+import xy177.farmersfuturedelight.common.worldgen.FFDNetherBlockProvider;
+import xy177.farmersfuturedelight.core.FFDHeightHooks;
 
 public class BlockNetherFungus extends BlockNetherPlant implements net.minecraft.block.IGrowable {
     private final boolean warped;
@@ -20,7 +22,7 @@ public class BlockNetherFungus extends BlockNetherPlant implements net.minecraft
     @Override
     public boolean canGrow(World world, BlockPos pos, IBlockState state, boolean isClient) {
         return isHugeFungusEnabled() && hasMatchingNylium(world, pos)
-                && pos.up().getY() < world.getHeight();
+                && pos.up().getY() < FFDHeightHooks.maxYExclusive(world);
     }
 
     @Override
@@ -59,9 +61,7 @@ public class BlockNetherFungus extends BlockNetherPlant implements net.minecraft
     }
 
     private boolean hasMatchingNylium(World world, BlockPos pos) {
-        return world.getBlockState(pos.down()).getBlock() == (warped
-                ? xy177.farmersfuturedelight.common.registry.FFDBlocks.WARPED_NYLIUM
-                : xy177.farmersfuturedelight.common.registry.FFDBlocks.CRIMSON_NYLIUM);
+        return FFDNetherBlockProvider.get().isNylium(world.getBlockState(pos.down()), warped);
     }
 
     private boolean isPlantEnabled() {

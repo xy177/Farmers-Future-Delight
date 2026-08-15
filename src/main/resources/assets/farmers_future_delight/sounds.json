@@ -2736,5 +2736,1351 @@
                                           }
                                       ],
                            "subtitle":  "subtitles.item.axe.strip"
-                       }
+                       },
+    "entity.phantom.ambient": {
+        "sounds": [
+            {"name": "farmers_future_delight:mob/phantom/idle1", "volume": 0.8},
+            {"name": "farmers_future_delight:mob/phantom/idle2", "volume": 0.8},
+            {"name": "farmers_future_delight:mob/phantom/idle3", "volume": 0.8},
+            {"name": "farmers_future_delight:mob/phantom/idle4", "volume": 0.8},
+            {"name": "farmers_future_delight:mob/phantom/idle5", "volume": 0.8}
+        ],
+        "subtitle": "subtitles.entity.phantom.ambient"
+    },
+    "entity.phantom.bite": {
+        "sounds": ["farmers_future_delight:mob/phantom/bite1", "farmers_future_delight:mob/phantom/bite2"],
+        "subtitle": "subtitles.entity.phantom.bite"
+    },
+    "entity.phantom.death": {
+        "sounds": ["farmers_future_delight:mob/phantom/death1", "farmers_future_delight:mob/phantom/death2", "farmers_future_delight:mob/phantom/death3"],
+        "subtitle": "subtitles.entity.phantom.death"
+    },
+    "entity.phantom.flap": {
+        "sounds": [
+            {"name": "farmers_future_delight:mob/phantom/flap1", "volume": 0.9},
+            {"name": "farmers_future_delight:mob/phantom/flap2", "volume": 0.9},
+            {"name": "farmers_future_delight:mob/phantom/flap3", "volume": 0.9},
+            {"name": "farmers_future_delight:mob/phantom/flap4", "volume": 0.9},
+            {"name": "farmers_future_delight:mob/phantom/flap5", "volume": 0.9},
+            {"name": "farmers_future_delight:mob/phantom/flap6", "volume": 0.9}
+        ],
+        "subtitle": "subtitles.entity.phantom.flap"
+    },
+    "entity.phantom.hurt": {
+        "sounds": [
+            {"name": "farmers_future_delight:mob/phantom/hurt1", "volume": 0.75},
+            {"name": "farmers_future_delight:mob/phantom/hurt2", "volume": 0.75},
+            {"name": "farmers_future_delight:mob/phantom/hurt3", "volume": 0.75}
+        ],
+        "subtitle": "subtitles.entity.phantom.hurt"
+    },
+    "entity.phantom.swoop": {
+        "sounds": [
+            {"name": "farmers_future_delight:mob/phantom/swoop1", "volume": 0.7},
+            {"name": "farmers_future_delight:mob/phantom/swoop2", "volume": 0.7},
+            {"name": "farmers_future_delight:mob/phantom/swoop3", "volume": 0.7},
+            {"name": "farmers_future_delight:mob/phantom/swoop4", "volume": 0.7}
+        ],
+        "subtitle": "subtitles.entity.phantom.swoop"
+    },
+    "block.amethyst_block.break": {
+        "sounds": [
+            "farmers_future_delight:block/amethyst/break1",
+            "farmers_future_delight:block/amethyst/break2",
+            "farmers_future_delight:block/amethyst/break3",
+            "farmers_future_delight:block/amethyst/break4"
+        ],
+        "subtitle": "subtitles.block.generic.break"
+    },
+    "block.amethyst_block.step": {
+        "sounds": [
+            "farmers_future_delight:block/amethyst/step1",
+            "farmers_future_delight:block/amethyst/step2",
+            "farmers_future_delight:block/amethyst/step3",
+            "farmers_future_delight:block/amethyst/step4",
+            "farmers_future_delight:block/amethyst/step5",
+            "farmers_future_delight:block/amethyst/step6",
+            "farmers_future_delight:block/amethyst/step7",
+            "farmers_future_delight:block/amethyst/step8",
+            "farmers_future_delight:block/amethyst/step9",
+            "farmers_future_delight:block/amethyst/step10",
+            "farmers_future_delight:block/amethyst/step11",
+            "farmers_future_delight:block/amethyst/step12",
+            "farmers_future_delight:block/amethyst/step13",
+            "farmers_future_delight:block/amethyst/step14"
+        ],
+        "subtitle": "subtitles.block.generic.footsteps"
+    },
+    "block.amethyst_block.place": {
+        "sounds": [
+            "farmers_future_delight:block/amethyst/place1",
+            "farmers_future_delight:block/amethyst/place2",
+            "farmers_future_delight:block/amethyst/place3",
+            "farmers_future_delight:block/amethyst/place4"
+        ],
+        "subtitle": "subtitles.block.generic.place"
+    },
+    "block.amethyst_block.hit": {
+        "sounds": [
+            "farmers_future_delight:block/amethyst/step1",
+            "farmers_future_delight:block/amethyst/step2",
+            "farmers_future_delight:block/amethyst/step3",
+            "farmers_future_delight:block/amethyst/step4",
+            "farmers_future_delight:block/amethyst/step5",
+            "farmers_future_delight:block/amethyst/step6",
+            "farmers_future_delight:block/amethyst/step7",
+            "farmers_future_delight:block/amethyst/step8",
+            "farmers_future_delight:block/amethyst/step9",
+            "farmers_future_delight:block/amethyst/step10",
+            "farmers_future_delight:block/amethyst/step11",
+            "farmers_future_delight:block/amethyst/step12"
+        ],
+        "subtitle": "subtitles.block.generic.hit"
+    },
+    "block.amethyst_block.fall": {
+        "sounds": [
+            "farmers_future_delight:block/amethyst/step1",
+            "farmers_future_delight:block/amethyst/step2",
+            "farmers_future_delight:block/amethyst/step3",
+            "farmers_future_delight:block/amethyst/step4",
+            "farmers_future_delight:block/amethyst/step5",
+            "farmers_future_delight:block/amethyst/step6",
+            "farmers_future_delight:block/amethyst/step7",
+            "farmers_future_delight:block/amethyst/step8",
+            "farmers_future_delight:block/amethyst/step9",
+            "farmers_future_delight:block/amethyst/step10",
+            "farmers_future_delight:block/amethyst/step11",
+            "farmers_future_delight:block/amethyst/step12",
+            "farmers_future_delight:block/amethyst/step14"
+        ],
+        "subtitle": "subtitles.block.generic.fall"
+    },
+    "block.amethyst_block.chime": {
+        "sounds": [
+            {"name": "farmers_future_delight:block/amethyst/shimmer", "volume": 0.2}
+        ],
+        "subtitle": "subtitles.block.amethyst_block.chime"
+    },
+    "block.amethyst_cluster.break": {
+        "sounds": [
+            {"name": "farmers_future_delight:block/amethyst_cluster/break1", "pitch": 0.8, "volume": 0.8},
+            {"name": "farmers_future_delight:block/amethyst_cluster/break2", "pitch": 0.8, "volume": 0.8},
+            {"name": "farmers_future_delight:block/amethyst_cluster/break3", "pitch": 0.8, "volume": 0.8},
+            {"name": "farmers_future_delight:block/amethyst_cluster/break4", "pitch": 0.8, "volume": 0.8}
+        ],
+        "subtitle": "subtitles.block.generic.break"
+    },
+    "block.amethyst_cluster.step": {
+        "sounds": [
+            "farmers_future_delight:block/amethyst/step1",
+            "farmers_future_delight:block/amethyst/step2",
+            "farmers_future_delight:block/amethyst/step3",
+            "farmers_future_delight:block/amethyst/step4",
+            "farmers_future_delight:block/amethyst/step5",
+            "farmers_future_delight:block/amethyst/step6",
+            "farmers_future_delight:block/amethyst/step7",
+            "farmers_future_delight:block/amethyst/step8",
+            "farmers_future_delight:block/amethyst/step9",
+            "farmers_future_delight:block/amethyst/step10",
+            "farmers_future_delight:block/amethyst/step11",
+            "farmers_future_delight:block/amethyst/step12",
+            "farmers_future_delight:block/amethyst/step13",
+            "farmers_future_delight:block/amethyst/step14"
+        ],
+        "subtitle": "subtitles.block.generic.footsteps"
+    },
+    "block.amethyst_cluster.place": {
+        "sounds": [
+            {"name": "farmers_future_delight:block/amethyst_cluster/place1", "volume": 0.9},
+            {"name": "farmers_future_delight:block/amethyst_cluster/place2", "volume": 0.9},
+            {"name": "farmers_future_delight:block/amethyst_cluster/place3", "volume": 0.9},
+            {"name": "farmers_future_delight:block/amethyst_cluster/place4", "volume": 0.9}
+        ],
+        "subtitle": "subtitles.block.generic.place"
+    },
+    "block.amethyst_cluster.hit": {
+        "sounds": [
+            "farmers_future_delight:block/amethyst/step1",
+            "farmers_future_delight:block/amethyst/step2",
+            "farmers_future_delight:block/amethyst/step3",
+            "farmers_future_delight:block/amethyst/step4",
+            "farmers_future_delight:block/amethyst/step5",
+            "farmers_future_delight:block/amethyst/step6",
+            "farmers_future_delight:block/amethyst/step7",
+            "farmers_future_delight:block/amethyst/step8",
+            "farmers_future_delight:block/amethyst/step9",
+            "farmers_future_delight:block/amethyst/step10",
+            "farmers_future_delight:block/amethyst/step11",
+            "farmers_future_delight:block/amethyst/step12"
+        ],
+        "subtitle": "subtitles.block.generic.hit"
+    },
+    "block.amethyst_cluster.fall": {
+        "sounds": [
+            "farmers_future_delight:block/amethyst/step1",
+            "farmers_future_delight:block/amethyst/step2",
+            "farmers_future_delight:block/amethyst/step3",
+            "farmers_future_delight:block/amethyst/step4",
+            "farmers_future_delight:block/amethyst/step5",
+            "farmers_future_delight:block/amethyst/step6",
+            "farmers_future_delight:block/amethyst/step7",
+            "farmers_future_delight:block/amethyst/step8",
+            "farmers_future_delight:block/amethyst/step9",
+            "farmers_future_delight:block/amethyst/step10",
+            "farmers_future_delight:block/amethyst/step11",
+            "farmers_future_delight:block/amethyst/step12",
+            "farmers_future_delight:block/amethyst/step14"
+        ],
+        "subtitle": "subtitles.block.generic.fall"
+    },
+    "block.small_amethyst_bud.break": {
+        "sounds": [
+            {"name": "farmers_future_delight:block/amethyst_cluster/break1", "volume": 0.4},
+            {"name": "farmers_future_delight:block/amethyst_cluster/break2", "volume": 0.4},
+            {"name": "farmers_future_delight:block/amethyst_cluster/break3", "volume": 0.4},
+            {"name": "farmers_future_delight:block/amethyst_cluster/break4", "volume": 0.4}
+        ],
+        "subtitle": "subtitles.block.generic.break"
+    },
+    "block.small_amethyst_bud.place": {
+        "sounds": [
+            {"name": "farmers_future_delight:block/amethyst_cluster/place1", "pitch": 1.2, "volume": 0.4},
+            {"name": "farmers_future_delight:block/amethyst_cluster/place2", "pitch": 1.2, "volume": 0.4},
+            {"name": "farmers_future_delight:block/amethyst_cluster/place3", "pitch": 1.2, "volume": 0.4},
+            {"name": "farmers_future_delight:block/amethyst_cluster/place4", "pitch": 1.2, "volume": 0.4}
+        ],
+        "subtitle": "subtitles.block.generic.place"
+    },
+    "block.medium_amethyst_bud.break": {
+        "sounds": [
+            {"name": "farmers_future_delight:block/amethyst_cluster/break1", "pitch": 0.95, "volume": 0.55},
+            {"name": "farmers_future_delight:block/amethyst_cluster/break2", "pitch": 0.95, "volume": 0.55},
+            {"name": "farmers_future_delight:block/amethyst_cluster/break3", "pitch": 0.95, "volume": 0.55},
+            {"name": "farmers_future_delight:block/amethyst_cluster/break4", "pitch": 0.95, "volume": 0.55}
+        ],
+        "subtitle": "subtitles.block.generic.break"
+    },
+    "block.medium_amethyst_bud.place": {
+        "sounds": [
+            {"name": "farmers_future_delight:block/amethyst_cluster/place1", "pitch": 1.1, "volume": 0.5},
+            {"name": "farmers_future_delight:block/amethyst_cluster/place2", "pitch": 1.1, "volume": 0.5},
+            {"name": "farmers_future_delight:block/amethyst_cluster/place3", "pitch": 1.1, "volume": 0.5},
+            {"name": "farmers_future_delight:block/amethyst_cluster/place4", "pitch": 1.1, "volume": 0.5}
+        ],
+        "subtitle": "subtitles.block.generic.place"
+    },
+    "block.large_amethyst_bud.break": {
+        "sounds": [
+            {"name": "farmers_future_delight:block/amethyst_cluster/break1", "pitch": 0.85, "volume": 0.7},
+            {"name": "farmers_future_delight:block/amethyst_cluster/break2", "pitch": 0.85, "volume": 0.7},
+            {"name": "farmers_future_delight:block/amethyst_cluster/break3", "pitch": 0.85, "volume": 0.7},
+            {"name": "farmers_future_delight:block/amethyst_cluster/break4", "pitch": 0.85, "volume": 0.7}
+        ],
+        "subtitle": "subtitles.block.generic.break"
+    },
+    "block.large_amethyst_bud.place": {
+        "sounds": [
+            {"name": "farmers_future_delight:block/amethyst_cluster/place1", "volume": 0.75},
+            {"name": "farmers_future_delight:block/amethyst_cluster/place2", "volume": 0.75},
+            {"name": "farmers_future_delight:block/amethyst_cluster/place3", "volume": 0.75},
+            {"name": "farmers_future_delight:block/amethyst_cluster/place4", "volume": 0.75}
+        ],
+        "subtitle": "subtitles.block.generic.place"
+    },
+    "block.calcite.break": {
+        "sounds": [
+            {"name": "farmers_future_delight:block/calcite/break1", "volume": 0.9},
+            {"name": "farmers_future_delight:block/calcite/break2", "volume": 0.9},
+            {"name": "farmers_future_delight:block/calcite/break3", "volume": 0.9},
+            {"name": "farmers_future_delight:block/calcite/break4", "volume": 0.9}
+        ],
+        "subtitle": "subtitles.block.generic.break"
+    },
+    "block.calcite.step": {
+        "sounds": [
+            "farmers_future_delight:block/calcite/step1",
+            "farmers_future_delight:block/calcite/step2",
+            "farmers_future_delight:block/calcite/step3",
+            "farmers_future_delight:block/calcite/step4",
+            "farmers_future_delight:block/calcite/step5",
+            "farmers_future_delight:block/calcite/step6"
+        ],
+        "subtitle": "subtitles.block.generic.footsteps"
+    },
+    "block.calcite.place": {
+        "sounds": [
+            {"name": "farmers_future_delight:block/calcite/place1", "volume": 0.94},
+            {"name": "farmers_future_delight:block/calcite/place2", "volume": 0.94},
+            {"name": "farmers_future_delight:block/calcite/place3", "volume": 0.94},
+            {"name": "farmers_future_delight:block/calcite/place4", "volume": 0.94}
+        ],
+        "subtitle": "subtitles.block.generic.place"
+    },
+    "block.calcite.hit": {
+        "sounds": [
+            "farmers_future_delight:block/calcite/step1",
+            "farmers_future_delight:block/calcite/step2",
+            "farmers_future_delight:block/calcite/step3",
+            "farmers_future_delight:block/calcite/step4",
+            "farmers_future_delight:block/calcite/step5",
+            "farmers_future_delight:block/calcite/step6"
+        ],
+        "subtitle": "subtitles.block.generic.hit"
+    },
+    "block.calcite.fall": {
+        "sounds": [
+            "farmers_future_delight:block/calcite/step1",
+            "farmers_future_delight:block/calcite/step2",
+            "farmers_future_delight:block/calcite/step3",
+            "farmers_future_delight:block/calcite/step4",
+            "farmers_future_delight:block/calcite/step5",
+            "farmers_future_delight:block/calcite/step6"
+        ],
+        "subtitle": "subtitles.block.generic.fall"
+    },
+    "block.basalt.break": {
+        "sounds": [
+            "farmers_future_delight:block/basalt/break1",
+            "farmers_future_delight:block/basalt/break2",
+            "farmers_future_delight:block/basalt/break3",
+            "farmers_future_delight:block/basalt/break4",
+            "farmers_future_delight:block/basalt/break5"
+        ],
+        "subtitle": "subtitles.block.generic.break"
+    },
+    "block.basalt.step": {
+        "sounds": [
+            "farmers_future_delight:block/basalt/step1",
+            "farmers_future_delight:block/basalt/step2",
+            "farmers_future_delight:block/basalt/step3",
+            "farmers_future_delight:block/basalt/step4",
+            "farmers_future_delight:block/basalt/step5",
+            "farmers_future_delight:block/basalt/step6"
+        ],
+        "subtitle": "subtitles.block.generic.footsteps"
+    },
+    "block.basalt.place": {
+        "sounds": [
+            "farmers_future_delight:block/basalt/break1",
+            "farmers_future_delight:block/basalt/break2",
+            "farmers_future_delight:block/basalt/break3",
+            "farmers_future_delight:block/basalt/break4",
+            "farmers_future_delight:block/basalt/break5"
+        ],
+        "subtitle": "subtitles.block.generic.place"
+    },
+    "block.basalt.hit": {
+        "sounds": [
+            "farmers_future_delight:block/basalt/step1",
+            "farmers_future_delight:block/basalt/step2",
+            "farmers_future_delight:block/basalt/step3",
+            "farmers_future_delight:block/basalt/step4",
+            "farmers_future_delight:block/basalt/step5",
+            "farmers_future_delight:block/basalt/step6"
+        ],
+        "subtitle": "subtitles.block.generic.hit"
+    },
+    "block.basalt.fall": {
+        "sounds": [
+            "farmers_future_delight:block/basalt/step1",
+            "farmers_future_delight:block/basalt/step2",
+            "farmers_future_delight:block/basalt/step3",
+            "farmers_future_delight:block/basalt/step4",
+            "farmers_future_delight:block/basalt/step5",
+            "farmers_future_delight:block/basalt/step6"
+        ],
+        "subtitle": "subtitles.block.generic.fall"
+    },
+    "block.deepslate.break": {
+        "sounds": [
+            "farmers_future_delight:block/deepslate/break1",
+            "farmers_future_delight:block/deepslate/break2",
+            "farmers_future_delight:block/deepslate/break3",
+            "farmers_future_delight:block/deepslate/break4"
+        ],
+        "subtitle": "subtitles.block.generic.break"
+    },
+    "block.deepslate.step": {
+        "sounds": [
+            "farmers_future_delight:block/deepslate/step1",
+            "farmers_future_delight:block/deepslate/step2",
+            "farmers_future_delight:block/deepslate/step3",
+            "farmers_future_delight:block/deepslate/step4",
+            "farmers_future_delight:block/deepslate/step5",
+            "farmers_future_delight:block/deepslate/step6"
+        ],
+        "subtitle": "subtitles.block.generic.footsteps"
+    },
+    "block.deepslate.place": {
+        "sounds": [
+            "farmers_future_delight:block/deepslate/place1",
+            "farmers_future_delight:block/deepslate/place2",
+            "farmers_future_delight:block/deepslate/place3",
+            "farmers_future_delight:block/deepslate/place4",
+            "farmers_future_delight:block/deepslate/place5",
+            "farmers_future_delight:block/deepslate/place6"
+        ],
+        "subtitle": "subtitles.block.generic.place"
+    },
+    "block.deepslate.hit": {
+        "sounds": [
+            "farmers_future_delight:block/deepslate/step1",
+            "farmers_future_delight:block/deepslate/step2",
+            "farmers_future_delight:block/deepslate/step3",
+            "farmers_future_delight:block/deepslate/step4",
+            "farmers_future_delight:block/deepslate/step5",
+            "farmers_future_delight:block/deepslate/step6"
+        ],
+        "subtitle": "subtitles.block.generic.hit"
+    },
+    "block.deepslate.fall": {
+        "sounds": [
+            "farmers_future_delight:block/deepslate/step1",
+            "farmers_future_delight:block/deepslate/step2",
+            "farmers_future_delight:block/deepslate/step3",
+            "farmers_future_delight:block/deepslate/step4",
+            "farmers_future_delight:block/deepslate/step5",
+            "farmers_future_delight:block/deepslate/step6"
+        ],
+        "subtitle": "subtitles.block.generic.fall"
+    },
+    "block.deepslate_bricks.break": {
+        "sounds": [
+            {"name": "farmers_future_delight:block/deepslate_bricks/place1", "volume": 0.85},
+            {"name": "farmers_future_delight:block/deepslate_bricks/place2", "volume": 0.85},
+            {"name": "farmers_future_delight:block/deepslate_bricks/place3", "volume": 0.85},
+            {"name": "farmers_future_delight:block/deepslate_bricks/place4", "volume": 0.85},
+            {"name": "farmers_future_delight:block/deepslate_bricks/place5", "volume": 0.85},
+            {"name": "farmers_future_delight:block/deepslate_bricks/place6", "volume": 0.85}
+        ],
+        "subtitle": "subtitles.block.generic.break"
+    },
+    "block.deepslate_bricks.step": {
+        "sounds": [
+            {"name": "farmers_future_delight:block/deepslate_bricks/step1", "pitch": 0.9},
+            {"name": "farmers_future_delight:block/deepslate_bricks/step2", "pitch": 0.9},
+            {"name": "farmers_future_delight:block/deepslate_bricks/step3", "pitch": 0.9},
+            {"name": "farmers_future_delight:block/deepslate_bricks/step4", "pitch": 0.9},
+            {"name": "farmers_future_delight:block/deepslate_bricks/step5", "pitch": 0.9}
+        ],
+        "subtitle": "subtitles.block.generic.footsteps"
+    },
+    "block.deepslate_bricks.place": {
+        "sounds": [
+            {"name": "farmers_future_delight:block/deepslate_bricks/place1", "volume": 0.85},
+            {"name": "farmers_future_delight:block/deepslate_bricks/place2", "volume": 0.85},
+            {"name": "farmers_future_delight:block/deepslate_bricks/place3", "volume": 0.85},
+            {"name": "farmers_future_delight:block/deepslate_bricks/place4", "volume": 0.85},
+            {"name": "farmers_future_delight:block/deepslate_bricks/place5", "volume": 0.85},
+            {"name": "farmers_future_delight:block/deepslate_bricks/place6", "volume": 0.85}
+        ],
+        "subtitle": "subtitles.block.generic.place"
+    },
+    "block.deepslate_bricks.hit": {
+        "sounds": [
+            "farmers_future_delight:block/deepslate_bricks/step1",
+            "farmers_future_delight:block/deepslate_bricks/step2",
+            "farmers_future_delight:block/deepslate_bricks/step3",
+            "farmers_future_delight:block/deepslate_bricks/step4",
+            "farmers_future_delight:block/deepslate_bricks/step5"
+        ],
+        "subtitle": "subtitles.block.generic.hit"
+    },
+    "block.deepslate_bricks.fall": {
+        "sounds": [
+            "farmers_future_delight:block/deepslate_bricks/step1",
+            "farmers_future_delight:block/deepslate_bricks/step2",
+            "farmers_future_delight:block/deepslate_bricks/step3",
+            "farmers_future_delight:block/deepslate_bricks/step4",
+            "farmers_future_delight:block/deepslate_bricks/step5"
+        ],
+        "subtitle": "subtitles.block.generic.fall"
+    },
+    "block.tuff.break": {
+        "sounds": [
+            "farmers_future_delight:block/tuff/break1",
+            "farmers_future_delight:block/tuff/break2",
+            "farmers_future_delight:block/tuff/break3",
+            "farmers_future_delight:block/tuff/break4"
+        ],
+        "subtitle": "subtitles.block.generic.break"
+    },
+    "block.tuff.step": {
+        "sounds": [
+            "farmers_future_delight:block/tuff/step1",
+            "farmers_future_delight:block/tuff/step2",
+            "farmers_future_delight:block/tuff/step3",
+            "farmers_future_delight:block/tuff/step4",
+            "farmers_future_delight:block/tuff/step5",
+            "farmers_future_delight:block/tuff/step6"
+        ],
+        "subtitle": "subtitles.block.generic.footsteps"
+    },
+    "block.tuff.place": {
+        "sounds": [
+            "farmers_future_delight:block/tuff/break1",
+            "farmers_future_delight:block/tuff/break2",
+            "farmers_future_delight:block/tuff/break3",
+            "farmers_future_delight:block/tuff/break4"
+        ],
+        "subtitle": "subtitles.block.generic.place"
+    },
+    "block.tuff.hit": {
+        "sounds": [
+            "farmers_future_delight:block/tuff/step1",
+            "farmers_future_delight:block/tuff/step2",
+            "farmers_future_delight:block/tuff/step3",
+            "farmers_future_delight:block/tuff/step4",
+            "farmers_future_delight:block/tuff/step5",
+            "farmers_future_delight:block/tuff/step6"
+        ],
+        "subtitle": "subtitles.block.generic.hit"
+    },
+    "block.tuff.fall": {
+        "sounds": [
+            "farmers_future_delight:block/tuff/step1",
+            "farmers_future_delight:block/tuff/step2",
+            "farmers_future_delight:block/tuff/step3",
+            "farmers_future_delight:block/tuff/step4",
+            "farmers_future_delight:block/tuff/step5",
+            "farmers_future_delight:block/tuff/step6"
+        ],
+        "subtitle": "subtitles.block.generic.fall"
+    },
+    "block.copper.break": {
+        "sounds": [
+            "farmers_future_delight:block/copper/break1",
+            "farmers_future_delight:block/copper/break2",
+            "farmers_future_delight:block/copper/break3",
+            "farmers_future_delight:block/copper/break4"
+        ],
+        "subtitle": "subtitles.block.generic.break"
+    },
+    "block.copper.step": {
+        "sounds": [
+            "farmers_future_delight:block/copper/step1",
+            "farmers_future_delight:block/copper/step2",
+            "farmers_future_delight:block/copper/step3",
+            "farmers_future_delight:block/copper/step4",
+            "farmers_future_delight:block/copper/step5",
+            "farmers_future_delight:block/copper/step6"
+        ],
+        "subtitle": "subtitles.block.generic.footsteps"
+    },
+    "block.copper.place": {
+        "sounds": [
+            "farmers_future_delight:block/copper/break1",
+            "farmers_future_delight:block/copper/break2",
+            "farmers_future_delight:block/copper/break3",
+            "farmers_future_delight:block/copper/break4"
+        ],
+        "subtitle": "subtitles.block.generic.place"
+    },
+    "block.copper.hit": {
+        "sounds": [
+            "farmers_future_delight:block/copper/step1",
+            "farmers_future_delight:block/copper/step2",
+            "farmers_future_delight:block/copper/step3",
+            "farmers_future_delight:block/copper/step4",
+            "farmers_future_delight:block/copper/step5",
+            "farmers_future_delight:block/copper/step6"
+        ],
+        "subtitle": "subtitles.block.generic.hit"
+    },
+    "block.copper.fall": {
+        "sounds": [
+            "farmers_future_delight:block/copper/step1",
+            "farmers_future_delight:block/copper/step2",
+            "farmers_future_delight:block/copper/step3",
+            "farmers_future_delight:block/copper/step4",
+            "farmers_future_delight:block/copper/step5",
+            "farmers_future_delight:block/copper/step6"
+        ],
+        "subtitle": "subtitles.block.generic.fall"
+    },
+    "item.axe.scrape": {
+        "sounds": [
+            "farmers_future_delight:item/axe/scrape1",
+            {"name": "farmers_future_delight:item/axe/scrape1", "pitch": 0.9},
+            {"name": "farmers_future_delight:item/axe/scrape1", "pitch": 1.1},
+            "farmers_future_delight:item/axe/scrape2",
+            {"name": "farmers_future_delight:item/axe/scrape2", "pitch": 0.9},
+            {"name": "farmers_future_delight:item/axe/scrape2", "pitch": 1.1},
+            "farmers_future_delight:item/axe/scrape3",
+            {"name": "farmers_future_delight:item/axe/scrape3", "pitch": 0.9},
+            {"name": "farmers_future_delight:item/axe/scrape3", "pitch": 1.1}
+        ],
+        "subtitle": "subtitles.item.axe.scrape"
+    },
+    "item.axe.wax_off": {
+        "sounds": [
+            "farmers_future_delight:item/axe/wax_off1",
+            {"name": "farmers_future_delight:item/axe/wax_off1", "pitch": 0.9},
+            {"name": "farmers_future_delight:item/axe/wax_off1", "pitch": 1.1},
+            "farmers_future_delight:item/axe/wax_off2",
+            {"name": "farmers_future_delight:item/axe/wax_off2", "pitch": 0.9},
+            {"name": "farmers_future_delight:item/axe/wax_off2", "pitch": 1.1},
+            "farmers_future_delight:item/axe/wax_off3",
+            {"name": "farmers_future_delight:item/axe/wax_off3", "pitch": 0.9},
+            {"name": "farmers_future_delight:item/axe/wax_off3", "pitch": 1.1}
+        ],
+        "subtitle": "subtitles.item.axe.wax_off"
+    },
+    "item.honeycomb.wax_on": {
+        "sounds": [
+            "farmers_future_delight:item/honeycomb/wax_on1",
+            {"name": "farmers_future_delight:item/honeycomb/wax_on1", "pitch": 0.9},
+            {"name": "farmers_future_delight:item/honeycomb/wax_on1", "pitch": 1.1},
+            "farmers_future_delight:item/honeycomb/wax_on2",
+            {"name": "farmers_future_delight:item/honeycomb/wax_on2", "pitch": 0.9},
+            {"name": "farmers_future_delight:item/honeycomb/wax_on2", "pitch": 1.1},
+            "farmers_future_delight:item/honeycomb/wax_on3",
+            {"name": "farmers_future_delight:item/honeycomb/wax_on3", "pitch": 0.9},
+            {"name": "farmers_future_delight:item/honeycomb/wax_on3", "pitch": 1.1}
+        ],
+        "subtitle": "subtitles.item.honeycomb.wax_on"
+    },
+    "item.spyglass.use": {
+        "sounds": [
+            {"name": "farmers_future_delight:item/spyglass/use", "pitch": 1.15, "volume": 0.5},
+            {"name": "farmers_future_delight:item/spyglass/use", "pitch": 1.33, "volume": 0.5},
+            {"name": "farmers_future_delight:item/spyglass/use", "pitch": 1.4, "volume": 0.5},
+            {"name": "farmers_future_delight:item/spyglass/use", "pitch": 1.55, "volume": 0.5}
+        ],
+        "subtitle": "subtitles.item.spyglass.use"
+    },
+    "item.spyglass.stop_using": {
+        "sounds": [
+            {"name": "farmers_future_delight:item/spyglass/stop", "volume": 0.5},
+            {"name": "farmers_future_delight:item/spyglass/stop", "pitch": 0.8, "volume": 0.5},
+            {"name": "farmers_future_delight:item/spyglass/stop", "pitch": 0.9, "volume": 0.5}
+        ],
+        "subtitle": "subtitles.item.spyglass.stop_using"
+    },
+    "block.dripstone_block.break": {
+        "sounds": [
+            "farmers_future_delight:block/dripstone/break1",
+            "farmers_future_delight:block/dripstone/break2",
+            "farmers_future_delight:block/dripstone/break3",
+            "farmers_future_delight:block/dripstone/break4",
+            "farmers_future_delight:block/dripstone/break5"
+        ],
+        "subtitle": "subtitles.block.generic.break"
+    },
+    "block.dripstone_block.step": {
+        "sounds": [
+            "farmers_future_delight:block/dripstone/step1",
+            "farmers_future_delight:block/dripstone/step2",
+            "farmers_future_delight:block/dripstone/step3",
+            "farmers_future_delight:block/dripstone/step4",
+            "farmers_future_delight:block/dripstone/step5",
+            "farmers_future_delight:block/dripstone/step6"
+        ],
+        "subtitle": "subtitles.block.generic.footsteps"
+    },
+    "block.dripstone_block.place": {
+        "sounds": [
+            "farmers_future_delight:block/dripstone/break1",
+            "farmers_future_delight:block/dripstone/break2",
+            "farmers_future_delight:block/dripstone/break3",
+            "farmers_future_delight:block/dripstone/break4",
+            "farmers_future_delight:block/dripstone/break5"
+        ],
+        "subtitle": "subtitles.block.generic.place"
+    },
+    "block.dripstone_block.hit": {
+        "sounds": [
+            "farmers_future_delight:block/dripstone/step1",
+            "farmers_future_delight:block/dripstone/step2",
+            "farmers_future_delight:block/dripstone/step3",
+            "farmers_future_delight:block/dripstone/step4",
+            "farmers_future_delight:block/dripstone/step5",
+            "farmers_future_delight:block/dripstone/step6"
+        ],
+        "subtitle": "subtitles.block.generic.hit"
+    },
+    "block.dripstone_block.fall": {
+        "sounds": [
+            "farmers_future_delight:block/dripstone/step1",
+            "farmers_future_delight:block/dripstone/step2",
+            "farmers_future_delight:block/dripstone/step3",
+            "farmers_future_delight:block/dripstone/step4",
+            "farmers_future_delight:block/dripstone/step5",
+            "farmers_future_delight:block/dripstone/step6"
+        ],
+        "subtitle": "subtitles.block.generic.fall"
+    },
+    "block.pointed_dripstone.break": {
+        "sounds": [
+            "farmers_future_delight:block/dripstone/break1",
+            "farmers_future_delight:block/dripstone/break2",
+            "farmers_future_delight:block/dripstone/break3",
+            "farmers_future_delight:block/dripstone/break4",
+            "farmers_future_delight:block/dripstone/break5"
+        ],
+        "subtitle": "subtitles.block.generic.break"
+    },
+    "block.pointed_dripstone.step": {
+        "sounds": [
+            "farmers_future_delight:block/dripstone/step1",
+            "farmers_future_delight:block/dripstone/step2",
+            "farmers_future_delight:block/dripstone/step3",
+            "farmers_future_delight:block/dripstone/step4",
+            "farmers_future_delight:block/dripstone/step5",
+            "farmers_future_delight:block/dripstone/step6"
+        ],
+        "subtitle": "subtitles.block.generic.footsteps"
+    },
+    "block.pointed_dripstone.place": {
+        "sounds": [
+            "farmers_future_delight:block/dripstone/break1",
+            "farmers_future_delight:block/dripstone/break2",
+            "farmers_future_delight:block/dripstone/break3",
+            "farmers_future_delight:block/dripstone/break4",
+            "farmers_future_delight:block/dripstone/break5"
+        ],
+        "subtitle": "subtitles.block.generic.place"
+    },
+    "block.pointed_dripstone.hit": {
+        "sounds": [
+            "farmers_future_delight:block/dripstone/step1",
+            "farmers_future_delight:block/dripstone/step2",
+            "farmers_future_delight:block/dripstone/step3",
+            "farmers_future_delight:block/dripstone/step4",
+            "farmers_future_delight:block/dripstone/step5",
+            "farmers_future_delight:block/dripstone/step6"
+        ],
+        "subtitle": "subtitles.block.generic.hit"
+    },
+    "block.pointed_dripstone.fall": {
+        "sounds": [
+            "farmers_future_delight:block/dripstone/step1",
+            "farmers_future_delight:block/dripstone/step2",
+            "farmers_future_delight:block/dripstone/step3",
+            "farmers_future_delight:block/dripstone/step4",
+            "farmers_future_delight:block/dripstone/step5",
+            "farmers_future_delight:block/dripstone/step6"
+        ],
+        "subtitle": "subtitles.block.generic.fall"
+    },
+    "block.pointed_dripstone.drip_water": {
+        "sounds": [
+            "farmers_future_delight:block/pointed_dripstone/drip_water1",
+            "farmers_future_delight:block/pointed_dripstone/drip_water2",
+            "farmers_future_delight:block/pointed_dripstone/drip_water3",
+            "farmers_future_delight:block/pointed_dripstone/drip_water4",
+            "farmers_future_delight:block/pointed_dripstone/drip_water5",
+            "farmers_future_delight:block/pointed_dripstone/drip_water6",
+            "farmers_future_delight:block/pointed_dripstone/drip_water7",
+            "farmers_future_delight:block/pointed_dripstone/drip_water8",
+            "farmers_future_delight:block/pointed_dripstone/drip_water9",
+            "farmers_future_delight:block/pointed_dripstone/drip_water10",
+            "farmers_future_delight:block/pointed_dripstone/drip_water11",
+            "farmers_future_delight:block/pointed_dripstone/drip_water12",
+            "farmers_future_delight:block/pointed_dripstone/drip_water13",
+            "farmers_future_delight:block/pointed_dripstone/drip_water14",
+            "farmers_future_delight:block/pointed_dripstone/drip_water15"
+        ],
+        "subtitle": "subtitles.block.pointed_dripstone.drip_water"
+    },
+    "block.pointed_dripstone.drip_lava": {
+        "sounds": [
+            "farmers_future_delight:block/pointed_dripstone/drip_lava1",
+            "farmers_future_delight:block/pointed_dripstone/drip_lava2",
+            "farmers_future_delight:block/pointed_dripstone/drip_lava3",
+            "farmers_future_delight:block/pointed_dripstone/drip_lava4",
+            "farmers_future_delight:block/pointed_dripstone/drip_lava5",
+            "farmers_future_delight:block/pointed_dripstone/drip_lava6"
+        ],
+        "subtitle": "subtitles.block.pointed_dripstone.drip_lava"
+    },
+    "block.pointed_dripstone.drip_water_into_cauldron": {
+        "sounds": [
+            "farmers_future_delight:block/pointed_dripstone/drip_water_cauldron1",
+            "farmers_future_delight:block/pointed_dripstone/drip_water_cauldron2",
+            "farmers_future_delight:block/pointed_dripstone/drip_water_cauldron3",
+            "farmers_future_delight:block/pointed_dripstone/drip_water_cauldron4",
+            "farmers_future_delight:block/pointed_dripstone/drip_water_cauldron5",
+            "farmers_future_delight:block/pointed_dripstone/drip_water_cauldron6",
+            "farmers_future_delight:block/pointed_dripstone/drip_water_cauldron7",
+            "farmers_future_delight:block/pointed_dripstone/drip_water_cauldron8"
+        ],
+        "subtitle": "subtitles.block.pointed_dripstone.drip_water_into_cauldron"
+    },
+    "block.pointed_dripstone.drip_lava_into_cauldron": {
+        "sounds": [
+            "farmers_future_delight:block/pointed_dripstone/drip_lava_cauldron1",
+            "farmers_future_delight:block/pointed_dripstone/drip_lava_cauldron2",
+            "farmers_future_delight:block/pointed_dripstone/drip_lava_cauldron3",
+            "farmers_future_delight:block/pointed_dripstone/drip_lava_cauldron4"
+        ],
+        "subtitle": "subtitles.block.pointed_dripstone.drip_lava_into_cauldron"
+    },
+    "block.pointed_dripstone.land": {
+        "sounds": [
+            "farmers_future_delight:block/pointed_dripstone/land1",
+            "farmers_future_delight:block/pointed_dripstone/land2",
+            "farmers_future_delight:block/pointed_dripstone/land3",
+            "farmers_future_delight:block/pointed_dripstone/land4",
+            "farmers_future_delight:block/pointed_dripstone/land5"
+        ]
+    },
+    "block.powder_snow.break": {
+        "sounds": [
+            "farmers_future_delight:block/powder_snow/break1",
+            "farmers_future_delight:block/powder_snow/break2",
+            "farmers_future_delight:block/powder_snow/break3",
+            "farmers_future_delight:block/powder_snow/break4",
+            "farmers_future_delight:block/powder_snow/break5",
+            "farmers_future_delight:block/powder_snow/break6",
+            "farmers_future_delight:block/powder_snow/break7"
+        ],
+        "subtitle": "subtitles.block.generic.break"
+    },
+    "block.powder_snow.step": {
+        "sounds": [
+            "farmers_future_delight:block/powder_snow/step1",
+            "farmers_future_delight:block/powder_snow/step2",
+            "farmers_future_delight:block/powder_snow/step3",
+            "farmers_future_delight:block/powder_snow/step4",
+            "farmers_future_delight:block/powder_snow/step5",
+            "farmers_future_delight:block/powder_snow/step6",
+            "farmers_future_delight:block/powder_snow/step7",
+            "farmers_future_delight:block/powder_snow/step8",
+            "farmers_future_delight:block/powder_snow/step9",
+            "farmers_future_delight:block/powder_snow/step10"
+        ],
+        "subtitle": "subtitles.block.generic.footsteps"
+    },
+    "block.powder_snow.place": {
+        "sounds": [
+            "farmers_future_delight:block/powder_snow/break1",
+            "farmers_future_delight:block/powder_snow/break2",
+            "farmers_future_delight:block/powder_snow/break3",
+            "farmers_future_delight:block/powder_snow/break4",
+            "farmers_future_delight:block/powder_snow/break5",
+            "farmers_future_delight:block/powder_snow/break6",
+            "farmers_future_delight:block/powder_snow/break7"
+        ],
+        "subtitle": "subtitles.block.generic.place"
+    },
+    "block.powder_snow.hit": {
+        "sounds": [
+            {"name": "farmers_future_delight:block/powder_snow/step1", "pitch": 1.3, "volume": 0.83},
+            {"name": "farmers_future_delight:block/powder_snow/step2", "pitch": 1.3, "volume": 0.83},
+            {"name": "farmers_future_delight:block/powder_snow/step3", "pitch": 1.3, "volume": 0.83},
+            {"name": "farmers_future_delight:block/powder_snow/step4", "pitch": 1.3, "volume": 0.83},
+            {"name": "farmers_future_delight:block/powder_snow/step5", "pitch": 1.3, "volume": 0.83},
+            {"name": "farmers_future_delight:block/powder_snow/step6", "pitch": 1.3, "volume": 0.83},
+            {"name": "farmers_future_delight:block/powder_snow/step7", "pitch": 1.3, "volume": 0.83},
+            {"name": "farmers_future_delight:block/powder_snow/step8", "pitch": 1.3, "volume": 0.83},
+            {"name": "farmers_future_delight:block/powder_snow/step9", "pitch": 1.3, "volume": 0.83},
+            {"name": "farmers_future_delight:block/powder_snow/step10", "pitch": 1.3, "volume": 0.83}
+        ],
+        "subtitle": "subtitles.block.generic.hit"
+    },
+    "block.powder_snow.fall": {
+        "sounds": [
+            "farmers_future_delight:block/powder_snow/step1",
+            "farmers_future_delight:block/powder_snow/step2",
+            "farmers_future_delight:block/powder_snow/step3",
+            "farmers_future_delight:block/powder_snow/step4",
+            "farmers_future_delight:block/powder_snow/step5",
+            "farmers_future_delight:block/powder_snow/step6",
+            "farmers_future_delight:block/powder_snow/step7",
+            "farmers_future_delight:block/powder_snow/step8",
+            "farmers_future_delight:block/powder_snow/step9",
+            "farmers_future_delight:block/powder_snow/step10"
+        ],
+        "subtitle": "subtitles.block.generic.fall"
+    },
+    "item.bucket.fill_powder_snow": {
+        "sounds": [
+            "farmers_future_delight:item/bucket/fill_powder_snow1",
+            {"name": "farmers_future_delight:item/bucket/fill_powder_snow1", "pitch": 0.9},
+            {"name": "farmers_future_delight:item/bucket/fill_powder_snow1", "pitch": 1.1},
+            "farmers_future_delight:item/bucket/fill_powder_snow2",
+            {"name": "farmers_future_delight:item/bucket/fill_powder_snow2", "pitch": 0.9},
+            {"name": "farmers_future_delight:item/bucket/fill_powder_snow2", "pitch": 1.1}
+        ],
+        "subtitle": "subtitles.item.bucket.fill"
+    },
+    "item.bucket.empty_powder_snow": {
+        "sounds": [
+            "farmers_future_delight:item/bucket/empty_powder_snow1",
+            {"name": "farmers_future_delight:item/bucket/empty_powder_snow1", "pitch": 0.95},
+            {"name": "farmers_future_delight:item/bucket/empty_powder_snow1", "pitch": 1.1},
+            "farmers_future_delight:item/bucket/empty_powder_snow2",
+            {"name": "farmers_future_delight:item/bucket/empty_powder_snow2", "pitch": 0.95},
+            {"name": "farmers_future_delight:item/bucket/empty_powder_snow2", "pitch": 1.1}
+        ],
+        "subtitle": "subtitles.item.bucket.empty"
+    },
+    "entity.skeleton.converted_to_stray": {
+        "sounds": [
+            "farmers_future_delight:mob/stray/convert1",
+            "farmers_future_delight:mob/stray/convert2",
+            "farmers_future_delight:mob/stray/convert3"
+        ],
+        "subtitle": "subtitles.entity.skeleton.converted_to_stray"
+    },
+    "block.chain.break": {
+        "sounds": [
+            {"name": "farmers_future_delight:block/chain/break1", "volume": 0.5},
+            {"name": "farmers_future_delight:block/chain/break2", "volume": 0.5},
+            {"name": "farmers_future_delight:block/chain/break3", "volume": 0.5},
+            {"name": "farmers_future_delight:block/chain/break4", "volume": 0.5}
+        ],
+        "subtitle": "subtitles.block.generic.break"
+    },
+    "block.chain.step": {
+        "sounds": [
+            "farmers_future_delight:block/chain/step1",
+            "farmers_future_delight:block/chain/step2",
+            "farmers_future_delight:block/chain/step3",
+            "farmers_future_delight:block/chain/step4",
+            "farmers_future_delight:block/chain/step5",
+            "farmers_future_delight:block/chain/step6"
+        ],
+        "subtitle": "subtitles.block.generic.footsteps"
+    },
+    "block.chain.place": {
+        "sounds": [
+            {"name": "farmers_future_delight:block/chain/break1", "volume": 0.5},
+            {"name": "farmers_future_delight:block/chain/break2", "volume": 0.5},
+            {"name": "farmers_future_delight:block/chain/break3", "volume": 0.5},
+            {"name": "farmers_future_delight:block/chain/break4", "volume": 0.5}
+        ],
+        "subtitle": "subtitles.block.generic.place"
+    },
+    "block.chain.hit": {
+        "sounds": [
+            {"name": "farmers_future_delight:block/chain/step1", "volume": 0.8},
+            {"name": "farmers_future_delight:block/chain/step2", "volume": 0.8},
+            {"name": "farmers_future_delight:block/chain/step3", "volume": 0.8},
+            {"name": "farmers_future_delight:block/chain/step4", "volume": 0.8},
+            {"name": "farmers_future_delight:block/chain/step5", "volume": 0.8},
+            {"name": "farmers_future_delight:block/chain/step6", "volume": 0.8}
+        ],
+        "subtitle": "subtitles.block.generic.hit"
+    },
+    "block.chain.fall": {
+        "sounds": [
+            "farmers_future_delight:block/chain/step1",
+            "farmers_future_delight:block/chain/step2",
+            "farmers_future_delight:block/chain/step3",
+            "farmers_future_delight:block/chain/step4",
+            "farmers_future_delight:block/chain/step5",
+            "farmers_future_delight:block/chain/step6"
+        ],
+        "subtitle": "subtitles.block.generic.fall"
+    },
+    "block.cake.add_candle": {
+        "sounds": [
+            "farmers_future_delight:block/cake/add_candle1",
+            "farmers_future_delight:block/cake/add_candle2",
+            "farmers_future_delight:block/cake/add_candle3"
+        ],
+        "subtitle": "subtitles.block.cake.add_candle"
+    },
+    "block.candle.ambient": {
+        "sounds": [
+            {"name": "farmers_future_delight:block/candle/ambient1", "attenuation_distance": 3},
+            {"name": "farmers_future_delight:block/candle/ambient1", "volume": 0.7, "pitch": 0.8, "attenuation_distance": 3},
+            {"name": "farmers_future_delight:block/candle/ambient1", "volume": 0.8, "pitch": 0.9, "attenuation_distance": 3},
+            {"name": "farmers_future_delight:block/candle/ambient2", "attenuation_distance": 3},
+            {"name": "farmers_future_delight:block/candle/ambient2", "volume": 0.7, "pitch": 0.8, "attenuation_distance": 3},
+            {"name": "farmers_future_delight:block/candle/ambient2", "volume": 0.8, "pitch": 0.9, "attenuation_distance": 3},
+            {"name": "farmers_future_delight:block/candle/ambient3", "attenuation_distance": 3},
+            {"name": "farmers_future_delight:block/candle/ambient3", "volume": 0.7, "pitch": 0.8, "attenuation_distance": 3},
+            {"name": "farmers_future_delight:block/candle/ambient3", "volume": 0.8, "pitch": 0.9, "attenuation_distance": 3},
+            {"name": "farmers_future_delight:block/candle/ambient4", "attenuation_distance": 3},
+            {"name": "farmers_future_delight:block/candle/ambient4", "volume": 0.7, "pitch": 0.8, "attenuation_distance": 3},
+            {"name": "farmers_future_delight:block/candle/ambient4", "volume": 0.8, "pitch": 0.9, "attenuation_distance": 3},
+            {"name": "farmers_future_delight:block/candle/ambient5", "attenuation_distance": 3},
+            {"name": "farmers_future_delight:block/candle/ambient5", "volume": 0.7, "pitch": 0.8, "attenuation_distance": 3},
+            {"name": "farmers_future_delight:block/candle/ambient5", "volume": 0.8, "pitch": 0.9, "attenuation_distance": 3},
+            {"name": "farmers_future_delight:block/candle/ambient6", "attenuation_distance": 3},
+            {"name": "farmers_future_delight:block/candle/ambient6", "volume": 0.7, "pitch": 0.8, "attenuation_distance": 3},
+            {"name": "farmers_future_delight:block/candle/ambient6", "volume": 0.8, "pitch": 0.9, "attenuation_distance": 3},
+            {"name": "farmers_future_delight:block/candle/ambient7", "attenuation_distance": 3},
+            {"name": "farmers_future_delight:block/candle/ambient7", "volume": 0.7, "pitch": 0.8, "attenuation_distance": 3},
+            {"name": "farmers_future_delight:block/candle/ambient7", "volume": 0.8, "pitch": 0.9, "attenuation_distance": 3},
+            {"name": "farmers_future_delight:block/candle/ambient8", "attenuation_distance": 3},
+            {"name": "farmers_future_delight:block/candle/ambient8", "volume": 0.7, "pitch": 0.8, "attenuation_distance": 3},
+            {"name": "farmers_future_delight:block/candle/ambient8", "volume": 0.8, "pitch": 0.9, "attenuation_distance": 3},
+            {"name": "farmers_future_delight:block/candle/ambient9", "attenuation_distance": 3},
+            {"name": "farmers_future_delight:block/candle/ambient9", "volume": 0.7, "pitch": 0.8, "attenuation_distance": 3},
+            {"name": "farmers_future_delight:block/candle/ambient9", "volume": 0.8, "pitch": 0.9, "attenuation_distance": 3}
+        ],
+        "subtitle": "subtitles.block.candle.crackle"
+    },
+    "block.candle.break": {
+        "sounds": [
+            "farmers_future_delight:block/candle/break1",
+            "farmers_future_delight:block/candle/break2",
+            "farmers_future_delight:block/candle/break3",
+            "farmers_future_delight:block/candle/break4",
+            "farmers_future_delight:block/candle/break5"
+        ],
+        "subtitle": "subtitles.block.generic.break"
+    },
+    "block.candle.step": {
+        "sounds": [
+            "farmers_future_delight:block/candle/step1",
+            "farmers_future_delight:block/candle/step2",
+            "farmers_future_delight:block/candle/step3",
+            "farmers_future_delight:block/candle/step4",
+            "farmers_future_delight:block/candle/step5"
+        ],
+        "subtitle": "subtitles.block.generic.footsteps"
+    },
+    "block.candle.place": {
+        "sounds": [
+            "farmers_future_delight:block/candle/break1",
+            "farmers_future_delight:block/candle/break2",
+            "farmers_future_delight:block/candle/break3",
+            "farmers_future_delight:block/candle/break4",
+            "farmers_future_delight:block/candle/break5"
+        ],
+        "subtitle": "subtitles.block.generic.place"
+    },
+    "block.candle.hit": {
+        "sounds": [
+            "farmers_future_delight:block/candle/step1",
+            "farmers_future_delight:block/candle/step2",
+            "farmers_future_delight:block/candle/step3",
+            "farmers_future_delight:block/candle/step4",
+            "farmers_future_delight:block/candle/step5"
+        ],
+        "subtitle": "subtitles.block.generic.hit"
+    },
+    "block.candle.fall": {
+        "sounds": [
+            "farmers_future_delight:block/candle/step1",
+            "farmers_future_delight:block/candle/step2",
+            "farmers_future_delight:block/candle/step3",
+            "farmers_future_delight:block/candle/step4",
+            "farmers_future_delight:block/candle/step5"
+        ],
+        "subtitle": "subtitles.block.generic.fall"
+    },
+    "block.candle.extinguish": {
+        "sounds": [
+            {"name": "farmers_future_delight:block/candle/extinguish1", "attenuation_distance": 8},
+            {"name": "farmers_future_delight:block/candle/extinguish1", "volume": 0.9, "attenuation_distance": 8},
+            {"name": "farmers_future_delight:block/candle/extinguish1", "pitch": 0.9, "attenuation_distance": 8},
+            {"name": "farmers_future_delight:block/candle/extinguish1", "volume": 0.9, "pitch": 0.9, "attenuation_distance": 8},
+            {"name": "farmers_future_delight:block/candle/extinguish1", "pitch": 1.1, "attenuation_distance": 8},
+            {"name": "farmers_future_delight:block/candle/extinguish1", "volume": 0.9, "pitch": 1.1, "attenuation_distance": 8},
+            {"name": "farmers_future_delight:block/candle/extinguish2", "attenuation_distance": 8},
+            {"name": "farmers_future_delight:block/candle/extinguish2", "volume": 0.9, "attenuation_distance": 8},
+            {"name": "farmers_future_delight:block/candle/extinguish2", "pitch": 0.9, "attenuation_distance": 8},
+            {"name": "farmers_future_delight:block/candle/extinguish2", "volume": 0.9, "pitch": 0.9, "attenuation_distance": 8},
+            {"name": "farmers_future_delight:block/candle/extinguish2", "pitch": 1.1, "attenuation_distance": 8},
+            {"name": "farmers_future_delight:block/candle/extinguish2", "volume": 0.9, "pitch": 1.1, "attenuation_distance": 8},
+            {"name": "farmers_future_delight:block/candle/extinguish3", "attenuation_distance": 8},
+            {"name": "farmers_future_delight:block/candle/extinguish3", "volume": 0.9, "attenuation_distance": 8},
+            {"name": "farmers_future_delight:block/candle/extinguish3", "pitch": 0.9, "attenuation_distance": 8},
+            {"name": "farmers_future_delight:block/candle/extinguish3", "volume": 0.9, "pitch": 0.9, "attenuation_distance": 8},
+            {"name": "farmers_future_delight:block/candle/extinguish3", "pitch": 1.1, "attenuation_distance": 8},
+            {"name": "farmers_future_delight:block/candle/extinguish3", "volume": 0.9, "pitch": 1.1, "attenuation_distance": 8}
+        ],
+        "subtitle": "subtitles.block.candle.extinguish"
+    },
+    "entity.axolotl.attack": {
+        "sounds": [
+            {"name": "farmers_future_delight:mob/axolotl/attack1", "volume": 0.5},
+            {"name": "farmers_future_delight:mob/axolotl/attack2", "volume": 0.5},
+            {"name": "farmers_future_delight:mob/axolotl/attack3", "volume": 0.5},
+            {"name": "farmers_future_delight:mob/axolotl/attack4", "volume": 0.5}
+        ],
+        "subtitle": "subtitles.entity.axolotl.attack"
+    },
+    "entity.axolotl.death": {
+        "sounds": [
+            "farmers_future_delight:mob/axolotl/death1",
+            "farmers_future_delight:mob/axolotl/death2"
+        ],
+        "subtitle": "subtitles.entity.axolotl.death"
+    },
+    "entity.axolotl.hurt": {
+        "sounds": [
+            "farmers_future_delight:mob/axolotl/hurt1",
+            "farmers_future_delight:mob/axolotl/hurt2",
+            "farmers_future_delight:mob/axolotl/hurt3",
+            "farmers_future_delight:mob/axolotl/hurt4"
+        ],
+        "subtitle": "subtitles.entity.axolotl.hurt"
+    },
+    "entity.axolotl.idle_air": {
+        "sounds": [
+            "farmers_future_delight:mob/axolotl/idle_air1",
+            "farmers_future_delight:mob/axolotl/idle_air2",
+            {"name": "farmers_future_delight:mob/axolotl/idle_air3", "pitch": 1.2, "volume": 0.8},
+            "farmers_future_delight:mob/axolotl/idle_air4",
+            "farmers_future_delight:mob/axolotl/idle_air5"
+        ],
+        "subtitle": "subtitles.entity.axolotl.idle_air"
+    },
+    "entity.axolotl.idle_water": {
+        "sounds": [
+            "farmers_future_delight:mob/axolotl/idle1",
+            "farmers_future_delight:mob/axolotl/idle2",
+            "farmers_future_delight:mob/axolotl/idle3",
+            "farmers_future_delight:mob/axolotl/idle4",
+            "farmers_future_delight:mob/axolotl/idle5"
+        ],
+        "subtitle": "subtitles.entity.axolotl.idle_water"
+    },
+    "entity.axolotl.splash": {
+        "sounds": [
+            {"name": "farmers_future_delight:mob/dolphin/splash1", "pitch": 1.2, "volume": 0.9},
+            {"name": "farmers_future_delight:mob/dolphin/splash2", "pitch": 1.2, "volume": 0.9},
+            {"name": "farmers_future_delight:mob/dolphin/splash3", "pitch": 1.2, "volume": 0.9}
+        ],
+        "subtitle": "subtitles.entity.axolotl.splash"
+    },
+    "entity.axolotl.swim": {
+        "sounds": [
+            "farmers_future_delight:entity/fish/swim5",
+            "farmers_future_delight:entity/fish/swim6",
+            "farmers_future_delight:entity/fish/swim7",
+            "farmers_future_delight:mob/dolphin/swim1",
+            "farmers_future_delight:mob/dolphin/swim2",
+            "farmers_future_delight:mob/dolphin/swim3",
+            "farmers_future_delight:mob/dolphin/swim4"
+        ],
+        "subtitle": "subtitles.entity.axolotl.swim"
+    },
+    "item.bucket.fill_axolotl": {
+        "sounds": [
+            "farmers_future_delight:item/bucket/fill_axolotl1",
+            "farmers_future_delight:item/bucket/fill_axolotl2",
+            "farmers_future_delight:item/bucket/fill_axolotl3"
+        ],
+        "subtitle": "subtitles.item.bucket.fill_axolotl"
+    },
+    "item.bucket.empty_axolotl": {
+        "sounds": [
+            "farmers_future_delight:item/bucket/empty_fish1",
+            "farmers_future_delight:item/bucket/empty_fish2",
+            "farmers_future_delight:item/bucket/empty_fish3"
+        ],
+        "subtitle": "subtitles.item.bucket.empty"
+    },
+    "entity.goat.ambient": {
+        "sounds": [
+            {"name": "farmers_future_delight:mob/goat/idle1", "volume": 0.82},
+            {"name": "farmers_future_delight:mob/goat/idle2", "volume": 0.82},
+            {"name": "farmers_future_delight:mob/goat/idle3", "volume": 0.84},
+            {"name": "farmers_future_delight:mob/goat/idle4", "volume": 0.84},
+            {"name": "farmers_future_delight:mob/goat/idle5", "volume": 0.84},
+            {"name": "farmers_future_delight:mob/goat/idle6", "volume": 0.84},
+            {"name": "farmers_future_delight:mob/goat/idle7", "volume": 0.83},
+            {"name": "farmers_future_delight:mob/goat/idle8", "volume": 0.84}
+        ],
+        "subtitle": "subtitles.entity.goat.ambient"
+    },
+    "entity.goat.death": {
+        "sounds": [
+            {"name": "farmers_future_delight:mob/goat/death1", "volume": 0.65},
+            {"name": "farmers_future_delight:mob/goat/death2", "volume": 0.65},
+            {"name": "farmers_future_delight:mob/goat/death3", "volume": 0.65},
+            {"name": "farmers_future_delight:mob/goat/death4", "volume": 0.65},
+            {"name": "farmers_future_delight:mob/goat/death5", "volume": 0.65}
+        ],
+        "subtitle": "subtitles.entity.goat.death"
+    },
+    "entity.goat.eat": {
+        "sounds": [
+            "farmers_future_delight:mob/goat/eat1",
+            "farmers_future_delight:mob/goat/eat2",
+            "farmers_future_delight:mob/goat/eat3"
+        ],
+        "subtitle": "subtitles.entity.goat.eat"
+    },
+    "entity.goat.horn_break": {
+        "sounds": [
+            {"name": "farmers_future_delight:mob/goat/horn_break1", "volume": 0.9},
+            {"name": "farmers_future_delight:mob/goat/horn_break2", "volume": 0.9},
+            {"name": "farmers_future_delight:mob/goat/horn_break3", "volume": 0.9},
+            {"name": "farmers_future_delight:mob/goat/horn_break4", "volume": 0.9}
+        ],
+        "subtitle": "subtitles.entity.goat.horn_break"
+    },
+    "entity.goat.hurt": {
+        "sounds": [
+            {"name": "farmers_future_delight:mob/goat/hurt1", "volume": 0.65},
+            {"name": "farmers_future_delight:mob/goat/hurt2", "volume": 0.65},
+            {"name": "farmers_future_delight:mob/goat/hurt3", "volume": 0.65},
+            {"name": "farmers_future_delight:mob/goat/hurt4", "volume": 0.65}
+        ],
+        "subtitle": "subtitles.entity.goat.hurt"
+    },
+    "entity.goat.long_jump": {
+        "sounds": [
+            {"name": "farmers_future_delight:mob/goat/jump1", "volume": 0.8},
+            {"name": "farmers_future_delight:mob/goat/jump1", "pitch": 0.8, "volume": 0.8},
+            {"name": "farmers_future_delight:mob/goat/jump2", "volume": 0.8},
+            {"name": "farmers_future_delight:mob/goat/jump2", "pitch": 0.8, "volume": 0.8}
+        ],
+        "subtitle": "subtitles.entity.goat.long_jump"
+    },
+    "entity.goat.milk": {
+        "sounds": [
+            "farmers_future_delight:mob/mooshroom/milk1",
+            "farmers_future_delight:mob/mooshroom/milk2",
+            "farmers_future_delight:mob/mooshroom/milk3"
+        ],
+        "subtitle": "subtitles.entity.goat.milk"
+    },
+    "entity.goat.prepare_ram": {
+        "sounds": [
+            {"name": "farmers_future_delight:mob/goat/pre_ram1", "volume": 0.8},
+            {"name": "farmers_future_delight:mob/goat/pre_ram2", "volume": 0.8},
+            {"name": "farmers_future_delight:mob/goat/pre_ram3", "volume": 0.8},
+            {"name": "farmers_future_delight:mob/goat/pre_ram4", "volume": 0.8}
+        ],
+        "subtitle": "subtitles.entity.goat.prepare_ram"
+    },
+    "entity.goat.ram_impact": {
+        "sounds": [
+            {"name": "farmers_future_delight:mob/goat/impact1", "volume": 0.8},
+            {"name": "farmers_future_delight:mob/goat/impact2", "volume": 0.8},
+            {"name": "farmers_future_delight:mob/goat/impact2", "volume": 0.8}
+        ],
+        "subtitle": "subtitles.entity.goat.ram_impact"
+    },
+    "entity.goat.screaming.ambient": {
+        "sounds": [
+            {"name": "farmers_future_delight:mob/goat/idle1", "volume": 0.82},
+            {"name": "farmers_future_delight:mob/goat/idle2", "volume": 0.82},
+            {"name": "farmers_future_delight:mob/goat/idle3", "volume": 0.84},
+            {"name": "farmers_future_delight:mob/goat/idle4", "volume": 0.84},
+            {"name": "farmers_future_delight:mob/goat/idle5", "volume": 0.84},
+            {"name": "farmers_future_delight:mob/goat/idle6", "volume": 0.84},
+            {"name": "farmers_future_delight:mob/goat/idle7", "volume": 0.83},
+            {"name": "farmers_future_delight:mob/goat/idle8", "volume": 0.84},
+            {"name": "farmers_future_delight:mob/goat/scream1", "volume": 0.9},
+            {"name": "farmers_future_delight:mob/goat/scream2", "volume": 0.9},
+            {"name": "farmers_future_delight:mob/goat/scream3", "volume": 0.9},
+            {"name": "farmers_future_delight:mob/goat/scream4", "volume": 0.9},
+            {"name": "farmers_future_delight:mob/goat/scream5", "volume": 0.9},
+            {"name": "farmers_future_delight:mob/goat/scream6", "volume": 0.9},
+            {"name": "farmers_future_delight:mob/goat/scream7", "volume": 0.9},
+            {"name": "farmers_future_delight:mob/goat/scream8", "volume": 0.9},
+            {"name": "farmers_future_delight:mob/goat/scream9", "volume": 0.9}
+        ],
+        "subtitle": "subtitles.entity.goat.screaming.ambient"
+    },
+    "entity.goat.screaming.death": {
+        "sounds": [
+            {"name": "farmers_future_delight:mob/goat/screaming_death1", "volume": 0.65},
+            {"name": "farmers_future_delight:mob/goat/screaming_death2", "volume": 0.65},
+            {"name": "farmers_future_delight:mob/goat/screaming_death3", "volume": 0.65}
+        ],
+        "subtitle": "subtitles.entity.goat.death"
+    },
+    "entity.goat.screaming.eat": {
+        "sounds": [
+            "farmers_future_delight:mob/goat/eat1",
+            "farmers_future_delight:mob/goat/eat2",
+            "farmers_future_delight:mob/goat/eat3"
+        ],
+        "subtitle": "subtitles.entity.goat.eat"
+    },
+    "entity.goat.screaming.hurt": {
+        "sounds": [
+            {"name": "farmers_future_delight:mob/goat/screaming_hurt1", "volume": 0.65},
+            {"name": "farmers_future_delight:mob/goat/screaming_hurt2", "volume": 0.65},
+            {"name": "farmers_future_delight:mob/goat/screaming_hurt3", "volume": 0.65}
+        ],
+        "subtitle": "subtitles.entity.goat.hurt"
+    },
+    "entity.goat.screaming.long_jump": {
+        "sounds": [
+            {"name": "farmers_future_delight:mob/goat/jump1", "volume": 0.8},
+            {"name": "farmers_future_delight:mob/goat/jump1", "pitch": 0.8, "volume": 0.8},
+            {"name": "farmers_future_delight:mob/goat/jump2", "volume": 0.8},
+            {"name": "farmers_future_delight:mob/goat/jump2", "pitch": 0.8, "volume": 0.8}
+        ],
+        "subtitle": "subtitles.entity.goat.long_jump"
+    },
+    "entity.goat.screaming.milk": {
+        "sounds": [
+            "farmers_future_delight:mob/goat/screaming_milk1",
+            "farmers_future_delight:mob/goat/screaming_milk2",
+            "farmers_future_delight:mob/goat/screaming_milk3",
+            "farmers_future_delight:mob/goat/screaming_milk4",
+            "farmers_future_delight:mob/goat/screaming_milk5"
+        ],
+        "subtitle": "subtitles.entity.goat.milk"
+    },
+    "entity.goat.screaming.prepare_ram": {
+        "sounds": [
+            {"name": "farmers_future_delight:mob/goat/screaming_pre_ram1", "volume": 0.8},
+            {"name": "farmers_future_delight:mob/goat/screaming_pre_ram2", "volume": 0.8},
+            {"name": "farmers_future_delight:mob/goat/screaming_pre_ram3", "volume": 0.8},
+            {"name": "farmers_future_delight:mob/goat/screaming_pre_ram4", "volume": 0.8},
+            {"name": "farmers_future_delight:mob/goat/screaming_pre_ram5", "volume": 0.8}
+        ],
+        "subtitle": "subtitles.entity.goat.prepare_ram"
+    },
+    "entity.goat.screaming.ram_impact": {
+        "sounds": [
+            {"name": "farmers_future_delight:mob/goat/impact1", "volume": 0.8},
+            {"name": "farmers_future_delight:mob/goat/impact2", "volume": 0.8},
+            {"name": "farmers_future_delight:mob/goat/impact2", "volume": 0.8}
+        ],
+        "subtitle": "subtitles.entity.goat.ram_impact"
+    },
+    "entity.goat.step": {
+        "sounds": [
+            "farmers_future_delight:mob/goat/step1",
+            "farmers_future_delight:mob/goat/step2",
+            "farmers_future_delight:mob/goat/step3",
+            "farmers_future_delight:mob/goat/step4",
+            "farmers_future_delight:mob/goat/step5",
+            "farmers_future_delight:mob/goat/step6"
+        ],
+        "subtitle": "subtitles.block.generic.footsteps"
+    },
+    "item.goat_horn.sound.0": {
+        "sounds": ["farmers_future_delight:item/goat_horn/call0"],
+        "subtitle": "subtitles.item.goat_horn.play"
+    },
+    "item.goat_horn.sound.1": {
+        "sounds": ["farmers_future_delight:item/goat_horn/call1"],
+        "subtitle": "subtitles.item.goat_horn.play"
+    },
+    "item.goat_horn.sound.2": {
+        "sounds": ["farmers_future_delight:item/goat_horn/call2"],
+        "subtitle": "subtitles.item.goat_horn.play"
+    },
+    "item.goat_horn.sound.3": {
+        "sounds": ["farmers_future_delight:item/goat_horn/call3"],
+        "subtitle": "subtitles.item.goat_horn.play"
+    },
+    "item.goat_horn.sound.4": {
+        "sounds": ["farmers_future_delight:item/goat_horn/call4"],
+        "subtitle": "subtitles.item.goat_horn.play"
+    },
+    "item.goat_horn.sound.5": {
+        "sounds": ["farmers_future_delight:item/goat_horn/call5"],
+        "subtitle": "subtitles.item.goat_horn.play"
+    },
+    "item.goat_horn.sound.6": {
+        "sounds": ["farmers_future_delight:item/goat_horn/call6"],
+        "subtitle": "subtitles.item.goat_horn.play"
+    },
+    "item.goat_horn.sound.7": {
+        "sounds": ["farmers_future_delight:item/goat_horn/call7"],
+        "subtitle": "subtitles.item.goat_horn.play"
+    },
+    "music_disc.otherside": {
+        "sounds": [
+            {"name": "farmers_future_delight:records/otherside", "stream": true}
+        ]
+    }
 }

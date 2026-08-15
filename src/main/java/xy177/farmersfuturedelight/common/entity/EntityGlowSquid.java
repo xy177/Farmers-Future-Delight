@@ -25,6 +25,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.FFDConfig;
 import xy177.farmersfuturedelight.common.registry.FFDEntities;
+import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
 
 public class EntityGlowSquid extends EntitySquid {
@@ -191,7 +192,18 @@ public class EntityGlowSquid extends EntitySquid {
 
     @Override
     protected ResourceLocation getLootTable() {
-        return FFDEntities.isGlowSquidEnabled() ? LOOT_TABLE : null;
+        return FFDItems.isItemRegistered(FFDItems.GLOW_INK_SAC) ? LOOT_TABLE : null;
+    }
+
+    @Override
+    protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
+        ItemStack ink = FFDItems.effectiveStack(FFDItems.GLOW_INK_SAC);
+        if (ink.isEmpty()) {
+            return;
+        }
+        ink.setCount(1 + rand.nextInt(3)
+                + (lootingModifier <= 0 ? 0 : rand.nextInt(lootingModifier + 1)));
+        entityDropItem(ink, 0.0F);
     }
 
     @Override

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "facing=down": { "model": "farmers_future_delight:large_amethyst_bud", "x": 180 },
+    "facing=east": { "model": "farmers_future_delight:large_amethyst_bud", "x": 90, "y": 90 },
+    "facing=north": { "model": "farmers_future_delight:large_amethyst_bud", "x": 90 },
+    "facing=south": { "model": "farmers_future_delight:large_amethyst_bud", "x": 90, "y": 180 },
+    "facing=up": { "model": "farmers_future_delight:large_amethyst_bud" },
+    "facing=west": { "model": "farmers_future_delight:large_amethyst_bud", "x": 90, "y": 270 }
+  }
+}

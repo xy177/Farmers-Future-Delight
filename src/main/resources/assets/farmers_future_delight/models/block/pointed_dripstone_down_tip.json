@@ -1,0 +1,4 @@
+{
+  "parent": "farmers_future_delight:block/pointed_dripstone",
+  "textures": { "cross": "farmers_future_delight:block/pointed_dripstone_down_tip" }
+}

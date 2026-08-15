@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube_mirrored",
+  "textures": {
+    "particle": "farmers_future_delight:block/deepslate",
+    "down": "farmers_future_delight:block/deepslate_top",
+    "up": "farmers_future_delight:block/deepslate_top",
+    "north": "farmers_future_delight:block/deepslate",
+    "east": "farmers_future_delight:block/deepslate",
+    "south": "farmers_future_delight:block/deepslate",
+    "west": "farmers_future_delight:block/deepslate"
+  }
+}

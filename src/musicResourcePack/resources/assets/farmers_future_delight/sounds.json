@@ -1,0 +1,14 @@
+{
+    "music.caves_and_cliffs": {
+        "sounds": [
+            {"name": "farmers_future_delight:music/game/an_ordinary_day", "stream": true, "volume": 0.4},
+            {"name": "farmers_future_delight:music/game/comforting_memories", "stream": true, "volume": 0.4},
+            {"name": "farmers_future_delight:music/game/floating_dream", "stream": true, "volume": 0.4},
+            {"name": "farmers_future_delight:music/game/infinite_amethyst", "stream": true, "volume": 0.4},
+            {"name": "farmers_future_delight:music/game/left_to_bloom", "stream": true, "volume": 0.4},
+            {"name": "farmers_future_delight:music/game/one_more_day", "stream": true, "volume": 0.4},
+            {"name": "farmers_future_delight:music/game/stand_tall", "stream": true, "volume": 0.4},
+            {"name": "farmers_future_delight:music/game/wending", "stream": true, "volume": 0.4}
+        ]
+    }
+}

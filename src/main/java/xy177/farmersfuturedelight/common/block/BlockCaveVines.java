@@ -70,6 +70,16 @@ public class BlockCaveVines extends BlockCaveVinesBase {
         ((TileEntityCaveVines) tile).setAge(age);
     }
 
+    public static boolean stopGrowth(World world, BlockPos pos) {
+        TileEntity tile = world.getTileEntity(pos);
+        if (tile instanceof TileEntityCaveVines
+                && ((TileEntityCaveVines) tile).getAge() >= MAX_AGE) {
+            return false;
+        }
+        setAge(world, pos, MAX_AGE);
+        return true;
+    }
+
     private static int getOrInitializeAge(World world, BlockPos pos, Random random) {
         TileEntity tile = world.getTileEntity(pos);
         if (tile instanceof TileEntityCaveVines && ((TileEntityCaveVines) tile).getAge() >= 0) {

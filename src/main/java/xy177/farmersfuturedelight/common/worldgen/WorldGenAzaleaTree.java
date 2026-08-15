@@ -18,8 +18,7 @@ import net.minecraft.world.gen.feature.WorldGenerator;
 
 import xy177.farmersfuturedelight.common.block.BlockAzalea;
 import xy177.farmersfuturedelight.common.block.BlockCaveVinesBase;
-import xy177.farmersfuturedelight.common.registry.FFDBlocks;
-import xy177.farmersfuturedelight.common.registry.FFDItems;
+import xy177.farmersfuturedelight.core.FFDHeightHooks;
 
 public class WorldGenAzaleaTree extends WorldGenerator {
     public static final WorldGenAzaleaTree INSTANCE = new WorldGenAzaleaTree();
@@ -30,8 +29,12 @@ public class WorldGenAzaleaTree extends WorldGenerator {
 
     @Override
     public boolean generate(World world, Random random, BlockPos pos) {
+        if (!lushBlocks().hasAzalea()) {
+            return false;
+        }
         int height = 4 + random.nextInt(3);
-        if (pos.getY() < 1 || pos.getY() + height + 4 >= world.getHeight()
+        if (pos.getY() <= FFDHeightHooks.minY(world)
+                || pos.getY() + height + 4 >= FFDHeightHooks.maxYExclusive(world)
                 || !BlockAzalea.canGrowOn(world.getBlockState(pos.down()))) {
             return false;
         }
@@ -64,8 +67,8 @@ public class WorldGenAzaleaTree extends WorldGenerator {
                 return false;
             }
         }
-        if (FFDItems.isRootedDirtEnabled()) {
-            world.setBlockState(pos.down(), FFDBlocks.ROOTED_DIRT.getDefaultState(), 2);
+        if (lushBlocks().hasRootedDirt()) {
+            world.setBlockState(pos.down(), lushBlocks().rootedDirt(), 2);
         }
         for (BlockPos logPos : logs) {
             world.setBlockState(logPos, oakLog(), 2);
@@ -86,8 +89,8 @@ public class WorldGenAzaleaTree extends WorldGenerator {
                 continue;
             }
             IBlockState leaves = random.nextInt(4) == 0
-                    ? FFDBlocks.FLOWERING_AZALEA_LEAVES.getDefaultState()
-                    : FFDBlocks.AZALEA_LEAVES.getDefaultState();
+                    ? lushBlocks().azaleaLeaves(true)
+                    : lushBlocks().azaleaLeaves(false);
             world.setBlockState(leavesPos, leaves, 2);
         }
     }
@@ -103,7 +106,11 @@ public class WorldGenAzaleaTree extends WorldGenerator {
         Block block = state.getBlock();
         return state.getMaterial() != Material.WATER
                 && (world.isAirBlock(pos) || block.isReplaceable(world, pos)
-                || state.getMaterial() == Material.LEAVES || block == FFDBlocks.HANGING_ROOTS
-                || BlockCaveVinesBase.isCaveVine(state));
+                || state.getMaterial() == Material.LEAVES || lushBlocks().isHangingRoots(state)
+                || lushBlocks().isCaveVine(state));
+    }
+
+    private static FFDLushCaveBlockProvider lushBlocks() {
+        return FFDLushCaveBlockProvider.get();
     }
 }

@@ -15,6 +15,7 @@ import xy177.farmersfuturedelight.common.FFDCreativeTab;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
+import xy177.farmersfuturedelight.common.worldgen.FFDLushCaveBlockProvider;
 
 public class BlockRootedDirt extends Block implements IGrowable {
     public BlockRootedDirt() {
@@ -28,20 +29,24 @@ public class BlockRootedDirt extends Block implements IGrowable {
 
     @Override
     public boolean canGrow(World world, BlockPos pos, IBlockState state, boolean isClient) {
-        return FFDItems.isRootedDirtEnabled() && FFDItems.isHangingRootsEnabled()
+        return FFDItems.isRootedDirtEnabled()
+                && FFDLushCaveBlockProvider.get().hangingRoots() != null
                 && world.isAirBlock(pos.down());
     }
 
     @Override
     public boolean canUseBonemeal(World world, Random random, BlockPos pos, IBlockState state) {
-        return FFDItems.isRootedDirtEnabled() && FFDItems.isHangingRootsEnabled();
+        return FFDItems.isRootedDirtEnabled()
+                && FFDLushCaveBlockProvider.get().hangingRoots() != null;
     }
 
     @Override
     public void grow(World world, Random random, BlockPos pos, IBlockState state) {
         BlockPos rootsPos = pos.down();
-        if (world.isAirBlock(rootsPos) && FFDBlocks.HANGING_ROOTS.canPlaceBlockAt(world, rootsPos)) {
-            world.setBlockState(rootsPos, FFDBlocks.HANGING_ROOTS.getDefaultState(), 3);
+        IBlockState roots = FFDLushCaveBlockProvider.get().hangingRoots();
+        if (roots != null && world.isAirBlock(rootsPos)
+                && roots.getBlock().canPlaceBlockAt(world, rootsPos)) {
+            world.setBlockState(rootsPos, roots, 3);
         }
     }
 }
