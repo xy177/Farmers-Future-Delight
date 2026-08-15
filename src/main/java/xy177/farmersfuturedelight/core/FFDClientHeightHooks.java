@@ -53,6 +53,14 @@ public final class FFDClientHeightHooks {
         return state;
     }
 
+    public static boolean hwylaTreatAsLiquid(boolean originalIsLiquid, IBlockState state) {
+        boolean waterloggedPlant = state != null
+                && state.getBlock() != Blocks.WATER
+                && state.getBlock() != Blocks.FLOWING_WATER
+                && WaterloggedPlantFluid.isWaterlogged(state);
+        return originalIsLiquid && !waterloggedPlant;
+    }
+
     public static int shaderBlockAlias(IBlockState state, int mappedId) {
         if (state == null || !(state.getBlock() instanceof BlockSeaPickle)) {
             return mappedId;

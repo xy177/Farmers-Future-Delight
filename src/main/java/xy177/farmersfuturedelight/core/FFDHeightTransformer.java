@@ -99,6 +99,8 @@ public final class FFDHeightTransformer implements IClassTransformer {
             "net.optifine.util.RenderChunkUtils");
     private static final Set<String> OPTIFINE_SHADER_VERTEX_BUILDER_CLASS = names(
             "net.optifine.shaders.SVertexBuilder");
+    private static final Set<String> HWYLA_BLOCK_HUD_CLASSES = names(
+            "mcp.mobius.waila.addons.core.HUDHandlerBlocks");
     private static final Set<String> PLAYER_CHUNK_ENTRY_CLASS = names("net.minecraft.server.management.PlayerChunkMapEntry");
     private static final Set<String> MULTI_BLOCK_PACKET_CLASS = names("net.minecraft.network.play.server.SPacketMultiBlockChange");
     private static final Set<String> MULTI_BLOCK_DATA_CLASS = names("net.minecraft.network.play.server.SPacketMultiBlockChange$BlockUpdateData");
@@ -805,6 +807,15 @@ public final class FFDHeightTransformer implements IClassTransformer {
                         @Override
                         public byte[] transform(byte[] bytes) {
                             return transformOptiFineShaderVertexBuilder(bytes);
+                        }
+                    });
+        }
+        if (HWYLA_BLOCK_HUD_CLASSES.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformHwylaBlockHud(bytes);
                         }
                     });
         }
@@ -3438,38 +3449,64 @@ public final class FFDHeightTransformer implements IClassTransformer {
         MethodNode method = findMethod(node, "isBlocked", "func_176372_g",
                 "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;"
                         + "Lnet/minecraft/block/state/IBlockState;)Z");
-        prependConditionBranch(method, list(
-                new VarInsnNode(Opcodes.ALOAD, 0),
-                new VarInsnNode(Opcodes.ALOAD, 3),
-                new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
-                        "blocksFlowingWater",
-                        "(Lnet/minecraft/block/Block;"
-                                + "Lnet/minecraft/block/state/IBlockState;)Z",
-                        false)), list(
-                new InsnNode(Opcodes.ICONST_1),
-                new InsnNode(Opcodes.IRETURN)));
-        LOGGER.info("Patched flowing-water interaction with waterloggable blocks");
+        int patched = 0;
+        for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (instruction.getOpcode() != Opcodes.IRETURN) {
+                continue;
+            }
+            method.instructions.insertBefore(instruction, list(
+                    new VarInsnNode(Opcodes.ALOAD, 0),
+                    new VarInsnNode(Opcodes.ALOAD, 3),
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                            "blocksFlowingWater",
+                            "(Lnet/minecraft/block/Block;"
+                                    + "Lnet/minecraft/block/state/IBlockState;)Z",
+                            false),
+                    new InsnNode(Opcodes.IOR)));
+            patched++;
+        }
+        require(patched > 0, "Missing BlockDynamicLiquid isBlocked returns");
+        LOGGER.info("Patched flowing-water interaction with waterloggable blocks at {} returns",
+                patched);
         return write(node);
     }
 
     private static byte[] transformPistonBase(byte[] basicClass) {
         ClassNode node = read(basicClass);
         if (!CAVE_BIOMES_HEIGHT_CORE) {
-            replace(findMethod(node, "canPush", "func_185646_a",
+            MethodNode canPush = findMethod(node, "canPush", "func_185646_a",
                     "(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/world/World;"
                             + "Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/EnumFacing;"
-                            + "ZLnet/minecraft/util/EnumFacing;)Z"), list(
-                    new VarInsnNode(Opcodes.ALOAD, 0),
-                    new VarInsnNode(Opcodes.ALOAD, 1),
-                    new VarInsnNode(Opcodes.ALOAD, 2),
-                    new VarInsnNode(Opcodes.ALOAD, 3),
-                    new VarInsnNode(Opcodes.ILOAD, 4),
-                    new VarInsnNode(Opcodes.ALOAD, 5),
-                    new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "canPush",
-                            "(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/world/World;"
-                                    + "Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/EnumFacing;"
-                                    + "ZLnet/minecraft/util/EnumFacing;)Z", false),
-                    new InsnNode(Opcodes.IRETURN)));
+                            + "ZLnet/minecraft/util/EnumFacing;)Z");
+            int lowerBounds = 0;
+            for (AbstractInsnNode instruction = canPush.instructions.getFirst(); instruction != null;
+                    instruction = instruction.getNext()) {
+                if (!(instruction instanceof MethodInsnNode)) {
+                    continue;
+                }
+                MethodInsnNode call = (MethodInsnNode) instruction;
+                if (!"net/minecraft/util/math/BlockPos".equals(call.owner)
+                        || !"()I".equals(call.desc)
+                        || !("getY".equals(call.name) || "func_177956_o".equals(call.name))) {
+                    continue;
+                }
+                AbstractInsnNode next = nextReal(instruction);
+                if (!(next instanceof JumpInsnNode)
+                        || (next.getOpcode() != Opcodes.IFLT
+                                && next.getOpcode() != Opcodes.IFEQ)) {
+                    continue;
+                }
+                canPush.instructions.insertBefore(next, list(
+                        new VarInsnNode(Opcodes.ALOAD, 1),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "minY",
+                                "(Lnet/minecraft/world/World;)I", false)));
+                ((JumpInsnNode) next).setOpcode(next.getOpcode() == Opcodes.IFLT
+                        ? Opcodes.IF_ICMPLT : Opcodes.IF_ICMPEQ);
+                lowerBounds++;
+            }
+            require(lowerBounds == 2,
+                    "Expected two piston lower build-height comparisons, patched " + lowerBounds);
         }
         MethodNode method = findMethod(node, "doMove", "func_176319_a",
                 "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;"
@@ -5224,6 +5261,46 @@ public final class FFDHeightTransformer implements IClassTransformer {
                         + "Lnet/minecraft/util/math/BlockPos;"
                         + "Lnet/minecraft/world/IBlockAccess;"
                         + "Lnet/minecraft/client/renderer/BufferBuilder;)V").equals(desc);
+    }
+
+    private static byte[] transformHwylaBlockHud(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        require("mcp/mobius/waila/addons/core/HUDHandlerBlocks".equals(node.name),
+                "Unexpected HWYLA block HUD class");
+        String descriptor = "(Lnet/minecraft/item/ItemStack;Ljava/util/List;"
+                + "Lmcp/mobius/waila/api/IWailaDataAccessor;"
+                + "Lmcp/mobius/waila/api/IWailaConfigHandler;)Ljava/util/List;";
+        patchHwylaLiquidCheck(findMethod(node, "getWailaHead", "getWailaHead", descriptor));
+        patchHwylaLiquidCheck(findMethod(node, "getWailaTail", "getWailaTail", descriptor));
+        LOGGER.info("Patched HWYLA labels for FFD waterlogged blocks");
+        return write(node);
+    }
+
+    private static void patchHwylaLiquidCheck(MethodNode method) {
+        MethodInsnNode isLiquid = null;
+        for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (call.getOpcode() == Opcodes.INVOKEVIRTUAL
+                    && "net/minecraft/block/material/Material".equals(call.owner)
+                    && "()Z".equals(call.desc)
+                    && ("isLiquid".equals(call.name) || "func_76224_d".equals(call.name))) {
+                require(isLiquid == null, "Multiple HWYLA liquid checks in " + method.name);
+                isLiquid = call;
+            }
+        }
+        require(isLiquid != null, "Missing HWYLA liquid check in " + method.name);
+        method.instructions.insert(isLiquid, list(
+                new VarInsnNode(Opcodes.ALOAD, 3),
+                new MethodInsnNode(Opcodes.INVOKEINTERFACE,
+                        "mcp/mobius/waila/api/IWailaDataAccessor", "getBlockState",
+                        "()Lnet/minecraft/block/state/IBlockState;", true),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, CLIENT_HOOKS,
+                        "hwylaTreatAsLiquid",
+                        "(ZLnet/minecraft/block/state/IBlockState;)Z", false)));
     }
 
     private static byte[] transformRenderChunk(byte[] basicClass) {
