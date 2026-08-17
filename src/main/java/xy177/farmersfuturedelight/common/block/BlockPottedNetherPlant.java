@@ -22,6 +22,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import xy177.farmersfuturedelight.FarmerFutureDelight;
+import xy177.farmersfuturedelight.common.registry.FFDItems;
 
 public class BlockPottedNetherPlant extends Block {
     private static final AxisAlignedBB SHAPE = new AxisAlignedBB(
@@ -82,8 +83,8 @@ public class BlockPottedNetherPlant extends Block {
                                     EntityPlayer player, EnumHand hand, EnumFacing facing,
                                     float hitX, float hitY, float hitZ) {
         if (!world.isRemote) {
-            ItemStack plantStack = new ItemStack(Item.getItemFromBlock(plant));
-            if (!player.addItemStackToInventory(plantStack)) {
+            ItemStack plantStack = plantStack();
+            if (!plantStack.isEmpty() && !player.addItemStackToInventory(plantStack)) {
                 player.dropItem(plantStack, false);
             }
             world.setBlockState(pos, Blocks.FLOWER_POT.getDefaultState(), 3);
@@ -95,17 +96,24 @@ public class BlockPottedNetherPlant extends Block {
     public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos,
                          IBlockState state, int fortune) {
         drops.add(new ItemStack(Items.FLOWER_POT));
-        drops.add(new ItemStack(Item.getItemFromBlock(plant)));
+        ItemStack plantStack = plantStack();
+        if (!plantStack.isEmpty()) {
+            drops.add(plantStack);
+        }
     }
 
     @Override
     public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
-        return new ItemStack(Item.getItemFromBlock(plant));
+        return plantStack();
     }
 
     @Override
     public Item getItemDropped(IBlockState state, Random random, int fortune) {
         return Items.FLOWER_POT;
+    }
+
+    private ItemStack plantStack() {
+        return FFDItems.effectiveStack(Item.getItemFromBlock(plant));
     }
 
     @Override

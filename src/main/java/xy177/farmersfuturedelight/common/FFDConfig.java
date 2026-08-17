@@ -41,6 +41,7 @@ public final class FFDConfig {
     private static final String CATEGORY_WORLDGEN = "worldgen";
     private static final String CATEGORY_GROWTH = "growth";
     private static final String CATEGORY_PARTICLES = "particles";
+    private static final String CATEGORY_DEBUG = "debug";
     private static final String CATEGORY_INTERNAL = "internal";
     private static final int CURRENT_CONFIG_VERSION = 4;
 
@@ -98,6 +99,7 @@ public final class FFDConfig {
     public static boolean shulkerDuplication;
     public static boolean experienceOrbMerging;
     public static boolean illagersIgnoreBabyVillagers;
+    public static boolean logAutoCompatibilityDecisions;
     public static float goatScreamingChance;
     public static float goatSingleHornChance;
     public static int goatLongJumpCooldownMinTicks;
@@ -397,6 +399,8 @@ public final class FFDConfig {
                 true, "是否允许相同经验值的经验球按高版本规则合并，且拾取时不损失经验。对所有世界类型生效。");
         illagersIgnoreBabyVillagers = config.getBoolean("illagersIgnoreBabyVillagers", CATEGORY_GAMEPLAY,
                 true, "是否让灾厄村民不再主动攻击或伤害幼年村民。对所有世界类型生效。");
+        logAutoCompatibilityDecisions = config.getBoolean("logAutoCompatibilityDecisions", CATEGORY_DEBUG,
+                false, "是否在日志中逐项显示 AUTO 自动避让的内容与世界生成判定。默认关闭；仅建议排查兼容问题时开启。");
 
         goatScreamingChance = config.getFloat("goatScreamingChance", CATEGORY_GAMEPLAY,
                 0.02F, 0.0F, 1.0F, "山羊生成或繁殖时成为尖叫山羊的基础概率，26.3 默认值为 0.02。");
@@ -897,6 +901,9 @@ public final class FFDConfig {
         if (CATEGORY_PARTICLES.equals(category)) {
             return "粒子视觉设置，仅影响客户端显示。\nParticle visual settings; these affect client-side rendering only.";
         }
+        if (CATEGORY_DEBUG.equals(category)) {
+            return "诊断日志设置。\nDiagnostic logging settings.";
+        }
         if (CATEGORY_INTERNAL.equals(category)) {
             return "内部设置，请勿手动修改。\nInternal settings; do not edit manually.";
         }
@@ -923,6 +930,9 @@ public final class FFDConfig {
         }
         if ("sporeBlossomParticlesEnabled".equals(key)) {
             return "Enable falling spore particles from spore blossoms. Disabled by default.";
+        }
+        if ("logAutoCompatibilityDecisions".equals(key)) {
+            return "Log each AUTO compatibility content and world-generation decision. Disabled by default; enable only when diagnosing compatibility issues.";
         }
         if ("lightBlockMode".equals(key)) {
             return "Feature mode for the invisible administrator light block. ENABLED uses this mod's implementation; DISABLED turns it off; AUTO is enabled unless a compatible provider is added.";

@@ -7,9 +7,9 @@ import java.util.Set;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.oredict.OreDictionary;
@@ -25,6 +25,10 @@ public final class FFDCompat {
             new ResourceLocation("futuremc", "honeycomb");
     private static final ResourceLocation OCEANIC_EXPANSE_GLOW_INK_SAC =
             new ResourceLocation("oe", "glow_ink_sac");
+    private static final ResourceLocation NB_CRIMSON_FOREST =
+            new ResourceLocation("nb", "crimson_forest");
+    private static final ResourceLocation NB_WARPED_FOREST =
+            new ResourceLocation("nb", "warped_forest");
     private static final Logger LOGGER = LogManager.getLogger("FFD Auto Compatibility");
     private static final Set<String> LOGGED_CONTENT = new HashSet<>();
     private static boolean honeycombCompatibilityRegistered;
@@ -59,16 +63,14 @@ public final class FFDCompat {
     }
 
     public static boolean isLocalItemEnabled(FFDConfig.FeatureMode mode, Feature feature,
-                                             Item local, String... aliases) {
+                                             Item local, Block localBlock, String... aliases) {
         if (mode != FFDConfig.FeatureMode.AUTO) {
             return mode == FFDConfig.FeatureMode.ENABLED;
         }
         String[] paths = contentPaths(registryPath(local.getRegistryName()), aliases);
-        if (local instanceof ItemBlock) {
-            Block block = ((ItemBlock) local).getBlock();
-            if (!isLocalBlockEnabled(mode, feature, block, aliases)) {
-                return false;
-            }
+        if (localBlock != null
+                && !isLocalBlockEnabled(mode, feature, localBlock, aliases)) {
+            return false;
         }
         ExternalItem external = feature.findItem(paths);
         logDecision(feature, "item", paths[0], external == null ? null : external.provider);
@@ -88,12 +90,12 @@ public final class FFDCompat {
 
     public static IBlockState getExternalBlockState(Feature feature, String... paths) {
         ExternalBlock external = feature.findBlock(contentPaths(null, paths));
-        return external == null ? null : external.block.getDefaultState();
+        return external == null ? null : external.state;
     }
 
     public static ItemStack getExternalItemStack(Feature feature, String... paths) {
         ExternalItem external = feature.findItem(contentPaths(null, paths));
-        return external == null ? ItemStack.EMPTY : new ItemStack(external.item);
+        return external == null ? ItemStack.EMPTY : external.stack.copy();
     }
 
     public static EntityEntry getExternalEntityEntry(Feature feature, String... paths) {
@@ -101,8 +103,23 @@ public final class FFDCompat {
         return external == null ? null : external.entity;
     }
 
+    public static boolean shouldGenerateNetherForest(boolean warped) {
+        FFDConfig.FeatureMode mode = warped ? FFDConfig.warpedMode : FFDConfig.crimsonMode;
+        if (mode != FFDConfig.FeatureMode.AUTO) {
+            return mode == FFDConfig.FeatureMode.ENABLED;
+        }
+        ResourceLocation externalBiome = warped ? NB_WARPED_FOREST : NB_CRIMSON_FOREST;
+        Biome biome = ForgeRegistries.BIOMES.getValue(externalBiome);
+        boolean externalWorldgen = biome != null && externalBiome.equals(biome.getRegistryName());
+        logWorldgenDecision(warped, externalWorldgen ? "Unseens Nether Backport" : null);
+        return !externalWorldgen;
+    }
+
     private static void logDecision(Feature feature, String type, String path,
                                     ProviderSet provider) {
+        if (!FFDConfig.logAutoCompatibilityDecisions) {
+            return;
+        }
         String key = feature.name() + ':' + type + ':' + path;
         if (!LOGGED_CONTENT.add(key)) {
             return;
@@ -111,6 +128,21 @@ public final class FFDCompat {
                 provider == null ? "using Farmer's Future Delight"
                         : "yielding to external content",
                 provider == null ? "" : " (" + provider.name + ")");
+    }
+
+    private static void logWorldgenDecision(boolean warped, String provider) {
+        if (!FFDConfig.logAutoCompatibilityDecisions) {
+            return;
+        }
+        String forest = warped ? "warped" : "crimson";
+        String key = "NETHER_FOREST:worldgen:" + forest;
+        if (!LOGGED_CONTENT.add(key)) {
+            return;
+        }
+        LOGGER.info("AUTO Nether forest worldgen {}: {}{}", forest,
+                provider == null ? "using Farmer's Future Delight"
+                        : "yielding to external biome",
+                provider == null ? "" : " (" + provider + ")");
     }
 
     private static String registryPath(ResourceLocation registryName) {
@@ -143,21 +175,18 @@ public final class FFDCompat {
             paths.add("seagrass");
         } else if ("turtle_scute".equals(path)) {
             paths.add("scute");
+        } else if ("iron_chain".equals(path)) {
+            paths.add("chain");
         } else if ("music_disc_otherside".equals(path)) {
             paths.add("record_otherside");
-        }
-        if (path.startsWith("potted_")) {
-            String unpotted = path.substring("potted_".length());
-            if (unpotted.endsWith("_bush")) {
-                unpotted = unpotted.substring(0, unpotted.length() - "_bush".length());
-            }
-            paths.add(unpotted);
-        }
-        if (path.endsWith("_double_slab")) {
-            paths.add(path.substring(0, path.length() - "_double_slab".length()) + "_slab");
-        }
-        if (path.endsWith("lightning_rod")) {
-            paths.add("lightning_rod");
+        } else if ("deepslate_bricks".equals(path)) {
+            paths.add("deepslate_brick");
+        } else if ("cracked_deepslate_bricks".equals(path)) {
+            paths.add("cracked_deepslate_brick");
+        } else if ("deepslate_tiles".equals(path)) {
+            paths.add("deepslate_tile");
+        } else if ("cracked_deepslate_tiles".equals(path)) {
+            paths.add("cracked_deepslate_tile");
         }
     }
 
@@ -193,7 +222,9 @@ public final class FFDCompat {
                 blocks("Caves Not Cliffs", "cavesnotcliffs", "spore_blossom")),
         HONEY(
                 blocks("Future MC", "futuremc", "honey_block", "honeycomb_block",
-                        "bee_nest", "beehive")),
+                        "bee_nest", "beehive"),
+                blocks("Caves Not Cliffs", "cavesnotcliffs", "honey_block",
+                        "honeycomb_block", "bee_nest", "beehive")),
         KELP(
                 blocks("Oceanic Expanse", "oe", "kelp", "dried_kelp_block")),
         SEAGRASS(
@@ -217,42 +248,48 @@ public final class FFDCompat {
                 blocks("Depths Update", "depthsupdate", "amethyst_block", "budding_amethyst",
                         "small_amethyst_bud", "medium_amethyst_bud", "large_amethyst_bud",
                         "amethyst_cluster", "calcite", "smooth_basalt", "tinted_glass"),
-                blocks("Deeper Depths", "deeperdepths", "amethyst_block", "budding_amethyst",
-                        "small_amethyst_bud", "medium_amethyst_bud", "large_amethyst_bud",
-                        "amethyst_cluster", "calcite", "smooth_basalt", "tinted_glass"),
+                deeperDepthsAmethyst(),
+                blocks("Unseens Nether Backport", "nb", "smooth_basalt"),
                 blocks("Caves Not Cliffs", "cavesnotcliffs", "amethyst_block",
                         "budding_amethyst", "small_amethyst_bud", "medium_amethyst_bud",
                         "large_amethyst_bud", "amethyst_cluster", "calcite", "smooth_basalt",
                         "tinted_glass")),
         DEEPSLATE(
                 depthsUpdateDeepslate(),
+                deeperDepthsDeepslate(),
                 cavesNotCliffsDeepslate()),
         RAW_ORE(
                 blocks("Depths Update", "depthsupdate", "raw_iron_block", "raw_gold_block"),
                 blocks("Caves Not Cliffs", "cavesnotcliffs", "raw_iron_block", "raw_gold_block")),
         COPPER(
                 copper("Depths Update", "depthsupdate"),
-                copper("Deeper Depths", "deeperdepths"),
-                copper("Caves Not Cliffs", "cavesnotcliffs")),
+                deeperDepthsCopper(),
+                cavesNotCliffsCopper()),
         DRIPSTONE(
                 blocks("Depths Update", "depthsupdate", "dripstone_block", "pointed_dripstone"),
                 blocks("Caves Not Cliffs", "cavesnotcliffs", "dripstone_block",
                         "pointed_dripstone")),
         IRON_CHAIN(
-                blocks("Future MC", "futuremc", "chain")),
+                blocks("Future MC", "futuremc", "chain"),
+                netherBackportChain()),
         CANDLE(
+                candles("Deeper Depths", "deeperdepths"),
                 candles("Caves Not Cliffs", "cavesnotcliffs")),
         POWDER_SNOW(
                 content("Caves Not Cliffs", ids("cavesnotcliffs", "powder_snow"),
                         ids("cavesnotcliffs", "powder_snow_bucket"), null)),
         CRIMSON(
-                netherPlants("Future MC", "futuremc", true)),
+                netherPlants("Future MC", "futuremc", true),
+                netherBackportPlants(true)),
         WARPED(
-                netherPlants("Future MC", "futuremc", false)),
+                netherPlants("Future MC", "futuremc", false),
+                netherBackportPlants(false)),
         CRIMSON_WOOD(
-                netherWood("Future MC", "futuremc", true)),
+                netherWood("Future MC", "futuremc", true),
+                netherBackportWood(true)),
         WARPED_WOOD(
-                netherWood("Future MC", "futuremc", false));
+                netherWood("Future MC", "futuremc", false),
+                netherBackportWood(false));
 
         private final ProviderSet[] providers;
 
@@ -262,9 +299,9 @@ public final class FFDCompat {
 
         private ExternalBlock findBlock(String... paths) {
             for (ProviderSet provider : providers) {
-                Block block = provider.findBlock(paths);
-                if (block != null) {
-                    return new ExternalBlock(provider, block);
+                IBlockState state = provider.findBlock(paths);
+                if (state != null) {
+                    return new ExternalBlock(provider, state);
                 }
             }
             return null;
@@ -272,9 +309,9 @@ public final class FFDCompat {
 
         private ExternalItem findItem(String... paths) {
             for (ProviderSet provider : providers) {
-                Item item = provider.findItem(paths);
-                if (item != null) {
-                    return new ExternalItem(provider, item);
+                ItemStack stack = provider.findItem(paths);
+                if (!stack.isEmpty()) {
+                    return new ExternalItem(provider, stack);
                 }
             }
             return null;
@@ -309,47 +346,259 @@ public final class FFDCompat {
         return new ProviderSet(name, blocks, items, entities);
     }
 
+    private static ProviderSet content(String name, String[] blocks, String[] items,
+                                       String[] entities, ContentVariant[] blockVariants,
+                                       ContentVariant[] itemVariants) {
+        return new ProviderSet(name, blocks, items, entities, blockVariants, itemVariants);
+    }
+
+    private static ContentVariant variant(String path, String namespace,
+                                          String registryPath, int metadata) {
+        return new ContentVariant(path, namespace + ':' + registryPath, metadata);
+    }
+
     private static ProviderSet depthsUpdateDeepslate() {
-        return blocks("Depths Update", "depthsupdate", "deepslate", "tuff",
-                "cobbled_deepslate", "polished_deepslate", "deepslate_bricks",
-                "cracked_deepslate_bricks", "deepslate_tiles", "cracked_deepslate_tiles",
-                "chiseled_deepslate", "infested_deepslate", "cobbled_deepslate_stairs",
-                "polished_deepslate_stairs", "deepslate_brick_stairs",
-                "deepslate_tile_stairs", "deepslate_slab_half", "deepslate_slab_double",
-                "cobbled_deepslate_wall", "polished_deepslate_wall",
-                "deepslate_brick_wall", "deepslate_tile_wall", "deepslate_coal_ore",
-                "deepslate_iron_ore", "deepslate_gold_ore", "deepslate_redstone_ore",
-                "deepslate_lapis_ore", "deepslate_diamond_ore", "deepslate_emerald_ore");
+        ContentVariant[] blocks = {
+                variant("cobbled_deepslate_slab", "depthsupdate", "deepslate_slab_half", 0),
+                variant("cobbled_deepslate_double_slab", "depthsupdate", "deepslate_slab_double", 0),
+                variant("polished_deepslate_slab", "depthsupdate", "deepslate_slab_half", 1),
+                variant("polished_deepslate_double_slab", "depthsupdate", "deepslate_slab_double", 1),
+                variant("deepslate_brick_slab", "depthsupdate", "deepslate_slab_half", 2),
+                variant("deepslate_brick_double_slab", "depthsupdate", "deepslate_slab_double", 2),
+                variant("deepslate_tile_slab", "depthsupdate", "deepslate_slab_half", 3),
+                variant("deepslate_tile_double_slab", "depthsupdate", "deepslate_slab_double", 3)
+        };
+        ContentVariant[] items = {
+                variant("cobbled_deepslate_slab", "depthsupdate", "deepslate_slab_half", 0),
+                variant("polished_deepslate_slab", "depthsupdate", "deepslate_slab_half", 1),
+                variant("deepslate_brick_slab", "depthsupdate", "deepslate_slab_half", 2),
+                variant("deepslate_tile_slab", "depthsupdate", "deepslate_slab_half", 3)
+        };
+        return content("Depths Update", ids("depthsupdate", "deepslate", "tuff",
+                        "cobbled_deepslate", "polished_deepslate", "deepslate_bricks",
+                        "cracked_deepslate_bricks", "deepslate_tiles",
+                        "cracked_deepslate_tiles", "chiseled_deepslate",
+                        "infested_deepslate", "cobbled_deepslate_stairs",
+                        "polished_deepslate_stairs", "deepslate_brick_stairs",
+                        "deepslate_tile_stairs", "cobbled_deepslate_wall",
+                        "polished_deepslate_wall", "deepslate_brick_wall",
+                        "deepslate_tile_wall", "deepslate_coal_ore",
+                        "deepslate_iron_ore", "deepslate_gold_ore",
+                        "deepslate_redstone_ore", "deepslate_lapis_ore",
+                        "deepslate_diamond_ore", "deepslate_emerald_ore"),
+                null, null, blocks, items);
     }
 
     private static ProviderSet cavesNotCliffsDeepslate() {
-        return blocks("Caves Not Cliffs", "cavesnotcliffs", "deepslate", "tuff",
-                "cobbled_deepslate", "polished_deepslate", "deepslate_bricks",
-                "cracked_deepslate_bricks", "deepslate_tiles", "cracked_deepslate_tiles",
-                "chiseled_deepslate", "infested_deepslate", "cobbled_deepslate_stairs",
-                "polished_deepslate_stairs", "deepslate_brick_stairs",
-                "deepslate_tile_stairs", "cobbled_deepslate_slab",
-                "cobbled_deepslate_slab_double", "polished_deepslate_slab",
-                "polished_deepslate_slab_double", "deepslate_brick_slab",
-                "deepslate_brick_slab_double", "deepslate_tile_slab",
-                "deepslate_tile_slab_double", "cobbled_deepslate_wall",
-                "polished_deepslate_wall", "deepslate_brick_wall", "deepslate_tile_wall",
-                "deepslate_coal_ore", "deepslate_iron_ore", "deepslate_gold_ore",
-                "deepslate_redstone_ore", "deepslate_lapis_ore", "deepslate_diamond_ore",
-                "deepslate_emerald_ore");
+        ContentVariant[] blocks = {
+                variant("cobbled_deepslate_double_slab", "cavesnotcliffs",
+                        "cobbled_deepslate_slab_double", 0),
+                variant("polished_deepslate_double_slab", "cavesnotcliffs",
+                        "polished_deepslate_slab_double", 0),
+                variant("deepslate_brick_double_slab", "cavesnotcliffs",
+                        "deepslate_brick_slab_double", 0),
+                variant("deepslate_tile_double_slab", "cavesnotcliffs",
+                        "deepslate_tile_slab_double", 0)
+        };
+        return content("Caves Not Cliffs", ids("cavesnotcliffs", "deepslate", "tuff",
+                        "cobbled_deepslate", "polished_deepslate", "deepslate_bricks",
+                        "cracked_deepslate_bricks", "deepslate_tiles",
+                        "cracked_deepslate_tiles", "chiseled_deepslate",
+                        "infested_deepslate", "cobbled_deepslate_stairs",
+                        "polished_deepslate_stairs", "deepslate_brick_stairs",
+                        "deepslate_tile_stairs", "cobbled_deepslate_slab",
+                        "cobbled_deepslate_slab_double", "polished_deepslate_slab",
+                        "polished_deepslate_slab_double", "deepslate_brick_slab",
+                        "deepslate_brick_slab_double", "deepslate_tile_slab",
+                        "deepslate_tile_slab_double", "cobbled_deepslate_wall",
+                        "polished_deepslate_wall", "deepslate_brick_wall",
+                        "deepslate_tile_wall", "deepslate_coal_ore",
+                        "deepslate_iron_ore", "deepslate_gold_ore",
+                        "deepslate_redstone_ore", "deepslate_lapis_ore",
+                        "deepslate_diamond_ore", "deepslate_emerald_ore"),
+                null, null, blocks, null);
+    }
+
+    private static ProviderSet deeperDepthsDeepslate() {
+        ContentVariant[] blocks = {
+                variant("tuff", "deeperdepths", "stone", 0),
+                variant("cobbled_deepslate", "deeperdepths", "stone", 6),
+                variant("chiseled_deepslate", "deeperdepths", "stone", 7),
+                variant("polished_deepslate", "deeperdepths", "stone", 8),
+                variant("deepslate_bricks", "deeperdepths", "stone", 9),
+                variant("cracked_deepslate_bricks", "deeperdepths", "stone", 10),
+                variant("deepslate_tiles", "deeperdepths", "stone", 11),
+                variant("cracked_deepslate_tiles", "deeperdepths", "stone", 12),
+                variant("infested_deepslate", "deeperdepths", "deepslate", 1),
+                variant("cobbled_deepslate_slab", "deeperdepths", "stone_slab", 3),
+                variant("cobbled_deepslate_double_slab", "deeperdepths", "double_stone_slab", 3),
+                variant("polished_deepslate_slab", "deeperdepths", "stone_slab", 4),
+                variant("polished_deepslate_double_slab", "deeperdepths", "double_stone_slab", 4),
+                variant("deepslate_brick_slab", "deeperdepths", "stone_slab", 5),
+                variant("deepslate_brick_double_slab", "deeperdepths", "double_stone_slab", 5),
+                variant("deepslate_tile_slab", "deeperdepths", "stone_slab", 6),
+                variant("deepslate_tile_double_slab", "deeperdepths", "double_stone_slab", 6),
+                variant("cobbled_deepslate_wall", "deeperdepths", "stone_wall", 3),
+                variant("polished_deepslate_wall", "deeperdepths", "stone_wall", 4),
+                variant("deepslate_brick_wall", "deeperdepths", "stone_wall", 5),
+                variant("deepslate_tile_wall", "deeperdepths", "stone_wall", 6)
+        };
+        ContentVariant[] items = {
+                variant("tuff", "deeperdepths", "stone", 0),
+                variant("cobbled_deepslate", "deeperdepths", "stone", 6),
+                variant("chiseled_deepslate", "deeperdepths", "stone", 7),
+                variant("polished_deepslate", "deeperdepths", "stone", 8),
+                variant("deepslate_bricks", "deeperdepths", "stone", 9),
+                variant("cracked_deepslate_bricks", "deeperdepths", "stone", 10),
+                variant("deepslate_tiles", "deeperdepths", "stone", 11),
+                variant("cracked_deepslate_tiles", "deeperdepths", "stone", 12),
+                variant("infested_deepslate", "deeperdepths", "deepslate", 1),
+                variant("cobbled_deepslate_slab", "deeperdepths", "stone_slab", 3),
+                variant("polished_deepslate_slab", "deeperdepths", "stone_slab", 4),
+                variant("deepslate_brick_slab", "deeperdepths", "stone_slab", 5),
+                variant("deepslate_tile_slab", "deeperdepths", "stone_slab", 6),
+                variant("cobbled_deepslate_wall", "deeperdepths", "stone_wall", 3),
+                variant("polished_deepslate_wall", "deeperdepths", "stone_wall", 4),
+                variant("deepslate_brick_wall", "deeperdepths", "stone_wall", 5),
+                variant("deepslate_tile_wall", "deeperdepths", "stone_wall", 6)
+        };
+        return content("Deeper Depths", ids("deeperdepths", "deepslate",
+                        "cobbled_deepslate_stairs", "polished_deepslate_stairs",
+                        "deepslate_brick_stairs", "deepslate_tile_stairs"), null, null,
+                blocks, items);
+    }
+
+    private static ProviderSet deeperDepthsAmethyst() {
+        ContentVariant[] blocks = {
+                variant("calcite", "deeperdepths", "stone", 5)
+        };
+        ContentVariant[] items = {
+                variant("calcite", "deeperdepths", "stone", 5),
+                variant("amethyst_shard", "deeperdepths", "material", 1)
+        };
+        return content("Deeper Depths", ids("deeperdepths", "amethyst_block",
+                        "budding_amethyst", "small_amethyst_bud", "medium_amethyst_bud",
+                        "large_amethyst_bud", "amethyst_cluster", "tinted_glass"),
+                null, null, blocks, items);
+    }
+
+    private static ProviderSet deeperDepthsCopper() {
+        ContentVariant[] blocks = {
+                variant("copper_block", "deeperdepths", "copper_block", 0),
+                variant("exposed_copper", "deeperdepths", "copper_block", 1),
+                variant("weathered_copper", "deeperdepths", "copper_block", 2),
+                variant("oxidized_copper", "deeperdepths", "copper_block", 3),
+                variant("waxed_copper_block", "deeperdepths", "copper_block", 4),
+                variant("waxed_exposed_copper", "deeperdepths", "copper_block", 5),
+                variant("waxed_weathered_copper", "deeperdepths", "copper_block", 6),
+                variant("waxed_oxidized_copper", "deeperdepths", "copper_block", 7),
+                variant("cut_copper", "deeperdepths", "cut_copper", 0),
+                variant("exposed_cut_copper", "deeperdepths", "cut_copper", 1),
+                variant("weathered_cut_copper", "deeperdepths", "cut_copper", 2),
+                variant("oxidized_cut_copper", "deeperdepths", "cut_copper", 3),
+                variant("waxed_cut_copper", "deeperdepths", "cut_copper", 4),
+                variant("waxed_exposed_cut_copper", "deeperdepths", "cut_copper", 5),
+                variant("waxed_weathered_cut_copper", "deeperdepths", "cut_copper", 6),
+                variant("waxed_oxidized_cut_copper", "deeperdepths", "cut_copper", 7),
+                variant("cut_copper_slab", "deeperdepths", "cut_copper_slab", 0),
+                variant("exposed_cut_copper_slab", "deeperdepths", "cut_copper_slab", 1),
+                variant("weathered_cut_copper_slab", "deeperdepths", "cut_copper_slab", 2),
+                variant("oxidized_cut_copper_slab", "deeperdepths", "cut_copper_slab", 3),
+                variant("waxed_cut_copper_slab", "deeperdepths", "cut_copper_slab", 4),
+                variant("waxed_exposed_cut_copper_slab", "deeperdepths", "cut_copper_slab", 5),
+                variant("waxed_weathered_cut_copper_slab", "deeperdepths", "cut_copper_slab", 6),
+                variant("waxed_oxidized_cut_copper_slab", "deeperdepths", "cut_copper_slab", 7),
+                variant("cut_copper_double_slab", "deeperdepths", "double_cut_copper_slab", 0),
+                variant("exposed_cut_copper_double_slab", "deeperdepths", "double_cut_copper_slab", 1),
+                variant("weathered_cut_copper_double_slab", "deeperdepths", "double_cut_copper_slab", 2),
+                variant("oxidized_cut_copper_double_slab", "deeperdepths", "double_cut_copper_slab", 3),
+                variant("waxed_cut_copper_double_slab", "deeperdepths", "double_cut_copper_slab", 4),
+                variant("waxed_exposed_cut_copper_double_slab", "deeperdepths", "double_cut_copper_slab", 5),
+                variant("waxed_weathered_cut_copper_double_slab", "deeperdepths", "double_cut_copper_slab", 6),
+                variant("waxed_oxidized_cut_copper_double_slab", "deeperdepths", "double_cut_copper_slab", 7)
+        };
+        ContentVariant[] items = {
+                variant("copper_block", "deeperdepths", "copper_block", 0),
+                variant("exposed_copper", "deeperdepths", "copper_block", 1),
+                variant("weathered_copper", "deeperdepths", "copper_block", 2),
+                variant("oxidized_copper", "deeperdepths", "copper_block", 3),
+                variant("waxed_copper_block", "deeperdepths", "copper_block", 4),
+                variant("waxed_exposed_copper", "deeperdepths", "copper_block", 5),
+                variant("waxed_weathered_copper", "deeperdepths", "copper_block", 6),
+                variant("waxed_oxidized_copper", "deeperdepths", "copper_block", 7),
+                variant("cut_copper", "deeperdepths", "cut_copper", 0),
+                variant("exposed_cut_copper", "deeperdepths", "cut_copper", 1),
+                variant("weathered_cut_copper", "deeperdepths", "cut_copper", 2),
+                variant("oxidized_cut_copper", "deeperdepths", "cut_copper", 3),
+                variant("waxed_cut_copper", "deeperdepths", "cut_copper", 4),
+                variant("waxed_exposed_cut_copper", "deeperdepths", "cut_copper", 5),
+                variant("waxed_weathered_cut_copper", "deeperdepths", "cut_copper", 6),
+                variant("waxed_oxidized_cut_copper", "deeperdepths", "cut_copper", 7),
+                variant("cut_copper_slab", "deeperdepths", "cut_copper_slab", 0),
+                variant("exposed_cut_copper_slab", "deeperdepths", "cut_copper_slab", 1),
+                variant("weathered_cut_copper_slab", "deeperdepths", "cut_copper_slab", 2),
+                variant("oxidized_cut_copper_slab", "deeperdepths", "cut_copper_slab", 3),
+                variant("waxed_cut_copper_slab", "deeperdepths", "cut_copper_slab", 4),
+                variant("waxed_exposed_cut_copper_slab", "deeperdepths", "cut_copper_slab", 5),
+                variant("waxed_weathered_cut_copper_slab", "deeperdepths", "cut_copper_slab", 6),
+                variant("waxed_oxidized_cut_copper_slab", "deeperdepths", "cut_copper_slab", 7),
+                variant("copper_ingot", "deeperdepths", "material", 0)
+        };
+        return content("Deeper Depths", ids("deeperdepths", "copper_ore",
+                        "raw_copper_block", "cut_copper_stairs",
+                        "exposed_cut_copper_stairs", "weathered_cut_copper_stairs",
+                        "oxidized_cut_copper_stairs", "waxed_cut_copper_stairs",
+                        "waxed_exposed_cut_copper_stairs",
+                        "waxed_weathered_cut_copper_stairs",
+                        "waxed_oxidized_cut_copper_stairs", "lightning_rod",
+                        "exposed_lightning_rod", "weathered_lightning_rod",
+                        "oxidized_lightning_rod", "waxed_lightning_rod",
+                        "waxed_exposed_lightning_rod", "waxed_weathered_lightning_rod",
+                        "waxed_oxidized_lightning_rod"),
+                null, null, blocks, items);
     }
 
     private static ProviderSet copper(String name, String namespace) {
-        return blocks(name, namespace, "copper_ore", "raw_copper_block", "copper_block",
-                "exposed_copper", "weathered_copper", "oxidized_copper", "cut_copper",
-                "exposed_cut_copper", "weathered_cut_copper", "oxidized_cut_copper",
-                "cut_copper_stairs", "exposed_cut_copper_stairs",
-                "weathered_cut_copper_stairs", "oxidized_cut_copper_stairs",
-                "cut_copper_slab", "exposed_cut_copper_slab", "weathered_cut_copper_slab",
-                "oxidized_cut_copper_slab", "waxed_copper_block", "waxed_exposed_copper",
-                "waxed_weathered_copper", "waxed_oxidized_copper", "waxed_cut_copper",
-                "waxed_exposed_cut_copper", "waxed_weathered_cut_copper",
-                "waxed_oxidized_cut_copper", "lightning_rod");
+        return copper(name, namespace, null);
+    }
+
+    private static ProviderSet copper(String name, String namespace,
+                                      ContentVariant[] blockVariants) {
+        return content(name, ids(namespace, "copper_ore", "raw_copper_block",
+                        "copper_block", "exposed_copper", "weathered_copper",
+                        "oxidized_copper", "cut_copper", "exposed_cut_copper",
+                        "weathered_cut_copper", "oxidized_cut_copper",
+                        "cut_copper_stairs", "exposed_cut_copper_stairs",
+                        "weathered_cut_copper_stairs", "oxidized_cut_copper_stairs",
+                        "cut_copper_slab", "exposed_cut_copper_slab",
+                        "weathered_cut_copper_slab", "oxidized_cut_copper_slab",
+                        "waxed_copper_block", "waxed_exposed_copper",
+                        "waxed_weathered_copper", "waxed_oxidized_copper",
+                        "waxed_cut_copper", "waxed_exposed_cut_copper",
+                        "waxed_weathered_cut_copper", "waxed_oxidized_cut_copper",
+                        "lightning_rod"), null, null, blockVariants, null);
+    }
+
+    private static ProviderSet cavesNotCliffsCopper() {
+        ContentVariant[] blocks = {
+                variant("cut_copper_double_slab", "cavesnotcliffs",
+                        "cut_copper_slab_double", 0),
+                variant("exposed_cut_copper_double_slab", "cavesnotcliffs",
+                        "exposed_cut_copper_slab_double", 0),
+                variant("weathered_cut_copper_double_slab", "cavesnotcliffs",
+                        "weathered_cut_copper_slab_double", 0),
+                variant("oxidized_cut_copper_double_slab", "cavesnotcliffs",
+                        "oxidized_cut_copper_slab_double", 0),
+                variant("waxed_cut_copper_double_slab", "cavesnotcliffs",
+                        "waxed_cut_copper_slab_double", 0),
+                variant("waxed_exposed_cut_copper_double_slab", "cavesnotcliffs",
+                        "waxed_exposed_cut_copper_slab_double", 0),
+                variant("waxed_weathered_cut_copper_double_slab", "cavesnotcliffs",
+                        "waxed_weathered_cut_copper_slab_double", 0),
+                variant("waxed_oxidized_cut_copper_double_slab", "cavesnotcliffs",
+                        "waxed_oxidized_cut_copper_slab_double", 0)
+        };
+        return copper("Caves Not Cliffs", "cavesnotcliffs", blocks);
     }
 
     private static ProviderSet candles(String name, String namespace) {
@@ -384,6 +633,54 @@ public final class FFDCompat {
                 "shroomlight");
     }
 
+    private static ProviderSet netherBackportPlants(boolean crimson) {
+        ContentVariant[] variants = crimson
+                ? new ContentVariant[] {
+                        variant("crimson_nylium", "nb", "crimson_grass", 0),
+                        variant("crimson_fungus", "nb", "crimson_fungus", 0),
+                        variant("crimson_roots", "nb", "crimson_roots", 0),
+                        variant("weeping_vines", "nb", "crimson_vine", 0),
+                        variant("weeping_vines_plant", "nb", "crimson_vine", 0)
+                }
+                : new ContentVariant[] {
+                        variant("warped_nylium", "nb", "warped_grass", 0),
+                        variant("warped_fungus", "nb", "warped_fungus", 0),
+                        variant("warped_roots", "nb", "warped_roots", 0),
+                        variant("nether_sprouts", "nb", "warped_sprout", 0),
+                        variant("twisting_vines", "nb", "warped_vine", 0),
+                        variant("twisting_vines_plant", "nb", "warped_vine", 0)
+                };
+        return content("Unseens Nether Backport", null, null, null, variants, variants);
+    }
+
+    private static ProviderSet netherBackportChain() {
+        ContentVariant[] variants = {
+                variant("iron_chain", "nb", "chain_block", 0)
+        };
+        return content("Unseens Nether Backport", null, null, null, variants, variants);
+    }
+
+    private static ProviderSet netherBackportWood(boolean crimson) {
+        String prefix = crimson ? "crimson" : "warped";
+        String wart = crimson ? "crimson_wart" : "warped_wart";
+        ContentVariant[] variants = {
+                variant(prefix + "_stem", "nb", prefix + "_stem", 0),
+                variant(prefix + "_hyphae", "nb", prefix + "_hyphae", 0),
+                variant(crimson ? "nether_wart_block" : "warped_wart_block",
+                        "nb", wart, 0),
+                variant(prefix + "_planks", "nb", prefix + "_planks", 0),
+                variant(prefix + "_stairs", "nb", prefix + "_stairs", 0),
+                variant(prefix + "_slab", "nb", prefix + "_slab_half", 0),
+                variant(prefix + "_double_slab", "nb", prefix + "_slab_double", 0),
+                variant(prefix + "_fence", "nb", prefix + "_fence", 0),
+                variant(prefix + "_fence_gate", "nb", prefix + "_gate", 0),
+                variant(prefix + "_door", "nb", prefix + "_door", 0),
+                variant(prefix + "_trapdoor", "nb", prefix + "_trapdoor", 0),
+                variant("shroomlight", "nb", "shroom_light", 0)
+        };
+        return content("Unseens Nether Backport", null, null, null, variants, variants);
+    }
+
     private static String[] ids(String namespace, String... paths) {
         String[] result = new String[paths.length];
         for (int index = 0; index < paths.length; index++) {
@@ -397,24 +694,49 @@ public final class FFDCompat {
         private final String[] blocks;
         private final String[] items;
         private final String[] entities;
+        private final ContentVariant[] blockVariants;
+        private final ContentVariant[] itemVariants;
         private final String namespace;
 
         private ProviderSet(String name, String[] blocks, String[] items, String[] entities) {
+            this(name, blocks, items, entities, null, null);
+        }
+
+        private ProviderSet(String name, String[] blocks, String[] items, String[] entities,
+                            ContentVariant[] blockVariants, ContentVariant[] itemVariants) {
             this.name = name;
             this.blocks = blocks;
             this.items = items;
             this.entities = entities;
+            this.blockVariants = blockVariants;
+            this.itemVariants = itemVariants;
             this.namespace = namespace(blocks, items, entities);
         }
 
-        private Block findBlock(String... paths) {
+        private IBlockState findBlock(String... paths) {
             Block explicit = findRegisteredBlock(blocks, paths);
-            return explicit != null ? explicit : findRegisteredBlock(namespace, paths);
+            if (explicit != null) {
+                return explicit.getDefaultState();
+            }
+            IBlockState variant = findRegisteredBlockVariant(blockVariants, paths);
+            if (variant != null) {
+                return variant;
+            }
+            Block inferred = findRegisteredBlock(namespace, paths);
+            return inferred == null ? null : inferred.getDefaultState();
         }
 
-        private Item findItem(String... paths) {
+        private ItemStack findItem(String... paths) {
             Item explicit = findRegisteredItem(items, paths);
-            return explicit != null ? explicit : findRegisteredItem(namespace, paths);
+            if (explicit != null) {
+                return new ItemStack(explicit);
+            }
+            ItemStack variant = findRegisteredItemVariant(itemVariants, paths);
+            if (!variant.isEmpty()) {
+                return variant;
+            }
+            Item inferred = findRegisteredItem(namespace, paths);
+            return inferred == null ? ItemStack.EMPTY : new ItemStack(inferred);
         }
 
         private EntityEntry findEntity(String... paths) {
@@ -422,6 +744,42 @@ public final class FFDCompat {
             return explicit != null ? explicit : findRegisteredEntity(namespace, paths);
         }
 
+    }
+
+    private static IBlockState findRegisteredBlockVariant(ContentVariant[] variants,
+                                                           String... paths) {
+        if (variants == null) {
+            return null;
+        }
+        for (ContentVariant variant : variants) {
+            if (!containsPath(paths, variant.path)) {
+                continue;
+            }
+            ResourceLocation key = new ResourceLocation(variant.registryName);
+            Block block = ForgeRegistries.BLOCKS.getValue(key);
+            if (block != null && key.equals(block.getRegistryName())) {
+                return block.getStateFromMeta(variant.metadata);
+            }
+        }
+        return null;
+    }
+
+    private static ItemStack findRegisteredItemVariant(ContentVariant[] variants,
+                                                       String... paths) {
+        if (variants == null) {
+            return ItemStack.EMPTY;
+        }
+        for (ContentVariant variant : variants) {
+            if (!containsPath(paths, variant.path)) {
+                continue;
+            }
+            ResourceLocation key = new ResourceLocation(variant.registryName);
+            Item item = ForgeRegistries.ITEMS.getValue(key);
+            if (item != null && key.equals(item.getRegistryName())) {
+                return new ItemStack(item, 1, variant.metadata);
+            }
+        }
+        return ItemStack.EMPTY;
     }
 
     private static Block findRegisteredBlock(String[] ids, String... paths) {
@@ -537,21 +895,33 @@ public final class FFDCompat {
 
     private static final class ExternalBlock {
         private final ProviderSet provider;
-        private final Block block;
+        private final IBlockState state;
 
-        private ExternalBlock(ProviderSet provider, Block block) {
+        private ExternalBlock(ProviderSet provider, IBlockState state) {
             this.provider = provider;
-            this.block = block;
+            this.state = state;
         }
     }
 
     private static final class ExternalItem {
         private final ProviderSet provider;
-        private final Item item;
+        private final ItemStack stack;
 
-        private ExternalItem(ProviderSet provider, Item item) {
+        private ExternalItem(ProviderSet provider, ItemStack stack) {
             this.provider = provider;
-            this.item = item;
+            this.stack = stack;
+        }
+    }
+
+    private static final class ContentVariant {
+        private final String path;
+        private final String registryName;
+        private final int metadata;
+
+        private ContentVariant(String path, String registryName, int metadata) {
+            this.path = path;
+            this.registryName = registryName;
+            this.metadata = metadata;
         }
     }
 

@@ -90,6 +90,8 @@ public final class FFDHeightTransformer implements IClassTransformer {
     private static final Set<String> CHUNK_CACHE_CLASS = names("net.minecraft.world.ChunkCache");
     private static final Set<String> ANVIL_CLASS = names("net.minecraft.world.chunk.storage.AnvilChunkLoader");
     private static final Set<String> CHUNK_PACKET_CLASS = names("net.minecraft.network.play.server.SPacketChunkData");
+    private static final Set<String> NET_HANDLER_PLAY_SERVER_CLASS = names(
+            "net.minecraft.network.NetHandlerPlayServer");
     private static final Set<String> VIEW_FRUSTUM_CLASS = names("net.minecraft.client.renderer.ViewFrustum");
     private static final Set<String> RENDER_GLOBAL_CLASS = names("net.minecraft.client.renderer.RenderGlobal");
     private static final Set<String> RENDER_CHUNK_CLASS = names(
@@ -136,6 +138,8 @@ public final class FFDHeightTransformer implements IClassTransformer {
             "dev.redstudio.alfheim.mixin.ChunkMixin");
     private static final Set<String> ALFHEIM_CHUNK_CACHE_MIXIN_CLASSES = names(
             "dev.redstudio.alfheim.mixin.ChunkCacheMixin");
+    private static final Set<String> VINTAGE_FIX_CHUNK_MIXIN_CLASSES = names(
+            "org.embeddedt.vintagefix.mixin.chunk_access.ChunkMixin");
     private static final Set<String> NOTHIRIUM_WORLD_UTIL_CLASSES = names(
             "meldexun.nothirium.mc.util.WorldUtil");
     private static final Set<String> NOTHIRIUM_RENDER_CHUNK_CLASSES = names(
@@ -729,6 +733,15 @@ public final class FFDHeightTransformer implements IClassTransformer {
                         }
                     });
         }
+        if (VINTAGE_FIX_CHUNK_MIXIN_CLASSES.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformVintageFixChunkMixin(bytes);
+                        }
+                    });
+        }
         if (NOTHIRIUM_WORLD_UTIL_CLASSES.contains(transformedName)) {
             return transformOptionalCompat(transformedName, basicClass,
                     new OptionalTransformer() {
@@ -881,6 +894,9 @@ public final class FFDHeightTransformer implements IClassTransformer {
         if (HEIGHT_BOUNDED_COMMAND_CLASSES.contains(transformedName)) {
             return transformHeightBoundedCommand(basicClass,
                     "net.minecraft.command.CommandFill".equals(transformedName) ? 1 : 2);
+        }
+        if (NET_HANDLER_PLAY_SERVER_CLASS.contains(transformedName)) {
+            return transformNetHandlerPlayServer(basicClass);
         }
         if (WORLD_PROVIDER_CLASS.contains(transformedName)) {
             return transformWorldProvider(basicClass);
@@ -1411,6 +1427,26 @@ public final class FFDHeightTransformer implements IClassTransformer {
                     new InsnNode(Opcodes.IRETURN)));
         }
         LOGGER.info("Patched Alfheim 1.6 ChunkCacheMixin for extended-height light access");
+        return write(node);
+    }
+
+    private static byte[] transformVintageFixChunkMixin(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        require("org/embeddedt/vintagefix/mixin/chunk_access/ChunkMixin".equals(node.name),
+                "Unexpected VintageFix ChunkMixin class");
+        replace(findMethod(node, "func_186032_a", "func_186032_a",
+                "(III)Lnet/minecraft/block/state/IBlockState;"), list(
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new org.objectweb.asm.tree.TypeInsnNode(Opcodes.CHECKCAST,
+                        "net/minecraft/world/chunk/Chunk"),
+                new VarInsnNode(Opcodes.ILOAD, 1),
+                new VarInsnNode(Opcodes.ILOAD, 2),
+                new VarInsnNode(Opcodes.ILOAD, 3),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "getBlockState",
+                        "(Lnet/minecraft/world/chunk/Chunk;III)Lnet/minecraft/block/state/IBlockState;",
+                        false),
+                new InsnNode(Opcodes.ARETURN)));
+        LOGGER.info("Patched VintageFix 0.7.0 ChunkMixin for FFD height storage");
         return write(node);
     }
 
@@ -3364,6 +3400,60 @@ public final class FFDHeightTransformer implements IClassTransformer {
                         "(Lnet/minecraft/command/ICommandSender;[Ljava/lang/String;IZ)Lnet/minecraft/util/math/BlockPos;", false),
                 new InsnNode(Opcodes.ARETURN)));
         LOGGER.info("Patched command coordinate parsing for extended build height");
+        return write(node);
+    }
+
+    private static byte[] transformNetHandlerPlayServer(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode method = findMethod(node, "processTryUseItemOnBlock", "func_184337_a",
+                "(Lnet/minecraft/network/play/client/CPacketPlayerTryUseItemOnBlock;)V");
+        int worldLocal = -1;
+        for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if ("net/minecraft/server/MinecraftServer".equals(call.owner)
+                    && ("getWorld".equals(call.name) || "func_71218_a".equals(call.name))
+                    && "(I)Lnet/minecraft/world/WorldServer;".equals(call.desc)) {
+                AbstractInsnNode store = nextReal(call);
+                if (store instanceof VarInsnNode && store.getOpcode() == Opcodes.ASTORE) {
+                    worldLocal = ((VarInsnNode) store).var;
+                    break;
+                }
+            }
+        }
+        if (worldLocal < 0) {
+            throw new IllegalStateException("Could not locate player interaction world local");
+        }
+
+        int patched = 0;
+        for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null; ) {
+            AbstractInsnNode next = instruction.getNext();
+            if (instruction instanceof MethodInsnNode) {
+                MethodInsnNode call = (MethodInsnNode) instruction;
+                if ("net/minecraft/server/MinecraftServer".equals(call.owner)
+                        && ("getBuildLimit".equals(call.name)
+                                || "func_71207_Z".equals(call.name))
+                        && "()I".equals(call.desc)) {
+                    InsnList replacement = list(
+                            new InsnNode(Opcodes.POP),
+                            new VarInsnNode(Opcodes.ALOAD, worldLocal),
+                            new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS,
+                                    "playerBuildLimit", "(Lnet/minecraft/world/World;)I", false));
+                    method.instructions.insertBefore(call, replacement);
+                    method.instructions.remove(call);
+                    patched++;
+                }
+            }
+            instruction = next;
+        }
+        if (patched != 3) {
+            throw new IllegalStateException("Expected three player build-limit calls, patched "
+                    + patched);
+        }
+        LOGGER.info("Patched player block placement build limit");
         return write(node);
     }
 

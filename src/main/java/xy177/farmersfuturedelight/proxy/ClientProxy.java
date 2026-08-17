@@ -24,6 +24,7 @@ import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.client.particle.ParticleGlowSquid;
 import xy177.farmersfuturedelight.client.particle.ParticleDripstone;
 import xy177.farmersfuturedelight.client.particle.ParticleHoneyDrip;
+import xy177.farmersfuturedelight.client.particle.ParticleSmallFlame;
 import xy177.farmersfuturedelight.client.particle.ParticleSporeBlossom;
 import xy177.farmersfuturedelight.client.render.RenderBee;
 import xy177.farmersfuturedelight.client.render.RenderAxolotl;
@@ -216,27 +217,27 @@ public class ClientProxy extends CommonProxy {
             registerModel(FFDItems.RAW_IRON_BLOCK, "raw_iron_block");
             registerModel(FFDItems.RAW_GOLD_BLOCK, "raw_gold_block");
         }
+        registerModel(FFDItems.COPPER_ORE, "copper_ore");
+        registerModel(FFDItems.RAW_COPPER, "raw_copper");
+        registerModel(FFDItems.RAW_COPPER_BLOCK, "raw_copper_block");
+        registerModel(FFDItems.COPPER_INGOT, "copper_ingot");
+        registerModels(FFDItems.COPPER_BLOCK_ITEMS);
+        registerModels(FFDItems.WAXED_COPPER_BLOCK_ITEMS);
+        registerModels(FFDItems.CUT_COPPER_ITEMS);
+        registerModels(FFDItems.WAXED_CUT_COPPER_ITEMS);
+        registerModels(FFDItems.CUT_COPPER_STAIR_ITEMS);
+        registerModels(FFDItems.WAXED_CUT_COPPER_STAIR_ITEMS);
+        registerModels(FFDItems.CUT_COPPER_SLAB_ITEMS);
+        registerModels(FFDItems.WAXED_CUT_COPPER_SLAB_ITEMS);
+        registerModels(FFDItems.LIGHTNING_ROD_ITEMS);
+        registerModels(FFDItems.WAXED_LIGHTNING_ROD_ITEMS);
+        registerModel(FFDItems.SPYGLASS, "spyglass");
         if (FFDItems.isItemRegistered(FFDItems.SPYGLASS)) {
-            registerModel(FFDItems.COPPER_ORE, "copper_ore");
-            registerModel(FFDItems.RAW_COPPER, "raw_copper");
-            registerModel(FFDItems.RAW_COPPER_BLOCK, "raw_copper_block");
-            registerModel(FFDItems.COPPER_INGOT, "copper_ingot");
-            registerModels(FFDItems.COPPER_BLOCK_ITEMS);
-            registerModels(FFDItems.WAXED_COPPER_BLOCK_ITEMS);
-            registerModels(FFDItems.CUT_COPPER_ITEMS);
-            registerModels(FFDItems.WAXED_CUT_COPPER_ITEMS);
-            registerModels(FFDItems.CUT_COPPER_STAIR_ITEMS);
-            registerModels(FFDItems.WAXED_CUT_COPPER_STAIR_ITEMS);
-            registerModels(FFDItems.CUT_COPPER_SLAB_ITEMS);
-            registerModels(FFDItems.WAXED_CUT_COPPER_SLAB_ITEMS);
-            registerModels(FFDItems.LIGHTNING_ROD_ITEMS);
-            registerModels(FFDItems.WAXED_LIGHTNING_ROD_ITEMS);
-            registerModel(FFDItems.SPYGLASS, "spyglass");
             ModelBakery.registerItemVariants(FFDItems.SPYGLASS,
                     new ResourceLocation(FarmerFutureDelight.MODID, "spyglass_in_hand"));
-            if (FFDItems.isDeepslateEnabled()) {
-                registerModel(FFDItems.DEEPSLATE_COPPER_ORE, "deepslate_copper_ore");
-            }
+        }
+        if (FFDItems.isDeepslateEnabled()) {
+            registerModel(FFDItems.DEEPSLATE_COPPER_ORE, "deepslate_copper_ore");
         }
         if (FFDItems.isHoneyEnabled()) {
             registerModel(FFDItems.HONEY_BOTTLE, "honey_bottle");
@@ -422,6 +423,20 @@ public class ClientProxy extends CommonProxy {
                                        double z, boolean lava) {
         Minecraft.getMinecraft().effectRenderer.addEffect(
                 ParticleDripstone.create(world, x, y, z, lava));
+    }
+
+    @Override
+    public void spawnSmallFlameParticle(net.minecraft.world.World world, double x, double y,
+                                        double z) {
+        Minecraft minecraft = Minecraft.getMinecraft();
+        int particleSetting = minecraft.gameSettings.particleSetting;
+        if (particleSetting == 2
+                || particleSetting == 1 && world.rand.nextInt(3) == 0
+                || minecraft.getRenderViewEntity() == null
+                || minecraft.getRenderViewEntity().getDistanceSq(x, y, z) > 1024.0D) {
+            return;
+        }
+        minecraft.effectRenderer.addEffect(ParticleSmallFlame.create(world, x, y, z));
     }
 
     @Override

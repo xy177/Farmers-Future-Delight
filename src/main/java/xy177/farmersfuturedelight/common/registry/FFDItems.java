@@ -1,5 +1,9 @@
 package xy177.farmersfuturedelight.common.registry;
 
+import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.Map;
+
 import net.minecraft.block.Block;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
@@ -17,6 +21,7 @@ import xy177.farmersfuturedelight.common.FFDConfig;
 import xy177.farmersfuturedelight.common.FFDCreativeTab;
 import xy177.farmersfuturedelight.common.item.ItemAxolotlBucket;
 import xy177.farmersfuturedelight.common.item.ItemBigDripleaf;
+import xy177.farmersfuturedelight.common.item.ItemCandle;
 import xy177.farmersfuturedelight.common.item.ItemBlockDriedKelp;
 import xy177.farmersfuturedelight.common.item.ItemDriedKelp;
 import xy177.farmersfuturedelight.common.item.ItemGlowBerries;
@@ -40,6 +45,10 @@ import xy177.farmersfuturedelight.common.item.ItemTurtleEgg;
 import xy177.farmersfuturedelight.common.item.ItemTurtleHelmet;
 
 public final class FFDItems {
+    private static final Map<Item, Block> LOCAL_ITEM_BLOCKS = new IdentityHashMap<>();
+    private static final Map<net.minecraft.util.ResourceLocation, Item> LOCAL_BLOCK_ITEMS_BY_NAME =
+            new HashMap<>();
+
     public static final ArmorMaterial TURTLE_SCUTE_ARMOR = EnumHelper.addArmorMaterial(
             "turtle_scute", FarmerFutureDelight.MODID + ":turtle_scute", 25,
             new int[] {2, 5, 6, 2}, 9, FFDSounds.TURTLE_ARMOR_EQUIP, 0.0F);
@@ -131,7 +140,7 @@ public final class FFDItems {
     public static final Item LIGHT = new ItemLightBlock(FFDBlocks.LIGHT)
             .setRegistryName(FFDBlocks.LIGHT.getRegistryName())
             .setUnlocalizedName(FarmerFutureDelight.MODID + ".light");
-    public static final Item[] CANDLE_ITEMS = blockItems(FFDBlocks.CANDLES);
+    public static final Item[] CANDLE_ITEMS = candleItems(FFDBlocks.CANDLES);
     public static final Item CANDLE = CANDLE_ITEMS[0];
     public static final Item POWDER_SNOW = blockItem(FFDBlocks.POWDER_SNOW);
     public static final Item POWDER_SNOW_BUCKET = new ItemPowderSnowBucket()
@@ -313,6 +322,30 @@ public final class FFDItems {
     public static final Item CRIMSON_PRESSURE_PLATE = blockItem(FFDBlocks.CRIMSON_PRESSURE_PLATE);
     public static final Item WARPED_PRESSURE_PLATE = blockItem(FFDBlocks.WARPED_PRESSURE_PLATE);
 
+    static {
+        rememberBlockItem(MOSS_BLOCK, FFDBlocks.MOSS_BLOCK);
+        rememberBlockItem(MOSS_CARPET, FFDBlocks.MOSS_CARPET);
+        rememberBlockItem(AZALEA, FFDBlocks.AZALEA);
+        rememberBlockItem(FLOWERING_AZALEA, FFDBlocks.FLOWERING_AZALEA);
+        rememberBlockItem(AZALEA_LEAVES, FFDBlocks.AZALEA_LEAVES);
+        rememberBlockItem(FLOWERING_AZALEA_LEAVES, FFDBlocks.FLOWERING_AZALEA_LEAVES);
+        rememberBlockItem(SMALL_DRIPLEAF, FFDBlocks.SMALL_DRIPLEAF);
+        rememberBlockItem(ROOTED_DIRT, FFDBlocks.ROOTED_DIRT);
+        rememberBlockItem(HANGING_ROOTS, FFDBlocks.HANGING_ROOTS);
+        rememberBlockItem(SPORE_BLOSSOM, FFDBlocks.SPORE_BLOSSOM);
+        rememberBlockItem(GLOW_LICHEN, FFDBlocks.GLOW_LICHEN);
+        rememberBlockItem(LIGHT, FFDBlocks.LIGHT);
+        rememberBlockItem(HONEY_BLOCK, FFDBlocks.HONEY_BLOCK);
+        rememberBlockItem(HONEYCOMB_BLOCK, FFDBlocks.HONEYCOMB_BLOCK);
+        rememberBlockItem(BEE_NEST, FFDBlocks.BEE_NEST);
+        rememberBlockItem(BEEHIVE, FFDBlocks.BEEHIVE);
+        rememberBlockItem(KELP, FFDBlocks.KELP);
+        rememberBlockItem(DRIED_KELP_BLOCK, FFDBlocks.DRIED_KELP_BLOCK);
+        rememberBlockItem(SEAGRASS, FFDBlocks.SEAGRASS);
+        rememberBlockItem(SEA_PICKLE, FFDBlocks.SEA_PICKLE);
+        rememberBlockItem(TURTLE_EGG, FFDBlocks.TURTLE_EGG);
+    }
+
     public static boolean isSweetBerryEnabled() {
         return FFDCompat.isEnabled(FFDConfig.sweetBerryMode, FFDCompat.Feature.SWEET_BERRY);
     }
@@ -463,7 +496,9 @@ public final class FFDItems {
             return -1;
         }
         for (int i = 0; i < CANDLE_ITEMS.length; i++) {
-            if (stack.getItem() == CANDLE_ITEMS[i]) {
+            ItemStack effective = effectiveStack(CANDLE_ITEMS[i]);
+            if (!effective.isEmpty() && stack.getItem() == effective.getItem()
+                    && stack.getMetadata() == effective.getMetadata()) {
                 return i;
             }
         }
@@ -499,7 +534,7 @@ public final class FFDItems {
     public static boolean shouldRegisterItem(Item item) {
         FeatureBinding binding = itemBinding(item);
         return binding == null || FFDCompat.isLocalItemEnabled(
-                binding.mode, binding.feature, item);
+                binding.mode, binding.feature, item, LOCAL_ITEM_BLOCKS.get(item));
     }
 
     public static boolean isBlockRegistered(Block block) {
@@ -510,6 +545,14 @@ public final class FFDItems {
     public static boolean isItemRegistered(Item item) {
         return item.getRegistryName() != null
                 && ForgeRegistries.ITEMS.getValue(item.getRegistryName()) == item;
+    }
+
+    public static boolean shouldDisplayInCreativeTab(ItemStack stack) {
+        if (stack.isEmpty() || stack.getItem().getRegistryName() == null) {
+            return true;
+        }
+        Item local = LOCAL_BLOCK_ITEMS_BY_NAME.get(stack.getItem().getRegistryName());
+        return local == null || shouldRegisterItem(local);
     }
 
     public static ItemStack effectiveStack(Item local) {
@@ -652,8 +695,9 @@ public final class FFDItems {
     }
 
     private static FeatureBinding itemBinding(Item item) {
-        if (item instanceof ItemBlock) {
-            FeatureBinding block = blockBinding(((ItemBlock) item).getBlock());
+        Block localBlock = LOCAL_ITEM_BLOCKS.get(item);
+        if (localBlock != null) {
+            FeatureBinding block = blockBinding(localBlock);
             if (block != null) {
                 return block;
             }
@@ -817,7 +861,7 @@ public final class FFDItems {
         item.setRegistryName(block.getRegistryName());
         item.setUnlocalizedName(FarmerFutureDelight.MODID + "." + block.getRegistryName().getResourcePath());
         item.setCreativeTab(FFDCreativeTab.INSTANCE);
-        return item;
+        return rememberBlockItem(item, block);
     }
 
     private static Item simpleItem(String name) {
@@ -831,6 +875,19 @@ public final class FFDItems {
         Item[] items = new Item[blocks.length];
         for (int i = 0; i < blocks.length; i++) {
             items[i] = blockItem(blocks[i]);
+        }
+        return items;
+    }
+
+    private static Item[] candleItems(xy177.farmersfuturedelight.common.block.BlockCandle[] blocks) {
+        Item[] items = new Item[blocks.length];
+        for (int i = 0; i < blocks.length; i++) {
+            ItemCandle item = new ItemCandle(blocks[i]);
+            item.setRegistryName(blocks[i].getRegistryName());
+            item.setUnlocalizedName(FarmerFutureDelight.MODID + "."
+                    + blocks[i].getRegistryName().getResourcePath());
+            item.setCreativeTab(FFDCreativeTab.INSTANCE);
+            items[i] = rememberBlockItem(item, blocks[i]);
         }
         return items;
     }
@@ -850,7 +907,7 @@ public final class FFDItems {
         item.setUnlocalizedName(FarmerFutureDelight.MODID + "."
                 + block.getRegistryName().getResourcePath());
         item.setCreativeTab(FFDCreativeTab.INSTANCE);
-        return item;
+        return rememberBlockItem(item, block);
     }
 
     private static ItemSlab slabItem(net.minecraft.block.BlockSlab slab, net.minecraft.block.BlockSlab doubleSlab) {
@@ -863,7 +920,7 @@ public final class FFDItems {
         item.setRegistryName(slab.getRegistryName());
         item.setUnlocalizedName(FarmerFutureDelight.MODID + "." + slab.getRegistryName().getResourcePath());
         item.setCreativeTab(FFDCreativeTab.INSTANCE);
-        return item;
+        return rememberBlockItem(item, slab);
     }
 
     private static ItemDoor doorItem(Block door) {
@@ -876,6 +933,12 @@ public final class FFDItems {
         item.setRegistryName(door.getRegistryName());
         item.setUnlocalizedName(FarmerFutureDelight.MODID + "." + door.getRegistryName().getResourcePath());
         item.setCreativeTab(FFDCreativeTab.INSTANCE);
+        return rememberBlockItem(item, door);
+    }
+
+    private static <T extends Item> T rememberBlockItem(T item, Block block) {
+        LOCAL_ITEM_BLOCKS.put(item, block);
+        LOCAL_BLOCK_ITEMS_BY_NAME.put(item.getRegistryName(), item);
         return item;
     }
 

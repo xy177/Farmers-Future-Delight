@@ -301,7 +301,8 @@ public final class FFDGameplayEvents {
             return;
         }
         int candleIndex = FFDItems.getCandleIndex(event.getItemStack());
-        if (candleIndex < 0) {
+        if (candleIndex < 0
+                || !FFDItems.isBlockRegistered(FFDBlocks.CANDLE_CAKES[candleIndex])) {
             return;
         }
         IBlockState state = event.getWorld().getBlockState(event.getPos());

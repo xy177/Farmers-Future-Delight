@@ -56,15 +56,26 @@ public final class FFDHeightHooks {
     }
 
     public static boolean isExtended(World world) {
-        if (world == null || world.getWorldInfo() == null) {
+        if (!isOverworld(world) || world.getWorldInfo() == null) {
             return false;
         }
         WorldType type = world.getWorldInfo().getTerrainType();
-        return type != null && WORLD_TYPE_NAME.equals(type.getName());
+        return isExtended(type);
     }
 
     public static boolean isExtended(WorldType type) {
         return type != null && WORLD_TYPE_NAME.equals(type.getName());
+    }
+
+    private static boolean isOverworld(World world) {
+        return world != null && world.provider != null && world.provider.getDimension() == 0;
+    }
+
+    private static boolean hasExtendedWorldType(World world) {
+        if (world == null || world.getWorldInfo() == null) {
+            return false;
+        }
+        return isExtended(world.getWorldInfo().getTerrainType());
     }
 
     private static boolean usesDepthsUpdateHeight(World world) {
@@ -73,15 +84,12 @@ public final class FFDHeightHooks {
     }
 
     private static boolean usesExtendedHeight(World world) {
-        return FFDCoreCompat.isCaveBiomesApiPresent() || usesDepthsUpdateHeight(world)
-                || isExtended(world);
+        return isOverworld(world) && (FFDCoreCompat.isCaveBiomesApiPresent()
+                || usesDepthsUpdateHeight(world) || isExtended(world));
     }
 
     public static int sectionCount(World world) {
-        if (FFDCoreCompat.isCaveBiomesApiPresent() || usesDepthsUpdateHeight(world)) {
-            return EXTENDED_SECTION_COUNT;
-        }
-        return isExtended(world) ? EXTENDED_SECTION_COUNT : LEGACY_SECTION_COUNT;
+        return usesExtendedHeight(world) ? EXTENDED_SECTION_COUNT : LEGACY_SECTION_COUNT;
     }
 
     public static int minY(World world) {
@@ -104,18 +112,22 @@ public final class FFDHeightHooks {
         return maxYExclusive(chunk.getWorld());
     }
 
+    public static int playerBuildLimit(World world) {
+        return maxYExclusive(world);
+    }
+
     public static int adjustProviderHeight(int originalHeight, World world) {
         return usesExtendedHeight(world) && !usesLegacyWorldgenHeight()
                 ? MAX_Y_EXCLUSIVE : originalHeight;
     }
 
     public static int netherApiGenerationHeight(World world) {
-        return isExtended(world) ? 128 : world.getActualHeight();
+        return hasExtendedWorldType(world) ? 128 : world.getActualHeight();
     }
 
     public static int portalSearchHeight(World world) {
         if (world != null && world.provider != null && world.provider.getDimension() == -1
-                && isExtended(world)) {
+                && hasExtendedWorldType(world)) {
             return 128;
         }
         return world == null ? 256 : world.getActualHeight();

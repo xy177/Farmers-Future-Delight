@@ -8,8 +8,10 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 
 import xy177.farmersfuturedelight.common.FFDConfig;
+import xy177.farmersfuturedelight.common.FFDCompat;
 import xy177.farmersfuturedelight.common.block.BlockNetherVine;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.core.FFDHeightHooks;
@@ -25,24 +27,27 @@ public final class NetherForestFeatures {
 
     public static void generateForest(World world, Random random, int chunkX, int chunkZ,
                                       boolean warped, float[] columnStrengths) {
-        if (warped ? !FFDItems.isWarpedEnabled() : !FFDItems.isCrimsonEnabled()) {
+        if (!FFDCompat.shouldGenerateNetherForest(warped)) {
             return;
         }
         if (blocks().nylium(warped) == null) {
             return;
         }
 
-        convertExposedNetherrack(world, random, chunkX, chunkZ, warped, columnStrengths);
+        Chunk chunk = world.getChunkFromChunkCoords(chunkX, chunkZ);
+        convertExposedNetherrack(world, chunk, random, chunkX, chunkZ, warped, columnStrengths);
         if (warped) {
-            generateOnEveryLayer(world, random, chunkX, chunkZ, FFDConfig.warpedFungiAttempts,
+            final WorldGenHugeFungus hugeFungus = new WorldGenHugeFungus(true);
+            generateOnEveryLayer(world, chunk, random, chunkX, chunkZ, FFDConfig.warpedFungiAttempts,
                     columnStrengths,
-                    pos -> placeHugeFungus(world, random, pos, true));
-            generateOnEveryLayer(world, random, chunkX, chunkZ,
+                    pos -> placeHugeFungus(world, random, hugeFungus, pos, true));
+            hugeFungus.clearCache();
+            generateOnEveryLayer(world, chunk, random, chunkX, chunkZ,
                     FFDConfig.warpedForestVegetationAttempts, columnStrengths,
                     pos -> placeVegetationFeature(world, random, pos, true,
                             FFDConfig.netherVegetationSpreadWidth,
                             FFDConfig.netherVegetationSpreadHeight, WORLDGEN_FLAGS));
-            generateOnEveryLayer(world, random, chunkX, chunkZ, FFDConfig.netherSproutsAttempts,
+            generateOnEveryLayer(world, chunk, random, chunkX, chunkZ, FFDConfig.netherSproutsAttempts,
                     columnStrengths,
                     pos -> placeNetherSproutsFeature(world, random, pos,
                             FFDConfig.netherVegetationSpreadWidth,
@@ -61,10 +66,12 @@ public final class NetherForestFeatures {
                     columnStrengths,
                     pos -> placeWeepingVinesFeature(world, random, pos, WORLDGEN_FLAGS));
         }
-        generateOnEveryLayer(world, random, chunkX, chunkZ, FFDConfig.crimsonFungiAttempts,
+        final WorldGenHugeFungus hugeFungus = new WorldGenHugeFungus(false);
+        generateOnEveryLayer(world, chunk, random, chunkX, chunkZ, FFDConfig.crimsonFungiAttempts,
                 columnStrengths,
-                pos -> placeHugeFungus(world, random, pos, false));
-        generateOnEveryLayer(world, random, chunkX, chunkZ,
+                pos -> placeHugeFungus(world, random, hugeFungus, pos, false));
+        hugeFungus.clearCache();
+        generateOnEveryLayer(world, chunk, random, chunkX, chunkZ,
                 FFDConfig.crimsonForestVegetationAttempts, columnStrengths,
                 pos -> placeVegetationFeature(world, random, pos, false,
                         FFDConfig.netherVegetationSpreadWidth,
@@ -84,10 +91,13 @@ public final class NetherForestFeatures {
         }
     }
 
-    private static void convertExposedNetherrack(World world, Random random, int chunkX, int chunkZ,
+    private static void convertExposedNetherrack(World world, Chunk chunk, Random random,
+                                                  int chunkX, int chunkZ,
                                                   boolean warped, float[] columnStrengths) {
         IBlockState nylium = blocks().nylium(warped);
         int topY = getNetherTopY(world) - 2;
+        BlockPos.MutableBlockPos ground = new BlockPos.MutableBlockPos();
+        BlockPos.MutableBlockPos above = new BlockPos.MutableBlockPos();
         for (int localX = 0; localX < 16; localX++) {
             for (int localZ = 0; localZ < 16; localZ++) {
                 if (!acceptColumn(random, columnStrengths, localX, localZ)) {
@@ -96,9 +106,12 @@ public final class NetherForestFeatures {
                 int x = chunkX * 16 + localX;
                 int z = chunkZ * 16 + localZ;
                 for (int y = topY; y >= MIN_NYLIUM_Y; y--) {
-                    BlockPos ground = new BlockPos(x, y, z);
-                    if (world.getBlockState(ground).getBlock() == Blocks.NETHERRACK
-                            && world.isAirBlock(ground.up())) {
+                    ground.setPos(x, y, z);
+                    above.setPos(x, y + 1, z);
+                    IBlockState groundState = FFDHeightHooks.getBlockState(chunk, x, y, z);
+                    IBlockState aboveState = FFDHeightHooks.getBlockState(chunk, x, y + 1, z);
+                    if (groundState.getBlock() == Blocks.NETHERRACK
+                            && aboveState.getBlock().isAir(aboveState, world, above)) {
                         world.setBlockState(ground, nylium, WORLDGEN_FLAGS);
                     }
                 }
@@ -106,7 +119,8 @@ public final class NetherForestFeatures {
         }
     }
 
-    private static void generateOnEveryLayer(World world, Random random, int chunkX, int chunkZ,
+    private static void generateOnEveryLayer(World world, Chunk chunk, Random random,
+                                             int chunkX, int chunkZ,
                                              int count, float[] columnStrengths,
                                              PositionAction action) {
         int layer = 0;
@@ -121,7 +135,8 @@ public final class NetherForestFeatures {
                 }
                 int x = chunkX * 16 + localX;
                 int z = chunkZ * 16 + localZ;
-                int y = findOnGroundYPosition(world, x, getNetherTopY(world) - 1, z, layer);
+                int y = findOnGroundYPosition(world, chunk, x, getNetherTopY(world) - 1, z,
+                        layer);
                 if (y == POSITION_NOT_FOUND) {
                     continue;
                 }
@@ -132,14 +147,12 @@ public final class NetherForestFeatures {
         } while (foundAny);
     }
 
-    private static int findOnGroundYPosition(World world, int x, int startY, int z,
+    private static int findOnGroundYPosition(World world, Chunk chunk, int x, int startY, int z,
                                              int requestedLayer) {
-        BlockPos currentPos = new BlockPos(x, startY, z);
-        IBlockState currentState = world.getBlockState(currentPos);
+        IBlockState currentState = FFDHeightHooks.getBlockState(chunk, x, startY, z);
         int currentLayer = 0;
         for (int y = startY; y >= 1; y--) {
-            BlockPos belowPos = new BlockPos(x, y - 1, z);
-            IBlockState belowState = world.getBlockState(belowPos);
+            IBlockState belowState = FFDHeightHooks.getBlockState(chunk, x, y - 1, z);
             if (!isPlacementEmpty(belowState) && isPlacementEmpty(currentState)
                     && belowState.getBlock() != Blocks.BEDROCK) {
                 if (currentLayer == requestedLayer) {
@@ -237,7 +250,9 @@ public final class NetherForestFeatures {
         }
     }
 
-    private static void placeHugeFungus(World world, Random random, BlockPos origin,
+    private static void placeHugeFungus(World world, Random random,
+                                        WorldGenHugeFungus hugeFungus,
+                                        BlockPos origin,
                                         boolean warped) {
         boolean woodEnabled = warped ? FFDItems.isWarpedWoodEnabled()
                 : FFDItems.isCrimsonWoodEnabled();
@@ -245,7 +260,7 @@ public final class NetherForestFeatures {
                 && world.isAirBlock(origin)
                 && random.nextInt(FFDConfig.netherHugeFungusChanceRoll) == 0
                 && WorldGenHugeFungus.canGenerateAt(world, origin, warped)) {
-            new WorldGenHugeFungus(warped).generate(world, random, origin);
+            hugeFungus.generate(world, random, origin);
         }
     }
 

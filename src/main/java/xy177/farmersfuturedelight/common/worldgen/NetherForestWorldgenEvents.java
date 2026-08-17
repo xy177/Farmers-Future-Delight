@@ -1,6 +1,9 @@
 package xy177.farmersfuturedelight.common.worldgen;
 
 import java.util.Random;
+import java.util.Collections;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -11,6 +14,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import xy177.farmersfuturedelight.FarmerFutureDelight;
+import xy177.farmersfuturedelight.common.FFDCompat;
 import xy177.farmersfuturedelight.common.FFDConfig;
 import xy177.farmersfuturedelight.common.registry.FFDBiomes;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
@@ -21,17 +25,23 @@ public final class NetherForestWorldgenEvents {
     private static long biomeNoiseSeed = Long.MIN_VALUE;
     private static NoiseGeneratorPerlin biomeNoise;
     private static final ThreadLocal<Boolean> GENERATING_FOREST = new ThreadLocal<>();
+    private static final Map<World, Map<Long, ForestColumnMap>> FOREST_MAP_CACHE =
+            Collections.synchronizedMap(new WeakHashMap<World, Map<Long, ForestColumnMap>>());
 
     private NetherForestWorldgenEvents() {
     }
 
     @SubscribeEvent
     public static void assignForestBiome(PopulateChunkEvent.Pre event) {
-        ForestColumnMap forestMap = getForestMap(event.getWorld(), event.getChunkX(), event.getChunkZ());
+        World world = event.getWorld();
+        int chunkX = event.getChunkX();
+        int chunkZ = event.getChunkZ();
+        ForestColumnMap forestMap = getForestMap(world, chunkX, chunkZ);
+        cacheForestMap(world, chunkX, chunkZ, forestMap);
         if (!forestMap.hasForest()) {
             return;
         }
-        Chunk chunk = event.getWorld().getChunkFromChunkCoords(event.getChunkX(), event.getChunkZ());
+        Chunk chunk = world.getChunkFromChunkCoords(chunkX, chunkZ);
         byte[] biomes = chunk.getBiomeArray();
         byte crimsonId = (byte) Biome.getIdForBiome(FFDBiomes.CRIMSON_FOREST);
         byte warpedId = (byte) Biome.getIdForBiome(FFDBiomes.WARPED_FOREST);
@@ -57,23 +67,57 @@ public final class NetherForestWorldgenEvents {
         if (Boolean.TRUE.equals(GENERATING_FOREST.get())) {
             return;
         }
-        ForestColumnMap forestMap = getForestMap(event.getWorld(), event.getChunkX(), event.getChunkZ());
+        World world = event.getWorld();
+        int chunkX = event.getChunkX();
+        int chunkZ = event.getChunkZ();
+        ForestColumnMap forestMap = takeForestMap(world, chunkX, chunkZ);
+        if (forestMap == null) {
+            forestMap = getForestMap(world, chunkX, chunkZ);
+        }
         if (!forestMap.hasForest()) {
             return;
         }
         GENERATING_FOREST.set(Boolean.TRUE);
         try {
             if (forestMap.hasCrimson()) {
-                NetherForestFeatures.generateForest(event.getWorld(), event.getRand(), event.getChunkX(),
-                        event.getChunkZ(), false, forestMap.getStrengths(false));
+                NetherForestFeatures.generateForest(world, event.getRand(), chunkX, chunkZ,
+                        false, forestMap.getStrengths(false));
             }
             if (forestMap.hasWarped()) {
-                NetherForestFeatures.generateForest(event.getWorld(), event.getRand(), event.getChunkX(),
-                        event.getChunkZ(), true, forestMap.getStrengths(true));
+                NetherForestFeatures.generateForest(world, event.getRand(), chunkX, chunkZ,
+                        true, forestMap.getStrengths(true));
             }
         } finally {
             GENERATING_FOREST.remove();
         }
+    }
+
+    private static void cacheForestMap(World world, int chunkX, int chunkZ,
+                                       ForestColumnMap forestMap) {
+        synchronized (FOREST_MAP_CACHE) {
+            Map<Long, ForestColumnMap> worldCache = FOREST_MAP_CACHE.get(world);
+            if (worldCache == null) {
+                worldCache = new java.util.LinkedHashMap<Long, ForestColumnMap>(64, 0.75F, true) {
+                    @Override
+                    protected boolean removeEldestEntry(Map.Entry<Long, ForestColumnMap> eldest) {
+                        return size() > 256;
+                    }
+                };
+                FOREST_MAP_CACHE.put(world, worldCache);
+            }
+            worldCache.put(chunkKey(chunkX, chunkZ), forestMap);
+        }
+    }
+
+    private static ForestColumnMap takeForestMap(World world, int chunkX, int chunkZ) {
+        synchronized (FOREST_MAP_CACHE) {
+            Map<Long, ForestColumnMap> worldCache = FOREST_MAP_CACHE.get(world);
+            return worldCache == null ? null : worldCache.remove(chunkKey(chunkX, chunkZ));
+        }
+    }
+
+    private static long chunkKey(int chunkX, int chunkZ) {
+        return (chunkX & 0xFFFFFFFFL) | ((long) chunkZ << 32);
     }
 
     private static ForestColumnMap getForestMap(World world, int chunkX, int chunkZ) {
@@ -81,8 +125,8 @@ public final class NetherForestWorldgenEvents {
         if (world.provider.getDimension() != -1) {
             return forestMap;
         }
-        boolean crimson = FFDItems.isCrimsonEnabled();
-        boolean warped = FFDItems.isWarpedEnabled();
+        boolean crimson = FFDCompat.shouldGenerateNetherForest(false);
+        boolean warped = FFDCompat.shouldGenerateNetherForest(true);
         if (!crimson && !warped) {
             return forestMap;
         }

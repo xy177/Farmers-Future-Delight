@@ -1,11 +1,14 @@
 package xy177.farmersfuturedelight.common.worldgen;
 
 import java.util.Random;
+import java.util.HashMap;
+import java.util.Map;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.feature.WorldGenerator;
 
 import xy177.farmersfuturedelight.common.block.BlockNetherPlant;
@@ -18,6 +21,9 @@ public class WorldGenHugeFungus extends WorldGenerator {
 
     private final boolean warped;
     private final boolean planted;
+    private World cachedWorld;
+    private Map<Long, Chunk> cachedChunks;
+    private WorldgenBlockLight cachedLight;
 
     public WorldGenHugeFungus(boolean warped) {
         this(warped, false);
@@ -53,7 +59,14 @@ public class WorldGenHugeFungus extends WorldGenerator {
         }
 
         boolean huge = !planted && random.nextFloat() < HUGE_PROBABILITY;
-        world.setBlockToAir(pos);
+        if (world != cachedWorld || cachedChunks == null) {
+            cachedWorld = world;
+            cachedChunks = new HashMap<Long, Chunk>();
+            cachedLight = new WorldgenBlockLight(world, cachedChunks);
+        }
+        if (planted) {
+            world.setBlockToAir(pos);
+        }
         placeStem(world, random, pos, height, huge);
         placeHat(world, random, pos, height, huge);
         return true;
@@ -62,11 +75,12 @@ public class WorldGenHugeFungus extends WorldGenerator {
     private void placeStem(World world, Random random, BlockPos origin, int height, boolean huge) {
         IBlockState stem = blocks().stem(warped);
         int radius = huge ? 1 : 0;
+        BlockPos.MutableBlockPos stemPos = new BlockPos.MutableBlockPos();
         for (int x = -radius; x <= radius; x++) {
             for (int z = -radius; z <= radius; z++) {
                 boolean corner = huge && Math.abs(x) == radius && Math.abs(z) == radius;
                 for (int y = 0; y < height; y++) {
-                    BlockPos stemPos = origin.add(x, y, z);
+                    stemPos.setPos(origin.getX() + x, origin.getY() + y, origin.getZ() + z);
                     if (!isReplaceable(world, stemPos, true)
                             || corner && random.nextFloat() >= 0.1F) {
                         continue;
@@ -83,6 +97,7 @@ public class WorldGenHugeFungus extends WorldGenerator {
         boolean placeVines = !warped;
         int hatHeight = Math.min(random.nextInt(1 + height / 3) + 5, height);
         int hatStartY = height - hatHeight;
+        BlockPos.MutableBlockPos hatPos = new BlockPos.MutableBlockPos();
 
         for (int y = hatStartY; y <= height; y++) {
             int radius = y < height - random.nextInt(3) ? 2 : 1;
@@ -95,7 +110,7 @@ public class WorldGenHugeFungus extends WorldGenerator {
 
             for (int x = -radius; x <= radius; x++) {
                 for (int z = -radius; z <= radius; z++) {
-                    BlockPos hatPos = origin.add(x, y, z);
+                    hatPos.setPos(origin.getX() + x, origin.getY() + y, origin.getZ() + z);
                     if (!isReplaceable(world, hatPos, false)) {
                         continue;
                     }
@@ -139,7 +154,7 @@ public class WorldGenHugeFungus extends WorldGenerator {
 
     private void placeHatDropBlock(World world, Random random, BlockPos pos,
                                    IBlockState wart, boolean placeVines) {
-        if (world.getBlockState(pos.down()).getBlock() == wart.getBlock()) {
+        if (getBlockState(world, pos.down()).getBlock() == wart.getBlock()) {
             place(world, pos, wart);
         } else if (random.nextFloat() < 0.15F) {
             place(world, pos, wart);
@@ -151,7 +166,8 @@ public class WorldGenHugeFungus extends WorldGenerator {
 
     private void tryPlaceWeepingVines(World world, Random random, BlockPos hatPos) {
         BlockPos start = hatPos.down();
-        if (!world.isAirBlock(start)) {
+        IBlockState startState = getBlockState(world, start);
+        if (!startState.getBlock().isAir(startState, world, start)) {
             return;
         }
         int height = 1 + random.nextInt(5);
@@ -162,12 +178,12 @@ public class WorldGenHugeFungus extends WorldGenerator {
                 planted ? 2 : WORLDGEN_FLAGS);
     }
 
-    private static boolean isReplaceable(World world, BlockPos pos, boolean includePlants) {
+    private boolean isReplaceable(World world, BlockPos pos, boolean includePlants) {
         if (FFDHeightHooks.isOutsideBuildHeight(world, pos)) {
             return false;
         }
-        IBlockState state = world.getBlockState(pos);
-        if (world.isAirBlock(pos)) {
+        IBlockState state = getBlockState(world, pos);
+        if (state.getBlock().isAir(state, world, pos)) {
             return true;
         }
         if (!includePlants) {
@@ -179,6 +195,14 @@ public class WorldGenHugeFungus extends WorldGenerator {
                 || state.getBlock() instanceof BlockNetherPlant;
     }
 
+    private IBlockState getBlockState(World world, BlockPos pos) {
+        if (world != cachedWorld || cachedChunks == null) {
+            return world.getBlockState(pos);
+        }
+        Chunk chunk = getChunk(world, pos);
+        return FFDHeightHooks.getBlockState(chunk, pos.getX(), pos.getY(), pos.getZ());
+    }
+
     private void place(World world, BlockPos pos, IBlockState state) {
         if (planted && !world.isAirBlock(pos) && !world.isAirBlock(pos.down())) {
             world.destroyBlock(pos, true);
@@ -186,8 +210,46 @@ public class WorldGenHugeFungus extends WorldGenerator {
         if (planted) {
             setBlockAndNotifyAdequately(world, pos, state);
         } else {
-            world.setBlockState(pos, state, WORLDGEN_FLAGS);
+            BlockPos immutable = pos.toImmutable();
+            IBlockState oldState = getBlockState(world, immutable);
+            int oldLight = oldState.getLightValue(world, immutable);
+            int oldOpacity = oldState.getLightOpacity(world, immutable);
+            Chunk chunk = getChunk(world, immutable);
+            IBlockState replaced = chunk.setBlockState(immutable, state);
+            if (replaced == null) {
+                return;
+            }
+            if (state.getLightOpacity(world, immutable) != oldOpacity
+                    || state.getLightValue(world, immutable) != oldLight) {
+                cachedLight.check(immutable);
+            }
+            world.markAndNotifyBlock(immutable, chunk, replaced, state, WORLDGEN_FLAGS);
         }
+    }
+
+    void clearCache() {
+        cachedWorld = null;
+        cachedChunks = null;
+        cachedLight = null;
+    }
+
+    private Chunk getChunk(World world, BlockPos pos) {
+        if (world != cachedWorld || cachedChunks == null) {
+            cachedWorld = world;
+            cachedChunks = new HashMap<Long, Chunk>();
+            cachedLight = new WorldgenBlockLight(world, cachedChunks);
+        }
+        int chunkX = pos.getX() >> 4;
+        int chunkZ = pos.getZ() >> 4;
+        long key = ((long) chunkX & 0xffffffffL)
+                | (((long) chunkZ & 0xffffffffL) << 32);
+        Long boxedKey = Long.valueOf(key);
+        Chunk chunk = cachedChunks.get(boxedKey);
+        if (chunk == null) {
+            chunk = world.getChunkFromChunkCoords(chunkX, chunkZ);
+            cachedChunks.put(boxedKey, chunk);
+        }
+        return chunk;
     }
 
     private static FFDNetherBlockProvider blocks() {

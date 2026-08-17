@@ -68,7 +68,7 @@ public class ModelAxolotlBaby extends ModelBase {
     private ModelRenderer flatLeg(int u, int v, float x, float z, boolean right) {
         ModelRenderer leg = new ModelRenderer(this, u, v);
         leg.setRotationPoint(x, 0.25F, z);
-        leg.addBox(right ? -3.0F : 0.0F, 0.0F, -0.5F, 3, 0, 1, 0.0F);
+        leg.addBox(right ? -3.0F : 0.0F, 0.0F, -0.5F, 3, 0, 1, 0.01F);
         body.addChild(leg);
         return leg;
     }

@@ -355,8 +355,11 @@ public final class ClientEventHandler {
 
     private static int waterColor(net.minecraft.block.state.IBlockState state, IBlockAccess world,
                                   BlockPos pos, int tintIndex) {
-        return tintIndex == 0 && world != null && pos != null
-                ? BiomeColorHelper.getWaterColorAtPos(world, pos) : 0xFFFFFF;
+        if (tintIndex != 0 || world == null || pos == null) {
+            return 0xFFFFFF;
+        }
+        int biomeColor = BiomeColorHelper.getWaterColorAtPos(world, pos);
+        return OptiFineWaterColorCompat.getColor(world, pos, biomeColor);
     }
 
     private static ResourceLocation id(String path) {

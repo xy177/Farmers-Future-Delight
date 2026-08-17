@@ -15,7 +15,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -73,21 +72,7 @@ public class BlockCandle extends BlockAbstractCandle {
         if (handleLightingInteraction(world, pos, state, player, hand)) {
             return true;
         }
-        ItemStack held = player.getHeldItem(hand);
-        int count = state.getValue(CANDLES);
-        if (player.isSneaking() || held.isEmpty()
-                || held.getItem() != Item.getItemFromBlock(this) || count >= 4) {
-            return false;
-        }
-        if (!world.isRemote) {
-            world.setBlockState(pos, state.withProperty(CANDLES, count + 1), 11);
-            world.playSound(null, pos, FFDSounds.CANDLE.getPlaceSound(),
-                    SoundCategory.BLOCKS, 1.0F, 0.8F);
-            if (!player.capabilities.isCreativeMode) {
-                held.shrink(1);
-            }
-        }
-        return true;
+        return false;
     }
 
     @Override

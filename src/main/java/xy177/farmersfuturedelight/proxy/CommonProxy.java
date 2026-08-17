@@ -30,6 +30,9 @@ public class CommonProxy {
                                        boolean lava) {
     }
 
+    public void spawnSmallFlameParticle(World world, double x, double y, double z) {
+    }
+
     public void handleDripstoneParticle(double x, double y, double z, boolean lava) {
     }
 

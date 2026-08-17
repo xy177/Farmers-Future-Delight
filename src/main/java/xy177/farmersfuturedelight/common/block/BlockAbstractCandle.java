@@ -24,6 +24,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
+import xy177.farmersfuturedelight.FarmerFutureDelight;
 
 public abstract class BlockAbstractCandle extends Block {
     public static final PropertyBool LIT = PropertyBool.create("lit");
@@ -122,8 +123,7 @@ public abstract class BlockAbstractCandle extends Block {
                             random.nextFloat() * 0.7F + 0.3F, false);
                 }
             }
-            world.spawnParticle(EnumParticleTypes.FLAME,
-                    x, y, z, 0.0D, 0.0D, 0.0D);
+            FarmerFutureDelight.proxy.spawnSmallFlameParticle(world, x, y, z);
         }
     }
 
