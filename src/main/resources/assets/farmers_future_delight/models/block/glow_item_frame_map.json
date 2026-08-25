@@ -1,8 +1,8 @@
 {
     "textures": {
         "particle": "blocks/planks_birch",
-        "wood": "farmers_future_delight:block/glow_item_frame",
-        "back": "blocks/itemframe_background"
+        "wood": "blocks/planks_birch",
+        "back": "farmers_future_delight:block/glow_item_frame"
     },
     "elements": [
         {   "from": [ 1, 1, 15.001 ],

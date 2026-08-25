@@ -1,9 +1,16 @@
 package xy177.farmersfuturedelight.common;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -13,8 +20,6 @@ import net.minecraft.entity.monster.EntityMagmaCube;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntityStray;
 import net.minecraft.entity.boss.EntityWither;
-import net.minecraft.entity.monster.EntityPolarBear;
-import net.minecraft.entity.monster.EntitySnowman;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -23,6 +28,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -45,13 +51,114 @@ public final class FFDPowderSnowEvents {
             FarmerFutureDelight.MODID + ".skeletonPowderSnowTicks";
     private static final String SKELETON_CONVERSION_TAG =
             FarmerFutureDelight.MODID + ".strayConversionTicks";
+    private static final String TRANSFORMATION_TICKS_TAG =
+            FarmerFutureDelight.MODID + ".powderSnowTransformationTicks";
+    private static final String TRANSFORMATION_COUNTDOWN_TAG =
+            FarmerFutureDelight.MODID + ".powderSnowTransformationCountdown";
     private static final UUID FROST_SLOW_UUID =
             UUID.fromString("f32d8a13-c64b-49a3-9b66-07fc71f6b96a");
     private static final DamageSource FREEZE = new DamageSource("freeze").setDamageBypassesArmor();
     private static final int TICKS_TO_FREEZE = 140;
     private static final int STRAY_CONVERSION_TIME = 300;
+    private static volatile Map<ResourceLocation, ResourceLocation> TRANSFORMATIONS =
+            Collections.emptyMap();
+    private static volatile Set<ResourceLocation> IMMUNITIES = Collections.emptySet();
+    private static volatile Map<ResourceLocation, Float> ADDITIONAL_DAMAGE =
+            Collections.emptyMap();
+    private static volatile Set<ResourceLocation> WALKABLE_BOOTS = Collections.emptySet();
 
     private FFDPowderSnowEvents() {
+    }
+
+    public static void reloadConfig() {
+        Map<ResourceLocation, ResourceLocation> transformations = new HashMap<>();
+        if (FFDConfig.powderSnowMobTransformations != null) {
+            for (String entry : FFDConfig.powderSnowMobTransformations) {
+                String[] parts = entry == null ? new String[0] : entry.split(";", -1);
+                if (parts.length < 2) {
+                    continue;
+                }
+                ResourceLocation source = parseId(parts[0]);
+                ResourceLocation target = parseId(parts[1]);
+                if (source != null && target != null && !source.equals(target)) {
+                    transformations.put(source, target);
+                }
+            }
+        }
+
+        Set<ResourceLocation> immunities = new HashSet<>();
+        if (FFDConfig.powderSnowMobImmunities != null) {
+            for (String entry : FFDConfig.powderSnowMobImmunities) {
+                ResourceLocation id = parseId(entry);
+                if (id != null) {
+                    immunities.add(id);
+                }
+            }
+        }
+
+        Map<ResourceLocation, Float> additionalDamage = new HashMap<>();
+        if (FFDConfig.powderSnowAdditionalDamage != null) {
+            for (String entry : FFDConfig.powderSnowAdditionalDamage) {
+                String[] parts = entry == null ? new String[0] : entry.split(";", -1);
+                if (parts.length == 0) {
+                    continue;
+                }
+                ResourceLocation id = parseId(parts[0]);
+                if (id == null) {
+                    continue;
+                }
+                float damage = 5.0F;
+                if (parts.length > 1) {
+                    try {
+                        damage = Float.parseFloat(parts[1].trim());
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
+                if (damage > 0.0F) {
+                    additionalDamage.put(id, damage);
+                }
+            }
+        }
+
+        Set<ResourceLocation> walkableBoots = new HashSet<>();
+        if (FFDConfig.powderSnowWalkableBoots != null) {
+            for (String entry : FFDConfig.powderSnowWalkableBoots) {
+                ResourceLocation id = parseId(entry);
+                if (id != null) {
+                    walkableBoots.add(id);
+                }
+            }
+        }
+
+        TRANSFORMATIONS = Collections.unmodifiableMap(transformations);
+        IMMUNITIES = Collections.unmodifiableSet(immunities);
+        ADDITIONAL_DAMAGE = Collections.unmodifiableMap(additionalDamage);
+        WALKABLE_BOOTS = Collections.unmodifiableSet(walkableBoots);
+    }
+
+    private static ResourceLocation parseId(String value) {
+        if (value == null) {
+            return null;
+        }
+        String id = value.trim();
+        if (id.isEmpty()) {
+            return null;
+        }
+        if (id.indexOf(':') < 0) {
+            id = "minecraft:" + id;
+        }
+        try {
+            return new ResourceLocation(id);
+        } catch (IllegalArgumentException ignored) {
+            return null;
+        }
+    }
+
+    public static boolean isWalkableBoots(ItemStack stack) {
+        if (stack == null || stack.isEmpty() || stack.getItem().getRegistryName() == null) {
+            return false;
+        }
+        return WALKABLE_BOOTS.contains(stack.getItem().getRegistryName());
     }
 
     @SubscribeEvent
@@ -93,13 +200,12 @@ public final class FFDPowderSnowEvents {
             }
             updateFrostSlowdown(entity, frozenTicks);
             if (frozenTicks >= TICKS_TO_FREEZE && entity.ticksExisted % 40 == 0) {
-                float damage = entity instanceof EntityBlaze || entity instanceof EntityMagmaCube
-                        ? 5.0F : 1.0F;
-                entity.attackEntityFrom(FREEZE, damage);
+                ResourceLocation entityId = EntityList.getKey(entity);
+                float damage = entityId != null && ADDITIONAL_DAMAGE.containsKey(entityId)
+                        ? ADDITIONAL_DAMAGE.get(entityId) : 1.0F;
+                applyFreezeDamage(entity, damage);
             }
-            if (entity.getClass() == EntitySkeleton.class) {
-                updateSkeletonConversion((EntitySkeleton) entity, inside);
-            }
+            updateTransformation(entity, inside);
         }
     }
 
@@ -110,6 +216,25 @@ public final class FFDPowderSnowEvents {
 
     public static boolean isInsidePowderSnow(EntityLivingBase entity) {
         return findPowderSnow(entity) != null;
+    }
+
+    private static void applyFreezeDamage(EntityLivingBase entity, float damage) {
+        if (!(entity instanceof EntityPlayer) || entity.isSilent()) {
+            entity.attackEntityFrom(FREEZE, damage);
+            return;
+        }
+        entity.setSilent(true);
+        boolean damaged;
+        try {
+            damaged = entity.attackEntityFrom(FREEZE, damage);
+        } finally {
+            entity.setSilent(false);
+        }
+        if (damaged) {
+            entity.world.playSound(null, entity.posX, entity.posY, entity.posZ,
+                    FFDSounds.PLAYER_HURT_FREEZE, SoundCategory.PLAYERS, 1.0F,
+                    (entity.getRNG().nextFloat() - entity.getRNG().nextFloat()) * 0.2F + 1.0F);
+        }
     }
 
     @Nullable
@@ -139,8 +264,8 @@ public final class FFDPowderSnowEvents {
         if (entity instanceof EntityPlayer && ((EntityPlayer) entity).isSpectator()) {
             return false;
         }
-        if (entity instanceof EntityStray || entity instanceof EntityPolarBear
-                || entity instanceof EntitySnowman || entity instanceof EntityWither) {
+        ResourceLocation entityId = EntityList.getKey(entity);
+        if (entityId != null && IMMUNITIES.contains(entityId)) {
             return false;
         }
         for (EntityEquipmentSlot slot : new EntityEquipmentSlot[] {
@@ -173,27 +298,57 @@ public final class FFDPowderSnowEvents {
         }
     }
 
-    private static void updateSkeletonConversion(EntitySkeleton skeleton, boolean inside) {
-        NBTTagCompound data = skeleton.getEntityData();
-        int conversion = data.hasKey(SKELETON_CONVERSION_TAG)
-                ? data.getInteger(SKELETON_CONVERSION_TAG) : -1;
+    private static void updateTransformation(EntityLivingBase entity, boolean inside) {
+        ResourceLocation sourceId = EntityList.getKey(entity);
+        ResourceLocation targetId = sourceId == null ? null : TRANSFORMATIONS.get(sourceId);
+        String ticksTag = entity instanceof EntitySkeleton
+                ? SKELETON_SNOW_TICKS_TAG : TRANSFORMATION_TICKS_TAG;
+        String countdownTag = entity instanceof EntitySkeleton
+                ? SKELETON_CONVERSION_TAG : TRANSFORMATION_COUNTDOWN_TAG;
+        NBTTagCompound data = entity.getEntityData();
+        if (targetId == null || !canFreeze(entity)) {
+            data.setInteger(ticksTag, -1);
+            data.setInteger(countdownTag, -1);
+            return;
+        }
+        int conversion = data.hasKey(countdownTag) ? data.getInteger(countdownTag) : -1;
         if (!inside) {
-            data.setInteger(SKELETON_SNOW_TICKS_TAG, -1);
-            data.setInteger(SKELETON_CONVERSION_TAG, -1);
+            data.setInteger(ticksTag, -1);
+            data.setInteger(countdownTag, -1);
             return;
         }
         if (conversion >= 0) {
             conversion--;
-            data.setInteger(SKELETON_CONVERSION_TAG, conversion);
+            data.setInteger(countdownTag, conversion);
             if (conversion < 0) {
-                convertToStray(skeleton);
+                convertEntity(entity, targetId);
             }
             return;
         }
-        int snowTicks = data.getInteger(SKELETON_SNOW_TICKS_TAG) + 1;
-        data.setInteger(SKELETON_SNOW_TICKS_TAG, snowTicks);
+        int snowTicks = data.getInteger(ticksTag) + 1;
+        data.setInteger(ticksTag, snowTicks);
         if (snowTicks >= TICKS_TO_FREEZE) {
-            data.setInteger(SKELETON_CONVERSION_TAG, STRAY_CONVERSION_TIME);
+            data.setInteger(countdownTag, STRAY_CONVERSION_TIME);
+        }
+    }
+
+    private static void convertEntity(EntityLivingBase entity, ResourceLocation targetId) {
+        if (entity instanceof EntitySkeleton && "minecraft:stray".equals(targetId.toString())) {
+            convertToStray((EntitySkeleton) entity);
+            return;
+        }
+        NBTTagCompound entityData = entity.writeToNBT(new NBTTagCompound());
+        entityData.setString("id", targetId.toString());
+        Entity converted = EntityList.createEntityFromNBT(entityData, entity.world);
+        if (!(converted instanceof EntityLivingBase)) {
+            return;
+        }
+        converted.copyLocationAndAnglesFrom(entity);
+        converted.motionX = entity.motionX;
+        converted.motionY = entity.motionY;
+        converted.motionZ = entity.motionZ;
+        if (entity.world.spawnEntity(converted)) {
+            entity.setDead();
         }
     }
 

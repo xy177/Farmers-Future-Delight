@@ -4078,6 +4078,16 @@
         "sounds": ["farmers_future_delight:item/goat_horn/call7"],
         "subtitle": "subtitles.item.goat_horn.play"
     },
+    "entity.player.hurt_freeze": {
+        "sounds": [
+            "farmers_future_delight:entity/player/hurt/freeze_hurt1",
+            "farmers_future_delight:entity/player/hurt/freeze_hurt2",
+            "farmers_future_delight:entity/player/hurt/freeze_hurt3",
+            "farmers_future_delight:entity/player/hurt/freeze_hurt4",
+            "farmers_future_delight:entity/player/hurt/freeze_hurt5"
+        ],
+        "subtitle": "subtitles.entity.player.freeze_hurt"
+    },
     "music_disc.otherside": {
         "sounds": [
             {"name": "farmers_future_delight:records/otherside", "stream": true}

@@ -35,6 +35,7 @@ import xy177.farmersfuturedelight.common.item.ItemKelp;
 import xy177.farmersfuturedelight.common.item.ItemLightBlock;
 import xy177.farmersfuturedelight.common.item.ItemMusicDisc;
 import xy177.farmersfuturedelight.common.item.ItemNetherPlant;
+import xy177.farmersfuturedelight.common.item.ItemNetherVine;
 import xy177.farmersfuturedelight.common.item.ItemPowderSnowBucket;
 import xy177.farmersfuturedelight.common.item.ItemSeagrass;
 import xy177.farmersfuturedelight.common.item.ItemSeaPickle;
@@ -290,8 +291,8 @@ public final class FFDItems {
     public static final Item WARPED_ROOTS = netherPlantItem(FFDBlocks.WARPED_ROOTS,
             FFDBlocks.POTTED_WARPED_ROOTS);
     public static final Item NETHER_SPROUTS = blockItem(FFDBlocks.NETHER_SPROUTS);
-    public static final Item WEEPING_VINES = blockItem(FFDBlocks.WEEPING_VINES);
-    public static final Item TWISTING_VINES = blockItem(FFDBlocks.TWISTING_VINES);
+    public static final Item WEEPING_VINES = netherVineItem(FFDBlocks.WEEPING_VINES);
+    public static final Item TWISTING_VINES = netherVineItem(FFDBlocks.TWISTING_VINES);
     public static final Item CRIMSON_STEM = blockItem(FFDBlocks.CRIMSON_STEM);
     public static final Item STRIPPED_CRIMSON_STEM = blockItem(FFDBlocks.STRIPPED_CRIMSON_STEM);
     public static final Item CRIMSON_HYPHAE = blockItem(FFDBlocks.CRIMSON_HYPHAE);
@@ -903,6 +904,16 @@ public final class FFDItems {
 
     private static ItemNetherPlant netherPlantItem(Block block, Block pottedBlock) {
         ItemNetherPlant item = new ItemNetherPlant(block, pottedBlock);
+        item.setRegistryName(block.getRegistryName());
+        item.setUnlocalizedName(FarmerFutureDelight.MODID + "."
+                + block.getRegistryName().getResourcePath());
+        item.setCreativeTab(FFDCreativeTab.INSTANCE);
+        return rememberBlockItem(item, block);
+    }
+
+    private static ItemNetherVine netherVineItem(
+            xy177.farmersfuturedelight.common.block.BlockNetherVine block) {
+        ItemNetherVine item = new ItemNetherVine(block);
         item.setRegistryName(block.getRegistryName());
         item.setUnlocalizedName(FarmerFutureDelight.MODID + "."
                 + block.getRegistryName().getResourcePath());

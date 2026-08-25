@@ -43,7 +43,7 @@ public final class FFDConfig {
     private static final String CATEGORY_PARTICLES = "particles";
     private static final String CATEGORY_DEBUG = "debug";
     private static final String CATEGORY_INTERNAL = "internal";
-    private static final int CURRENT_CONFIG_VERSION = 4;
+    private static final int CURRENT_CONFIG_VERSION = 5;
 
     public static FeatureMode sweetBerryMode;
     public static FeatureMode honeyMode;
@@ -100,6 +100,11 @@ public final class FFDConfig {
     public static boolean experienceOrbMerging;
     public static boolean illagersIgnoreBabyVillagers;
     public static boolean logAutoCompatibilityDecisions;
+    public static String[] beeAdditionalPollinationTargets;
+    public static String[] powderSnowMobTransformations;
+    public static String[] powderSnowMobImmunities;
+    public static String[] powderSnowAdditionalDamage;
+    public static String[] powderSnowWalkableBoots;
     public static float goatScreamingChance;
     public static float goatSingleHornChance;
     public static int goatLongJumpCooldownMinTicks;
@@ -149,6 +154,7 @@ public final class FFDConfig {
     public static int modernOreVeinSizePercent;
     public static int modernFossilRarity;
     public static int modernVillageSpacing;
+    public static String[] cavesAndCliffsAdditionalBiomeCandidates;
     public static int modernCoalUpperCount;
     public static int modernCoalLowerCount;
     public static int modernIronUpperCount;
@@ -399,6 +405,24 @@ public final class FFDConfig {
                 true, "是否允许相同经验值的经验球按高版本规则合并，且拾取时不损失经验。对所有世界类型生效。");
         illagersIgnoreBabyVillagers = config.getBoolean("illagersIgnoreBabyVillagers", CATEGORY_GAMEPLAY,
                 true, "是否让灾厄村民不再主动攻击或伤害幼年村民。对所有世界类型生效。");
+        beeAdditionalPollinationTargets = config.getStringList(
+                "beeAdditionalPollinationTargets", CATEGORY_GAMEPLAY, new String[0],
+                "蜜蜂可额外用于授粉的方块或方块状态。支持 模组ID:方块ID、模组ID:方块ID@metadata、模组ID:方块ID[属性=值,属性=值] 三种格式。");
+        powderSnowMobTransformations = config.getStringList(
+                "powderSnowMobTransformations", CATEGORY_GAMEPLAY,
+                new String[]{"minecraft:skeleton;minecraft:stray"},
+                "细雪中的生物转换规则。每项使用 源生物注册名;目标生物注册名，例如 minecraft:pig;minecraft:creeper。默认保留骷髅转化为流浪者。");
+        powderSnowMobImmunities = config.getStringList(
+                "powderSnowMobImmunities", CATEGORY_GAMEPLAY,
+                new String[]{"minecraft:stray", "minecraft:polar_bear", "minecraft:snowman", "minecraft:wither"},
+                "免疫细雪冻结效果的生物注册名列表。旁观者和穿戴皮革盔甲的生物仍按独立规则处理。");
+        powderSnowAdditionalDamage = config.getStringList(
+                "powderSnowAdditionalDamage", CATEGORY_GAMEPLAY,
+                new String[]{"minecraft:blaze;5.0", "minecraft:magma_cube;5.0"},
+                "完全冻结后在细雪中受到额外伤害的生物规则。每项使用 生物注册名;伤害值，例如 minecraft:blaze;5.0。");
+        powderSnowWalkableBoots = config.getStringList(
+                "powderSnowWalkableBoots", CATEGORY_GAMEPLAY, new String[0],
+                "穿戴后可在细雪表面行走而不陷入的靴子物品注册名列表，例如 twilightforest:yeti_boots。皮革靴仍始终有效。");
         logAutoCompatibilityDecisions = config.getBoolean("logAutoCompatibilityDecisions", CATEGORY_DEBUG,
                 false, "是否在日志中逐项显示 AUTO 自动避让的内容与世界生成判定。默认关闭；仅建议排查兼容问题时开启。");
 
@@ -518,6 +542,9 @@ public final class FFDConfig {
                 64, 1, 100000, "ffd_cac 深层化石的区块触发分母；26.3 默认值为 64。");
         modernVillageSpacing = config.getInt("modernVillageSpacing", CATEGORY_WORLDGEN,
                 34, 9, 256, "ffd_cac 村庄随机扩散间距（区块）；26.3 默认值为 34，分离距离固定为 8。");
+        cavesAndCliffsAdditionalBiomeCandidates = config.getStringList(
+                "cavesAndCliffsAdditionalBiomeCandidates", CATEGORY_WORLDGEN, new String[0],
+                "额外加入 ffd_cac 主世界候选池的群系注册名。仅用于未登记到 Forge 主世界群系表的群系，格式为模组ID:群系ID。");
         modernCoalUpperCount = oreCount(config, "modernCoalUpperCount", 30, "高层煤矿");
         modernCoalLowerCount = oreCount(config, "modernCoalLowerCount", 20, "低层煤矿");
         modernIronUpperCount = oreCount(config, "modernIronUpperCount", 90, "高层铁矿");
@@ -838,6 +865,7 @@ public final class FFDConfig {
                 8, 1, 64, "扭曲藤特征单列的基础最大高度，26.3 默认值为 8。");
 
         migrateLegacyDefaults(config, loadedConfigVersion);
+        xy177.farmersfuturedelight.common.FFDPowderSnowEvents.reloadConfig();
         configVersion.set(CURRENT_CONFIG_VERSION);
         boolean bilingualCommentsChanged = applyBilingualComments(config);
 
@@ -985,6 +1013,9 @@ public final class FFDConfig {
         if ("modernVillageSpacing".equals(key)) {
             return "Village random-spread spacing in chunks for ffd_cac. The 26.3 default is 34; separation remains 8.";
         }
+        if ("cavesAndCliffsAdditionalBiomeCandidates".equals(key)) {
+            return "Registry names of additional Overworld biomes allowed in the ffd_cac candidate pool. Use this only for biomes that are not registered with Forge's Overworld biome lists.";
+        }
         if ("enchantingTableEmitsLight".equals(key)) {
             return "Make enchanting tables emit modern light level 7 in every world type.";
         }
@@ -1002,6 +1033,21 @@ public final class FFDConfig {
         }
         if ("illagersIgnoreBabyVillagers".equals(key)) {
             return "Prevent illagers from targeting or damaging baby villagers in every world type.";
+        }
+        if ("beeAdditionalPollinationTargets".equals(key)) {
+            return "Additional blocks or block states that bees can pollinate. Supported formats: modid:block, modid:block@metadata, and modid:block[property=value,property=value].";
+        }
+        if ("powderSnowMobTransformations".equals(key)) {
+            return "Powder-snow entity transformation rules. Use source entity registry name;target entity registry name, for example minecraft:pig;minecraft:creeper. Skeletons become strays by default.";
+        }
+        if ("powderSnowMobImmunities".equals(key)) {
+            return "Entity registry names that are immune to powder-snow freezing. Spectators and entities wearing leather armor remain handled separately.";
+        }
+        if ("powderSnowAdditionalDamage".equals(key)) {
+            return "Entity registry name;damage rules for extra damage after an entity is fully frozen in powder snow. For example minecraft:blaze;5.0.";
+        }
+        if ("powderSnowWalkableBoots".equals(key)) {
+            return "Item registry names for boots that let their wearer walk on powder snow without sinking. Leather boots always work.";
         }
         if ("goatScreamingChance".equals(key)) {
             return "Base chance for a spawned or bred goat to be a screaming goat. The 26.3 default is 0.02.";

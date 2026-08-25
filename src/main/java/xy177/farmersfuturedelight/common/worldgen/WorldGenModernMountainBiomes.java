@@ -77,13 +77,15 @@ public final class WorldGenModernMountainBiomes {
             int treeX = startX + random.nextInt(16);
             int treeZ = startZ + random.nextInt(16);
             BlockPos treePos = surfacePosition(world, treeX, treeZ);
-            clearSnowLayer(world, treePos);
             if (isSurfaceBiome(world, treePos, FFDVerticalBiome.MEADOW)
                     && canGrowTreeOn(world.getBlockState(treePos.down()))) {
+                IBlockState snow = removeSnowLayer(world, treePos);
                 WorldGenerator tree = random.nextBoolean()
                         ? new WorldGenBigTree(false) : new WorldGenBirchTree(false, true);
                 if (tree.generate(world, random, treePos)) {
                     FFDWorldGenerator.addGuaranteedBeeNest(random, world, treePos);
+                } else {
+                    restoreSnowLayer(world, treePos, snow);
                 }
             }
         }
@@ -97,7 +99,6 @@ public final class WorldGenModernMountainBiomes {
             int x = startX + random.nextInt(16);
             int z = startZ + random.nextInt(16);
             BlockPos treePos = surfacePosition(world, x, z);
-            clearSnowLayer(world, treePos);
             if (!isSurfaceBiome(world, treePos, FFDVerticalBiome.GROVE)) {
                 continue;
             }
@@ -106,11 +107,13 @@ public final class WorldGenModernMountainBiomes {
                 continue;
             }
 
+            IBlockState snow = removeSnowLayer(world, treePos);
             world.setBlockState(treePos.down(), Blocks.DIRT.getDefaultState(), WORLDGEN_FLAGS);
             WorldGenerator tree = random.nextInt(3) == 0
                     ? new WorldGenTaiga2(false) : new WorldGenTaiga1();
             if (!tree.generate(world, random, treePos)) {
                 world.setBlockState(treePos.down(), surface, WORLDGEN_FLAGS);
+                restoreSnowLayer(world, treePos, snow);
             }
         }
 
@@ -118,7 +121,6 @@ public final class WorldGenModernMountainBiomes {
             int x = startX + random.nextInt(16);
             int z = startZ + random.nextInt(16);
             BlockPos pos = surfacePosition(world, x, z);
-            clearSnowLayer(world, pos);
             if (isSurfaceBiome(world, pos, FFDVerticalBiome.GROVE)
                     && world.getBlockState(pos.down()).getBlock() == Blocks.GRASS) {
                 new WorldGenPumpkin().generate(world, random, pos);
@@ -207,20 +209,28 @@ public final class WorldGenModernMountainBiomes {
     }
 
     private static void placePlant(World world, BlockPos pos, IBlockState state) {
-        clearSnowLayer(world, pos);
-        if (!world.isAirBlock(pos) || !canSupportPlant(world.getBlockState(pos.down()))
-                || !state.getBlock().canPlaceBlockAt(world, pos)) {
+        IBlockState replaced = world.getBlockState(pos);
+        if (!world.isAirBlock(pos) && replaced.getBlock() != Blocks.SNOW_LAYER
+                || !canSupportPlant(world.getBlockState(pos.down()))) {
+            return;
+        }
+        IBlockState snow = removeSnowLayer(world, pos);
+        if (!state.getBlock().canPlaceBlockAt(world, pos)) {
+            restoreSnowLayer(world, pos, snow);
             return;
         }
         if (state.getBlock() == Blocks.DOUBLE_PLANT) {
             if (!world.isAirBlock(pos.up())) {
+                restoreSnowLayer(world, pos, snow);
                 return;
             }
             Blocks.DOUBLE_PLANT.placeAt(world, pos, BlockDoublePlant.EnumPlantType.GRASS,
                     WORLDGEN_FLAGS);
             return;
         }
-        world.setBlockState(pos, state, WORLDGEN_FLAGS);
+        if (!world.setBlockState(pos, state, WORLDGEN_FLAGS)) {
+            restoreSnowLayer(world, pos, snow);
+        }
     }
 
     private static boolean canSupportPlant(IBlockState state) {
@@ -234,6 +244,21 @@ public final class WorldGenModernMountainBiomes {
     private static void clearSnowLayer(World world, BlockPos pos) {
         if (world.getBlockState(pos).getBlock() == Blocks.SNOW_LAYER) {
             world.setBlockState(pos, Blocks.AIR.getDefaultState(), WORLDGEN_FLAGS);
+        }
+    }
+
+    private static IBlockState removeSnowLayer(World world, BlockPos pos) {
+        IBlockState state = world.getBlockState(pos);
+        if (state.getBlock() == Blocks.SNOW_LAYER
+                && world.setBlockState(pos, Blocks.AIR.getDefaultState(), WORLDGEN_FLAGS)) {
+            return state;
+        }
+        return null;
+    }
+
+    private static void restoreSnowLayer(World world, BlockPos pos, IBlockState state) {
+        if (state != null && world.isAirBlock(pos)) {
+            world.setBlockState(pos, state, WORLDGEN_FLAGS);
         }
     }
 

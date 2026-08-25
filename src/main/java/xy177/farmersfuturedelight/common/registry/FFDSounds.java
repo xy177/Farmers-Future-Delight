@@ -247,6 +247,8 @@ public final class FFDSounds {
             sound("item.bucket.empty_powder_snow");
     public static final SoundEvent SKELETON_CONVERTED_TO_STRAY =
             sound("entity.skeleton.converted_to_stray");
+    public static final SoundEvent PLAYER_HURT_FREEZE =
+            sound("entity.player.hurt_freeze");
 
     private FFDSounds() {
     }

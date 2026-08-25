@@ -545,7 +545,7 @@ public final class FFDCompat {
                 variant("copper_ingot", "deeperdepths", "material", 0)
         };
         return content("Deeper Depths", ids("deeperdepths", "copper_ore",
-                        "raw_copper_block", "cut_copper_stairs",
+                        "cut_copper_stairs",
                         "exposed_cut_copper_stairs", "weathered_cut_copper_stairs",
                         "oxidized_cut_copper_stairs", "waxed_cut_copper_stairs",
                         "waxed_exposed_cut_copper_stairs",

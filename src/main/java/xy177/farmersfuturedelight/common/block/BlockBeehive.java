@@ -87,6 +87,14 @@ public class BlockBeehive extends Block {
     }
 
     @Override
+    public IBlockState getActualState(IBlockState state, IBlockAccess world, BlockPos pos) {
+        TileEntity tile = world.getTileEntity(pos);
+        return tile instanceof TileEntityBeehive
+                ? state.withProperty(HONEY_LEVEL, ((TileEntityBeehive) tile).getHoneyLevel())
+                : state;
+    }
+
+    @Override
     public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing,
                                              float hitX, float hitY, float hitZ, int meta,
                                              EntityLivingBase placer) {
@@ -128,7 +136,11 @@ public class BlockBeehive extends Block {
     @Override
     public void randomDisplayTick(IBlockState state, World world, BlockPos pos,
                                   java.util.Random random) {
-        if (state.getValue(HONEY_LEVEL) < 5 || random.nextFloat() < 0.3F) {
+        TileEntity tile = world.getTileEntity(pos);
+        int honeyLevel = tile instanceof TileEntityBeehive
+                ? ((TileEntityBeehive) tile).getHoneyLevel()
+                : state.getValue(HONEY_LEVEL);
+        if (honeyLevel < 5 || random.nextFloat() < 0.3F) {
             return;
         }
         BlockPos below = pos.down();

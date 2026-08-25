@@ -12,9 +12,11 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -26,6 +28,7 @@ import net.minecraftforge.common.IShearable;
 
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.FFDCreativeTab;
+import xy177.farmersfuturedelight.common.item.ItemNetherVine;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
@@ -80,6 +83,15 @@ public class BlockNetherVine extends Block implements IGrowable, IShearable {
         if (!world.isRemote && world.getBlockState(pos).getBlock() == this) {
             setAge(world, pos, world.rand.nextInt(MAX_AGE));
         }
+    }
+
+    @Override
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state,
+                                    EntityPlayer player, EnumHand hand, EnumFacing facing,
+                                    float hitX, float hitY, float hitZ) {
+        EnumActionResult result = ItemNetherVine.extendHeldVine(
+                player, world, pos, hand, facing, growsUpward);
+        return result == EnumActionResult.SUCCESS;
     }
 
     @Override

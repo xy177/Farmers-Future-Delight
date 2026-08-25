@@ -53,6 +53,7 @@ tipped_arrow.effect.farmers_future_delight.turtle_master=神龟之箭
 tipped_arrow.effect.farmers_future_delight.long_turtle_master=神龟之箭+
 tipped_arrow.effect.farmers_future_delight.strong_turtle_master=神龟之箭 II
 subtitles.entity.zombie.destroy_egg=僵尸破坏海龟蛋
+subtitles.entity.player.freeze_hurt=玩家：冻伤
 item.farmers_future_delight.honey_bottle.name=蜂蜜瓶
 item.farmers_future_delight.honeycomb.name=蜜脾
 tile.farmers_future_delight.honey_block.name=蜂蜜块

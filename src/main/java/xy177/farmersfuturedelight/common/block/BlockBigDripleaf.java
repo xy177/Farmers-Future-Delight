@@ -333,9 +333,6 @@ public class BlockBigDripleaf extends Block implements IGrowable {
     @Override
     public boolean shouldSideBeRendered(IBlockState state, IBlockAccess world, BlockPos pos,
                                         EnumFacing side) {
-        if (waterlogged && world.getBlockState(pos.offset(side)).getMaterial() == Material.WATER) {
-            return false;
-        }
         return super.shouldSideBeRendered(state, world, pos, side);
     }
 

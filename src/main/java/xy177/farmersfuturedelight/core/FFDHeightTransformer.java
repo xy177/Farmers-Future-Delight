@@ -38,6 +38,7 @@ public final class FFDHeightTransformer implements IClassTransformer {
     private static final String CLIENT_HOOKS = Type.getInternalName(FFDClientHeightHooks.class);
     private static final String PULSAR_HOOKS = Type.getInternalName(FFDPulsarHooks.class);
     private static final String MINESHAFT_HOOKS = Type.getInternalName(FFDMineshaftHooks.class);
+    private static final String WEATHER2_HOOKS = Type.getInternalName(FFDWeather2CompatHooks.class);
     private static final String VIEW_FRUSTUM_ACCESS = Type.getInternalName(FFDViewFrustumAccess.class);
     private static final String RENDER_GLOBAL_ACCESS = Type.getInternalName(FFDRenderGlobalAccess.class);
     private static final String CONFIG = Type.getInternalName(FFDConfig.class);
@@ -70,10 +71,13 @@ public final class FFDHeightTransformer implements IClassTransformer {
     private static final Set<String> BLOCK_DYNAMIC_LIQUID_CLASS = names(
             "net.minecraft.block.BlockDynamicLiquid");
     private static final Set<String> BLOCK_STATIC_LIQUID_CLASS = names("net.minecraft.block.BlockStaticLiquid");
+    private static final Set<String> FLUIDLOGGED_FLUID_STATE_CLASS = names(
+            "git.jbredwards.fluidlogged_api.api.util.FluidState");
     private static final Set<String> BLOCK_CHORUS_FLOWER_CLASS = names("net.minecraft.block.BlockChorusFlower");
     private static final Set<String> PATH_NAVIGATE_GROUND_CLASS = names("net.minecraft.pathfinding.PathNavigateGround");
     private static final Set<String> WALK_NODE_PROCESSOR_CLASS = names("net.minecraft.pathfinding.WalkNodeProcessor");
     private static final Set<String> ENTITY_LIVING_BASE_CLASS = names("net.minecraft.entity.EntityLivingBase");
+    private static final Set<String> ENTITY_BAT_CLASS = names("net.minecraft.entity.passive.EntityBat");
     private static final Set<String> ENTITY_SHULKER_CLASS = names("net.minecraft.entity.monster.EntityShulker");
     private static final Set<String> ENTITY_XP_ORB_CLASS = names("net.minecraft.entity.item.EntityXPOrb");
     private static final Set<String> CHUNK_CLASS = names("net.minecraft.world.chunk.Chunk");
@@ -82,6 +86,16 @@ public final class FFDHeightTransformer implements IClassTransformer {
     private static final Set<String> BOAT_CLASS = names("net.minecraft.entity.item.EntityBoat");
     private static final Set<String> MINECART_CLASS = names("net.minecraft.entity.item.EntityMinecart");
     private static final Set<String> FALLING_BLOCK_CLASS = names("net.minecraft.entity.item.EntityFallingBlock");
+    private static final Set<String> REALISTIC_PHYSICS_CHUNK_CLASS = names(
+            "xbigellx.realisticphysics.internal.level.chunk.RPChunk");
+    private static final Set<String> REALISTIC_PHYSICS_LEVEL_CLASS = names(
+            "xbigellx.realisticphysics.internal.level.RPLevel");
+    private static final Set<String> REALISTIC_PHYSICS_QUEUE_CLASS = names(
+            "xbigellx.realisticphysics.internal.util.PriorityChunkQueue");
+    private static final Set<String> REALISTIC_PHYSICS_TASK_CLASS = names(
+            "xbigellx.rbp.internal.physics.task.BlockPhysicsTask");
+    private static final Set<String> REALISTIC_PHYSICS_SCHEDULER_CLASS = names(
+            "xbigellx.rbp.internal.physics.BlockOperationScheduler");
     private static final Set<String> CAULDRON_CLASS = names("net.minecraft.block.BlockCauldron");
     private static final Set<String> JUKEBOX_CLASS = names("net.minecraft.block.BlockJukebox");
     private static final Set<String> PLAYER_MP_CLASS = names("net.minecraft.entity.player.EntityPlayerMP");
@@ -132,14 +146,10 @@ public final class FFDHeightTransformer implements IClassTransformer {
             "com.dhj.actinium.world.cloned.ClonedChunkSection");
     private static final Set<String> PULSAR_WORLD_UTIL_CLASSES = names(
             "com.sumirelabs.pulsar.util.WorldUtil");
-    private static final Set<String> ALFHEIM_WORLD_MIXIN_CLASSES = names(
-            "dev.redstudio.alfheim.mixin.WorldMixin");
-    private static final Set<String> ALFHEIM_CHUNK_MIXIN_CLASSES = names(
-            "dev.redstudio.alfheim.mixin.ChunkMixin");
-    private static final Set<String> ALFHEIM_CHUNK_CACHE_MIXIN_CLASSES = names(
-            "dev.redstudio.alfheim.mixin.ChunkCacheMixin");
     private static final Set<String> VINTAGE_FIX_CHUNK_MIXIN_CLASSES = names(
             "org.embeddedt.vintagefix.mixin.chunk_access.ChunkMixin");
+    private static final Set<String> STELLAR_CORE_WORLD_POS_MIXIN_CLASSES = names(
+            "github.kasuminova.stellarcore.mixin.minecraft.world_pos_judgement.MixinWorld");
     private static final Set<String> NOTHIRIUM_WORLD_UTIL_CLASSES = names(
             "meldexun.nothirium.mc.util.WorldUtil");
     private static final Set<String> NOTHIRIUM_RENDER_CHUNK_CLASSES = names(
@@ -158,6 +168,20 @@ public final class FFDHeightTransformer implements IClassTransformer {
             "com.seibel.distanthorizons.common.wrappers.world.ServerLevelWrapper");
     private static final Set<String> NETHER_API_CHUNK_GENERATOR_CLASSES = names(
             "git.jbredwards.nether_api.mod.common.world.gen.ChunkGeneratorNether");
+    private static final Set<String> WEATHER2_STORM_CLASSES = names(
+            "weather2.weathersystem.storm.StormObject");
+    private static final Set<String> YUNG_MINESHAFT_PIECE_CLASSES = names(
+            "com.yungnickyoung.minecraft.bettermineshafts.world.generator.pieces.MineshaftPiece");
+    private static final Set<String> DEADLY_WORLD_CONFIG_PROPERTY_CLASSES = names(
+            "fathertoast.deadlyworld.config.Config$PropertyCategory");
+    private static final Set<String> DEADLY_WORLD_FEATURE_GENERATOR_CLASSES = names(
+            "fathertoast.deadlyworld.featuregen.FeatureGenerator");
+    private static final Set<String> DEADLY_WORLD_FLOOR_FEATURE_CLASSES = names(
+            "fathertoast.deadlyworld.featuregen.WorldGenFloorFeature");
+    private static final Set<String> DEADLY_WORLD_ORE_GENERATOR_CLASSES = names(
+            "fathertoast.deadlyworld.oregen.OreGenerator");
+    private static final Set<String> CORPSE_ENTITY_CLASSES = names(
+            "de.maxhenkel.corpse.entities.EntityCorpse");
     private static final Map<String, String> PULSAR_DEV_MIXIN_TARGETS = pulsarDevMixinTargets();
     private static final Map<String, String> PULSAR_DEV_METHOD_NAMES = pulsarDevMethodNames();
     private static final Map<String, String> PULSAR_DEV_FIELD_NAMES = pulsarDevFieldNames();
@@ -706,39 +730,21 @@ public final class FFDHeightTransformer implements IClassTransformer {
         if (basicClass == null) {
             return null;
         }
-        if (ALFHEIM_WORLD_MIXIN_CLASSES.contains(transformedName)) {
-            return transformOptionalCompat(transformedName, basicClass,
-                    new OptionalTransformer() {
-                        @Override
-                        public byte[] transform(byte[] bytes) {
-                            return transformAlfheimWorldMixin(bytes);
-                        }
-                    });
-        }
-        if (ALFHEIM_CHUNK_MIXIN_CLASSES.contains(transformedName)) {
-            return transformOptionalCompat(transformedName, basicClass,
-                    new OptionalTransformer() {
-                        @Override
-                        public byte[] transform(byte[] bytes) {
-                            return transformAlfheimChunkMixin(bytes);
-                        }
-                    });
-        }
-        if (ALFHEIM_CHUNK_CACHE_MIXIN_CLASSES.contains(transformedName)) {
-            return transformOptionalCompat(transformedName, basicClass,
-                    new OptionalTransformer() {
-                        @Override
-                        public byte[] transform(byte[] bytes) {
-                            return transformAlfheimChunkCacheMixin(bytes);
-                        }
-                    });
-        }
         if (VINTAGE_FIX_CHUNK_MIXIN_CLASSES.contains(transformedName)) {
             return transformOptionalCompat(transformedName, basicClass,
                     new OptionalTransformer() {
                         @Override
                         public byte[] transform(byte[] bytes) {
                             return transformVintageFixChunkMixin(bytes);
+                        }
+                    });
+        }
+        if (STELLAR_CORE_WORLD_POS_MIXIN_CLASSES.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformStellarCoreWorldPosMixin(bytes);
                         }
                     });
         }
@@ -814,6 +820,69 @@ public final class FFDHeightTransformer implements IClassTransformer {
                         }
                     });
         }
+        if (WEATHER2_STORM_CLASSES.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformWeather2StormObject(bytes);
+                        }
+                    });
+        }
+        if (YUNG_MINESHAFT_PIECE_CLASSES.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformYungMineshaftPiece(bytes);
+                        }
+                    });
+        }
+        if (DEADLY_WORLD_CONFIG_PROPERTY_CLASSES.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformDeadlyWorldConfigProperty(bytes);
+                        }
+                    });
+        }
+        if (DEADLY_WORLD_FEATURE_GENERATOR_CLASSES.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformDeadlyWorldFeatureGenerator(bytes);
+                        }
+                    });
+        }
+        if (DEADLY_WORLD_FLOOR_FEATURE_CLASSES.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformDeadlyWorldFloorFeature(bytes);
+                        }
+                    });
+        }
+        if (DEADLY_WORLD_ORE_GENERATOR_CLASSES.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformDeadlyWorldOreGenerator(bytes);
+                        }
+                    });
+        }
+        if (CORPSE_ENTITY_CLASSES.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformCorpseEntity(bytes);
+                        }
+                    });
+        }
         if (OPTIFINE_SHADER_VERTEX_BUILDER_CLASS.contains(transformedName)) {
             return transformOptionalCompat(transformedName, basicClass,
                     new OptionalTransformer() {
@@ -829,6 +898,60 @@ public final class FFDHeightTransformer implements IClassTransformer {
                         @Override
                         public byte[] transform(byte[] bytes) {
                             return transformHwylaBlockHud(bytes);
+                        }
+                    });
+        }
+        if (FLUIDLOGGED_FLUID_STATE_CLASS.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformFluidloggedFluidState(bytes);
+                        }
+                    });
+        }
+        if (REALISTIC_PHYSICS_CHUNK_CLASS.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformRealisticPhysicsChunk(bytes);
+                        }
+                    });
+        }
+        if (REALISTIC_PHYSICS_LEVEL_CLASS.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformRealisticPhysicsLevel(bytes);
+                        }
+                    });
+        }
+        if (REALISTIC_PHYSICS_QUEUE_CLASS.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformRealisticPhysicsQueue(bytes);
+                        }
+                    });
+        }
+        if (REALISTIC_PHYSICS_TASK_CLASS.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformRealisticPhysicsTask(bytes);
+                        }
+                    });
+        }
+        if (REALISTIC_PHYSICS_SCHEDULER_CLASS.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformRealisticPhysicsScheduler(bytes);
                         }
                     });
         }
@@ -962,6 +1085,9 @@ public final class FFDHeightTransformer implements IClassTransformer {
         }
         if (ENTITY_LIVING_BASE_CLASS.contains(transformedName)) {
             return transformEntityLivingBase(basicClass);
+        }
+        if (ENTITY_BAT_CLASS.contains(transformedName)) {
+            return transformEntityBat(basicClass);
         }
         if (ENTITY_XP_ORB_CLASS.contains(transformedName)) {
             return transformExperienceOrb(basicClass);
@@ -1240,193 +1366,318 @@ public final class FFDHeightTransformer implements IClassTransformer {
         return write(node);
     }
 
-    private static byte[] transformAlfheimWorldMixin(byte[] basicClass) {
+    private static byte[] transformFluidloggedFluidState(byte[] basicClass) {
         ClassNode node = read(basicClass);
-        require("dev/redstudio/alfheim/mixin/WorldMixin".equals(node.name),
-                "Unexpected Alfheim WorldMixin class");
+        String owner = "git/jbredwards/fluidlogged_api/api/util/FluidState";
+        MethodNode predicate = findMethod(node, "lambda$buildFluidLevelLookup$0",
+                "lambda$buildFluidLevelLookup$0",
+                "(Lnet/minecraft/block/state/IBlockState;)Z");
+        int patched = 0;
+        for (AbstractInsnNode instruction = predicate.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (call.getOpcode() != Opcodes.INVOKEVIRTUAL || !owner.equals(call.owner)
+                    || !"getLevel".equals(call.name) || !"()I".equals(call.desc)) {
+                continue;
+            }
+            LabelNode nonEmpty = new LabelNode();
+            predicate.instructions.insertBefore(call, list(
+                    new InsnNode(Opcodes.DUP),
+                    new MethodInsnNode(Opcodes.INVOKEVIRTUAL, owner, "isEmpty", "()Z", false),
+                    new JumpInsnNode(Opcodes.IFEQ, nonEmpty),
+                    new InsnNode(Opcodes.POP),
+                    new InsnNode(Opcodes.ICONST_0),
+                    new InsnNode(Opcodes.IRETURN),
+                    nonEmpty,
+                    new FrameNode(Opcodes.F_SAME1, 0, null, 1, new Object[] {owner})));
+            patched++;
+        }
+        require(patched == 1,
+                "Expected one Fluidlogged API fluid-level predicate call, patched " + patched);
+        LOGGER.info("Patched Fluidlogged API mixed-state fluid lookup");
+        return write(node);
+    }
 
-        prependExtendedWorldBranch(findMethod(node, "func_180500_c", "func_180500_c",
-                "(Lnet/minecraft/world/EnumSkyBlock;Lnet/minecraft/util/math/BlockPos;)Z"),
-                loadMixinSelfAsWorld(), list(
-                        new VarInsnNode(Opcodes.ALOAD, 0),
-                        new org.objectweb.asm.tree.TypeInsnNode(Opcodes.CHECKCAST,
-                                "net/minecraft/world/World"),
-                        new VarInsnNode(Opcodes.ALOAD, 1),
-                        new VarInsnNode(Opcodes.ALOAD, 2),
-                        new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/world/World",
-                                "ffd$checkLightFor",
-                                "(Lnet/minecraft/world/EnumSkyBlock;Lnet/minecraft/util/math/BlockPos;)Z",
-                                false),
-                        new InsnNode(Opcodes.IRETURN)));
-        prependExtendedWorldBranch(findMethod(node, "func_175721_c", "func_175721_c",
-                "(Lnet/minecraft/util/math/BlockPos;Z)I"), loadMixinSelfAsWorld(), list(
-                        new VarInsnNode(Opcodes.ALOAD, 0),
-                        new org.objectweb.asm.tree.TypeInsnNode(Opcodes.CHECKCAST,
-                                "net/minecraft/world/World"),
-                        new VarInsnNode(Opcodes.ALOAD, 1),
-                        new VarInsnNode(Opcodes.ILOAD, 2),
-                        new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "getWorldLight",
-                                "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Z)I",
-                                false),
-                        new InsnNode(Opcodes.IRETURN)));
-        MethodNode neighborLight = findMethodOptional(node, "func_175705_a", "func_175705_a",
-                "(Lnet/minecraft/world/EnumSkyBlock;Lnet/minecraft/util/math/BlockPos;)I");
-        if (neighborLight != null) {
-            prependExtendedWorldBranch(neighborLight, loadMixinSelfAsWorld(), list(
-                    new VarInsnNode(Opcodes.ALOAD, 0),
-                    new org.objectweb.asm.tree.TypeInsnNode(Opcodes.CHECKCAST,
-                            "net/minecraft/world/World"),
+    private static byte[] transformWeather2StormObject(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        require("weather2/weathersystem/storm/StormObject".equals(node.name),
+                "Unexpected Weather2 storm class");
+        MethodNode method = findMethod(node, "tickProgression", "tickProgression", "()V");
+        int patched = 0;
+        for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (call.getOpcode() != Opcodes.INVOKEVIRTUAL
+                    || !"net/minecraft/world/World".equals(call.owner)
+                    || !"(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/state/IBlockState;"
+                            .equals(call.desc)
+                    || !("getBlockState".equals(call.name) || "func_180495_p".equals(call.name))) {
+                continue;
+            }
+            call.setOpcode(Opcodes.INVOKESTATIC);
+            call.owner = WEATHER2_HOOKS;
+            call.name = "getLoadedBlockState";
+            call.desc = "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)"
+                    + "Lnet/minecraft/block/state/IBlockState;";
+            call.itf = false;
+            patched++;
+        }
+        require(patched == 1,
+                "Expected one Weather2 storm block-state lookup, patched " + patched);
+        LOGGER.info("Patched Weather2 storm sampling to avoid synchronous FFD chunk generation");
+        return write(node);
+    }
+
+    private static byte[] transformYungMineshaftPiece(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode method = findMethod(node, "generateLeg", "generateLeg",
+                "(Lnet/minecraft/world/World;Ljava/util/Random;"
+                        + "Lnet/minecraft/world/gen/structure/StructureBoundingBox;II"
+                        + "Lcom/yungnickyoung/minecraft/bettermineshafts/util/BlockSetSelector;)V");
+        int patched = 0;
+        for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (!(instruction instanceof JumpInsnNode)
+                    || instruction.getOpcode() != Opcodes.IFLE) {
+                continue;
+            }
+            AbstractInsnNode previous = previousReal(instruction);
+            if (!(previous instanceof MethodInsnNode)
+                    || !"(I)I".equals(((MethodInsnNode) previous).desc)) {
+                continue;
+            }
+            method.instructions.insertBefore(instruction, list(
                     new VarInsnNode(Opcodes.ALOAD, 1),
-                    new VarInsnNode(Opcodes.ALOAD, 2),
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "minY",
+                            "(Lnet/minecraft/world/World;)I", false)));
+            JumpInsnNode branch = (JumpInsnNode) instruction;
+            method.instructions.set(instruction,
+                    new JumpInsnNode(Opcodes.IF_ICMPLE, branch.label));
+            patched++;
+        }
+        require(patched == 1, "Expected one YUNG mineshaft leg lower bound, patched " + patched);
+        LOGGER.info("Patched YUNG mineshaft leg lower build-height bound");
+        return write(node);
+    }
+
+    private static byte[] transformDeadlyWorldConfigProperty(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode method = findMethod(node, "cprop", "cprop",
+                "(Ljava/lang/String;ILjava/lang/String;[I)"
+                        + "Lnet/minecraftforge/common/config/Property;");
+        int patched = 0;
+        for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (call.getOpcode() != Opcodes.INVOKEVIRTUAL
+                    || !"net/minecraftforge/common/config/Configuration".equals(call.owner)
+                    || !"get".equals(call.name)
+                    || !"(Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;II)"
+                            .concat("Lnet/minecraftforge/common/config/Property;")
+                            .equals(call.desc)) {
+                continue;
+            }
+            call.setOpcode(Opcodes.INVOKESTATIC);
+            call.owner = HOOKS;
+            call.name = "deadlyWorldHeightProperty";
+            call.desc = "(Lnet/minecraftforge/common/config/Configuration;"
+                    + "Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;II)"
+                    + "Lnet/minecraftforge/common/config/Property;";
+            call.itf = false;
+            patched++;
+        }
+        require(patched == 1, "Expected one Deadly World height config range, patched " + patched);
+        LOGGER.info("Patched Deadly World configured height lower bounds");
+        return write(node);
+    }
+
+    private static byte[] transformDeadlyWorldFeatureGenerator(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode pre = findMethod(node, "prePopulateChunk", "prePopulateChunk",
+                "(Lnet/minecraftforge/event/terraingen/PopulateChunkEvent$Pre;)V");
+        MethodNode post = findMethod(node, "postPopulateChunk", "postPopulateChunk",
+                "(Lnet/minecraftforge/event/terraingen/PopulateChunkEvent$Post;)V");
+        int patched = wrapDeadlyWorldEvent(pre,
+                "net/minecraftforge/event/terraingen/PopulateChunkEvent")
+                + wrapDeadlyWorldEvent(post,
+                        "net/minecraftforge/event/terraingen/PopulateChunkEvent");
+        require(patched == 2, "Expected two Deadly World feature event scopes, patched " + patched);
+        LOGGER.info("Patched Deadly World feature generation for extended height");
+        return write(node);
+    }
+
+    private static byte[] transformDeadlyWorldOreGenerator(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode pre = findMethod(node, "preOreGen", "preOreGen",
+                "(Lnet/minecraftforge/event/terraingen/DecorateBiomeEvent$Pre;)V");
+        MethodNode post = findMethod(node, "postOreGen", "postOreGen",
+                "(Lnet/minecraftforge/event/terraingen/DecorateBiomeEvent$Post;)V");
+        int patched = wrapDeadlyWorldEvent(pre,
+                "net/minecraftforge/event/terraingen/DecorateBiomeEvent")
+                + wrapDeadlyWorldEvent(post,
+                        "net/minecraftforge/event/terraingen/DecorateBiomeEvent");
+        require(patched == 2, "Expected two Deadly World ore event scopes, patched " + patched);
+        LOGGER.info("Patched Deadly World ore generation for extended height");
+        return write(node);
+    }
+
+    private static int wrapDeadlyWorldEvent(MethodNode method, String eventOwner) {
+        method.instructions.insert(list(
+                new VarInsnNode(Opcodes.ALOAD, 1),
+                new MethodInsnNode(Opcodes.INVOKEVIRTUAL, eventOwner, "getWorld",
+                        "()Lnet/minecraft/world/World;", false),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "beginDeadlyWorldGeneration",
+                        "(Lnet/minecraft/world/World;)V", false)));
+        int returns = 0;
+        for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (instruction.getOpcode() != Opcodes.RETURN) {
+                continue;
+            }
+            method.instructions.insertBefore(instruction, list(
                     new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS,
-                            "getWorldLightFromNeighborsFor",
-                            "(Lnet/minecraft/world/World;Lnet/minecraft/world/EnumSkyBlock;Lnet/minecraft/util/math/BlockPos;)I",
-                            false),
-                    new InsnNode(Opcodes.IRETURN)));
+                            "endExtendedWorldgenHeight", "()V", false)));
+            returns++;
         }
-        LOGGER.info("Patched Alfheim 1.6 WorldMixin for signed extended-height lighting");
+        require(returns == 1, "Expected one Deadly World event return, patched " + returns);
+        return 1;
+    }
+
+    private static byte[] transformDeadlyWorldFloorFeature(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode method = findMethod(node, "generate", "generate",
+                "(Lfathertoast/deadlyworld/config/Config;"
+                        + "Lfathertoast/deadlyworld/config/TargetBlock$TargetMap;"
+                        + "Lnet/minecraft/world/World;Ljava/util/Random;"
+                        + "Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/util/math/BlockPos;");
+        method.instructions.insert(list(
+                new VarInsnNode(Opcodes.ALOAD, 3),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "beginDeadlyWorldGeneration",
+                        "(Lnet/minecraft/world/World;)V", false)));
+        int patched = 0;
+        for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (!isIntConstant(instruction, 5)) {
+                continue;
+            }
+            AbstractInsnNode previous = previousReal(instruction);
+            AbstractInsnNode branch = nextReal(instruction);
+            if (!(previous instanceof MethodInsnNode)
+                    || !isBlockPosCoordinateGetter(previous)
+                    || !(branch instanceof JumpInsnNode)
+                    || branch.getOpcode() != Opcodes.IF_ICMPLE) {
+                continue;
+            }
+            method.instructions.insertBefore(instruction, list(
+                    new VarInsnNode(Opcodes.ALOAD, 3),
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "deadlyWorldFloorMinY",
+                            "(Lnet/minecraft/world/World;)I", false)));
+            method.instructions.remove(instruction);
+            patched++;
+        }
+        int returns = 0;
+        for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (instruction.getOpcode() != Opcodes.ARETURN) {
+                continue;
+            }
+            method.instructions.insertBefore(instruction, list(
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS,
+                            "endExtendedWorldgenHeight", "()V", false)));
+            returns++;
+        }
+        require(patched == 1, "Expected one Deadly World floor scan lower bound, patched " + patched);
+        require(returns == 2, "Expected two Deadly World floor-feature returns, patched " + returns);
+        LOGGER.info("Patched Deadly World floor-feature lower build-height bound");
         return write(node);
     }
 
-    private static byte[] transformAlfheimChunkMixin(byte[] basicClass) {
+    private static byte[] transformCorpseEntity(byte[] basicClass) {
         ClassNode node = read(basicClass);
-        require("dev/redstudio/alfheim/mixin/ChunkMixin".equals(node.name),
-                "Unexpected Alfheim ChunkMixin class");
-        InsnList world = loadAlfheimChunkWorld(node.name);
+        MethodNode create = findMethod(node, "createFromDeath", "createFromDeath",
+                "(Lnet/minecraft/entity/player/EntityPlayer;Lde/maxhenkel/corpse/Death;)"
+                        + "Lde/maxhenkel/corpse/entities/EntityCorpse;");
+        int createPatched = 0;
+        for (AbstractInsnNode instruction = create.instructions.getFirst(); instruction != null;) {
+            AbstractInsnNode next = instruction.getNext();
+            if (instruction.getOpcode() == Opcodes.DCONST_0) {
+                create.instructions.insertBefore(instruction, list(
+                        new VarInsnNode(Opcodes.ALOAD, 0),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "corpseMinY",
+                                "(Lnet/minecraft/entity/Entity;)D", false)));
+                create.instructions.remove(instruction);
+                createPatched++;
+            }
+            instruction = next;
+        }
+        require(createPatched == 2,
+                "Expected two Corpse creation lower bounds, patched " + createPatched);
 
-        prependExtendedWorldBranch(findMethodByName(node, "onGetLightSubtracted"),
-                copy(world), list(new InsnNode(Opcodes.RETURN)));
-        prependExtendedWorldBranch(findMethodByName(node, "onLoad"),
-                copy(world), list(new InsnNode(Opcodes.RETURN)));
-        MethodNode setLightRedirect = findMethodByName(node,
-                "setLightForRedirectGenerateSkylightMap");
-        setMixinAnnotationInt(setLightRedirect,
-                "Lorg/spongepowered/asm/mixin/injection/Redirect;", "require", 0);
-        prependExtendedWorldBranch(setLightRedirect, copy(world),
-                list(new InsnNode(Opcodes.RETURN)));
-
-        prependExtendedWorldBranch(findMethod(node, "func_76615_h", "func_76615_h", "(III)V"),
-                copy(world), list(
-                        new VarInsnNode(Opcodes.ALOAD, 0),
-                        new org.objectweb.asm.tree.TypeInsnNode(Opcodes.CHECKCAST,
-                                "net/minecraft/world/chunk/Chunk"),
-                        new VarInsnNode(Opcodes.ILOAD, 1),
-                        new VarInsnNode(Opcodes.ILOAD, 2),
-                        new VarInsnNode(Opcodes.ILOAD, 3),
-                        new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "relightBlock",
-                                "(Lnet/minecraft/world/chunk/Chunk;III)V", false),
-                        new InsnNode(Opcodes.RETURN)));
-        prependExtendedWorldBranch(findMethod(node, "func_177413_a", "func_177413_a",
-                "(Lnet/minecraft/world/EnumSkyBlock;Lnet/minecraft/util/math/BlockPos;)I"),
-                copy(world), list(
-                        new VarInsnNode(Opcodes.ALOAD, 0),
-                        new org.objectweb.asm.tree.TypeInsnNode(Opcodes.CHECKCAST,
-                                "net/minecraft/world/chunk/Chunk"),
-                        new VarInsnNode(Opcodes.ALOAD, 1),
-                        new VarInsnNode(Opcodes.ALOAD, 2),
-                        new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "getLightFor",
-                                "(Lnet/minecraft/world/chunk/Chunk;Lnet/minecraft/world/EnumSkyBlock;Lnet/minecraft/util/math/BlockPos;)I",
-                                false),
-                        new InsnNode(Opcodes.IRETURN)));
-        prependExtendedWorldBranch(findMethod(node, "func_150809_p", "func_150809_p", "()V"),
-                copy(world), list(
-                        new VarInsnNode(Opcodes.ALOAD, 0),
-                        new org.objectweb.asm.tree.TypeInsnNode(Opcodes.CHECKCAST,
-                                "net/minecraft/world/chunk/Chunk"),
-                        new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/world/chunk/Chunk",
-                                "ffd$checkLight", "()V", false),
-                        new InsnNode(Opcodes.RETURN)));
-        prependExtendedWorldBranch(findMethod(node, "func_150803_c", "func_150803_c", "(Z)V"),
-                copy(world), list(
-                        new VarInsnNode(Opcodes.ALOAD, 0),
-                        new org.objectweb.asm.tree.TypeInsnNode(Opcodes.CHECKCAST,
-                                "net/minecraft/world/chunk/Chunk"),
-                        new VarInsnNode(Opcodes.ILOAD, 1),
-                        new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/world/chunk/Chunk",
-                                "ffd$recheckGaps", "(Z)V", false),
-                        new InsnNode(Opcodes.RETURN)));
-
-        prependExtendedWorldBranch(findMethodByName(node, "setBlockStateCreateSectionVanilla"),
-                copy(world), list(
-                        new org.objectweb.asm.tree.TypeInsnNode(Opcodes.NEW, STORAGE),
-                        new InsnNode(Opcodes.DUP),
-                        new VarInsnNode(Opcodes.ILOAD, 1),
-                        new VarInsnNode(Opcodes.ILOAD, 2),
-                        new MethodInsnNode(Opcodes.INVOKESPECIAL, STORAGE, "<init>", "(IZ)V", false),
-                        new InsnNode(Opcodes.ARETURN)));
-        prependExtendedWorldBranch(findMethodByName(node, "preventGenerateSkylightMap"),
-                copy(world), list(
-                        new VarInsnNode(Opcodes.ILOAD, 1),
-                        new InsnNode(Opcodes.IRETURN)));
-        prependExtendedWorldBranch(findMethodByName(node, "doPropagateSkylight"),
-                copy(world), list(
-                        new VarInsnNode(Opcodes.ALOAD, 0),
-                        new org.objectweb.asm.tree.FieldInsnNode(Opcodes.GETFIELD, node.name,
-                                "field_76639_c", "[Z"),
-                        new VarInsnNode(Opcodes.ILOAD, 2),
-                        new VarInsnNode(Opcodes.ILOAD, 3),
-                        new IntInsnNode(Opcodes.BIPUSH, 16),
-                        new InsnNode(Opcodes.IMUL),
-                        new InsnNode(Opcodes.IADD),
-                        new InsnNode(Opcodes.ICONST_1),
-                        new InsnNode(Opcodes.BASTORE),
-                        new VarInsnNode(Opcodes.ALOAD, 0),
-                        new InsnNode(Opcodes.ICONST_1),
-                        new org.objectweb.asm.tree.FieldInsnNode(Opcodes.PUTFIELD, node.name,
-                                "field_76650_s", "Z"),
-                        new InsnNode(Opcodes.RETURN)));
-        prependExtendedWorldBranch(findMethodByName(node, "fakeGetLightFor"),
-                copy(world), list(
-                        new VarInsnNode(Opcodes.ALOAD, 1),
-                        new VarInsnNode(Opcodes.ALOAD, 2),
-                        new VarInsnNode(Opcodes.ALOAD, 3),
-                        new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "getLightFor",
-                                "(Lnet/minecraft/world/chunk/Chunk;Lnet/minecraft/world/EnumSkyBlock;Lnet/minecraft/util/math/BlockPos;)I",
-                                false),
-                        new InsnNode(Opcodes.IRETURN)));
-        prependExtendedWorldBranch(findMethodByName(node, "alfheim$getCachedLightFor"),
-                copy(world), list(
-                        new VarInsnNode(Opcodes.ALOAD, 0),
-                        new org.objectweb.asm.tree.TypeInsnNode(Opcodes.CHECKCAST,
-                                "net/minecraft/world/chunk/Chunk"),
-                        new VarInsnNode(Opcodes.ALOAD, 1),
-                        new VarInsnNode(Opcodes.ALOAD, 2),
-                        new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "getLightFor",
-                                "(Lnet/minecraft/world/chunk/Chunk;Lnet/minecraft/world/EnumSkyBlock;Lnet/minecraft/util/math/BlockPos;)I",
-                                false),
-                        new InsnNode(Opcodes.I2B),
-                        new InsnNode(Opcodes.IRETURN)));
-
-        LOGGER.info("Patched Alfheim 1.6 ChunkMixin for FFD's 24-section light storage");
+        MethodNode update = findMethod(node, "onUpdate", "func_70071_h_", "()V");
+        int comparePatched = 0;
+        int teleportPatched = 0;
+        for (AbstractInsnNode instruction = update.instructions.getFirst(); instruction != null;) {
+            AbstractInsnNode next = instruction.getNext();
+            if (instruction.getOpcode() == Opcodes.DCONST_0) {
+                AbstractInsnNode previous = previousReal(instruction);
+                AbstractInsnNode following = nextReal(instruction);
+                boolean positionComparison = previous instanceof FieldInsnNode
+                        && previous.getOpcode() == Opcodes.GETFIELD
+                        && "D".equals(((FieldInsnNode) previous).desc)
+                        && following != null
+                        && (following.getOpcode() == Opcodes.DCMPG
+                                || following.getOpcode() == Opcodes.DCMPL);
+                boolean teleportY = previous instanceof FieldInsnNode
+                        && previous.getOpcode() == Opcodes.GETFIELD
+                        && "D".equals(((FieldInsnNode) previous).desc)
+                        && following != null && following.getOpcode() == Opcodes.ALOAD;
+                if (positionComparison || teleportY) {
+                    update.instructions.insertBefore(instruction, list(
+                            new VarInsnNode(Opcodes.ALOAD, 0),
+                            new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "corpseMinY",
+                                    "(Lnet/minecraft/entity/Entity;)D", false)));
+                    update.instructions.remove(instruction);
+                    if (positionComparison) {
+                        comparePatched++;
+                    } else {
+                        teleportPatched++;
+                    }
+                }
+            }
+            instruction = next;
+        }
+        require(comparePatched == 2,
+                "Expected two Corpse update lower-bound comparisons, patched " + comparePatched);
+        require(teleportPatched == 1,
+                "Expected one Corpse update lower-bound teleport, patched " + teleportPatched);
+        LOGGER.info("Patched Corpse negative-height placement and updates");
         return write(node);
     }
 
-    private static byte[] transformAlfheimChunkCacheMixin(byte[] basicClass) {
+    private static byte[] transformStellarCoreWorldPosMixin(byte[] basicClass) {
         ClassNode node = read(basicClass);
-        require("dev/redstudio/alfheim/mixin/ChunkCacheMixin".equals(node.name),
-                "Unexpected Alfheim ChunkCacheMixin class");
-        MethodNode lightForExt = findMethodOptional(node, "func_175629_a", "func_175629_a",
-                "(Lnet/minecraft/world/EnumSkyBlock;Lnet/minecraft/util/math/BlockPos;)I");
-        if (lightForExt != null) {
-            InsnList condition = list(
-                    new VarInsnNode(Opcodes.ALOAD, 0),
-                    new org.objectweb.asm.tree.TypeInsnNode(Opcodes.CHECKCAST,
-                            "net/minecraft/world/ChunkCache"),
-                    new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/world/ChunkCache",
-                            "ffd$isExtended", "()Z", false));
-            prependConditionBranch(lightForExt, condition, list(
-                    new VarInsnNode(Opcodes.ALOAD, 0),
-                    new org.objectweb.asm.tree.TypeInsnNode(Opcodes.CHECKCAST,
-                            "net/minecraft/world/ChunkCache"),
-                    new VarInsnNode(Opcodes.ALOAD, 1),
-                    new VarInsnNode(Opcodes.ALOAD, 2),
-                    new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/world/ChunkCache",
-                            "ffd$getLightForExt",
-                            "(Lnet/minecraft/world/EnumSkyBlock;Lnet/minecraft/util/math/BlockPos;)I",
-                            false),
-                    new InsnNode(Opcodes.IRETURN)));
-        }
-        LOGGER.info("Patched Alfheim 1.6 ChunkCacheMixin for extended-height light access");
+        require("github/kasuminova/stellarcore/mixin/minecraft/world_pos_judgement/MixinWorld"
+                        .equals(node.name),
+                "Unexpected StellarCore world-position mixin class");
+        replace(findMethod(node, "func_189509_E", "func_189509_E",
+                "(Lnet/minecraft/util/math/BlockPos;)Z"), list(
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new org.objectweb.asm.tree.TypeInsnNode(Opcodes.CHECKCAST,
+                        "net/minecraft/world/World"),
+                new VarInsnNode(Opcodes.ALOAD, 1),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "isOutsideBuildHeight",
+                        "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)Z", false),
+                new InsnNode(Opcodes.IRETURN)));
+        LOGGER.info("Patched StellarCore world-position bounds for extended height");
         return write(node);
     }
 
@@ -1804,10 +2055,17 @@ public final class FFDHeightTransformer implements IClassTransformer {
 
     private static byte[] transformOptimizedWorldRenderer(byte[] basicClass) {
         ClassNode node = read(basicClass);
-        MethodNode minimum = findMethod(node, "getMinimumBuildHeight",
+        MethodNode minimum = findMethodOptional(node, "getMinimumBuildHeight",
                 "getMinimumBuildHeight", "()I");
-        MethodNode maximum = findMethod(node, "getMaximumBuildHeight",
+        MethodNode maximum = findMethodOptional(node, "getMaximumBuildHeight",
                 "getMaximumBuildHeight", "()I");
+        if (minimum == null && maximum == null) {
+            LOGGER.info("Optimized renderer {} delegates build height to its section manager",
+                    node.name);
+            return basicClass;
+        }
+        require(minimum != null && maximum != null,
+                "Expected matching optimized renderer build-height methods");
         org.objectweb.asm.tree.FieldInsnNode worldField = null;
         for (AbstractInsnNode instruction = maximum.instructions.getFirst(); instruction != null;
                 instruction = instruction.getNext()) {
@@ -1917,20 +2175,65 @@ public final class FFDHeightTransformer implements IClassTransformer {
         int patched = 0;
         for (AbstractInsnNode instruction = prepare.instructions.getFirst(); instruction != null;
                 instruction = instruction.getNext()) {
-            if (instruction.getOpcode() != Opcodes.AALOAD) {
+            if (!(instruction instanceof MethodInsnNode)
+                    || !"y".equals(((MethodInsnNode) instruction).name)
+                    || !"()I".equals(((MethodInsnNode) instruction).desc)) {
                 continue;
             }
-            AbstractInsnNode index = previousReal(instruction);
-            if (!(index instanceof MethodInsnNode) || !"y".equals(((MethodInsnNode) index).name)
-                    || !"()I".equals(((MethodInsnNode) index).desc)) {
+            AbstractInsnNode store = nextReal(instruction);
+            if (!(store instanceof VarInsnNode) || store.getOpcode() != Opcodes.ISTORE) {
                 continue;
             }
-            prepare.instructions.insertBefore(instruction, list(
+            int sectionY = ((VarInsnNode) store).var;
+            AbstractInsnNode lowerLoad = nextReal(store);
+            AbstractInsnNode lowerJump = nextReal(lowerLoad);
+            AbstractInsnNode upperLoad = nextReal(lowerJump);
+            AbstractInsnNode storageLoad = nextReal(upperLoad);
+            AbstractInsnNode storageLength = nextReal(storageLoad);
+            AbstractInsnNode upperJump = nextReal(storageLength);
+            if (!(lowerLoad instanceof VarInsnNode) || lowerLoad.getOpcode() != Opcodes.ILOAD
+                    || ((VarInsnNode) lowerLoad).var != sectionY
+                    || !(lowerJump instanceof JumpInsnNode)
+                    || lowerJump.getOpcode() != Opcodes.IFLT
+                    || !(upperLoad instanceof VarInsnNode)
+                    || upperLoad.getOpcode() != Opcodes.ILOAD
+                    || ((VarInsnNode) upperLoad).var != sectionY
+                    || !(storageLoad instanceof VarInsnNode)
+                    || storageLoad.getOpcode() != Opcodes.ALOAD
+                    || storageLength.getOpcode() != Opcodes.ARRAYLENGTH
+                    || !(upperJump instanceof JumpInsnNode)
+                    || upperJump.getOpcode() != Opcodes.IF_ICMPLT) {
+                continue;
+            }
+            prepare.instructions.insert(store, list(
+                    new VarInsnNode(Opcodes.ILOAD, sectionY),
                     new VarInsnNode(Opcodes.ALOAD, 0),
                     new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS,
                             "storageIndexForSectionY",
-                            "(ILnet/minecraft/world/World;)I", false)));
+                            "(ILnet/minecraft/world/World;)I", false),
+                    new VarInsnNode(Opcodes.ISTORE, sectionY)));
             patched++;
+            break;
+        }
+        if (patched == 0) {
+            for (AbstractInsnNode instruction = prepare.instructions.getFirst();
+                    instruction != null; instruction = instruction.getNext()) {
+                if (instruction.getOpcode() != Opcodes.AALOAD) {
+                    continue;
+                }
+                AbstractInsnNode index = previousReal(instruction);
+                if (!(index instanceof MethodInsnNode)
+                        || !"y".equals(((MethodInsnNode) index).name)
+                        || !"()I".equals(((MethodInsnNode) index).desc)) {
+                    continue;
+                }
+                prepare.instructions.insertBefore(instruction, list(
+                        new VarInsnNode(Opcodes.ALOAD, 0),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS,
+                                "storageIndexForSectionY",
+                                "(ILnet/minecraft/world/World;)I", false)));
+                patched++;
+            }
         }
         require(patched == 1, "Expected one optimized world-slice storage lookup, patched "
                 + patched);
@@ -3177,6 +3480,16 @@ public final class FFDHeightTransformer implements IClassTransformer {
         MethodNode method = findMethod(node, "generateStructure", "func_75068_a",
                 "(Lnet/minecraft/world/World;Ljava/util/Random;"
                         + "Lnet/minecraft/world/gen/structure/StructureBoundingBox;)V");
+        method.instructions.insert(list(
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new VarInsnNode(Opcodes.ALOAD, 1),
+                new VarInsnNode(Opcodes.ALOAD, 3),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS,
+                        "beginYungMineshaftStructure",
+                        "(Lnet/minecraft/world/gen/structure/StructureStart;"
+                                + "Lnet/minecraft/world/World;"
+                                + "Lnet/minecraft/world/gen/structure/StructureBoundingBox;)V",
+                        false)));
         int patched = 0;
         for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;
              instruction = instruction.getNext()) {
@@ -3192,7 +3505,9 @@ public final class FFDHeightTransformer implements IClassTransformer {
                             "(Lnet/minecraft/world/gen/structure/StructureStart;"
                                     + "Lnet/minecraft/world/World;"
                                     + "Lnet/minecraft/world/gen/structure/StructureBoundingBox;)V",
-                            false)));
+                            false),
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS,
+                            "endExtendedWorldgenHeight", "()V", false)));
             patched++;
         }
         require(patched == 1, "Expected one structure generation return, patched " + patched);
@@ -3405,8 +3720,20 @@ public final class FFDHeightTransformer implements IClassTransformer {
 
     private static byte[] transformNetHandlerPlayServer(byte[] basicClass) {
         ClassNode node = read(basicClass);
-        MethodNode method = findMethod(node, "processTryUseItemOnBlock", "func_184337_a",
-                "(Lnet/minecraft/network/play/client/CPacketPlayerTryUseItemOnBlock;)V");
+        int diggingPatched = patchPlayerBuildLimitCalls(findMethod(node,
+                "processPlayerDigging", "func_147345_a",
+                "(Lnet/minecraft/network/play/client/CPacketPlayerDigging;)V"));
+        int usePatched = patchPlayerBuildLimitCalls(findMethod(node,
+                "processTryUseItemOnBlock", "func_184337_a",
+                "(Lnet/minecraft/network/play/client/CPacketPlayerTryUseItemOnBlock;)V"));
+        require(diggingPatched == 1 && usePatched == 3,
+                "Unexpected player build-limit calls: digging=" + diggingPatched
+                        + ", use=" + usePatched);
+        LOGGER.info("Patched player block digging and placement build limits");
+        return write(node);
+    }
+
+    private static int patchPlayerBuildLimitCalls(MethodNode method) {
         int worldLocal = -1;
         for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;
                 instruction = instruction.getNext()) {
@@ -3425,7 +3752,7 @@ public final class FFDHeightTransformer implements IClassTransformer {
             }
         }
         if (worldLocal < 0) {
-            throw new IllegalStateException("Could not locate player interaction world local");
+            throw new IllegalStateException("Could not locate player world local in " + method.name);
         }
 
         int patched = 0;
@@ -3449,12 +3776,7 @@ public final class FFDHeightTransformer implements IClassTransformer {
             }
             instruction = next;
         }
-        if (patched != 3) {
-            throw new IllegalStateException("Expected three player build-limit calls, patched "
-                    + patched);
-        }
-        LOGGER.info("Patched player block placement build limit");
-        return write(node);
+        return patched;
     }
 
     private static byte[] transformCauldron(byte[] basicClass) {
@@ -3799,14 +4121,34 @@ public final class FFDHeightTransformer implements IClassTransformer {
         MethodNode burn = findMethod(node, "getCanBlockBurn", "func_176368_m",
                 "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)Z");
         int[] burnPatched = patchDynamicWorldBounds(burn, 1);
+        boolean fluidloggedBurn = isFluidloggedStaticLiquidBurnHook(burn);
         require(updatePatched[0] == 2 && updatePatched[1] == 1,
                 "Expected static-liquid update min/max bounds, patched "
                         + updatePatched[0] + "/" + updatePatched[1]);
-        require(burnPatched[0] == 1 && burnPatched[1] == 1,
+        require((burnPatched[0] == 1 && burnPatched[1] == 1)
+                        || (burnPatched[0] == 0 && burnPatched[1] == 0 && fluidloggedBurn),
                 "Expected static-liquid burn min/max bounds, patched "
                         + burnPatched[0] + "/" + burnPatched[1]);
         LOGGER.info("Patched static-liquid fire checks build-height bounds");
         return write(node);
+    }
+
+    private static boolean isFluidloggedStaticLiquidBurnHook(MethodNode method) {
+        for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (instruction instanceof MethodInsnNode) {
+                MethodInsnNode call = (MethodInsnNode) instruction;
+                if (call.getOpcode() == Opcodes.INVOKESTATIC
+                        && "git/jbredwards/fluidlogged_api/mod/asm/plugins/vanilla/block/PluginBlockStaticLiquid$Hooks"
+                                .equals(call.owner)
+                        && "getCanBlockBurn".equals(call.name)
+                        && "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)Z"
+                                .equals(call.desc)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private static byte[] transformChorusFlower(byte[] basicClass) {
@@ -3828,7 +4170,26 @@ public final class FFDHeightTransformer implements IClassTransformer {
                 "(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/pathfinding/Path;");
         int patched = patchPathNavigateLowerBounds(method, node.name, 2);
         require(patched == 2, "Expected two ground-navigation lower bounds, patched " + patched);
-        LOGGER.info("Patched ground-navigation lower build-height bounds");
+        MethodNode pathableY = findMethod(node, "getPathablePosY", "func_179687_p", "()I");
+        org.objectweb.asm.tree.FieldInsnNode entityField = findReferencedFieldInstruction(
+                pathableY, "Lnet/minecraft/entity/EntityLiving;");
+        int rounded = 0;
+        for (AbstractInsnNode instruction = pathableY.instructions.getFirst(); instruction != null;) {
+            AbstractInsnNode next = instruction.getNext();
+            if (instruction.getOpcode() == Opcodes.D2I) {
+                pathableY.instructions.insertBefore(instruction, list(
+                        new VarInsnNode(Opcodes.ALOAD, 0),
+                        new org.objectweb.asm.tree.FieldInsnNode(Opcodes.GETFIELD,
+                                entityField.owner, entityField.name, entityField.desc),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "pathableY",
+                                "(DLnet/minecraft/entity/Entity;)I", false)));
+                pathableY.instructions.remove(instruction);
+                rounded++;
+            }
+            instruction = next;
+        }
+        require(rounded == 3, "Expected three ground-navigation Y conversions, patched " + rounded);
+        LOGGER.info("Patched ground-navigation lower bounds and negative-Y rounding");
         return write(node);
     }
 
@@ -3868,6 +4229,17 @@ public final class FFDHeightTransformer implements IClassTransformer {
 
     private static byte[] transformWalkNodeProcessor(byte[] basicClass) {
         ClassNode node = read(basicClass);
+        String pathMinYField = "ffd$pathMinY";
+        node.fields.add(new FieldNode(Opcodes.ACC_PRIVATE, pathMinYField, "I", null, null));
+        MethodNode init = findMethod(node, "init", "func_186315_a",
+                "(Lnet/minecraft/world/IBlockAccess;"
+                        + "Lnet/minecraft/entity/EntityLiving;)V");
+        init.instructions.insert(list(
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new VarInsnNode(Opcodes.ALOAD, 2),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "minY",
+                        "(Lnet/minecraft/entity/Entity;)I", false),
+                new FieldInsnNode(Opcodes.PUTFIELD, node.name, pathMinYField, "I")));
         MethodNode method = findMethod(node, "getStart", "func_186318_b",
                 "()Lnet/minecraft/pathfinding/PathPoint;");
         int patched = 0;
@@ -3881,15 +4253,9 @@ public final class FFDHeightTransformer implements IClassTransformer {
                 AbstractInsnNode jump = nextReal(instruction);
                 if (jump instanceof org.objectweb.asm.tree.JumpInsnNode
                         && jump.getOpcode() == Opcodes.IFLE) {
-                    org.objectweb.asm.tree.FieldInsnNode entityField =
-                            findReferencedFieldInstruction(method,
-                                    "Lnet/minecraft/entity/EntityLiving;");
                     method.instructions.insertBefore(jump, list(
                             new VarInsnNode(Opcodes.ALOAD, 0),
-                            new org.objectweb.asm.tree.FieldInsnNode(Opcodes.GETFIELD,
-                                    entityField.owner, entityField.name, entityField.desc),
-                            new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "minY",
-                                    "(Lnet/minecraft/entity/Entity;)I", false)));
+                            new FieldInsnNode(Opcodes.GETFIELD, node.name, pathMinYField, "I")));
                     ((org.objectweb.asm.tree.JumpInsnNode) jump).setOpcode(Opcodes.IF_ICMPLE);
                     patched++;
                 }
@@ -3897,7 +4263,56 @@ public final class FFDHeightTransformer implements IClassTransformer {
             instruction = next;
         }
         require(patched == 1, "Expected one walk-node lower build-height bound, patched " + patched);
-        LOGGER.info("Patched walk-node lower build-height bound");
+
+        MethodNode safePoint = findMethod(node, "getSafePoint", "func_186332_a",
+                "(IIIIDLnet/minecraft/util/EnumFacing;)Lnet/minecraft/pathfinding/PathPoint;");
+        int safePointPatched = 0;
+        for (AbstractInsnNode instruction = safePoint.instructions.getFirst(); instruction != null;) {
+            AbstractInsnNode next = instruction.getNext();
+            AbstractInsnNode jump = nextReal(instruction);
+            if (instruction instanceof VarInsnNode
+                    && instruction.getOpcode() == Opcodes.ILOAD
+                    && ((VarInsnNode) instruction).var == 2
+                    && jump instanceof JumpInsnNode
+                    && jump.getOpcode() == Opcodes.IFLE) {
+                safePoint.instructions.insertBefore(jump, list(
+                        new VarInsnNode(Opcodes.ALOAD, 0),
+                        new FieldInsnNode(Opcodes.GETFIELD, node.name, pathMinYField, "I")));
+                ((JumpInsnNode) jump).setOpcode(Opcodes.IF_ICMPLE);
+                safePointPatched++;
+            }
+            instruction = next;
+        }
+        require(safePointPatched == 1,
+                "Expected one safe-point lower build-height bound, patched " + safePointPatched);
+
+        MethodNode pathNodeType = findMethod(node, "getPathNodeType", "func_186330_a",
+                "(Lnet/minecraft/world/IBlockAccess;III)Lnet/minecraft/pathfinding/PathNodeType;");
+        int pathNodeTypePatched = 0;
+        for (AbstractInsnNode instruction = pathNodeType.instructions.getFirst();
+                instruction != null;) {
+            AbstractInsnNode next = instruction.getNext();
+            AbstractInsnNode previous = previousReal(instruction);
+            AbstractInsnNode jump = nextReal(instruction);
+            if (instruction.getOpcode() == Opcodes.ICONST_1
+                    && previous instanceof VarInsnNode
+                    && previous.getOpcode() == Opcodes.ILOAD
+                    && ((VarInsnNode) previous).var == 3
+                    && jump instanceof JumpInsnNode
+                    && jump.getOpcode() == Opcodes.IF_ICMPLT) {
+                pathNodeType.instructions.insertBefore(instruction, list(
+                        new VarInsnNode(Opcodes.ALOAD, 0),
+                        new FieldInsnNode(Opcodes.GETFIELD, node.name, pathMinYField, "I"),
+                        new InsnNode(Opcodes.ICONST_1),
+                        new InsnNode(Opcodes.IADD)));
+                pathNodeType.instructions.remove(instruction);
+                pathNodeTypePatched++;
+            }
+            instruction = next;
+        }
+        require(pathNodeTypePatched == 1,
+                "Expected one path-node floor lookup bound, patched " + pathNodeTypePatched);
+        LOGGER.info("Patched walk-node lower build-height bounds");
         return write(node);
     }
 
@@ -3909,6 +4324,40 @@ public final class FFDHeightTransformer implements IClassTransformer {
         require(patched == 1, "Expected one entity-teleport lower build-height bound, patched " + patched);
         patchPowderSnowJump(node);
         LOGGER.info("Patched entity teleport lower build-height bound and powder-snow jump");
+        return write(node);
+    }
+
+    private static byte[] transformEntityBat(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode method = findMethod(node, "updateAITasks", "func_70619_bc", "()V");
+        int patched = 0;
+        for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (call.getOpcode() != Opcodes.INVOKEVIRTUAL
+                    || !"net/minecraft/util/math/BlockPos".equals(call.owner)
+                    || !("getY".equals(call.name) || "func_177956_o".equals(call.name))
+                    || !"()I".equals(call.desc)) {
+                continue;
+            }
+            AbstractInsnNode one = nextReal(call);
+            AbstractInsnNode branch = nextReal(one);
+            if (!isIntConstant(one, 1) || !(branch instanceof org.objectweb.asm.tree.JumpInsnNode)
+                    || branch.getOpcode() != Opcodes.IF_ICMPGE) {
+                continue;
+            }
+            method.instructions.insertBefore(one, list(
+                    new VarInsnNode(Opcodes.ALOAD, 0),
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "batFlightMinTargetY",
+                            "(Lnet/minecraft/entity/Entity;)I", false)));
+            method.instructions.remove(one);
+            patched++;
+        }
+        require(patched == 1, "Expected one bat flight-target lower bound, patched " + patched);
+        LOGGER.info("Patched bat flight-target lower build-height bound");
         return write(node);
     }
 
@@ -4518,7 +4967,34 @@ public final class FFDHeightTransformer implements IClassTransformer {
                 new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "getRandomChunkPosition",
                         "(Lnet/minecraft/world/World;II)Lnet/minecraft/util/math/BlockPos;", false),
                 new InsnNode(Opcodes.ARETURN)));
-        LOGGER.info("Patched natural-spawn vertical range");
+        MethodNode optifineRandomPosition = findMethodOptional(node, "getRandomChunkPosition", null,
+                "(Lnet/minecraft/world/World;IILnet/optifine/BlockPosM;)Lnet/optifine/BlockPosM;");
+        if (optifineRandomPosition != null) {
+            prependExtendedWorldBranch(optifineRandomPosition, list(
+                    new VarInsnNode(Opcodes.ALOAD, 0)), list(
+                    new VarInsnNode(Opcodes.ALOAD, 0),
+                    new VarInsnNode(Opcodes.ILOAD, 1),
+                    new VarInsnNode(Opcodes.ILOAD, 2),
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "getRandomChunkPosition",
+                            "(Lnet/minecraft/world/World;II)Lnet/minecraft/util/math/BlockPos;", false),
+                    new VarInsnNode(Opcodes.ASTORE, 4),
+                    new VarInsnNode(Opcodes.ALOAD, 3),
+                    new VarInsnNode(Opcodes.ALOAD, 4),
+                    new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/util/math/BlockPos",
+                            "func_177958_n", "()I", false),
+                    new VarInsnNode(Opcodes.ALOAD, 4),
+                    new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/util/math/BlockPos",
+                            "func_177956_o", "()I", false),
+                    new VarInsnNode(Opcodes.ALOAD, 4),
+                    new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/util/math/BlockPos",
+                            "func_177952_p", "()I", false),
+                    new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/optifine/BlockPosM",
+                            "setXyz", "(III)V", false),
+                    new VarInsnNode(Opcodes.ALOAD, 3),
+                    new InsnNode(Opcodes.ARETURN)));
+        }
+        LOGGER.info("Patched natural-spawn vertical range{}",
+                optifineRandomPosition == null ? "" : " and OptiFine sampler");
         return write(node);
     }
 
@@ -4597,6 +5073,310 @@ public final class FFDHeightTransformer implements IClassTransformer {
         patchEntityDoubleConstant(findMethod(node, "onUpdate", "func_70071_h_", "()V"),
                 -64.0D, "outOfWorldThreshold");
         LOGGER.info("Patched minecart void threshold");
+        return write(node);
+    }
+
+    private static byte[] transformRealisticPhysicsChunk(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        String chunkField = findField(node, "Lnet/minecraft/world/chunk/Chunk;");
+        MethodNode getSection = findMethod(node, "getSection", "getSection",
+                "(I)Lxbigellx/realisticphysics/internal/level/chunk/RPChunkSectionAccessor;");
+        getSection.instructions.insert(list(
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new FieldInsnNode(Opcodes.GETFIELD, node.name, chunkField,
+                        "Lnet/minecraft/world/chunk/Chunk;"),
+                new VarInsnNode(Opcodes.ILOAD, 1),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS,
+                        "realisticPhysicsStorageIndex",
+                        "(Lnet/minecraft/world/chunk/Chunk;I)I", false),
+                new VarInsnNode(Opcodes.ISTORE, 1)));
+        MethodNode fromSection = findMethod(node, "getSectionIndexFromSectionY",
+                "getSectionIndexFromSectionY", "(I)I");
+        replace(fromSection, list(
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new FieldInsnNode(Opcodes.GETFIELD, node.name, chunkField,
+                        "Lnet/minecraft/world/chunk/Chunk;"),
+                new VarInsnNode(Opcodes.ILOAD, 1),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "realisticPhysicsSectionIndex",
+                        "(Lnet/minecraft/world/chunk/Chunk;I)I", false),
+                new InsnNode(Opcodes.IRETURN)));
+        MethodNode toSection = findMethod(node, "getSectionYFromSectionIndex",
+                "getSectionYFromSectionIndex", "(I)I");
+        replace(toSection, list(
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new FieldInsnNode(Opcodes.GETFIELD, node.name, chunkField,
+                        "Lnet/minecraft/world/chunk/Chunk;"),
+                new VarInsnNode(Opcodes.ILOAD, 1),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "realisticPhysicsSectionY",
+                        "(Lnet/minecraft/world/chunk/Chunk;I)I", false),
+                new InsnNode(Opcodes.IRETURN)));
+        replace(findMethod(node, "getMinSection", "getMinSection", "()I"), list(
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new FieldInsnNode(Opcodes.GETFIELD, node.name, chunkField,
+                        "Lnet/minecraft/world/chunk/Chunk;"),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS,
+                        "realisticPhysicsMinSection",
+                        "(Lnet/minecraft/world/chunk/Chunk;)I", false),
+                new InsnNode(Opcodes.IRETURN)));
+        replace(findMethod(node, "getMaxSection", "getMaxSection", "()I"), list(
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new FieldInsnNode(Opcodes.GETFIELD, node.name, chunkField,
+                        "Lnet/minecraft/world/chunk/Chunk;"),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS,
+                        "realisticPhysicsMaxSection",
+                        "(Lnet/minecraft/world/chunk/Chunk;)I", false),
+                new InsnNode(Opcodes.IRETURN)));
+        LOGGER.info("Patched Realistic Physics section coordinate mapping");
+        return write(node);
+    }
+
+    private static byte[] transformRealisticPhysicsLevel(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        String worldField = findField(node, "Lnet/minecraft/world/World;");
+        replace(findMethod(node, "getMinSection", "getMinSection", "()I"), list(
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new FieldInsnNode(Opcodes.GETFIELD, node.name, worldField,
+                        "Lnet/minecraft/world/World;"),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS,
+                        "realisticPhysicsMinSection", "(Lnet/minecraft/world/World;)I", false),
+                new InsnNode(Opcodes.IRETURN)));
+        replace(findMethod(node, "getMaxSection", "getMaxSection", "()I"), list(
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new FieldInsnNode(Opcodes.GETFIELD, node.name, worldField,
+                        "Lnet/minecraft/world/World;"),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS,
+                        "realisticPhysicsMaxSection", "(Lnet/minecraft/world/World;)I", false),
+                new InsnNode(Opcodes.IRETURN)));
+        MethodNode constructor = findMethod(node, "<init>", "<init>",
+                "(Lnet/minecraft/world/World;"
+                        + "Lxbigellx/realisticphysics/internal/level/chunk/RPChunkContainer;"
+                        + "Lxbigellx/realisticphysics/internal/level/RPLevelPhysics;)V");
+        int patched = 0;
+        for (AbstractInsnNode instruction = constructor.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode height = (MethodInsnNode) instruction;
+            if (height.getOpcode() != Opcodes.INVOKEVIRTUAL
+                    || !"net/minecraft/world/World".equals(height.owner)
+                    || !"()I".equals(height.desc)
+                    || !("func_72940_L".equals(height.name) || "getHeight".equals(height.name))) {
+                continue;
+            }
+            AbstractInsnNode loadWorldField = previousReal(height);
+            AbstractInsnNode loadSelf = previousReal(loadWorldField);
+            AbstractInsnNode one = nextReal(height);
+            AbstractInsnNode subtract = nextReal(one);
+            AbstractInsnNode min = previousReal(loadSelf);
+            if (!(loadWorldField instanceof FieldInsnNode)
+                    || loadWorldField.getOpcode() != Opcodes.GETFIELD
+                    || !worldField.equals(((FieldInsnNode) loadWorldField).name)
+                    || !(loadSelf instanceof VarInsnNode) || loadSelf.getOpcode() != Opcodes.ALOAD
+                    || ((VarInsnNode) loadSelf).var != 0
+                    || min == null || min.getOpcode() != Opcodes.ICONST_0
+                    || one == null || one.getOpcode() != Opcodes.ICONST_1
+                    || subtract == null || subtract.getOpcode() != Opcodes.ISUB) {
+                continue;
+            }
+            constructor.instructions.insertBefore(min, list(
+                    new VarInsnNode(Opcodes.ALOAD, 0),
+                    new FieldInsnNode(Opcodes.GETFIELD, node.name, worldField,
+                            "Lnet/minecraft/world/World;"),
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS,
+                            "realisticPhysicsMinY", "(Lnet/minecraft/world/World;)I", false)));
+            constructor.instructions.remove(min);
+            AbstractInsnNode after = subtract.getNext();
+            constructor.instructions.insertBefore(loadSelf, list(
+                    new VarInsnNode(Opcodes.ALOAD, 0),
+                    new FieldInsnNode(Opcodes.GETFIELD, node.name, worldField,
+                            "Lnet/minecraft/world/World;"),
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS,
+                            "realisticPhysicsMaxY", "(Lnet/minecraft/world/World;)I", false)));
+            for (AbstractInsnNode remove = loadSelf; remove != after;) {
+                AbstractInsnNode next = remove.getNext();
+                constructor.instructions.remove(remove);
+                remove = next;
+            }
+            patched++;
+            break;
+        }
+        require(patched == 1, "Expected one Realistic Physics dimension height mapping, patched "
+                + patched);
+        LOGGER.info("Patched Realistic Physics level and dimension height mapping");
+        return write(node);
+    }
+
+    private static byte[] transformRealisticPhysicsQueue(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode method = findMethod(node, "poll", "poll",
+                "(Lnet/minecraft/entity/player/EntityPlayer;Z)Ljava/lang/Object;");
+        AbstractInsnNode start = method.instructions.getFirst();
+        AbstractInsnNode end = null;
+        for (AbstractInsnNode instruction = start; instruction != null;
+                instruction = instruction.getNext()) {
+            if (instruction instanceof VarInsnNode && instruction.getOpcode() == Opcodes.ISTORE
+                    && ((VarInsnNode) instruction).var == 3) {
+                end = instruction;
+                break;
+            }
+        }
+        require(end != null, "Missing Realistic Physics player section local");
+        AbstractInsnNode after = end.getNext();
+        InsnList replacement = list(
+                new VarInsnNode(Opcodes.ALOAD, 1),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS,
+                        "realisticPhysicsPlayerSectionIndex",
+                        "(Lnet/minecraft/entity/player/EntityPlayer;)I", false),
+                new VarInsnNode(Opcodes.ISTORE, 3));
+        method.instructions.insertBefore(start, replacement);
+        for (AbstractInsnNode instruction = start; instruction != after;) {
+            AbstractInsnNode next = instruction.getNext();
+            method.instructions.remove(instruction);
+            instruction = next;
+        }
+        LOGGER.info("Patched Realistic Physics player queue priority mapping");
+        return write(node);
+    }
+
+    private static byte[] transformRealisticPhysicsTask(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode method = findMethod(node, "chunkSection", "chunkSection", "()I");
+        String levelOwner = "xbigellx/rbp/internal/physics/task/PhysicsTaskBase";
+        replace(method, list(
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new FieldInsnNode(Opcodes.GETFIELD, levelOwner, "level",
+                        "Lxbigellx/rbp/internal/level/RBPLevel;"),
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new FieldInsnNode(Opcodes.GETFIELD, node.name, "pos",
+                        "Lnet/minecraft/util/math/BlockPos;"),
+                new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "xbigellx/rbp/internal/level/RBPLevel",
+                        "getChunk", "(Lnet/minecraft/util/math/BlockPos;)"
+                                + "Lxbigellx/realisticphysics/internal/level/chunk/RPChunkAccessor;",
+                        false),
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new FieldInsnNode(Opcodes.GETFIELD, node.name, "pos",
+                        "Lnet/minecraft/util/math/BlockPos;"),
+                new MethodInsnNode(Opcodes.INVOKEINTERFACE,
+                        "xbigellx/realisticphysics/internal/level/chunk/RPChunkAccessor",
+                        "getSectionIndex", "(Lnet/minecraft/util/math/BlockPos;)I", true),
+                new InsnNode(Opcodes.IRETURN)));
+        LOGGER.info("Patched Realistic Block Physics task section mapping");
+        return write(node);
+    }
+
+    private static byte[] transformRealisticPhysicsScheduler(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        int patched = 0;
+        for (MethodNode method : node.methods) {
+            for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;
+                    instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode yCall = (MethodInsnNode) instruction;
+            if (!"net/minecraft/util/math/BlockPos".equals(yCall.owner)
+                    || !"()I".equals(yCall.desc)
+                    || !("func_177956_o".equals(yCall.name) || "getY".equals(yCall.name))) {
+                continue;
+            }
+            AbstractInsnNode shift = nextReal(yCall);
+            AbstractInsnNode yStore = shift == null ? null : nextReal(shift);
+            if (shift == null || shift.getOpcode() != Opcodes.ICONST_4
+                    || yStore == null || yStore.getOpcode() != Opcodes.ISHR) {
+                continue;
+            }
+            yStore = nextReal(yStore);
+            if (!(yStore instanceof VarInsnNode) || yStore.getOpcode() != Opcodes.ISTORE) {
+                continue;
+            }
+            AbstractInsnNode sectionYLoad = nextReal(yStore);
+            AbstractInsnNode loadLevel = nextReal(sectionYLoad);
+            AbstractInsnNode levelField = nextReal(loadLevel);
+            AbstractInsnNode minCall = nextReal(levelField);
+            AbstractInsnNode subtract = nextReal(minCall);
+            AbstractInsnNode sectionStore = nextReal(subtract);
+            if (!(sectionYLoad instanceof VarInsnNode) || sectionYLoad.getOpcode() != Opcodes.ILOAD
+                    || ((VarInsnNode) sectionYLoad).var != ((VarInsnNode) yStore).var
+                    || !(loadLevel instanceof VarInsnNode) || loadLevel.getOpcode() != Opcodes.ALOAD
+                    || ((VarInsnNode) loadLevel).var != 0
+                    || !(levelField instanceof FieldInsnNode)
+                    || levelField.getOpcode() != Opcodes.GETFIELD
+                    || !"level".equals(((FieldInsnNode) levelField).name)
+                    || !(minCall instanceof MethodInsnNode)
+                    || minCall.getOpcode() != Opcodes.INVOKEVIRTUAL
+                    || !"getMinSection".equals(((MethodInsnNode) minCall).name)
+                    || !"()I".equals(((MethodInsnNode) minCall).desc)
+                    || subtract.getOpcode() != Opcodes.ISUB
+                    || !(sectionStore instanceof VarInsnNode)
+                    || sectionStore.getOpcode() != Opcodes.ISTORE) {
+                continue;
+            }
+            AbstractInsnNode blockContextNode = previousReal(previousReal(yCall));
+            MethodInsnNode blockContextCall = blockContextNode instanceof MethodInsnNode
+                    ? (MethodInsnNode) blockContextNode : null;
+            if (blockContextCall == null || blockContextCall.getOpcode() != Opcodes.INVOKESTATIC
+                    || !blockContextCall.name.startsWith("access$000")) {
+                continue;
+            }
+            AbstractInsnNode start = previousReal(blockContextCall);
+            if (!(start instanceof VarInsnNode) || start.getOpcode() != Opcodes.ALOAD
+                    || ((VarInsnNode) start).var != 16) {
+                continue;
+            }
+            AbstractInsnNode after = sectionStore.getNext();
+            InsnList replacement = list(
+                    new VarInsnNode(Opcodes.ALOAD, 16),
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, blockContextCall.owner,
+                            blockContextCall.name, blockContextCall.desc, false),
+                    new MethodInsnNode(Opcodes.INVOKEVIRTUAL,
+                            "xbigellx/realisticphysics/internal/level/block/RPBlockContext",
+                            "pos", "()Lnet/minecraft/util/math/BlockPos;", false),
+                    new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/util/math/BlockPos",
+                            "func_177956_o", "()I", false),
+                    new InsnNode(Opcodes.ICONST_4),
+                    new InsnNode(Opcodes.ISHR),
+                    new VarInsnNode(Opcodes.ISTORE, ((VarInsnNode) yStore).var),
+                    new VarInsnNode(Opcodes.ALOAD, 0),
+                    new FieldInsnNode(Opcodes.GETFIELD, node.name, "level",
+                            "Lxbigellx/rbp/internal/level/RBPLevel;"),
+                    new VarInsnNode(Opcodes.ALOAD, 16),
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, blockContextCall.owner,
+                            blockContextCall.name, blockContextCall.desc, false),
+                    new MethodInsnNode(Opcodes.INVOKEVIRTUAL,
+                            "xbigellx/realisticphysics/internal/level/block/RPBlockContext",
+                            "pos", "()Lnet/minecraft/util/math/BlockPos;", false),
+                    new MethodInsnNode(Opcodes.INVOKEVIRTUAL,
+                            "xbigellx/rbp/internal/level/RBPLevel", "getChunk",
+                            "(Lnet/minecraft/util/math/BlockPos;)"
+                                    + "Lxbigellx/realisticphysics/internal/level/chunk/RPChunkAccessor;",
+                            false),
+                    new VarInsnNode(Opcodes.ALOAD, 16),
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, blockContextCall.owner,
+                            blockContextCall.name, blockContextCall.desc, false),
+                    new MethodInsnNode(Opcodes.INVOKEVIRTUAL,
+                            "xbigellx/realisticphysics/internal/level/block/RPBlockContext",
+                            "pos", "()Lnet/minecraft/util/math/BlockPos;", false),
+                    new MethodInsnNode(Opcodes.INVOKEINTERFACE,
+                            "xbigellx/realisticphysics/internal/level/chunk/RPChunkAccessor",
+                            "getSectionIndex", "(Lnet/minecraft/util/math/BlockPos;)I", true),
+                    new VarInsnNode(Opcodes.ISTORE, ((VarInsnNode) sectionStore).var));
+            method.instructions.insertBefore(start, replacement);
+            for (AbstractInsnNode remove = start; remove != after;) {
+                AbstractInsnNode next = remove.getNext();
+                method.instructions.remove(remove);
+                remove = next;
+            }
+            patched++;
+            break;
+        }
+            if (patched > 0) {
+                break;
+            }
+        }
+        require(patched == 1, "Expected one Realistic Block Physics retry section mapping, patched "
+                + patched);
+        LOGGER.info("Patched Realistic Block Physics retry section mapping");
         return write(node);
     }
 
@@ -5187,6 +5967,7 @@ public final class FFDHeightTransformer implements IClassTransformer {
                     "(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/renderer/chunk/RenderChunk;Lnet/minecraft/util/EnumFacing;ZI)Lnet/minecraft/client/renderer/chunk/RenderChunk;");
             require(optifineOffset != null,
                     "Missing vanilla and OptiFine RenderGlobal getRenderChunkOffset methods");
+            patchOptiFineRenderGlobalMaxChunkY(node, worldField);
             LOGGER.info("Preserving OptiFine RenderGlobal neighbor lookup; its height ceiling is patched in setupTerrain");
         }
         MethodNode markRange = findMethod(node, "markBlockRangeForRenderUpdate", "func_147585_a",
@@ -5213,6 +5994,60 @@ public final class FFDHeightTransformer implements IClassTransformer {
         patchWorldBorderHeight(node, worldField);
         LOGGER.info("Patched RenderGlobal entity sections, vertical traversal, chunk invalidation and world border height");
         return write(node);
+    }
+
+    private static void patchOptiFineRenderGlobalMaxChunkY(ClassNode node, String worldField) {
+        MethodNode setupTerrain = findMethod(node, "setupTerrain", "func_174970_a",
+                "(Lnet/minecraft/entity/Entity;DLnet/minecraft/client/renderer/culling/ICamera;IZ)V");
+        MethodInsnNode dynamic = null;
+        VarInsnNode dynamicStore = null;
+        for (AbstractInsnNode instruction = setupTerrain.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (call.getOpcode() == Opcodes.INVOKESTATIC
+                    && "net/optifine/render/ChunkVisibility".equals(call.owner)
+                    && "getMaxChunkY".equals(call.name)
+                    && "(Lnet/minecraft/world/World;Lnet/minecraft/entity/Entity;I)I".equals(call.desc)) {
+                require(dynamic == null, "Multiple OptiFine dynamic chunk-height calls");
+                AbstractInsnNode store = nextReal(call);
+                require(store instanceof VarInsnNode && store.getOpcode() == Opcodes.ISTORE,
+                        "Missing OptiFine dynamic chunk-height local");
+                dynamic = call;
+                dynamicStore = (VarInsnNode) store;
+            }
+        }
+        require(dynamic != null && dynamicStore != null,
+                "Missing OptiFine dynamic chunk-height call");
+
+        AbstractInsnNode defaultHeight = null;
+        for (AbstractInsnNode instruction = setupTerrain.instructions.getFirst(); instruction != dynamic;
+                instruction = instruction.getNext()) {
+            if (isIntConstant(instruction, 256)) {
+                AbstractInsnNode store = nextReal(instruction);
+                if (store instanceof VarInsnNode && store.getOpcode() == Opcodes.ISTORE
+                        && ((VarInsnNode) store).var == dynamicStore.var) {
+                    require(defaultHeight == null, "Multiple OptiFine default chunk heights");
+                    defaultHeight = instruction;
+                }
+            }
+        }
+        require(defaultHeight != null, "Missing OptiFine default chunk height");
+
+        setupTerrain.instructions.insert(defaultHeight, list(
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new FieldInsnNode(Opcodes.GETFIELD, node.name, worldField,
+                        "Lnet/minecraft/client/multiplayer/WorldClient;"),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, CLIENT_HOOKS, "optiFineDefaultMaxChunkY",
+                        "(ILnet/minecraft/world/World;)I", false)));
+        setupTerrain.instructions.insert(dynamic, list(
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new FieldInsnNode(Opcodes.GETFIELD, node.name, worldField,
+                        "Lnet/minecraft/client/multiplayer/WorldClient;"),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, CLIENT_HOOKS, "optiFineDynamicMaxChunkY",
+                        "(ILnet/minecraft/world/World;)I", false)));
     }
 
     private static void addRenderGlobalAccessBridge(ClassNode node) {
@@ -6344,13 +7179,6 @@ public final class FFDHeightTransformer implements IClassTransformer {
                 new VarInsnNode(Opcodes.ALOAD, 0),
                 new org.objectweb.asm.tree.TypeInsnNode(Opcodes.CHECKCAST,
                         "net/minecraft/world/World"));
-    }
-
-    private static InsnList loadAlfheimChunkWorld(String owner) {
-        return list(
-                new VarInsnNode(Opcodes.ALOAD, 0),
-                new org.objectweb.asm.tree.FieldInsnNode(Opcodes.GETFIELD, owner,
-                        "field_76637_e", "Lnet/minecraft/world/World;"));
     }
 
     private static void prependExtendedWorldBranch(MethodNode method, InsnList worldLoad,

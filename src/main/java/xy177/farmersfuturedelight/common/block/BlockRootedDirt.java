@@ -7,8 +7,12 @@ import net.minecraft.block.IGrowable;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.EnumPlantType;
+import net.minecraftforge.common.IPlantable;
 
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.FFDCreativeTab;
@@ -25,6 +29,25 @@ public class BlockRootedDirt extends Block implements IGrowable {
         setCreativeTab(FFDCreativeTab.INSTANCE);
         setHardness(0.5F);
         setSoundType(FFDSounds.ROOTED_DIRT);
+        setHarvestLevel("shovel", 0);
+    }
+
+    @Override
+    public boolean canSustainPlant(IBlockState state, IBlockAccess world, BlockPos pos,
+                                   EnumFacing direction, IPlantable plantable) {
+        if (direction == EnumFacing.UP) {
+            EnumPlantType type = plantable.getPlantType(world, pos.up());
+            if (type == EnumPlantType.Plains) {
+                return true;
+            }
+            if (type == EnumPlantType.Beach) {
+                return world.getBlockState(pos.east()).getMaterial() == Material.WATER
+                        || world.getBlockState(pos.west()).getMaterial() == Material.WATER
+                        || world.getBlockState(pos.north()).getMaterial() == Material.WATER
+                        || world.getBlockState(pos.south()).getMaterial() == Material.WATER;
+            }
+        }
+        return super.canSustainPlant(state, world, pos, direction, plantable);
     }
 
     @Override

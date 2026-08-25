@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.2.2'
+version = '1.2.4'
 group = 'xy177.farmersfuturedelight'
 archivesBaseName = 'farmers-future-delight'
 
@@ -136,6 +136,8 @@ jar {
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
             "FMLCorePlugin": "xy177.farmersfuturedelight.core.FFDLoadingPlugin",
             "FMLCorePluginContainsFMLMod": "true",
+            "TweakClass": "xy177.farmersfuturedelight.bootstrap.FFDEarlyTweaker",
+            "TweakOrder": "-10000",
             "ForceLoadAsMod": "true"
         ])
     }

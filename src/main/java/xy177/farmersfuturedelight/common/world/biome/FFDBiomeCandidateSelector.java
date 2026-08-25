@@ -18,6 +18,7 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import xy177.farmersfuturedelight.FarmerFutureDelight;
+import xy177.farmersfuturedelight.common.FFDConfig;
 import xy177.farmersfuturedelight.common.registry.FFDBiomes;
 import xy177.farmersfuturedelight.common.world.biome.FFDModernBiomeResolver.ModernBiome;
 import xy177.farmersfuturedelight.common.world.biome.FFDModernBiomeResolver.Sample;
@@ -32,7 +33,6 @@ import xy177.farmersfuturedelight.common.world.terrain.FFDModernWorldgenData;
 final class FFDBiomeCandidateSelector {
     private static final Logger LOGGER = LogManager.getLogger("FFD Biome Candidates");
     private static final int MAX_CELL_CACHE = 32768;
-    private static final int DEFAULT_VANILLA_WEIGHT = 4;
     private static final int DEFAULT_MODDED_WEIGHT = 3;
     private static final int DEFAULT_SPECIAL_WEIGHT = 10;
     private static final int REGION_SIZE = 1024;
@@ -279,22 +279,7 @@ final class FFDBiomeCandidateSelector {
         for (Map.Entry<Biome, Integer> entry : bopWeights.entrySet()) {
             mergeWeight(weights, entry.getKey(), entry.getValue());
         }
-
-        for (Biome biome : ForgeRegistries.BIOMES.getValuesCollection()) {
-            if (!isCandidate(biome) || weights.containsKey(biome)) {
-                continue;
-            }
-            ResourceLocation name = biome.getRegistryName();
-            boolean vanilla = name != null && "minecraft".equals(name.getResourceDomain());
-            TerrainRole role = FFDModernBiomeResolver.roleOf(biome);
-            int weight = role == TerrainRole.LAND
-                    ? vanilla ? DEFAULT_VANILLA_WEIGHT : DEFAULT_MODDED_WEIGHT
-                    : DEFAULT_SPECIAL_WEIGHT;
-            if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.RARE)) {
-                weight = Math.max(1, weight / 3);
-            }
-            mergeWeight(weights, biome, weight);
-        }
+        loadConfiguredCandidates(weights);
 
         List<Entry> loaded = new ArrayList<>();
         for (Map.Entry<Biome, Integer> entry : weights.entrySet()) {
@@ -304,6 +289,47 @@ final class FFDBiomeCandidateSelector {
         }
         Collections.sort(loaded, Comparator.comparing(Entry::registryName));
         return Collections.unmodifiableList(loaded);
+    }
+
+    private static void loadConfiguredCandidates(Map<Biome, Integer> weights) {
+        String[] configuredNames = FFDConfig.cavesAndCliffsAdditionalBiomeCandidates;
+        if (configuredNames == null) {
+            return;
+        }
+        for (String configuredName : configuredNames) {
+            String trimmed = configuredName == null ? "" : configuredName.trim();
+            if (trimmed.isEmpty()) {
+                continue;
+            }
+            ResourceLocation name;
+            try {
+                name = new ResourceLocation(trimmed);
+            } catch (RuntimeException exception) {
+                logConfiguredCandidate(trimmed, "invalid registry name");
+                continue;
+            }
+            Biome biome = ForgeRegistries.BIOMES.getValue(name);
+            if (biome == null) {
+                logConfiguredCandidate(trimmed, "biome is not registered");
+                continue;
+            }
+            if (!isCandidate(biome)) {
+                logConfiguredCandidate(trimmed, "biome is not eligible for the Overworld candidate pool");
+                continue;
+            }
+            int weight = DEFAULT_MODDED_WEIGHT;
+            if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.RARE)) {
+                weight = Math.max(1, weight / 3);
+            }
+            mergeWeight(weights, biome, weight);
+            logConfiguredCandidate(trimmed, "included with weight " + weight);
+        }
+    }
+
+    private static void logConfiguredCandidate(String name, String decision) {
+        if (FFDConfig.logAutoCompatibilityDecisions) {
+            LOGGER.info("ffd_cac additional biome candidate {}: {}", name, decision);
+        }
     }
 
     private static List<Biome> buildSpawnBiomes(List<Entry> entries) {

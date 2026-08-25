@@ -21,6 +21,9 @@ final class OptiFineWaterColorCompat {
     }
 
     static int getColor(IBlockAccess world, BlockPos pos, int fallback) {
+        if (AquaAcrobaticsWaterCompat.isEnabled()) {
+            return fallback;
+        }
         Accessor current = accessor;
         if (current == null) {
             synchronized (OptiFineWaterColorCompat.class) {

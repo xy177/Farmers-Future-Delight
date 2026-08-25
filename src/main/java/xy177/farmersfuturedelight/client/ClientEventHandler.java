@@ -3,6 +3,8 @@ package xy177.farmersfuturedelight.client;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.Set;
 
 import net.minecraft.client.renderer.block.model.IBakedModel;
@@ -13,6 +15,8 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -25,11 +29,13 @@ import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderHandEvent;
+import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -54,8 +60,12 @@ public final class ClientEventHandler {
             id("textures/misc/spyglass_scope.png");
     private static final ResourceLocation POWDER_SNOW_OUTLINE =
             id("textures/misc/powder_snow_outline.png");
+    private static final ResourceLocation FROZEN_HEART_ICONS =
+            id("textures/gui/icons_frozen.png");
     private static float scopeScale = 0.5F;
     private static Float savedMouseSensitivity;
+    private static final Map<EntityLivingBase, float[]> FROZEN_ROTATIONS =
+            new IdentityHashMap<>();
     private static final Set<String> WATERLOGGED_PLANT_MODELS = new HashSet<>(Arrays.asList(
             "kelp_young", "kelp", "kelp_plant", "seagrass", "tall_seagrass", "sea_pickle",
             "small_dripleaf", "big_dripleaf_stem", "big_dripleaf", "big_dripleaf_waterlogged",
@@ -98,6 +108,7 @@ public final class ClientEventHandler {
 
     @SubscribeEvent
     public static void stitchParticles(TextureStitchEvent.Pre event) {
+        event.getMap().registerSprite(id("block/powder_snow"));
         event.getMap().registerSprite(id("particle/glow"));
         event.getMap().registerSprite(id("particle/drip_hang"));
         event.getMap().registerSprite(id("particle/drip_fall"));
@@ -276,6 +287,57 @@ public final class ClientEventHandler {
         GlStateManager.enableDepth();
     }
 
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void bindFrozenHeartIconsBeforeMantle(RenderGameOverlayEvent.Pre event) {
+        if (Loader.isModLoaded("mantle")) {
+            bindFrozenHeartTexture(event);
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void bindFrozenHeartIcons(RenderGameOverlayEvent.Pre event) {
+        if (!Loader.isModLoaded("mantle")) {
+            bindFrozenHeartTexture(event);
+        }
+    }
+
+    private static void bindFrozenHeartTexture(RenderGameOverlayEvent.Pre event) {
+        Minecraft minecraft = Minecraft.getMinecraft();
+        if (event.getType() == RenderGameOverlayEvent.ElementType.HEALTH
+                && minecraft.player != null
+                && FFDPowderSnowEvents.getFrozenPercent(minecraft.player) >= 1.0F
+                && !minecraft.player.isPotionActive(MobEffects.POISON)
+                && !minecraft.player.isPotionActive(MobEffects.WITHER)) {
+            minecraft.getTextureManager().bindTexture(FROZEN_HEART_ICONS);
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+    public static void beginFrozenShake(RenderLivingEvent.Pre<?> event) {
+        if (event.isCanceled()) {
+            return;
+        }
+        EntityLivingBase entity = event.getEntity();
+        if (FFDPowderSnowEvents.getFrozenPercent(entity) < 1.0F) {
+            return;
+        }
+        float[] rotation = {entity.prevRenderYawOffset, entity.renderYawOffset};
+        FROZEN_ROTATIONS.put(entity, rotation);
+        float shake = (float) (Math.cos(Math.floor(entity.ticksExisted
+                + event.getPartialRenderTick()) * 3.25F) * Math.PI * 0.4D);
+        entity.prevRenderYawOffset += shake;
+        entity.renderYawOffset += shake;
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void endFrozenShake(RenderLivingEvent.Post<?> event) {
+        float[] rotation = FROZEN_ROTATIONS.remove(event.getEntity());
+        if (rotation != null) {
+            event.getEntity().prevRenderYawOffset = rotation[0];
+            event.getEntity().renderYawOffset = rotation[1];
+        }
+    }
+
     @SubscribeEvent
     public static void renderVerticalBiomeDebug(RenderGameOverlayEvent.Text event) {
         Minecraft minecraft = Minecraft.getMinecraft();
@@ -355,7 +417,7 @@ public final class ClientEventHandler {
 
     private static int waterColor(net.minecraft.block.state.IBlockState state, IBlockAccess world,
                                   BlockPos pos, int tintIndex) {
-        if (tintIndex != 0 || world == null || pos == null) {
+        if (tintIndex != 1 || world == null || pos == null) {
             return 0xFFFFFF;
         }
         int biomeColor = BiomeColorHelper.getWaterColorAtPos(world, pos);

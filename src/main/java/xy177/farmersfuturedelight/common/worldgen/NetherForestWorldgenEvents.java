@@ -5,6 +5,9 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
@@ -79,6 +82,7 @@ public final class NetherForestWorldgenEvents {
         }
         GENERATING_FOREST.set(Boolean.TRUE);
         try {
+            removeVanillaFire(world, chunkX, chunkZ, forestMap);
             if (forestMap.hasCrimson()) {
                 NetherForestFeatures.generateForest(world, event.getRand(), chunkX, chunkZ,
                         false, forestMap.getStrengths(false));
@@ -89,6 +93,31 @@ public final class NetherForestWorldgenEvents {
             }
         } finally {
             GENERATING_FOREST.remove();
+        }
+    }
+
+    private static void removeVanillaFire(World world, int chunkX, int chunkZ,
+                                          ForestColumnMap forestMap) {
+        Chunk chunk = world.getChunkFromChunkCoords(chunkX, chunkZ);
+        int startX = chunkX << 4;
+        int startZ = chunkZ << 4;
+        int maxY = world.getActualHeight();
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        for (int localZ = 0; localZ < 16; localZ++) {
+            for (int localX = 0; localX < 16; localX++) {
+                if (forestMap.getType((localZ << 4) | localX) == ForestType.NONE) {
+                    continue;
+                }
+                int x = startX + localX;
+                int z = startZ + localZ;
+                for (int y = 0; y < maxY; y++) {
+                    pos.setPos(x, y, z);
+                    IBlockState state = chunk.getBlockState(pos);
+                    if (state.getBlock() == Blocks.FIRE) {
+                        world.setBlockState(pos, Blocks.AIR.getDefaultState(), 2 | 16);
+                    }
+                }
+            }
         }
     }
 

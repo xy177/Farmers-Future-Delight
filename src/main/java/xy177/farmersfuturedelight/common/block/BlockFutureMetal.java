@@ -14,7 +14,7 @@ public class BlockFutureMetal extends Block {
         setCreativeTab(FFDCreativeTab.INSTANCE);
         setHardness(5.0F);
         setResistance(6.0F / 3.0F);
-        setSoundType(SoundType.METAL);
+        setSoundType(SoundType.STONE);
         setHarvestLevel("pickaxe", harvestLevel);
     }
 }

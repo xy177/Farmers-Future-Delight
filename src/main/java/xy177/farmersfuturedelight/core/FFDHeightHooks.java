@@ -1,6 +1,7 @@
 package xy177.farmersfuturedelight.core;
 
 import com.google.common.base.Predicate;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,6 +18,7 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.NumberInvalidException;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -36,7 +38,10 @@ import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 import net.minecraft.world.gen.ChunkGeneratorDebug;
 import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
+import net.minecraft.world.gen.structure.StructureStart;
 import net.minecraft.world.NextTickListEntry;
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public final class FFDHeightHooks {
@@ -50,6 +55,8 @@ public final class FFDHeightHooks {
     private static final int WORLDGEN_HEIGHT_LEGACY = 1;
     private static final int WORLDGEN_HEIGHT_EXTENDED = 2;
     private static final ThreadLocal<Integer> WORLDGEN_HEIGHT_SCOPE = new ThreadLocal<>();
+    private static final ThreadLocal<ArrayDeque<Integer>> COMPAT_WORLDGEN_HEIGHT_SCOPES =
+            new ThreadLocal<>();
     private static volatile World voxelMapWorld;
 
     private FFDHeightHooks() {
@@ -102,6 +109,74 @@ public final class FFDHeightHooks {
 
     public static int minY(Entity entity) {
         return entity == null ? 0 : minY(entity.world);
+    }
+
+    public static int pathableY(double y, Entity entity) {
+        return minY(entity) < 0 ? MathHelper.floor(y) : (int) y;
+    }
+
+    public static int batFlightMinTargetY(Entity entity) {
+        return minY(entity) + 1;
+    }
+
+    public static int deadlyWorldFloorMinY(World world) {
+        return minY(world) + 5;
+    }
+
+    public static void beginYungMineshaftStructure(StructureStart start,
+            World world, StructureBoundingBox box) {
+        boolean extended = isExtended(world) && start != null
+                && start.getClass().getName().startsWith(
+                        "com.yungnickyoung.minecraft.bettermineshafts.");
+        if (extended && box.minY > MIN_Y) {
+            box.minY = MIN_Y;
+        }
+        beginCompatExtendedWorldgen(extended);
+    }
+
+    public static void beginDeadlyWorldGeneration(World world) {
+        beginCompatExtendedWorldgen(isExtended(world));
+    }
+
+    public static void endExtendedWorldgenHeight() {
+        ArrayDeque<Integer> scopes = COMPAT_WORLDGEN_HEIGHT_SCOPES.get();
+        if (scopes == null || scopes.isEmpty()) {
+            return;
+        }
+        int previousMode = scopes.removeLast();
+        if (scopes.isEmpty()) {
+            COMPAT_WORLDGEN_HEIGHT_SCOPES.remove();
+        }
+        if (previousMode == WORLDGEN_HEIGHT_NORMAL) {
+            WORLDGEN_HEIGHT_SCOPE.remove();
+        } else {
+            WORLDGEN_HEIGHT_SCOPE.set(previousMode);
+        }
+    }
+
+    private static void beginCompatExtendedWorldgen(boolean extended) {
+        ArrayDeque<Integer> scopes = COMPAT_WORLDGEN_HEIGHT_SCOPES.get();
+        if (scopes == null) {
+            scopes = new ArrayDeque<>();
+            COMPAT_WORLDGEN_HEIGHT_SCOPES.set(scopes);
+        }
+        Integer previous = WORLDGEN_HEIGHT_SCOPE.get();
+        scopes.addLast(previous == null ? WORLDGEN_HEIGHT_NORMAL : previous);
+        if (extended) {
+            WORLDGEN_HEIGHT_SCOPE.set(WORLDGEN_HEIGHT_EXTENDED);
+        }
+    }
+
+    public static Property deadlyWorldHeightProperty(Configuration configuration,
+            String category, String key, int defaultValue, String comment, int min, int max) {
+        if (key != null && (key.endsWith("height_min") || key.endsWith("height_max"))) {
+            min = Integer.MIN_VALUE;
+        }
+        return configuration.get(category, key, defaultValue, comment, min, max);
+    }
+
+    public static double corpseMinY(Entity entity) {
+        return minY(entity);
     }
 
     public static int maxYExclusive(World world) {
@@ -348,6 +423,64 @@ public final class FFDHeightHooks {
 
     public static int storageIndexForSectionY(int sectionY, World world) {
         return storageIndex(sectionY << 4, world);
+    }
+
+    public static int realisticPhysicsSectionIndex(World world, int sectionY) {
+        return usesExtendedHeight(world) ? sectionY - (MIN_Y >> 4) : sectionY;
+    }
+
+    public static int realisticPhysicsSectionIndex(Chunk chunk, int sectionY) {
+        return chunk == null ? sectionY : realisticPhysicsSectionIndex(chunk.getWorld(), sectionY);
+    }
+
+    public static int realisticPhysicsSectionY(World world, int index) {
+        return usesExtendedHeight(world) ? index + (MIN_Y >> 4) : index;
+    }
+
+    public static int realisticPhysicsSectionY(Chunk chunk, int index) {
+        return chunk == null ? index : realisticPhysicsSectionY(chunk.getWorld(), index);
+    }
+
+    public static int realisticPhysicsStorageIndex(Chunk chunk, int index) {
+        if (chunk == null || !usesExtendedHeight(chunk.getWorld())) {
+            return index;
+        }
+        return storageIndexForSectionY(realisticPhysicsSectionY(chunk, index), chunk.getWorld());
+    }
+
+    public static int realisticPhysicsMinSection(World world) {
+        return usesExtendedHeight(world) ? MIN_Y >> 4 : 0;
+    }
+
+    public static int realisticPhysicsMinSection(Chunk chunk) {
+        return chunk == null ? 0 : realisticPhysicsMinSection(chunk.getWorld());
+    }
+
+    public static int realisticPhysicsMaxSection(World world) {
+        return usesExtendedHeight(world) ? MAX_Y_EXCLUSIVE >> 4 : 16;
+    }
+
+    public static int realisticPhysicsMaxSection(Chunk chunk) {
+        if (chunk == null) {
+            return 15;
+        }
+        return usesExtendedHeight(chunk.getWorld())
+                ? MAX_Y_EXCLUSIVE >> 4 : chunk.getBlockStorageArray().length - 1;
+    }
+
+    public static int realisticPhysicsMinY(World world) {
+        return usesExtendedHeight(world) ? MIN_Y : 0;
+    }
+
+    public static int realisticPhysicsMaxY(World world) {
+        return usesExtendedHeight(world) ? MAX_Y_EXCLUSIVE - 1 : 255;
+    }
+
+    public static int realisticPhysicsPlayerSectionIndex(EntityPlayer player) {
+        if (player == null) {
+            return 0;
+        }
+        return realisticPhysicsSectionIndex(player.world, player.getPosition().getY() >> 4);
     }
 
     public static int minSectionY(World world) {

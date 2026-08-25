@@ -166,7 +166,7 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
             if (hasNectar() && cropsGrownSincePollination < 10 && rand.nextFloat() < 0.05F) {
                 int count = 1 + rand.nextInt(2);
                 for (int i = 0; i < count; i++) {
-                    FarmerFutureDelight.proxy.spawnHoneyDripParticle(world,
+                    FarmerFutureDelight.proxy.spawnFallingNectarParticle(world,
                             posX - 0.3D + rand.nextDouble() * 0.6D,
                             posY + height * 0.5D,
                             posZ - 0.3D + rand.nextDouble() * 0.6D);
@@ -463,7 +463,7 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
 
     @Override
     public float getEyeHeight() {
-        return 0.35F;
+        return isChild() ? 0.175F : 0.35F;
     }
 
     @Override
@@ -524,11 +524,14 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
         if (state.getBlock() instanceof BlockDoublePlant) {
             BlockDoublePlant.EnumPlantType type = state.getValue(BlockDoublePlant.VARIANT);
             if (type == BlockDoublePlant.EnumPlantType.SUNFLOWER) {
-                return state.getValue(BlockDoublePlant.HALF) == BlockDoublePlant.EnumBlockHalf.UPPER;
-            }
-            return type == BlockDoublePlant.EnumPlantType.SYRINGA
+                if (state.getValue(BlockDoublePlant.HALF) == BlockDoublePlant.EnumBlockHalf.UPPER) {
+                    return true;
+                }
+            } else if (type == BlockDoublePlant.EnumPlantType.SYRINGA
                     || type == BlockDoublePlant.EnumPlantType.ROSE
-                    || type == BlockDoublePlant.EnumPlantType.PAEONIA;
+                    || type == BlockDoublePlant.EnumPlantType.PAEONIA) {
+                return true;
+            }
         }
         return isBeeAttractiveBlock(state);
     }
@@ -537,7 +540,8 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
         Block block = state.getBlock();
         return block instanceof BlockFlower || block == Blocks.CHORUS_FLOWER
                 || FFDLushCaveBlockProvider.get().isFloweringAzalea(state)
-                || FFDLushCaveBlockProvider.get().isSporeBlossom(state);
+                || FFDLushCaveBlockProvider.get().isSporeBlossom(state)
+                || BeePollinationTargets.matches(state);
     }
 
     @Nullable
@@ -862,6 +866,8 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
         private int pollinatingTicks;
         private int lastSoundTick;
         private boolean pollinating;
+        @Nullable
+        private Vec3d hoverPos;
 
         private BeePollinateGoal(EntityBee bee) {
             this.bee = bee;
@@ -899,6 +905,7 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
             pollinatingTicks = 0;
             lastSoundTick = 0;
             pollinating = true;
+            hoverPos = null;
             bee.setPollinating(true);
             bee.ticksSincePollination = 0;
         }
@@ -909,6 +916,7 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
                 bee.setHasNectar(true);
             }
             pollinating = false;
+            hoverPos = null;
             bee.setPollinating(false);
             bee.getNavigator().clearPath();
             bee.remainingCooldownBeforeLocatingNewFlower = 200;
@@ -929,19 +937,39 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
             double y = bee.flowerPos.getY() + 0.6D;
             double z = bee.flowerPos.getZ() + 0.5D;
             if (bee.getDistanceSq(x, y, z) > 1.0D) {
-                bee.moveToFlower(bee.flowerPos, 1.2D);
+                hoverPos = new Vec3d(x, y, z);
+                moveToHoverPos();
                 return;
             }
-            bee.getNavigator().clearPath();
-            bee.getMoveHelper().setMoveTo(x + (bee.rand.nextFloat() * 2.0F - 1.0F) / 3.0F,
-                    y, z + (bee.rand.nextFloat() * 2.0F - 1.0F) / 3.0F, 0.35D);
-            bee.getLookHelper().setLookPosition(x, y, z, 10.0F, bee.getVerticalFaceSpeed());
+            if (hoverPos == null) {
+                hoverPos = new Vec3d(x, y, z);
+            }
+            boolean reachedHoverPos = bee.getDistanceSq(hoverPos.x, hoverPos.y, hoverPos.z) <= 0.01D;
+            boolean move = true;
+            if (reachedHoverPos) {
+                if (bee.rand.nextInt(25) == 0) {
+                    hoverPos = new Vec3d(x + (bee.rand.nextFloat() * 2.0F - 1.0F) / 3.0F,
+                            y, z + (bee.rand.nextFloat() * 2.0F - 1.0F) / 3.0F);
+                    bee.getNavigator().clearPath();
+                } else {
+                    move = false;
+                }
+                bee.getLookHelper().setLookPosition(x, y, z, 10.0F,
+                        bee.getVerticalFaceSpeed());
+            }
+            if (move) {
+                moveToHoverPos();
+            }
             successfulPollinatingTicks++;
             if (bee.rand.nextFloat() < 0.05F
                     && successfulPollinatingTicks > lastSoundTick + 60) {
                 lastSoundTick = successfulPollinatingTicks;
                 bee.playSound(FFDSounds.BEE_POLLINATE, 1.0F, 1.0F);
             }
+        }
+
+        private void moveToHoverPos() {
+            bee.getMoveHelper().setMoveTo(hoverPos.x, hoverPos.y, hoverPos.z, 0.35D);
         }
     }
 
@@ -981,7 +1009,8 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
         private final List<BlockPos> blacklistedTargets = new ArrayList<>();
         private int travellingTicks;
         private int stuckTicks;
-        private double lastDistanceSq = Double.MAX_VALUE;
+        @Nullable
+        private Path lastPath;
 
         private BeeGoToHiveGoal(EntityBee bee) {
             this.bee = bee;
@@ -1004,7 +1033,7 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
         public void startExecuting() {
             travellingTicks = 0;
             stuckTicks = 0;
-            lastDistanceSq = Double.MAX_VALUE;
+            lastPath = null;
         }
 
         @Override
@@ -1012,6 +1041,7 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
             bee.getNavigator().clearPath();
             travellingTicks = 0;
             stuckTicks = 0;
+            lastPath = null;
         }
 
         @Override
@@ -1021,13 +1051,6 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
                 return;
             }
             double distanceSq = bee.getDistanceSqToCenter(bee.hivePos);
-            if (distanceSq + 0.01D < lastDistanceSq) {
-                stuckTicks = 0;
-            } else if (++stuckTicks > 60) {
-                bee.dropHive();
-                return;
-            }
-            lastDistanceSq = distanceSq;
             if (!bee.getNavigator().noPath()) {
                 return;
             }
@@ -1035,6 +1058,17 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
                 if (!bee.getNavigator().tryMoveToXYZ(bee.hivePos.getX() + 0.5D,
                         bee.hivePos.getY() + 0.5D, bee.hivePos.getZ() + 0.5D, 1.0D)) {
                     dropAndBlacklistHive();
+                    return;
+                }
+                Path path = bee.getNavigator().getPath();
+                if (lastPath != null && path != null && path.isSamePath(lastPath)) {
+                    if (++stuckTicks > 60) {
+                        bee.dropHive();
+                        stuckTicks = 0;
+                    }
+                } else {
+                    lastPath = path;
+                    stuckTicks = 0;
                 }
                 return;
             }

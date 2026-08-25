@@ -11,6 +11,7 @@ import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
@@ -36,6 +37,7 @@ import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
 import xy177.farmersfuturedelight.common.advancement.FFDAdvancements;
+import xy177.farmersfuturedelight.client.particle.ParticlePowderSnow;
 
 public class BlockPowderSnow extends Block {
     private static final AxisAlignedBB FALLING_COLLISION =
@@ -80,7 +82,11 @@ public class BlockPowderSnow extends Block {
         return entity instanceof EntityLivingBase
                 && ((EntityLivingBase) entity).getItemStackFromSlot(
                         net.minecraft.inventory.EntityEquipmentSlot.FEET).getItem()
-                == Items.LEATHER_BOOTS;
+                == Items.LEATHER_BOOTS
+                || entity instanceof EntityLivingBase
+                && xy177.farmersfuturedelight.common.FFDPowderSnowEvents.isWalkableBoots(
+                        ((EntityLivingBase) entity).getItemStackFromSlot(
+                                net.minecraft.inventory.EntityEquipmentSlot.FEET));
     }
 
     @Override
@@ -110,11 +116,17 @@ public class BlockPowderSnow extends Block {
     }
 
     public static boolean destroyPowderSnow(World world, BlockPos pos) {
+        return destroyPowderSnow(world, pos, FFDBlocks.POWDER_SNOW);
+    }
+
+    public static boolean destroyPowderSnow(World world, BlockPos pos, Block expectedBlock) {
         IBlockState state = world.getBlockState(pos);
-        if (state.getBlock() != FFDBlocks.POWDER_SNOW || !world.setBlockToAir(pos)) {
+        if (state.getBlock() != expectedBlock || !world.setBlockToAir(pos)) {
             return false;
         }
-        world.playEvent(2001, pos, Block.getStateId(state));
+        if (!world.isRemote) {
+            world.playEvent(2001, pos, Block.getStateId(state));
+        }
         return true;
     }
 
@@ -152,6 +164,13 @@ public class BlockPowderSnow extends Block {
     @Override
     public net.minecraft.item.ItemStack getItem(World world, BlockPos pos, IBlockState state) {
         return FFDItems.effectiveStack(FFDItems.POWDER_SNOW_BUCKET);
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean addDestroyEffects(World world, BlockPos pos, ParticleManager manager) {
+        ParticlePowderSnow.addDestroyEffects(world, pos, getDefaultState(), manager);
+        return true;
     }
 
     @Override

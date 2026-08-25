@@ -110,7 +110,7 @@ public final class NetherForestFeatures {
                     above.setPos(x, y + 1, z);
                     IBlockState groundState = FFDHeightHooks.getBlockState(chunk, x, y, z);
                     IBlockState aboveState = FFDHeightHooks.getBlockState(chunk, x, y + 1, z);
-                    if (groundState.getBlock() == Blocks.NETHERRACK
+                    if (isNyliumConvertible(groundState)
                             && aboveState.getBlock().isAir(aboveState, world, above)) {
                         world.setBlockState(ground, nylium, WORLDGEN_FLAGS);
                     }
@@ -331,30 +331,25 @@ public final class NetherForestFeatures {
     public static void placeWeepingVinesColumn(World world, Random random, BlockPos start,
                                                int totalHeight, int minAge, int maxAge,
                                                int updateFlags) {
+        IBlockState tip = blocks().vine(false, true);
+        IBlockState plant = blocks().vine(false, false);
+        if (tip == null || plant == null) {
+            return;
+        }
+        int length = contiguousAirLength(world, start, EnumFacing.DOWN,
+                totalHeight + 1, updateFlags);
+        if (length == 0) {
+            return;
+        }
         BlockPos cursor = start;
-        for (int height = 0; height <= totalHeight; height++) {
-            if (FFDHeightHooks.isOutsideBuildHeight(world, cursor)
-                    || (updateFlags == WORLDGEN_FLAGS && !isInsideWorld(world, cursor))
-                    || !isLoadedArea(world, cursor, 1)) {
-                break;
-            }
-            if (world.isAirBlock(cursor)) {
-                if (height == totalHeight || !world.isAirBlock(cursor.down())) {
-                    IBlockState tip = blocks().vine(false, true);
-                    if (tip == null) {
-                        break;
-                    }
-                    world.setBlockState(cursor, tip, updateFlags);
-                    if (tip.getBlock() instanceof BlockNetherVine) {
-                        BlockNetherVine.setAge(world, cursor,
-                                randomBetweenInclusive(random, minAge, maxAge));
-                    }
-                    break;
+        for (int index = 0; index < length; index++) {
+            if (index == length - 1) {
+                world.setBlockState(cursor, tip, updateFlags);
+                if (tip.getBlock() instanceof BlockNetherVine) {
+                    BlockNetherVine.setAge(world, cursor,
+                            randomBetweenInclusive(random, minAge, maxAge));
                 }
-                IBlockState plant = blocks().vine(false, false);
-                if (plant == null) {
-                    break;
-                }
+            } else {
                 world.setBlockState(cursor, plant, updateFlags);
             }
             cursor = cursor.down();
@@ -397,34 +392,44 @@ public final class NetherForestFeatures {
     private static void placeTwistingVinesColumn(World world, Random random, BlockPos start,
                                                  int totalHeight, int minAge, int maxAge,
                                                  int updateFlags) {
+        IBlockState tip = blocks().vine(true, true);
+        IBlockState plant = blocks().vine(true, false);
+        if (tip == null || plant == null) {
+            return;
+        }
+        int length = contiguousAirLength(world, start, EnumFacing.UP,
+                totalHeight, updateFlags);
+        if (length == 0) {
+            return;
+        }
         BlockPos cursor = start;
-        for (int height = 1; height <= totalHeight; height++) {
-            if (FFDHeightHooks.isOutsideBuildHeight(world, cursor)
-                    || (updateFlags == WORLDGEN_FLAGS && !isInsideWorld(world, cursor))
-                    || !isLoadedArea(world, cursor, 1)) {
-                break;
-            }
-            if (world.isAirBlock(cursor)) {
-                if (height == totalHeight || !world.isAirBlock(cursor.up())) {
-                    IBlockState tip = blocks().vine(true, true);
-                    if (tip == null) {
-                        break;
-                    }
-                    world.setBlockState(cursor, tip, updateFlags);
-                    if (tip.getBlock() instanceof BlockNetherVine) {
-                        BlockNetherVine.setAge(world, cursor,
-                                randomBetweenInclusive(random, minAge, maxAge));
-                    }
-                    break;
+        for (int index = 0; index < length; index++) {
+            if (index == length - 1) {
+                world.setBlockState(cursor, tip, updateFlags);
+                if (tip.getBlock() instanceof BlockNetherVine) {
+                    BlockNetherVine.setAge(world, cursor,
+                            randomBetweenInclusive(random, minAge, maxAge));
                 }
-                IBlockState plant = blocks().vine(true, false);
-                if (plant == null) {
-                    break;
-                }
+            } else {
                 world.setBlockState(cursor, plant, updateFlags);
             }
             cursor = cursor.up();
         }
+    }
+
+    private static int contiguousAirLength(World world, BlockPos start, EnumFacing direction,
+                                           int maxLength, int updateFlags) {
+        BlockPos cursor = start;
+        int length = 0;
+        while (length < maxLength
+                && !FFDHeightHooks.isOutsideBuildHeight(world, cursor)
+                && (updateFlags != WORLDGEN_FLAGS || isInsideWorld(world, cursor))
+                && isLoadedArea(world, cursor, 1)
+                && world.isAirBlock(cursor)) {
+            length++;
+            cursor = cursor.offset(direction);
+        }
+        return length;
     }
 
     private static int randomVineHeight(Random random, int maxHeight) {
@@ -453,6 +458,12 @@ public final class NetherForestFeatures {
 
     private static boolean isWeepingVinesSupport(IBlockState state) {
         return state.getBlock() == Blocks.NETHERRACK || blocks().isWart(state, false);
+    }
+
+    private static boolean isNyliumConvertible(IBlockState state) {
+        return state.getBlock() == Blocks.NETHERRACK
+                || state.getBlock() == Blocks.QUARTZ_ORE
+                || state.getBlock() == Blocks.MAGMA;
     }
 
     private static boolean isAnyNylium(IBlockState state) {

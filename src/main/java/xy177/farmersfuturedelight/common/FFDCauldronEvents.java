@@ -20,6 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.block.BlockFutureCauldron;
+import xy177.farmersfuturedelight.common.block.BlockPowderSnow;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
@@ -97,7 +98,9 @@ public final class FFDCauldronEvents {
             event.setCanceled(true);
             return;
         }
-        event.getWorld().setBlockToAir(pos);
+        if (!BlockPowderSnow.destroyPowderSnow(event.getWorld(), pos, powderSnow)) {
+            return;
+        }
         event.getWorld().playSound(player, pos, FFDSounds.BUCKET_FILL_POWDER_SNOW,
                 SoundCategory.BLOCKS, 1.0F, 1.0F);
         event.setFilledBucket(powderSnowBucket);

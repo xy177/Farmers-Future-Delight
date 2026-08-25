@@ -11,14 +11,21 @@ import net.minecraft.block.BlockLog;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.BlockOldLog;
 import net.minecraft.block.BlockPlanks;
+import net.minecraft.block.BlockShulkerBox;
 import net.minecraft.block.BlockTallGrass;
 import net.minecraft.block.BlockVine;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Biomes;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldType;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.MapGenBase;
 
@@ -406,17 +413,34 @@ public final class MapGenLushCaves extends MapGenBase {
                 || !isAir(primer.getBlockState(x, y, z))) {
             return;
         }
-        // The 1.12 vine has no persistent ceiling-only state, so use its four wall faces.
+        IBlockAccess access = new PrimerBlockAccess(primer);
         for (EnumFacing face : EnumFacing.Plane.HORIZONTAL) {
             int supportX = x + face.getDirectionVec().getX();
             int supportZ = z + face.getDirectionVec().getZ();
             if (inChunk(supportX, supportZ)
-                    && isSolidGround(primer.getBlockState(supportX, y, supportZ))) {
+                    && isClassicVineSupport(access, new BlockPos(supportX, y, supportZ),
+                            face.getOpposite())) {
                 primer.setBlockState(x, y, z, Blocks.VINE.getDefaultState()
                         .withProperty(BlockVine.getPropertyFor(face), true));
                 return;
             }
         }
+    }
+
+    private static boolean isClassicVineSupport(IBlockAccess access, BlockPos pos,
+                                                 EnumFacing supportFace) {
+        IBlockState state = access.getBlockState(pos);
+        Block block = state.getBlock();
+        return state.getBlockFaceShape(access, pos, supportFace) == BlockFaceShape.SOLID
+                && !(block instanceof BlockShulkerBox)
+                && block != Blocks.BEACON
+                && block != Blocks.CAULDRON
+                && block != Blocks.GLASS
+                && block != Blocks.STAINED_GLASS
+                && block != Blocks.PISTON
+                && block != Blocks.STICKY_PISTON
+                && block != Blocks.PISTON_HEAD
+                && block != Blocks.TRAPDOOR;
     }
 
     private static boolean isInsideCavern(List<Cavern> caverns, int chunkX, int chunkZ,
@@ -752,6 +776,58 @@ public final class MapGenLushCaves extends MapGenBase {
                 || block == Blocks.MYCELIUM || block == Blocks.CLAY
                 || block == Blocks.SAND || block == Blocks.GRAVEL
                 || lushBlocks().isMossBlock(state) || lushBlocks().isRootedDirt(state);
+    }
+
+    private static final class PrimerBlockAccess implements IBlockAccess {
+        private final ChunkPrimer primer;
+
+        private PrimerBlockAccess(ChunkPrimer primer) {
+            this.primer = primer;
+        }
+
+        @Override
+        public TileEntity getTileEntity(BlockPos pos) {
+            return null;
+        }
+
+        @Override
+        public int getCombinedLight(BlockPos pos, int lightValue) {
+            return 0;
+        }
+
+        @Override
+        public IBlockState getBlockState(BlockPos pos) {
+            return inChunk(pos.getX(), pos.getZ()) && pos.getY() >= 0 && pos.getY() < 256
+                    ? primer.getBlockState(pos.getX(), pos.getY(), pos.getZ())
+                    : Blocks.AIR.getDefaultState();
+        }
+
+        @Override
+        public boolean isAirBlock(BlockPos pos) {
+            IBlockState state = getBlockState(pos);
+            return state.getBlock().isAir(state, this, pos);
+        }
+
+        @Override
+        public Biome getBiome(BlockPos pos) {
+            return Biomes.PLAINS;
+        }
+
+        @Override
+        public int getStrongPower(BlockPos pos, EnumFacing direction) {
+            return 0;
+        }
+
+        @Override
+        public WorldType getWorldType() {
+            return WorldType.DEFAULT;
+        }
+
+        @Override
+        public boolean isSideSolid(BlockPos pos, EnumFacing side, boolean defaultValue) {
+            IBlockState state = getBlockState(pos);
+            return state.isSideSolid(this, pos, side);
+        }
     }
 
     private static void placeDripleaf(ChunkPrimer primer, int localX, int baseY, int localZ, Random random) {

@@ -28,6 +28,7 @@ import xy177.farmersfuturedelight.common.block.WaterloggedPlantFluid;
 import xy177.farmersfuturedelight.common.worldgen.WorldGenAmethystGeodes;
 import xy177.farmersfuturedelight.common.worldgen.WorldGenModernOreVeins;
 import xy177.farmersfuturedelight.common.worldgen.WorldGenModernFossils;
+import xy177.farmersfuturedelight.common.worldgen.WorldGenModernIcebergs;
 import xy177.farmersfuturedelight.common.worldgen.WorldGenModernOres;
 import xy177.farmersfuturedelight.common.worldgen.WorldGenModernMountainBiomes;
 import xy177.farmersfuturedelight.common.worldgen.WorldGenVerticalCaveBiomes;
@@ -63,6 +64,7 @@ public final class ChunkGeneratorExtended extends ChunkGeneratorOverworld {
     private final WorldGenModernOres modernOres;
     private final WorldGenVerticalCaveBiomes caveBiomes;
     private final WorldGenModernCarvers modernCarvers;
+    private final WorldGenModernIcebergs modernIcebergs;
     private final WorldGenModernMountainBiomes mountainBiomes;
     private final FFDModernStoneProvider modernStones;
     private final FFDLushCaveBlockProvider lushBlocks;
@@ -92,8 +94,10 @@ public final class ChunkGeneratorExtended extends ChunkGeneratorOverworld {
                 ? (FFDModernBiomeProvider) world.getBiomeProvider() : null;
         this.worldgenData = biomeProvider != null
                 ? biomeProvider.worldgenData() : new FFDModernWorldgenData(seed);
-        this.terrainBridge = new FFDBiomeTerrainBridge(biomeProvider != null
-                ? biomeProvider.resolver() : new FFDModernBiomeResolver(worldgenData, seed));
+        FFDModernBiomeResolver resolver = biomeProvider != null
+                ? biomeProvider.resolver() : new FFDModernBiomeResolver(worldgenData, seed);
+        this.terrainBridge = new FFDBiomeTerrainBridge(resolver);
+        this.modernIcebergs = new WorldGenModernIcebergs(seed, resolver);
         this.densityGridCache = new DensityGridCache(worldgenData.finalDensityComponents());
         this.modernOreVeins = new WorldGenModernOreVeins(worldgenData, modernStones);
         this.modernFossils = new WorldGenModernFossils(seed, modernStones);
@@ -1110,6 +1114,7 @@ public final class ChunkGeneratorExtended extends ChunkGeneratorOverworld {
 
     @Override
     public void populate(int x, int z) {
+        modernIcebergs.generate(world, x, z);
         try (FFDHeightHooks.WorldgenHeightScope ignored = FFDHeightHooks.enterLegacyWorldgenHeight()) {
             super.populate(x, z);
         }

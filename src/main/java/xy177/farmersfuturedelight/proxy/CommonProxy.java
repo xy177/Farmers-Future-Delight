@@ -26,6 +26,9 @@ public class CommonProxy {
     public void spawnHoneyDripParticle(World world, double x, double y, double z) {
     }
 
+    public void spawnFallingNectarParticle(World world, double x, double y, double z) {
+    }
+
     public void spawnDripstoneParticle(World world, double x, double y, double z,
                                        boolean lava) {
     }

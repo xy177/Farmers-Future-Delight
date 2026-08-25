@@ -21,6 +21,16 @@ import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 public final class WaterloggedPlantFluid {
     private static final int WATER_TICK_RATE = 5;
     public static final IUnlistedProperty<Boolean> WATER_ABOVE = new BooleanProperty("water_above");
+    public static final IUnlistedProperty<Boolean> WATER_NORTH_VISIBLE =
+            new BooleanProperty("water_north_visible");
+    public static final IUnlistedProperty<Boolean> WATER_SOUTH_VISIBLE =
+            new BooleanProperty("water_south_visible");
+    public static final IUnlistedProperty<Boolean> WATER_WEST_VISIBLE =
+            new BooleanProperty("water_west_visible");
+    public static final IUnlistedProperty<Boolean> WATER_EAST_VISIBLE =
+            new BooleanProperty("water_east_visible");
+    public static final IUnlistedProperty<Boolean> WATER_DOWN_VISIBLE =
+            new BooleanProperty("water_down_visible");
     public static final IUnlistedProperty<Float> WATER_NORTH_WEST =
             new FloatProperty("water_north_west");
     public static final IUnlistedProperty<Float> WATER_SOUTH_WEST =
@@ -66,7 +76,9 @@ public final class WaterloggedPlantFluid {
 
     public static IUnlistedProperty<?>[] extendedProperties() {
         return new IUnlistedProperty<?>[] {
-                WATER_ABOVE, WATER_NORTH_WEST, WATER_SOUTH_WEST,
+                WATER_ABOVE, WATER_NORTH_VISIBLE, WATER_SOUTH_VISIBLE,
+                WATER_WEST_VISIBLE, WATER_EAST_VISIBLE, WATER_DOWN_VISIBLE,
+                WATER_NORTH_WEST, WATER_SOUTH_WEST,
                 WATER_SOUTH_EAST, WATER_NORTH_EAST};
     }
 
@@ -84,6 +96,16 @@ public final class WaterloggedPlantFluid {
         float northEast = getFluidHeight(world, pos.east());
         return extended
                 .withProperty(WATER_ABOVE, hasWaterAbove(world, pos))
+                .withProperty(WATER_NORTH_VISIBLE,
+                        world.getBlockState(pos.north()).getMaterial() != Material.WATER)
+                .withProperty(WATER_SOUTH_VISIBLE,
+                        world.getBlockState(pos.south()).getMaterial() != Material.WATER)
+                .withProperty(WATER_WEST_VISIBLE,
+                        world.getBlockState(pos.west()).getMaterial() != Material.WATER)
+                .withProperty(WATER_EAST_VISIBLE,
+                        world.getBlockState(pos.east()).getMaterial() != Material.WATER)
+                .withProperty(WATER_DOWN_VISIBLE,
+                        world.getBlockState(pos.down()).getMaterial() != Material.WATER)
                 .withProperty(WATER_NORTH_WEST, northWest)
                 .withProperty(WATER_SOUTH_WEST, southWest)
                 .withProperty(WATER_SOUTH_EAST, southEast)

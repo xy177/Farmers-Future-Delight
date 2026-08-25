@@ -1,6 +1,7 @@
 {
   "parent": "block/carpet",
   "textures": {
+    "particle": "farmers_future_delight:block/moss_block",
     "wool": "farmers_future_delight:block/moss_block"
   }
 }

@@ -1,6 +1,7 @@
 package xy177.farmersfuturedelight.core;
 
 import java.util.Map;
+import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
 @IFMLLoadingPlugin.Name("Farmer's Future Delight Height Core")
@@ -10,6 +11,9 @@ import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 public final class FFDLoadingPlugin implements IFMLLoadingPlugin {
     @Override
     public String[] getASMTransformerClass() {
+        if (Boolean.TRUE.equals(Launch.blackboard.get("ffd.cleanMixActive"))) {
+            return new String[0];
+        }
         return new String[] {FFDHeightTransformer.class.getName()};
     }
 

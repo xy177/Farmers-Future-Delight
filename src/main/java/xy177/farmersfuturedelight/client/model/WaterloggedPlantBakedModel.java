@@ -26,6 +26,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad;
+import xy177.farmersfuturedelight.client.AquaAcrobaticsWaterCompat;
 import xy177.farmersfuturedelight.common.block.WaterloggedPlantFluid;
 
 /** Adds a water volume behind plants that replace a source-water block in 1.12. */
@@ -41,9 +42,9 @@ public final class WaterloggedPlantBakedModel implements IBakedModel {
     public WaterloggedPlantBakedModel(IBakedModel plantModel) {
         this.plantModel = plantModel;
         this.stillWater = Minecraft.getMinecraft().getTextureMapBlocks()
-                .getAtlasSprite("minecraft:blocks/water_still");
+                .getAtlasSprite(AquaAcrobaticsWaterCompat.stillTexture());
         this.flowingWater = Minecraft.getMinecraft().getTextureMapBlocks()
-                .getAtlasSprite("minecraft:blocks/water_flow");
+                .getAtlasSprite(AquaAcrobaticsWaterCompat.flowingTexture());
     }
 
     @Override
@@ -55,10 +56,7 @@ public final class WaterloggedPlantBakedModel implements IBakedModel {
             }
             return getWaterQuads(state).get(side);
         }
-        if (layer == null || layer == BlockRenderLayer.CUTOUT) {
-            return plantModel.getQuads(state, side, rand);
-        }
-        return Collections.emptyList();
+        return plantModel.getQuads(state, side, rand);
     }
 
     @Override
@@ -105,9 +103,29 @@ public final class WaterloggedPlantBakedModel implements IBakedModel {
         float southWest = getHeight(state, WaterloggedPlantFluid.WATER_SOUTH_WEST, fallback);
         float southEast = getHeight(state, WaterloggedPlantFluid.WATER_SOUTH_EAST, fallback);
         float northEast = getHeight(state, WaterloggedPlantFluid.WATER_NORTH_EAST, fallback);
+        boolean northVisible = isVisible(state, WaterloggedPlantFluid.WATER_NORTH_VISIBLE);
+        boolean southVisible = isVisible(state, WaterloggedPlantFluid.WATER_SOUTH_VISIBLE);
+        boolean westVisible = isVisible(state, WaterloggedPlantFluid.WATER_WEST_VISIBLE);
+        boolean eastVisible = isVisible(state, WaterloggedPlantFluid.WATER_EAST_VISIBLE);
+        boolean downVisible = isVisible(state, WaterloggedPlantFluid.WATER_DOWN_VISIBLE);
         long key = heightKey(northWest, southWest, southEast, northEast);
         if (waterAbove) {
             key |= 1L << 32;
+        }
+        if (northVisible) {
+            key |= 1L << 33;
+        }
+        if (southVisible) {
+            key |= 1L << 34;
+        }
+        if (westVisible) {
+            key |= 1L << 35;
+        }
+        if (eastVisible) {
+            key |= 1L << 36;
+        }
+        if (downVisible) {
+            key |= 1L << 37;
         }
         WaterQuadCache cache = waterQuadCache;
         if (cache == null || !cache.matches(format)) {
@@ -122,7 +140,8 @@ public final class WaterloggedPlantBakedModel implements IBakedModel {
         Map<EnumFacing, List<BakedQuad>> cached = cache.quads.get(key);
         if (cached == null) {
             Map<EnumFacing, List<BakedQuad>> created = createWaterQuads(format,
-                    northWest, southWest, southEast, northEast, waterAbove);
+                    northWest, southWest, southEast, northEast, waterAbove,
+                    northVisible, southVisible, westVisible, eastVisible, downVisible);
             Map<EnumFacing, List<BakedQuad>> existing = cache.quads.putIfAbsent(key, created);
             cached = existing == null ? created : existing;
         }
@@ -147,10 +166,21 @@ public final class WaterloggedPlantBakedModel implements IBakedModel {
                         .getValue(WaterloggedPlantFluid.WATER_ABOVE));
     }
 
+    private static boolean isVisible(IBlockState state,
+                                     net.minecraftforge.common.property.IUnlistedProperty<Boolean> property) {
+        return !(state instanceof IExtendedBlockState)
+                || !Boolean.FALSE.equals(((IExtendedBlockState) state).getValue(property));
+    }
+
     private Map<EnumFacing, List<BakedQuad>> createWaterQuads(VertexFormat format,
                                                                 float northWest, float southWest,
                                                                 float southEast, float northEast,
-                                                                boolean waterAbove) {
+                                                                boolean waterAbove,
+                                                                boolean northVisible,
+                                                                boolean southVisible,
+                                                                boolean westVisible,
+                                                                boolean eastVisible,
+                                                                boolean downVisible) {
         Map<EnumFacing, List<BakedQuad>> quads = new EnumMap<>(EnumFacing.class);
         Vertex topNorthWest = vertex(0.0F, northWest, 0.0F, 0.0F, 0.0F);
         Vertex topSouthWest = vertex(0.0F, southWest, 1.0F, 0.0F, 16.0F);
@@ -165,31 +195,51 @@ public final class WaterloggedPlantBakedModel implements IBakedModel {
                     createQuad(format, EnumFacing.DOWN, stillWater,
                             topNorthWest, topNorthEast, topSouthEast, topSouthWest)));
         }
-        quads.put(EnumFacing.DOWN, Collections.singletonList(createQuad(format, EnumFacing.DOWN, stillWater,
-                vertex(0.0F, 0.0F, 0.0F, 0.0F, 0.0F),
-                vertex(1.0F, 0.0F, 0.0F, 16.0F, 0.0F),
-                vertex(1.0F, 0.0F, 1.0F, 16.0F, 16.0F),
-                vertex(0.0F, 0.0F, 1.0F, 0.0F, 16.0F))));
-        quads.put(EnumFacing.NORTH, Collections.singletonList(createQuad(format, EnumFacing.NORTH, flowingWater,
-                vertex(0.0F, 0.0F, 0.0F, 0.0F, 16.0F),
-                vertex(0.0F, northWest, 0.0F, 0.0F, 0.0F),
-                vertex(1.0F, northEast, 0.0F, 16.0F, 0.0F),
-                vertex(1.0F, 0.0F, 0.0F, 16.0F, 16.0F))));
-        quads.put(EnumFacing.SOUTH, Collections.singletonList(createQuad(format, EnumFacing.SOUTH, flowingWater,
-                vertex(0.0F, 0.0F, 1.0F, 16.0F, 16.0F),
-                vertex(1.0F, 0.0F, 1.0F, 0.0F, 16.0F),
-                vertex(1.0F, southEast, 1.0F, 0.0F, 0.0F),
-                vertex(0.0F, southWest, 1.0F, 16.0F, 0.0F))));
-        quads.put(EnumFacing.WEST, Collections.singletonList(createQuad(format, EnumFacing.WEST, flowingWater,
-                vertex(0.0F, 0.0F, 0.0F, 16.0F, 16.0F),
-                vertex(0.0F, 0.0F, 1.0F, 0.0F, 16.0F),
-                vertex(0.0F, southWest, 1.0F, 0.0F, 0.0F),
-                vertex(0.0F, northWest, 0.0F, 16.0F, 0.0F))));
-        quads.put(EnumFacing.EAST, Collections.singletonList(createQuad(format, EnumFacing.EAST, flowingWater,
-                vertex(1.0F, 0.0F, 0.0F, 0.0F, 16.0F),
-                vertex(1.0F, northEast, 0.0F, 0.0F, 0.0F),
-                vertex(1.0F, southEast, 1.0F, 16.0F, 0.0F),
-                vertex(1.0F, 0.0F, 1.0F, 16.0F, 16.0F))));
+        if (downVisible) {
+            quads.put(EnumFacing.DOWN, Collections.singletonList(createQuad(format, EnumFacing.DOWN, stillWater,
+                    vertex(0.0F, 0.0F, 0.0F, 0.0F, 0.0F),
+                    vertex(1.0F, 0.0F, 0.0F, 16.0F, 0.0F),
+                    vertex(1.0F, 0.0F, 1.0F, 16.0F, 16.0F),
+                    vertex(0.0F, 0.0F, 1.0F, 0.0F, 16.0F))));
+        } else {
+            quads.put(EnumFacing.DOWN, Collections.<BakedQuad>emptyList());
+        }
+        if (northVisible) {
+            quads.put(EnumFacing.NORTH, Collections.singletonList(createQuad(format, EnumFacing.NORTH, flowingWater,
+                    vertex(0.0F, 0.0F, 0.0F, 0.0F, 16.0F),
+                    vertex(0.0F, northWest, 0.0F, 0.0F, 0.0F),
+                    vertex(1.0F, northEast, 0.0F, 16.0F, 0.0F),
+                    vertex(1.0F, 0.0F, 0.0F, 16.0F, 16.0F))));
+        } else {
+            quads.put(EnumFacing.NORTH, Collections.<BakedQuad>emptyList());
+        }
+        if (southVisible) {
+            quads.put(EnumFacing.SOUTH, Collections.singletonList(createQuad(format, EnumFacing.SOUTH, flowingWater,
+                    vertex(0.0F, 0.0F, 1.0F, 16.0F, 16.0F),
+                    vertex(1.0F, 0.0F, 1.0F, 0.0F, 16.0F),
+                    vertex(1.0F, southEast, 1.0F, 0.0F, 0.0F),
+                    vertex(0.0F, southWest, 1.0F, 16.0F, 0.0F))));
+        } else {
+            quads.put(EnumFacing.SOUTH, Collections.<BakedQuad>emptyList());
+        }
+        if (westVisible) {
+            quads.put(EnumFacing.WEST, Collections.singletonList(createQuad(format, EnumFacing.WEST, flowingWater,
+                    vertex(0.0F, 0.0F, 0.0F, 16.0F, 16.0F),
+                    vertex(0.0F, 0.0F, 1.0F, 0.0F, 16.0F),
+                    vertex(0.0F, southWest, 1.0F, 0.0F, 0.0F),
+                    vertex(0.0F, northWest, 0.0F, 16.0F, 0.0F))));
+        } else {
+            quads.put(EnumFacing.WEST, Collections.<BakedQuad>emptyList());
+        }
+        if (eastVisible) {
+            quads.put(EnumFacing.EAST, Collections.singletonList(createQuad(format, EnumFacing.EAST, flowingWater,
+                    vertex(1.0F, 0.0F, 0.0F, 0.0F, 16.0F),
+                    vertex(1.0F, northEast, 0.0F, 0.0F, 0.0F),
+                    vertex(1.0F, southEast, 1.0F, 16.0F, 0.0F),
+                    vertex(1.0F, 0.0F, 1.0F, 16.0F, 16.0F))));
+        } else {
+            quads.put(EnumFacing.EAST, Collections.<BakedQuad>emptyList());
+        }
         return quads;
     }
 
@@ -201,7 +251,7 @@ public final class WaterloggedPlantBakedModel implements IBakedModel {
                                         Vertex first, Vertex second, Vertex third, Vertex fourth) {
         UnpackedBakedQuad.Builder builder = new UnpackedBakedQuad.Builder(format);
         builder.setQuadOrientation(face);
-        builder.setQuadTint(0);
+        builder.setQuadTint(1);
         builder.setTexture(texture);
         builder.setApplyDiffuseLighting(true);
         Vertex[] vertices = {first, second, third, fourth};

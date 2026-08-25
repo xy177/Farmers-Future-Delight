@@ -15,6 +15,7 @@ import net.minecraft.world.World;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
+import xy177.farmersfuturedelight.common.block.BlockPowderSnow;
 import xy177.farmersfuturedelight.common.item.ItemAxolotlBucket;
 
 public final class FFDDispenserBehaviors {
@@ -85,7 +86,9 @@ public final class FFDDispenserBehaviors {
                             return previousBucketBehavior.dispense(source, stack);
                         }
 
-                        world.setBlockToAir(target);
+                        if (!BlockPowderSnow.destroyPowderSnow(world, target, powderSnow)) {
+                            return previousBucketBehavior.dispense(source, stack);
+                        }
                         world.playSound(null, target, FFDSounds.BUCKET_FILL_POWDER_SNOW,
                                 SoundCategory.BLOCKS, 1.0F, 1.0F);
                         world.playEvent(1000, source.getBlockPos(), 0);

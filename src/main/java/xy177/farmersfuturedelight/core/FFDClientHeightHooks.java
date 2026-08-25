@@ -244,7 +244,20 @@ public final class FFDClientHeightHooks {
         }
         if (FFDHeightHooks.isExtended(world) && y1 == 0 && (y2 == 255 || y2 == 256)) {
             y1 = FFDHeightHooks.minY(world);
-            y2 = FFDHeightHooks.maxYExclusive(world);
+            y2 = FFDHeightHooks.maxYInclusive(world);
+        }
+        if (FFDHeightHooks.isExtended(world)) {
+            int minY = FFDHeightHooks.minY(world);
+            int maxY = FFDHeightHooks.maxYInclusive(world);
+            if (y2 < minY || y1 > maxY) {
+                return;
+            }
+            y1 = Math.max(minY, y1 - 1);
+            y2 = Math.min(maxY, y2 + 1);
+            ((FFDRenderGlobalAccess) renderGlobal).ffd$markBlocksForUpdate(
+                    x1 - 1, y1, z1 - 1,
+                    x2 + 1, y2, z2 + 1, false);
+            return;
         }
         ((FFDRenderGlobalAccess) renderGlobal).ffd$markBlocksForUpdate(
                 x1 - 1, y1 - 1, z1 - 1,
@@ -263,6 +276,16 @@ public final class FFDClientHeightHooks {
             }
         }
         return Math.floorMod(sectionY, countChunksY);
+    }
+
+    public static int optiFineDefaultMaxChunkY(int original, World world) {
+        return FFDHeightHooks.isExtended(world)
+                ? FFDHeightHooks.maxYInclusive(world) : original;
+    }
+
+    public static int optiFineDynamicMaxChunkY(int original, World world) {
+        return FFDHeightHooks.isExtended(world)
+                ? FFDHeightHooks.maxYInclusive(world) : original;
     }
 
     private static boolean hasExtendedVerticalSections(ViewFrustum viewFrustum) {

@@ -18,6 +18,8 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumHand;
@@ -139,7 +141,11 @@ public class TileEntityBeehive extends TileEntity implements ITickable {
     }
 
     public void setHoneyLevel(int level) {
-        honeyLevel = Math.max(0, Math.min(MAX_HONEY_LEVEL, level));
+        int clampedLevel = Math.max(0, Math.min(MAX_HONEY_LEVEL, level));
+        if (honeyLevel == clampedLevel) {
+            return;
+        }
+        honeyLevel = clampedLevel;
         syncHoneyState();
         markDirty();
     }
@@ -260,6 +266,7 @@ public class TileEntityBeehive extends TileEntity implements ITickable {
         }
         String path = state.getBlock().getRegistryName().getResourcePath();
         if (!path.equals("campfire") && !path.endsWith("_campfire")
+                && !path.equals("brazier") && !path.endsWith("_brazier")
                 && !path.equals("stove") && !path.endsWith("_stove")) {
             return false;
         }
@@ -380,6 +387,20 @@ public class TileEntityBeehive extends TileEntity implements ITickable {
         return compound;
     }
 
+    @Nullable
+    @Override
+    public SPacketUpdateTileEntity getUpdatePacket() {
+        return new SPacketUpdateTileEntity(pos, 11, writeToNBT(new NBTTagCompound()));
+    }
+
+    @Override
+    public void onDataPacket(NetworkManager network, SPacketUpdateTileEntity packet) {
+        readFromNBT(packet.getNbtCompound());
+        if (world != null) {
+            world.markBlockRangeForRenderUpdate(pos, pos);
+        }
+    }
+
     private boolean releaseBee(BeeOccupant occupant, ReleaseStatus status,
                                @Nullable EntityPlayer angryAt) {
         return releaseBee(occupant, status, angryAt, null);
@@ -466,9 +487,9 @@ public class TileEntityBeehive extends TileEntity implements ITickable {
             return;
         }
         IBlockState state = world.getBlockState(pos);
-        if (state.getBlock() instanceof BlockBeehive
-                && state.getValue(BlockBeehive.HONEY_LEVEL) != honeyLevel) {
-            world.setBlockState(pos, state.withProperty(BlockBeehive.HONEY_LEVEL, honeyLevel), 3);
+        if (state.getBlock() instanceof BlockBeehive) {
+            world.notifyBlockUpdate(pos, state, state, 3);
+            world.updateComparatorOutputLevel(pos, state.getBlock());
         }
     }
 

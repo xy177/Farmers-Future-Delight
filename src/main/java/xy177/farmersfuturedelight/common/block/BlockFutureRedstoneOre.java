@@ -7,6 +7,8 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
@@ -29,7 +31,9 @@ public final class BlockFutureRedstoneOre extends BlockFutureOre {
 
     @Override
     public void onEntityWalk(World world, BlockPos pos, Entity entity) {
-        activate(world, pos);
+        if (!entity.isSneaking()) {
+            activate(world, pos);
+        }
         super.onEntityWalk(world, pos, entity);
     }
 
@@ -38,7 +42,14 @@ public final class BlockFutureRedstoneOre extends BlockFutureOre {
                                     EntityPlayer player, EnumHand hand, EnumFacing facing,
                                     float hitX, float hitY, float hitZ) {
         activate(world, pos);
-        return super.onBlockActivated(world, pos, state, player, hand, facing, hitX, hitY, hitZ);
+        ItemStack held = player.getHeldItem(hand);
+        if (held.getItem() instanceof ItemBlock) {
+            BlockPos target = state.getBlock().isReplaceable(world, pos) ? pos : pos.offset(facing);
+            if (world.getBlockState(target).getBlock().isReplaceable(world, target)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -53,6 +64,11 @@ public final class BlockFutureRedstoneOre extends BlockFutureOre {
         if (!state.getValue(LIT)) {
             return;
         }
+        spawnParticles(world, pos);
+    }
+
+    private static void spawnParticles(World world, BlockPos pos) {
+        Random random = world.rand;
         for (EnumFacing facing : EnumFacing.values()) {
             BlockPos adjacent = pos.offset(facing);
             if (world.getBlockState(adjacent).isOpaqueCube()) {
@@ -73,6 +89,11 @@ public final class BlockFutureRedstoneOre extends BlockFutureOre {
     }
 
     @Override
+    public int getLightValue(IBlockState state) {
+        return state.getValue(LIT) ? 9 : 0;
+    }
+
+    @Override
     public IBlockState getStateFromMeta(int meta) {
         return getDefaultState().withProperty(LIT, (meta & 1) != 0);
     }
@@ -89,14 +110,9 @@ public final class BlockFutureRedstoneOre extends BlockFutureOre {
 
     private void activate(World world, BlockPos pos) {
         IBlockState state = world.getBlockState(pos);
+        spawnParticles(world, pos);
         if (!state.getValue(LIT)) {
             world.setBlockState(pos, state.withProperty(LIT, true), 3);
         }
-        world.scheduleUpdate(pos, this, tickRate(world));
-    }
-
-    @Override
-    public int tickRate(World world) {
-        return 30;
     }
 }

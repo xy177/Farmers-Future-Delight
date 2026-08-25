@@ -23,6 +23,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.client.particle.ParticleGlowSquid;
 import xy177.farmersfuturedelight.client.particle.ParticleDripstone;
+import xy177.farmersfuturedelight.client.particle.ParticleFallingNectar;
 import xy177.farmersfuturedelight.client.particle.ParticleHoneyDrip;
 import xy177.farmersfuturedelight.client.particle.ParticleSmallFlame;
 import xy177.farmersfuturedelight.client.particle.ParticleSporeBlossom;
@@ -83,11 +84,11 @@ public class ClientProxy extends CommonProxy {
         registerStateMapper(FFDBlocks.HANGING_ROOTS,
                 new StateMap.Builder().ignore(BlockLiquid.LEVEL, BlockHangingRoots.WATERLOGGED).build());
         registerModel(FFDItems.ROOTED_DIRT, "rooted_dirt");
-        registerModel(FFDItems.HANGING_ROOTS, "hanging_roots");
+        registerModel(FFDItems.HANGING_ROOTS, "hanging_roots_item");
         registerModel(FFDItems.SPORE_BLOSSOM, "spore_blossom");
         if (FFDItems.isGlowLichenEnabled()) {
             ModelLoader.setCustomModelResourceLocation(FFDItems.GLOW_LICHEN, 0,
-                    new ModelResourceLocation(FarmerFutureDelight.MODID + ":glow_lichen", "inventory"));
+                    new ModelResourceLocation(FarmerFutureDelight.MODID + ":glow_lichen_item", "inventory"));
             for (net.minecraft.block.Block block : FFDBlocks.GLOW_LICHEN_VARIANTS) {
                 registerStateMapper(block,
                         new StateMap.Builder().ignore(BlockLiquid.LEVEL).build());
@@ -407,8 +408,16 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void spawnSporeBlossomParticle(net.minecraft.world.World world, double x, double y,
                                           double z, boolean ambient) {
-        Minecraft.getMinecraft().effectRenderer.addEffect(
-                ParticleSporeBlossom.create(world, x, y, z, ambient));
+        Minecraft minecraft = Minecraft.getMinecraft();
+        int particleSetting = minecraft.gameSettings.particleSetting;
+        if (particleSetting == 2
+                || particleSetting == 1 && world.rand.nextInt(3) == 0) {
+            return;
+        }
+        ParticleSporeBlossom particle = ParticleSporeBlossom.create(world, x, y, z, ambient);
+        if (particle != null) {
+            minecraft.effectRenderer.addEffect(particle);
+        }
     }
 
     @Override
@@ -416,6 +425,13 @@ public class ClientProxy extends CommonProxy {
                                        double z) {
         Minecraft.getMinecraft().effectRenderer.addEffect(
                 ParticleHoneyDrip.create(world, x, y, z));
+    }
+
+    @Override
+    public void spawnFallingNectarParticle(net.minecraft.world.World world, double x, double y,
+                                           double z) {
+        Minecraft.getMinecraft().effectRenderer.addEffect(
+                ParticleFallingNectar.create(world, x, y, z));
     }
 
     @Override

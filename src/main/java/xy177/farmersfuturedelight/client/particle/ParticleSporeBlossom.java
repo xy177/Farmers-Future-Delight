@@ -1,5 +1,8 @@
 package xy177.farmersfuturedelight.client.particle;
 
+import java.lang.ref.WeakReference;
+import java.util.PriorityQueue;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.util.ResourceLocation;
@@ -8,8 +11,11 @@ import net.minecraft.world.World;
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 
 public final class ParticleSporeBlossom extends Particle {
+    private static final int AMBIENT_LIMIT = 1000;
+    private static final PriorityQueue<Long> AMBIENT_EXPIRATIONS = new PriorityQueue<>();
     private static final ResourceLocation TEXTURE =
             new ResourceLocation(FarmerFutureDelight.MODID, "particle/drip_fall");
+    private static WeakReference<World> ambientWorld = new WeakReference<>(null);
     private final boolean ambient;
 
     private ParticleSporeBlossom(World world, double x, double y, double z, boolean ambient) {
@@ -32,7 +38,27 @@ public final class ParticleSporeBlossom extends Particle {
 
     public static ParticleSporeBlossom create(World world, double x, double y, double z,
                                                boolean ambient) {
-        return new ParticleSporeBlossom(world, x, y, z, ambient);
+        ParticleSporeBlossom particle = new ParticleSporeBlossom(world, x, y, z, ambient);
+        if (ambient && !reserveAmbient(world, particle.particleMaxAge)) {
+            return null;
+        }
+        return particle;
+    }
+
+    private static synchronized boolean reserveAmbient(World world, int maxAge) {
+        if (ambientWorld.get() != world) {
+            ambientWorld = new WeakReference<>(world);
+            AMBIENT_EXPIRATIONS.clear();
+        }
+        long now = world.getTotalWorldTime();
+        while (!AMBIENT_EXPIRATIONS.isEmpty() && AMBIENT_EXPIRATIONS.peek() <= now) {
+            AMBIENT_EXPIRATIONS.poll();
+        }
+        if (AMBIENT_EXPIRATIONS.size() >= AMBIENT_LIMIT) {
+            return false;
+        }
+        AMBIENT_EXPIRATIONS.add(now + maxAge + 1L);
+        return true;
     }
 
     @Override

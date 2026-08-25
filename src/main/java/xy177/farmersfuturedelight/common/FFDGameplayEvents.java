@@ -21,6 +21,7 @@ import net.minecraft.entity.projectile.EntityPotion;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemAxe;
 import net.minecraft.item.ItemHoe;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemShears;
 import net.minecraft.item.ItemSpade;
 import net.minecraft.item.ItemStack;
@@ -35,9 +36,11 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.GameRules;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.Vec3d;
@@ -88,6 +91,9 @@ import xy177.farmersfuturedelight.core.FFDGameplayHooks;
 
 @Mod.EventBusSubscriber(modid = FarmerFutureDelight.MODID)
 public final class FFDGameplayEvents {
+    private static final ResourceLocation DEEPER_DEPTHS_COPPER_ORE =
+            new ResourceLocation("deeperdepths", "copper_ore");
+
     private static final String TURTLE_ZOMBIE_AI_TAG = FarmerFutureDelight.MODID + ".turtleZombieAi";
     private static final String AXOLOTL_GUARDIAN_AI_TAG =
             FarmerFutureDelight.MODID + ".axolotlGuardianAi";
@@ -148,26 +154,40 @@ public final class FFDGameplayEvents {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onVanillaOreHarvested(HarvestDropsEvent event) {
-        if (!FFDConfig.oresDropRawMaterials || !FFDItems.isRawOreEnabled()
-                || event.isSilkTouching()) {
+        if (!FFDConfig.oresDropRawMaterials || event.isSilkTouching()) {
             return;
         }
         net.minecraft.item.Item raw;
+        int count;
         if (event.getState().getBlock() == Blocks.IRON_ORE) {
+            if (!FFDItems.isRawOreEnabled()) {
+                return;
+            }
             raw = FFDItems.RAW_IRON;
+            count = 1;
         } else if (event.getState().getBlock() == Blocks.GOLD_ORE) {
+            if (!FFDItems.isRawOreEnabled()) {
+                return;
+            }
             raw = FFDItems.RAW_GOLD;
+            count = 1;
+        } else if (DEEPER_DEPTHS_COPPER_ORE.equals(
+                event.getState().getBlock().getRegistryName())) {
+            if (!FFDItems.isCopperEnabled()) {
+                return;
+            }
+            raw = FFDItems.RAW_COPPER;
+            count = 2 + event.getWorld().rand.nextInt(4);
         } else {
             return;
         }
 
-        int multiplier = 1;
         if (event.getFortuneLevel() > 0) {
-            multiplier = Math.max(1,
-                    event.getWorld().rand.nextInt(event.getFortuneLevel() + 2));
+            int multiplier = event.getWorld().rand.nextInt(event.getFortuneLevel() + 2) - 1;
+            count *= Math.max(0, multiplier) + 1;
         }
         event.getDrops().clear();
-        ItemStack rawStack = FFDItems.effectiveStack(raw, multiplier);
+        ItemStack rawStack = FFDItems.effectiveStack(raw, count);
         if (!rawStack.isEmpty()) {
             event.getDrops().add(rawStack);
         }
@@ -199,6 +219,29 @@ public final class FFDGameplayEvents {
                 event.getItemStack().damageItem(1, event.getEntityPlayer());
             }
         }
+        event.setCanceled(true);
+        event.setCancellationResult(EnumActionResult.SUCCESS);
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void onVanillaRedstoneOreActivated(PlayerInteractEvent.RightClickBlock event) {
+        IBlockState state = event.getWorld().getBlockState(event.getPos());
+        if (state.getBlock() != Blocks.REDSTONE_ORE
+                && state.getBlock() != Blocks.LIT_REDSTONE_ORE) {
+            return;
+        }
+        ItemStack held = event.getItemStack();
+        EnumFacing face = event.getFace() == null ? EnumFacing.UP : event.getFace();
+        if (held.getItem() instanceof ItemBlock) {
+            BlockPos target = state.getBlock().isReplaceable(event.getWorld(), event.getPos())
+                    ? event.getPos() : event.getPos().offset(face);
+            if (event.getWorld().getBlockState(target).getBlock()
+                    .isReplaceable(event.getWorld(), target)) {
+                return;
+            }
+        }
+        state.getBlock().onBlockActivated(event.getWorld(), event.getPos(), state,
+                event.getEntityPlayer(), event.getHand(), face, 0.5F, 0.5F, 0.5F);
         event.setCanceled(true);
         event.setCancellationResult(EnumActionResult.SUCCESS);
     }

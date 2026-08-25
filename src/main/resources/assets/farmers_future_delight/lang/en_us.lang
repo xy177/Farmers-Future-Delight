@@ -53,6 +53,7 @@ tipped_arrow.effect.farmers_future_delight.turtle_master=Arrow of the Turtle Mas
 tipped_arrow.effect.farmers_future_delight.long_turtle_master=Arrow of the Turtle Master+
 tipped_arrow.effect.farmers_future_delight.strong_turtle_master=Arrow of the Turtle Master II
 subtitles.entity.zombie.destroy_egg=Zombie destroys turtle egg
+subtitles.entity.player.freeze_hurt=Player freezes
 item.farmers_future_delight.honey_bottle.name=Honey Bottle
 item.farmers_future_delight.honeycomb.name=Honeycomb
 tile.farmers_future_delight.honey_block.name=Honey Block

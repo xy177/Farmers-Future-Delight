@@ -106,6 +106,13 @@ public class BlockAzalea extends BlockBush implements IGrowable {
     }
 
     @Override
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState state,
+                                                  net.minecraft.world.IBlockAccess world,
+                                                  BlockPos pos) {
+        return AZALEA_AABB;
+    }
+
+    @Override
     public EnumPushReaction getMobilityFlag(IBlockState state) {
         return EnumPushReaction.DESTROY;
     }
