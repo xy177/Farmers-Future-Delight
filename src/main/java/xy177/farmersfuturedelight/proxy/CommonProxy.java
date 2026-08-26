@@ -45,4 +45,8 @@ public class CommonProxy {
     public AxisAlignedBB getLightSelectionBox(IBlockAccess world, BlockPos pos) {
         return net.minecraft.block.Block.NULL_AABB;
     }
+
+    public String getLanguageCode() {
+        return "en_us";
+    }
 }

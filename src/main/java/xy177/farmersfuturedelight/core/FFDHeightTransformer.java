@@ -28,6 +28,7 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.VarInsnNode;
+import xy177.farmersfuturedelight.common.registry.FFDRawOreDropHooks;
 import xy177.farmersfuturedelight.common.worldgen.FFDMineshaftHooks;
 import xy177.farmersfuturedelight.common.FFDConfig;
 
@@ -39,6 +40,7 @@ public final class FFDHeightTransformer implements IClassTransformer {
     private static final String PULSAR_HOOKS = Type.getInternalName(FFDPulsarHooks.class);
     private static final String MINESHAFT_HOOKS = Type.getInternalName(FFDMineshaftHooks.class);
     private static final String WEATHER2_HOOKS = Type.getInternalName(FFDWeather2CompatHooks.class);
+    private static final String RAW_ORE_DROP_HOOKS = Type.getInternalName(FFDRawOreDropHooks.class);
     private static final String VIEW_FRUSTUM_ACCESS = Type.getInternalName(FFDViewFrustumAccess.class);
     private static final String RENDER_GLOBAL_ACCESS = Type.getInternalName(FFDRenderGlobalAccess.class);
     private static final String CONFIG = Type.getInternalName(FFDConfig.class);
@@ -128,6 +130,10 @@ public final class FFDHeightTransformer implements IClassTransformer {
             "net.shadowmage.ancientwarfare.structure.worldgen.WorldStructureGenerator");
     private static final Set<String> ANCIENT_WARFARE_SMOOTHING_MATRIX_CLASSES = names(
             "net.shadowmage.ancientwarfare.structure.template.build.validation.border.SmoothingMatrix");
+    private static final Set<String> ANCIENT_WARFARE_QUARRY_CLASSES = names(
+            "net.shadowmage.ancientwarfare.automation.tile.worksite.WorkSiteQuarry");
+    private static final Set<String> MINER_GOLEMS_MINER_AI_CLASSES = names(
+            "wolforce.minergolems.entities.ai.MinerAI_7_FindAndBreakBlock");
     private static final Set<String> ICE_AND_FIRE_WORLDGEN_EVENTS_CLASSES = names(
             "com.github.alexthe666.iceandfire.event.WorldGenEvents");
     private static final Set<String> FORGE_HOOKS_CLIENT_CLASS = names(
@@ -182,6 +188,14 @@ public final class FFDHeightTransformer implements IClassTransformer {
             "fathertoast.deadlyworld.oregen.OreGenerator");
     private static final Set<String> CORPSE_ENTITY_CLASSES = names(
             "de.maxhenkel.corpse.entities.EntityCorpse");
+    private static final Set<String> LYCANITES_RANDOM_SPAWN_LOCATION_CLASSES = names(
+            "com.lycanitesmobs.core.spawner.location.RandomSpawnLocation");
+    private static final Set<String> LYCANITES_BLOCK_SPAWN_LOCATION_CLASSES = names(
+            "com.lycanitesmobs.core.spawner.location.BlockSpawnLocation");
+    private static final Set<String> FORGIVING_VOID_CLASSES = names(
+            "net.blay09.mods.forgivingvoid.ForgivingVoid");
+    private static final Set<String> UNFORGIVING_VOID_CLASSES = names(
+            "the_fireplace.unforgivingvoid.UnforgivingVoid");
     private static final Map<String, String> PULSAR_DEV_MIXIN_TARGETS = pulsarDevMixinTargets();
     private static final Map<String, String> PULSAR_DEV_METHOD_NAMES = pulsarDevMethodNames();
     private static final Map<String, String> PULSAR_DEV_FIELD_NAMES = pulsarDevFieldNames();
@@ -883,6 +897,42 @@ public final class FFDHeightTransformer implements IClassTransformer {
                         }
                     });
         }
+        if (LYCANITES_RANDOM_SPAWN_LOCATION_CLASSES.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformLycanitesRandomSpawnLocation(bytes);
+                        }
+                    });
+        }
+        if (LYCANITES_BLOCK_SPAWN_LOCATION_CLASSES.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformLycanitesBlockSpawnLocation(bytes);
+                        }
+                    });
+        }
+        if (FORGIVING_VOID_CLASSES.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformForgivingVoid(bytes);
+                        }
+                    });
+        }
+        if (UNFORGIVING_VOID_CLASSES.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformUnforgivingVoid(bytes);
+                        }
+                    });
+        }
         if (OPTIFINE_SHADER_VERTEX_BUILDER_CLASS.contains(transformedName)) {
             return transformOptionalCompat(transformedName, basicClass,
                     new OptionalTransformer() {
@@ -1185,6 +1235,24 @@ public final class FFDHeightTransformer implements IClassTransformer {
                         }
                     });
         }
+        if (ANCIENT_WARFARE_QUARRY_CLASSES.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformAncientWarfareQuarry(bytes);
+                        }
+                    });
+        }
+        if (MINER_GOLEMS_MINER_AI_CLASSES.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformMinerGolemsMinerAi(bytes);
+                        }
+                    });
+        }
         if (ICE_AND_FIRE_WORLDGEN_EVENTS_CLASSES.contains(transformedName)) {
             return transformOptionalCompat(transformedName, basicClass,
                     new OptionalTransformer() {
@@ -1357,6 +1425,58 @@ public final class FFDHeightTransformer implements IClassTransformer {
         }
     }
 
+    private static byte[] transformForgivingVoid(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode method = findMethod(node, "onPlayerTick", "onPlayerTick",
+                "(Lnet/minecraftforge/fml/common/gameevent/TickEvent$PlayerTickEvent;)V");
+        int patched = patchVoidTriggerYReads(method,
+                "net/blay09/mods/forgivingvoid/ModConfig");
+        require(patched == 2, "Expected two Forgiving Void triggerAtY reads, patched " + patched);
+        LOGGER.info("Patched Forgiving Void trigger height for extended-height worlds");
+        return write(node);
+    }
+
+    private static byte[] transformUnforgivingVoid(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode method = findMethod(node, "onPlayerTick", "onPlayerTick",
+                "(Lnet/minecraftforge/fml/common/gameevent/TickEvent$PlayerTickEvent;)V");
+        int patched = patchVoidTriggerYReads(method,
+                "the_fireplace/unforgivingvoid/UnforgivingVoid$ConfigValues");
+        require(patched == 1,
+                "Expected one Unforgiving Void triggerAtY read, patched " + patched);
+        LOGGER.info("Patched Unforgiving Void trigger height for extended-height worlds");
+        return write(node);
+    }
+
+    private static int patchVoidTriggerYReads(MethodNode method, String configOwner) {
+        int patched = 0;
+        for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;) {
+            AbstractInsnNode next = instruction.getNext();
+            if (instruction instanceof FieldInsnNode
+                    && instruction.getOpcode() == Opcodes.GETSTATIC) {
+                FieldInsnNode field = (FieldInsnNode) instruction;
+                if (configOwner.equals(field.owner) && "triggerAtY".equals(field.name)
+                        && "I".equals(field.desc)) {
+                    InsnList replacement = new InsnList();
+                    replacement.add(new VarInsnNode(Opcodes.ALOAD, 0));
+                    replacement.add(new FieldInsnNode(Opcodes.GETFIELD,
+                            "net/minecraftforge/fml/common/gameevent/TickEvent$PlayerTickEvent",
+                            "player", "Lnet/minecraft/entity/player/EntityPlayer;"));
+                    replacement.add(new FieldInsnNode(Opcodes.GETSTATIC, field.owner,
+                            field.name, field.desc));
+                    replacement.add(new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS,
+                            "adjustVoidTriggerY",
+                            "(Lnet/minecraft/entity/Entity;I)I", false));
+                    method.instructions.insertBefore(instruction, replacement);
+                    method.instructions.remove(instruction);
+                    patched++;
+                }
+            }
+            instruction = next;
+        }
+        return patched;
+    }
+
     private static byte[] transformFfdWorldTypeForCaveBiomes(byte[] basicClass) {
         ClassNode node = read(basicClass);
         if (!node.interfaces.contains(CAVE_BIOMES_EXTENDED_WORLD_TYPE)) {
@@ -1398,6 +1518,109 @@ public final class FFDHeightTransformer implements IClassTransformer {
         require(patched == 1,
                 "Expected one Fluidlogged API fluid-level predicate call, patched " + patched);
         LOGGER.info("Patched Fluidlogged API mixed-state fluid lookup");
+        return write(node);
+    }
+
+    private static byte[] transformLycanitesRandomSpawnLocation(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode randomY = findMethod(node, "getRandomYCoord", "getRandomYCoord",
+                "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)I");
+        int patchedLowerBound = 0;
+        for (AbstractInsnNode instruction = randomY.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (call.getOpcode() != Opcodes.INVOKESTATIC
+                    || !"java/lang/Math".equals(call.owner)
+                    || !"max".equals(call.name) || !"(II)I".equals(call.desc)) {
+                continue;
+            }
+            AbstractInsnNode lowerBound = previousReal(call);
+            if (!isIntConstant(lowerBound, 0)) {
+                continue;
+            }
+            randomY.instructions.insertBefore(lowerBound, list(
+                    new VarInsnNode(Opcodes.ALOAD, 1),
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "minY",
+                            "(Lnet/minecraft/world/World;)I", false)));
+            randomY.instructions.remove(lowerBound);
+            patchedLowerBound++;
+        }
+        require(patchedLowerBound == 1,
+                "Expected one Lycanites random-spawn lower bound, patched " + patchedLowerBound);
+
+        MethodNode ground = findMethod(node, "posHasGround", "posHasGround",
+                "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)Z");
+        int patchedFloorCheck = 0;
+        for (AbstractInsnNode instruction = ground.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (!(instruction instanceof JumpInsnNode)
+                    || instruction.getOpcode() != Opcodes.IFNE) {
+                continue;
+            }
+            AbstractInsnNode getY = previousReal(instruction);
+            if (!(getY instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode getYCall = (MethodInsnNode) getY;
+            if (getYCall.getOpcode() != Opcodes.INVOKEVIRTUAL
+                    || !"net/minecraft/util/math/BlockPos".equals(getYCall.owner)
+                    || !("getY".equals(getYCall.name) || "func_177956_o".equals(getYCall.name))
+                    || !"()I".equals(getYCall.desc)) {
+                continue;
+            }
+            JumpInsnNode jump = (JumpInsnNode) instruction;
+            ground.instructions.insertBefore(instruction, list(
+                    new VarInsnNode(Opcodes.ALOAD, 1),
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "minY",
+                            "(Lnet/minecraft/world/World;)I", false),
+                    new JumpInsnNode(Opcodes.IF_ICMPNE, jump.label)));
+            ground.instructions.remove(instruction);
+            patchedFloorCheck++;
+        }
+        require(patchedFloorCheck == 1,
+                "Expected one Lycanites ground-floor check, patched " + patchedFloorCheck);
+        LOGGER.info("Patched Lycanites custom spawn locations for extended world height");
+        return write(node);
+    }
+
+    private static byte[] transformLycanitesBlockSpawnLocation(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode positions = findMethod(node, "getSpawnPositions", "getSpawnPositions",
+                "(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;"
+                        + "Lnet/minecraft/util/math/BlockPos;)Ljava/util/List;");
+        int patched = 0;
+        for (AbstractInsnNode instruction = positions.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (!isIntConstant(instruction, 0)) {
+                continue;
+            }
+            AbstractInsnNode store = nextReal(instruction);
+            if (!(store instanceof VarInsnNode) || store.getOpcode() != Opcodes.ISTORE) {
+                continue;
+            }
+            AbstractInsnNode loadThis = nextReal(store);
+            AbstractInsnNode yMinField = nextReal(loadThis);
+            if (!(loadThis instanceof VarInsnNode) || loadThis.getOpcode() != Opcodes.ALOAD
+                    || ((VarInsnNode) loadThis).var != 0
+                    || !(yMinField instanceof FieldInsnNode)
+                    || yMinField.getOpcode() != Opcodes.GETFIELD
+                    || !"I".equals(((FieldInsnNode) yMinField).desc)
+                    || !"yMin".equals(((FieldInsnNode) yMinField).name)) {
+                continue;
+            }
+            positions.instructions.insertBefore(instruction, list(
+                    new VarInsnNode(Opcodes.ALOAD, 1),
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "minY",
+                            "(Lnet/minecraft/world/World;)I", false)));
+            positions.instructions.remove(instruction);
+            patched++;
+        }
+        require(patched == 1,
+                "Expected one Lycanites block-spawn lower bound, patched " + patched);
+        LOGGER.info("Patched Lycanites block-based spawn locations for extended world height");
         return write(node);
     }
 
@@ -3673,6 +3896,82 @@ public final class FFDHeightTransformer implements IClassTransformer {
         return write(node);
     }
 
+    private static byte[] transformAncientWarfareQuarry(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode method = findMethod(node, "harvestBlock", "harvestBlock",
+                "(Lnet/minecraft/util/math/BlockPos;)Z");
+        int patched = 0;
+        for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (call.getOpcode() != Opcodes.INVOKESTATIC
+                    || !"net/minecraftforge/event/ForgeEventFactory".equals(call.owner)
+                    || !"fireBlockHarvesting".equals(call.name)
+                    || !"(Ljava/util/List;Lnet/minecraft/world/World;"
+                            .concat("Lnet/minecraft/util/math/BlockPos;")
+                            .concat("Lnet/minecraft/block/state/IBlockState;IFZ")
+                            .concat("Lnet/minecraft/entity/player/EntityPlayer;)F")
+                            .equals(call.desc)) {
+                continue;
+            }
+            AbstractInsnNode pop = nextReal(call);
+            require(pop != null && pop.getOpcode() == Opcodes.POP,
+                    "Unexpected Ancient Warfare quarry harvesting result");
+            method.instructions.insert(pop, list(
+                    new VarInsnNode(Opcodes.ALOAD, 4),
+                    new VarInsnNode(Opcodes.ALOAD, 0),
+                    new MethodInsnNode(Opcodes.INVOKEVIRTUAL, node.name, "getFortune", "()I", false),
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, RAW_ORE_DROP_HOOKS,
+                            "convertMachineDrops",
+                            "(Lnet/minecraft/util/NonNullList;I)Lnet/minecraft/util/NonNullList;",
+                            false),
+                    new VarInsnNode(Opcodes.ASTORE, 4)));
+            patched++;
+        }
+        require(patched == 1, "Expected one Ancient Warfare quarry harvesting hook, patched "
+                + patched);
+        LOGGER.info("Patched Ancient Warfare quarry raw ore drops");
+        return write(node);
+    }
+
+    private static byte[] transformMinerGolemsMinerAi(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode method = findMethod(node, "mine", "mine",
+                "(Lnet/minecraft/util/math/BlockPos;Z)V");
+        int patched = 0;
+        for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (call.getOpcode() != Opcodes.INVOKEVIRTUAL
+                    || !"net/minecraft/block/Block".equals(call.owner)
+                    || !"getDrops".equals(call.name)
+                    || !"(Lnet/minecraft/util/NonNullList;Lnet/minecraft/world/IBlockAccess;"
+                            .concat("Lnet/minecraft/util/math/BlockPos;")
+                            .concat("Lnet/minecraft/block/state/IBlockState;I)V")
+                            .equals(call.desc)) {
+                continue;
+            }
+            method.instructions.insert(call, list(
+                    new VarInsnNode(Opcodes.ALOAD, 5),
+                    new InsnNode(Opcodes.ICONST_0),
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, RAW_ORE_DROP_HOOKS,
+                            "convertMachineDrops",
+                            "(Lnet/minecraft/util/NonNullList;I)Lnet/minecraft/util/NonNullList;",
+                            false),
+                    new VarInsnNode(Opcodes.ASTORE, 5)));
+            patched++;
+        }
+        require(patched == 1, "Expected one Miner Golems mining hook, patched " + patched);
+        LOGGER.info("Patched Miner Golems raw ore drops");
+        return write(node);
+    }
+
     private static byte[] transformIceAndFireWorldgenEvents(byte[] basicClass) {
         ClassNode node = read(basicClass);
         MethodNode method = findMethod(node, "degradeSurface", "degradeSurface",
@@ -5883,6 +6182,7 @@ public final class FFDHeightTransformer implements IClassTransformer {
         String descriptor = "(IILnet/minecraft/world/World;Lnet/minecraft/world/gen/IChunkGenerator;"
                 + "Lnet/minecraft/world/chunk/IChunkProvider;)V";
         int patched = 0;
+        int alreadyBridged = 0;
         for (MethodNode method : node.methods) {
             for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;
                     instruction = instruction.getNext()) {
@@ -5890,6 +6190,12 @@ public final class FFDHeightTransformer implements IClassTransformer {
                     continue;
                 }
                 MethodInsnNode call = (MethodInsnNode) instruction;
+                if (call.getOpcode() == Opcodes.INVOKESTATIC
+                        && HOOKS.equals(call.owner) && "generateLegacyWorld".equals(call.name)
+                        && descriptor.equals(call.desc)) {
+                    alreadyBridged++;
+                    continue;
+                }
                 if (call.getOpcode() != Opcodes.INVOKESTATIC
                         || !"net/minecraftforge/fml/common/registry/GameRegistry".equals(call.owner)
                         || !"generateWorld".equals(call.name) || !descriptor.equals(call.desc)) {
@@ -5901,7 +6207,16 @@ public final class FFDHeightTransformer implements IClassTransformer {
                 patched++;
             }
         }
-        require(patched == 1, "Expected one Forge world-generator call in Chunk, patched " + patched);
+        require(patched + alreadyBridged <= 1,
+                "Expected at most one Forge world-generator bridge in Chunk, found "
+                        + (patched + alreadyBridged));
+        if (patched == 1) {
+            LOGGER.info("Patched legacy worldgen bridge for Depths Update");
+        } else if (alreadyBridged > 0) {
+            LOGGER.info("Preserved existing legacy worldgen bridge for Depths Update");
+        } else {
+            LOGGER.warn("Skipped legacy worldgen bridge for Depths Update because the Chunk class has no canonical Forge world-generator call");
+        }
     }
 
     private static byte[] transformViewFrustum(byte[] basicClass) {

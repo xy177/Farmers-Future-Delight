@@ -16,6 +16,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.oredict.OreDictionary;
@@ -107,12 +108,11 @@ public final class FFDRegistryEvents {
             addDeepslateBlocks(blocks);
         }
         if (FFDItems.isRawOreEnabled()) {
-            blocks.add(FFDBlocks.RAW_IRON_BLOCK);
-            blocks.add(FFDBlocks.RAW_GOLD_BLOCK);
+            addRawOreBlocks(blocks, false);
         }
         if (FFDItems.isCopperEnabled()) {
             blocks.add(FFDBlocks.COPPER_ORE);
-            blocks.add(FFDBlocks.RAW_COPPER_BLOCK);
+            addRawOreBlocks(blocks, true);
             Collections.addAll(blocks, FFDBlocks.COPPER_BLOCKS);
             Collections.addAll(blocks, FFDBlocks.WAXED_COPPER_BLOCKS);
             Collections.addAll(blocks, FFDBlocks.CUT_COPPER_BLOCKS);
@@ -207,10 +207,65 @@ public final class FFDRegistryEvents {
         if (FFDItems.isCrimsonWoodEnabled() || FFDItems.isWarpedWoodEnabled()) {
             blocks.add(FFDBlocks.SHROOMLIGHT);
         }
+        for (FFDCustomRawOres.Entry entry : FFDCustomRawOres.entries()) {
+            if (entry.isEnabled()) {
+                blocks.add(entry.block());
+            }
+        }
         blocks.removeIf(block -> !FFDItems.shouldRegisterBlock(block));
         event.getRegistry().registerAll(blocks.toArray(new net.minecraft.block.Block[0]));
         CopperWeathering.rebuildEffectiveMappings();
         registerFlammability();
+    }
+
+    @SubscribeEvent
+    public static void remapRawOreBlocks(
+            RegistryEvent.MissingMappings<net.minecraft.block.Block> event) {
+        if (Loader.isModLoaded("suikerawore")) {
+            return;
+        }
+        for (RegistryEvent.MissingMappings.Mapping<net.minecraft.block.Block> mapping
+                : event.getAllMappings()) {
+            int index = rawOreMigrationIndex(mapping.key, "raw_block_");
+            if (index >= 0 && FFDItems.isBlockRegistered(FFDBlocks.RAW_ORE_BLOCKS[index])) {
+                mapping.remap(FFDBlocks.RAW_ORE_BLOCKS[index]);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void remapRawOreItems(
+            RegistryEvent.MissingMappings<net.minecraft.item.Item> event) {
+        if (Loader.isModLoaded("suikerawore")) {
+            return;
+        }
+        for (RegistryEvent.MissingMappings.Mapping<net.minecraft.item.Item> mapping
+                : event.getAllMappings()) {
+            int rawIndex = rawOreMigrationIndex(mapping.key, "raw_");
+            if (rawIndex >= 0 && FFDItems.isItemRegistered(FFDItems.RAW_ORE_ITEMS[rawIndex])) {
+                mapping.remap(FFDItems.RAW_ORE_ITEMS[rawIndex]);
+                continue;
+            }
+            int blockIndex = rawOreMigrationIndex(mapping.key, "raw_block_");
+            if (blockIndex >= 0
+                    && FFDItems.isItemRegistered(FFDItems.RAW_ORE_BLOCK_ITEMS[blockIndex])) {
+                mapping.remap(FFDItems.RAW_ORE_BLOCK_ITEMS[blockIndex]);
+            }
+        }
+    }
+
+    private static int rawOreMigrationIndex(ResourceLocation key, String prefix) {
+        if (key == null || !"suikerawore".equals(key.getResourceDomain())
+                || !key.getResourcePath().startsWith(prefix)) {
+            return -1;
+        }
+        String name = key.getResourcePath().substring(prefix.length());
+        for (int i = 0; i < FFDRawOres.NAMES.length; i++) {
+            if (FFDRawOres.NAMES[i].equals(name)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -379,6 +434,7 @@ public final class FFDRegistryEvents {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void registerItems(RegistryEvent.Register<net.minecraft.item.Item> event) {
+        FFDRawOreOreDictionaryCompat.register();
         List<net.minecraft.item.Item> items = new ArrayList<>();
         if (FFDItems.isSweetBerryEnabled()) {
             items.add(FFDItems.SWEET_BERRIES);
@@ -479,15 +535,11 @@ public final class FFDRegistryEvents {
             addDeepslateItems(items);
         }
         if (FFDItems.isRawOreEnabled()) {
-            items.add(FFDItems.RAW_IRON);
-            items.add(FFDItems.RAW_GOLD);
-            items.add(FFDItems.RAW_IRON_BLOCK);
-            items.add(FFDItems.RAW_GOLD_BLOCK);
+            addRawOreItems(items, false);
         }
         if (FFDItems.isCopperEnabled()) {
             items.add(FFDItems.COPPER_ORE);
-            items.add(FFDItems.RAW_COPPER);
-            items.add(FFDItems.RAW_COPPER_BLOCK);
+            addRawOreItems(items, true);
             items.add(FFDItems.COPPER_INGOT);
             Collections.addAll(items, FFDItems.COPPER_BLOCK_ITEMS);
             Collections.addAll(items, FFDItems.WAXED_COPPER_BLOCK_ITEMS);
@@ -560,6 +612,12 @@ public final class FFDRegistryEvents {
         if (FFDItems.isCrimsonWoodEnabled() || FFDItems.isWarpedWoodEnabled()) {
             items.add(FFDItems.SHROOMLIGHT);
         }
+        for (FFDCustomRawOres.Entry entry : FFDCustomRawOres.entries()) {
+            if (entry.isEnabled()) {
+                items.add(entry.item());
+                items.add(entry.blockItem());
+            }
+        }
         items.removeIf(item -> !FFDItems.shouldRegisterItem(item));
         event.getRegistry().registerAll(items.toArray(new net.minecraft.item.Item[0]));
         if (FFDItems.isSweetBerryEnabled()) {
@@ -603,6 +661,7 @@ public final class FFDRegistryEvents {
             registerNetherWoodOreDictionary(false);
         }
         registerModernOreDictionary();
+        registerCustomRawOreDictionary();
     }
 
     private static void addDeepslateItems(List<net.minecraft.item.Item> items) {
@@ -662,16 +721,12 @@ public final class FFDRegistryEvents {
             registerOre("oreEmerald", FFDItems.DEEPSLATE_EMERALD_ORE);
         }
         if (FFDItems.isRawOreEnabled()) {
-            registerOre("rawIron", FFDItems.RAW_IRON);
-            registerOre("rawGold", FFDItems.RAW_GOLD);
-            registerOre("blockRawIron", FFDItems.RAW_IRON_BLOCK);
-            registerOre("blockRawGold", FFDItems.RAW_GOLD_BLOCK);
+            registerRawOreDictionary(false);
         }
         if (FFDItems.isCopperEnabled()) {
             registerOre("oreCopper", FFDItems.COPPER_ORE);
             registerOre("ingotCopper", FFDItems.COPPER_INGOT);
-            registerOre("rawCopper", FFDItems.RAW_COPPER);
-            registerOre("blockRawCopper", FFDItems.RAW_COPPER_BLOCK);
+            registerRawOreDictionary(true);
             registerOre("blockCopper", FFDItems.COPPER_BLOCK);
             registerOre("blockCopperCut", FFDItems.CUT_COPPER);
             if (FFDItems.isDeepslateEnabled()) {
@@ -790,13 +845,13 @@ public final class FFDRegistryEvents {
             addDeepslateRecipes(recipes);
         }
         if (FFDItems.isRawOreEnabled()) {
-            addRawMaterialRecipes(recipes, "iron", FFDItems.RAW_IRON, FFDItems.RAW_IRON_BLOCK);
-            addRawMaterialRecipes(recipes, "gold", FFDItems.RAW_GOLD, FFDItems.RAW_GOLD_BLOCK);
+            addRawMaterialRecipes(recipes, false);
         }
         if (FFDItems.isCopperEnabled()) {
-            addRawMaterialRecipes(recipes, "copper", FFDItems.RAW_COPPER, FFDItems.RAW_COPPER_BLOCK);
+            addRawMaterialRecipes(recipes, true);
             addCopperRecipes(recipes);
         }
+        addCustomRawMaterialRecipes(recipes);
         if (FFDItems.isKelpEnabled()) {
             ResourceLocation kelpGroup = new ResourceLocation(FarmerFutureDelight.MODID, "kelp");
             ItemStack dried = FFDItems.effectiveStack(FFDItems.DRIED_KELP);
@@ -974,21 +1029,108 @@ public final class FFDRegistryEvents {
         }
     }
 
-    private static void addRawMaterialRecipes(List<IRecipe> recipes, String metal,
-                                               net.minecraft.item.Item raw,
-                                               net.minecraft.item.Item block) {
+    private static void addRawMaterialRecipes(List<IRecipe> recipes, boolean copperOnly) {
         ResourceLocation group = new ResourceLocation(FarmerFutureDelight.MODID, "raw_materials");
-        ItemStack effectiveRaw = FFDItems.effectiveStack(raw);
-        ItemStack effectiveBlock = FFDItems.effectiveStack(block);
-        if (FFDItems.isItemRegistered(block) && !effectiveRaw.isEmpty()) {
-            recipes.add(new ShapedOreRecipe(group, new ItemStack(block),
-                    "###", "###", "###", '#', effectiveRaw)
-                    .setRegistryName(FarmerFutureDelight.MODID,
-                            "raw_" + metal + "_block"));
+        for (int i = 0; i < FFDRawOres.NAMES.length; i++) {
+            if (FFDRawOres.isCopper(FFDRawOres.NAMES[i]) != copperOnly) {
+                continue;
+            }
+            net.minecraft.item.Item raw = FFDItems.RAW_ORE_ITEMS[i];
+            net.minecraft.item.Item block = FFDItems.RAW_ORE_BLOCK_ITEMS[i];
+            ItemStack effectiveRaw = FFDItems.effectiveStack(raw);
+            ItemStack effectiveBlock = FFDItems.effectiveStack(block);
+            if (FFDItems.isItemRegistered(block) && !effectiveRaw.isEmpty()) {
+                recipes.add(new ShapedOreRecipe(group, new ItemStack(block),
+                        "###", "###", "###", '#', effectiveRaw)
+                        .setRegistryName(FarmerFutureDelight.MODID,
+                                FFDRawOres.rawBlockName(FFDRawOres.NAMES[i])));
+            }
+            if (FFDItems.isItemRegistered(raw) && !effectiveBlock.isEmpty()) {
+                recipes.add(new ShapelessOreRecipe(group, new ItemStack(raw, 9), effectiveBlock)
+                        .setRegistryName(FarmerFutureDelight.MODID,
+                                FFDRawOres.rawItemName(FFDRawOres.NAMES[i])));
+            }
         }
-        if (FFDItems.isItemRegistered(raw) && !effectiveBlock.isEmpty()) {
-            recipes.add(new ShapelessOreRecipe(group, new ItemStack(raw, 9), effectiveBlock)
-                    .setRegistryName(FarmerFutureDelight.MODID, "raw_" + metal));
+    }
+
+    private static void addCustomRawMaterialRecipes(List<IRecipe> recipes) {
+        ResourceLocation group = new ResourceLocation(FarmerFutureDelight.MODID,
+                "custom_raw_materials");
+        for (FFDCustomRawOres.Entry entry : FFDCustomRawOres.entries()) {
+            ItemStack raw = entry.rawStack();
+            ItemStack block = entry.blockStack();
+            if (raw.isEmpty() || block.isEmpty()) {
+                continue;
+            }
+            recipes.add(new ShapedOreRecipe(group, block.copy(),
+                    "###", "###", "###", '#', raw.copy())
+                    .setRegistryName(FarmerFutureDelight.MODID,
+                            "custom_raw_" + entry.material() + "_block"));
+            recipes.add(new ShapelessOreRecipe(group, copyWithCount(raw, 9), block.copy())
+                    .setRegistryName(FarmerFutureDelight.MODID,
+                            "custom_raw_" + entry.material()));
+        }
+    }
+
+    private static ItemStack copyWithCount(ItemStack stack, int count) {
+        ItemStack copy = stack.copy();
+        copy.setCount(count);
+        return copy;
+    }
+
+    private static void registerCustomRawOreDictionary() {
+        for (FFDCustomRawOres.Entry entry : FFDCustomRawOres.entries()) {
+            ItemStack raw = entry.rawStack();
+            ItemStack block = entry.blockStack();
+            if (!raw.isEmpty()) {
+                OreDictionary.registerOre(entry.rawOreName(), raw);
+            }
+            if (!block.isEmpty()) {
+                OreDictionary.registerOre(entry.rawBlockOreName(), block);
+            }
+        }
+    }
+
+    private static void addRawOreBlocks(List<net.minecraft.block.Block> blocks,
+                                        boolean copperOnly) {
+        for (int i = 0; i < FFDRawOres.NAMES.length; i++) {
+            String material = FFDRawOres.NAMES[i];
+            if (FFDItems.isRawOreMaterialEnabled(material)
+                    && FFDRawOres.isCopper(material) == copperOnly
+                    && (copperOnly
+                    || FFDRawOreOreDictionaryCompat.hasSourceOre(material))) {
+                blocks.add(FFDBlocks.RAW_ORE_BLOCKS[i]);
+            }
+        }
+    }
+
+    private static void addRawOreItems(List<net.minecraft.item.Item> items,
+                                       boolean copperOnly) {
+        for (int i = 0; i < FFDRawOres.NAMES.length; i++) {
+            String material = FFDRawOres.NAMES[i];
+            if (FFDItems.isRawOreMaterialEnabled(material)
+                    && FFDRawOres.isCopper(material) == copperOnly
+                    && (copperOnly
+                    || FFDRawOreOreDictionaryCompat.hasSourceOre(material))) {
+                items.add(FFDItems.RAW_ORE_ITEMS[i]);
+                items.add(FFDItems.RAW_ORE_BLOCK_ITEMS[i]);
+            }
+        }
+    }
+
+    private static void registerRawOreDictionary(boolean copperOnly) {
+        for (int i = 0; i < FFDRawOres.NAMES.length; i++) {
+            if (FFDRawOres.isCopper(FFDRawOres.NAMES[i]) != copperOnly) {
+                continue;
+            }
+            if (FFDItems.isItemRegistered(FFDItems.RAW_ORE_ITEMS[i])) {
+                registerOre(FFDRawOres.rawOreName(FFDRawOres.NAMES[i]),
+                        FFDItems.RAW_ORE_ITEMS[i]);
+            }
+            if (FFDItems.isItemRegistered(FFDItems.RAW_ORE_BLOCK_ITEMS[i])) {
+                registerOre(FFDRawOres.rawBlockOreName(FFDRawOres.NAMES[i]),
+                        FFDItems.RAW_ORE_BLOCK_ITEMS[i]);
+            }
         }
     }
 

@@ -66,6 +66,7 @@ public final class FFDPowderSnowEvents {
     private static volatile Map<ResourceLocation, Float> ADDITIONAL_DAMAGE =
             Collections.emptyMap();
     private static volatile Set<ResourceLocation> WALKABLE_BOOTS = Collections.emptySet();
+    private static volatile Set<ResourceLocation> FREEZING_ARMOR = Collections.emptySet();
 
     private FFDPowderSnowEvents() {
     }
@@ -130,10 +131,21 @@ public final class FFDPowderSnowEvents {
             }
         }
 
+        Set<ResourceLocation> freezingArmor = new HashSet<>();
+        if (FFDConfig.powderSnowFreezingArmor != null) {
+            for (String entry : FFDConfig.powderSnowFreezingArmor) {
+                ResourceLocation id = parseId(entry);
+                if (id != null) {
+                    freezingArmor.add(id);
+                }
+            }
+        }
+
         TRANSFORMATIONS = Collections.unmodifiableMap(transformations);
         IMMUNITIES = Collections.unmodifiableSet(immunities);
         ADDITIONAL_DAMAGE = Collections.unmodifiableMap(additionalDamage);
         WALKABLE_BOOTS = Collections.unmodifiableSet(walkableBoots);
+        FREEZING_ARMOR = Collections.unmodifiableSet(freezingArmor);
     }
 
     private static ResourceLocation parseId(String value) {
@@ -275,7 +287,9 @@ public final class FFDPowderSnowEvents {
             if (armor.getItem() == Items.LEATHER_BOOTS
                     || armor.getItem() == Items.LEATHER_LEGGINGS
                     || armor.getItem() == Items.LEATHER_CHESTPLATE
-                    || armor.getItem() == Items.LEATHER_HELMET) {
+                    || armor.getItem() == Items.LEATHER_HELMET
+                    || armor.getItem().getRegistryName() != null
+                    && FREEZING_ARMOR.contains(armor.getItem().getRegistryName())) {
                 return false;
             }
         }

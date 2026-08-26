@@ -16,6 +16,8 @@ import net.minecraftforge.oredict.OreDictionary;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
+import xy177.farmersfuturedelight.common.registry.FFDRawOreOreDictionaryCompat;
+import xy177.farmersfuturedelight.common.registry.FFDRawOres;
 
 public final class FFDCompat {
     public static final String HONEYCOMB_ORE_DICTIONARY = "ffdHoneycomb";
@@ -57,9 +59,9 @@ public final class FFDCompat {
             return mode == FFDConfig.FeatureMode.ENABLED;
         }
         String[] paths = contentPaths(registryPath(local.getRegistryName()), aliases);
-        ExternalBlock external = feature.findBlock(paths);
-        logDecision(feature, "block", paths[0], external == null ? null : external.provider);
-        return external == null;
+        ProviderSet provider = feature.findBlockProvider(paths);
+        logDecision(feature, "block", paths[0], provider);
+        return provider == null;
     }
 
     public static boolean isLocalItemEnabled(FFDConfig.FeatureMode mode, Feature feature,
@@ -72,9 +74,9 @@ public final class FFDCompat {
                 && !isLocalBlockEnabled(mode, feature, localBlock, aliases)) {
             return false;
         }
-        ExternalItem external = feature.findItem(paths);
-        logDecision(feature, "item", paths[0], external == null ? null : external.provider);
-        return external == null;
+        ProviderSet provider = feature.findItemProvider(paths);
+        logDecision(feature, "item", paths[0], provider);
+        return provider == null;
     }
 
     public static boolean isLocalEntityEnabled(FFDConfig.FeatureMode mode, Feature feature,
@@ -192,31 +194,39 @@ public final class FFDCompat {
 
     public enum Feature {
         SWEET_BERRY(
-                blocks("Future MC", "futuremc", "sweet_berry_bush")),
+                blocks("Future MC", "futuremc", "sweet_berry_bush"),
+                blocks("Future Decoration", "fd", "sweet_berry_bush")),
         MOSS(
                 blocks("Depths Update", "depthsupdate", "moss_block", "moss_carpet"),
-                blocks("Caves Not Cliffs", "cavesnotcliffs", "moss_block", "moss_carpet")),
+                blocks("Caves Not Cliffs", "cavesnotcliffs", "moss_block", "moss_carpet"),
+                blocks("Future Decoration", "fd", "moss_block", "moss_carpet")),
         GLOW_BERRY(
                 blocks("Depths Update", "depthsupdate", "cave_vines", "cave_vines_plant"),
-                blocks("Caves Not Cliffs", "cavesnotcliffs", "cave_vines", "cave_vines_plant")),
+                blocks("Caves Not Cliffs", "cavesnotcliffs", "cave_vines", "cave_vines_plant"),
+                blocks("Future Decoration", "fd", "cave_vines", "cave_vines_plant")),
         AZALEA(
                 blocks("Depths Update", "depthsupdate", "azalea", "flowering_azalea",
                         "azalea_leaves", "flowering_azalea_leaves", "potted_azalea_bush",
                         "potted_flowering_azalea_bush"),
                 blocks("Caves Not Cliffs", "cavesnotcliffs", "azalea", "flowering_azalea",
                         "azalea_leaves", "flowering_azalea_leaves", "potted_azalea_bush",
-                        "potted_flowering_azalea_bush")),
+                        "potted_flowering_azalea_bush"),
+                futureDecorationAzalea()),
         DRIPLEAF(
                 blocks("Depths Update", "depthsupdate", "small_dripleaf", "big_dripleaf",
                         "big_dripleaf_stem"),
                 blocks("Caves Not Cliffs", "cavesnotcliffs", "small_dripleaf", "big_dripleaf",
+                        "big_dripleaf_stem"),
+                blocks("Future Decoration", "fd", "small_dripleaf", "big_dripleaf",
                         "big_dripleaf_stem")),
         ROOTED_DIRT(
                 blocks("Depths Update", "depthsupdate", "rooted_dirt"),
-                blocks("Caves Not Cliffs", "cavesnotcliffs", "rooted_dirt")),
+                blocks("Caves Not Cliffs", "cavesnotcliffs", "rooted_dirt"),
+                blocks("Future Decoration", "fd", "rooted_dirt")),
         HANGING_ROOTS(
                 blocks("Depths Update", "depthsupdate", "hanging_roots"),
-                blocks("Caves Not Cliffs", "cavesnotcliffs", "hanging_roots")),
+                blocks("Caves Not Cliffs", "cavesnotcliffs", "hanging_roots"),
+                blocks("Future Decoration", "fd", "hanging_roots")),
         SPORE_BLOSSOM(
                 blocks("Depths Update", "depthsupdate", "spore_blossom"),
                 blocks("Caves Not Cliffs", "cavesnotcliffs", "spore_blossom")),
@@ -238,7 +248,9 @@ public final class FFDCompat {
                 items("Oceanic Expanse", "oe", "glow_ink_sac")),
         AXOLOTL(
                 items("Caves Not Cliffs", "cavesnotcliffs", "axolotl_bucket")),
-        PHANTOM(),
+        PHANTOM(
+                content("Phantoms", null, ids("phantoms", "phantom_membrane"),
+                        ids("phantoms", "phantom"))),
         OTHERSIDE(
                 items("Caves Not Cliffs", "cavesnotcliffs", "music_disc_otherside"),
                 items("Future MC", "futuremc", "record_otherside")),
@@ -253,24 +265,31 @@ public final class FFDCompat {
                 blocks("Caves Not Cliffs", "cavesnotcliffs", "amethyst_block",
                         "budding_amethyst", "small_amethyst_bud", "medium_amethyst_bud",
                         "large_amethyst_bud", "amethyst_cluster", "calcite", "smooth_basalt",
-                        "tinted_glass")),
+                        "tinted_glass"),
+                futureDecorationAmethyst()),
         DEEPSLATE(
                 depthsUpdateDeepslate(),
                 deeperDepthsDeepslate(),
-                cavesNotCliffsDeepslate()),
+                cavesNotCliffsDeepslate(),
+                futureDecorationDeepslate()),
         RAW_ORE(
                 blocks("Depths Update", "depthsupdate", "raw_iron_block", "raw_gold_block"),
-                blocks("Caves Not Cliffs", "cavesnotcliffs", "raw_iron_block", "raw_gold_block")),
+                blocks("Caves Not Cliffs", "cavesnotcliffs", "raw_iron_block", "raw_gold_block"),
+                futureDecorationRawOre(),
+                rawOreProvider()),
         COPPER(
                 copper("Depths Update", "depthsupdate"),
                 deeperDepthsCopper(),
-                cavesNotCliffsCopper()),
+                cavesNotCliffsCopper(),
+                futureDecorationCopper(),
+                rawOreProvider()),
         DRIPSTONE(
                 blocks("Depths Update", "depthsupdate", "dripstone_block", "pointed_dripstone"),
                 blocks("Caves Not Cliffs", "cavesnotcliffs", "dripstone_block",
                         "pointed_dripstone")),
         IRON_CHAIN(
                 blocks("Future MC", "futuremc", "chain"),
+                blocks("Future Decoration", "fd", "chain"),
                 netherBackportChain()),
         CANDLE(
                 candles("Deeper Depths", "deeperdepths"),
@@ -307,11 +326,29 @@ public final class FFDCompat {
             return null;
         }
 
+        private ProviderSet findBlockProvider(String... paths) {
+            for (ProviderSet provider : providers) {
+                if (provider.findBlock(paths) != null || provider.providesPendingRawOre(paths)) {
+                    return provider;
+                }
+            }
+            return null;
+        }
+
         private ExternalItem findItem(String... paths) {
             for (ProviderSet provider : providers) {
                 ItemStack stack = provider.findItem(paths);
                 if (!stack.isEmpty()) {
                     return new ExternalItem(provider, stack);
+                }
+            }
+            return null;
+        }
+
+        private ProviderSet findItemProvider(String... paths) {
+            for (ProviderSet provider : providers) {
+                if (!provider.findItem(paths).isEmpty() || provider.providesPendingRawOre(paths)) {
+                    return provider;
                 }
             }
             return null;
@@ -480,6 +517,105 @@ public final class FFDCompat {
                         "budding_amethyst", "small_amethyst_bud", "medium_amethyst_bud",
                         "large_amethyst_bud", "amethyst_cluster", "tinted_glass"),
                 null, null, blocks, items);
+    }
+
+    private static ProviderSet futureDecorationAzalea() {
+        ContentVariant[] variants = {
+                variant("flowering_azalea", "fd", "azalea", 1)
+        };
+        return content("Future Decoration",
+                ids("fd", "azalea", "azalea_leaves", "flowering_azalea_leaves"),
+                null, null, variants, variants);
+    }
+
+    private static ProviderSet futureDecorationAmethyst() {
+        ContentVariant[] blocks = {
+                variant("budding_amethyst", "fd", "amethyst_budding", 0),
+                variant("small_amethyst_bud", "fd", "amethyst_small_bud", 0),
+                variant("medium_amethyst_bud", "fd", "amethyst_medium_bud", 0),
+                variant("large_amethyst_bud", "fd", "amethyst_large_bud", 0),
+                variant("calcite", "fd", "rock_block", 6),
+                variant("smooth_basalt", "fd", "rock_block", 7)
+        };
+        ContentVariant[] items = {
+                variant("budding_amethyst", "fd", "amethyst_budding", 0),
+                variant("small_amethyst_bud", "fd", "amethyst_small_bud", 0),
+                variant("medium_amethyst_bud", "fd", "amethyst_medium_bud", 0),
+                variant("large_amethyst_bud", "fd", "amethyst_large_bud", 0),
+                variant("calcite", "fd", "rock_block", 6),
+                variant("smooth_basalt", "fd", "rock_block", 7),
+                variant("amethyst_shard", "fd", "crystal_shard", 0)
+        };
+        return content("Future Decoration",
+                ids("fd", "amethyst_block", "amethyst_cluster", "tinted_glass"),
+                null, null, blocks, items);
+    }
+
+    private static ProviderSet futureDecorationDeepslate() {
+        ContentVariant[] variants = {
+                variant("cobbled_deepslate", "fd", "deepslate_rock", 0),
+                variant("polished_deepslate", "fd", "deepslate_rock", 1),
+                variant("deepslate_bricks", "fd", "deepslate_rock", 2),
+                variant("deepslate_tiles", "fd", "deepslate_rock", 3),
+                variant("chiseled_deepslate", "fd", "deepslate_rock", 4),
+                variant("cracked_deepslate_bricks", "fd", "deepslate_rock", 5),
+                variant("cracked_deepslate_tiles", "fd", "deepslate_rock", 6),
+                variant("tuff", "fd", "rock_block", 8),
+                variant("deepslate_brick_stairs", "fd", "deepslate_bricks_stairs", 0),
+                variant("deepslate_tile_stairs", "fd", "deepslate_tiles_stairs", 0),
+                variant("cobbled_deepslate_double_slab", "fd",
+                        "cobbled_deepslate_slab_double", 0),
+                variant("polished_deepslate_double_slab", "fd",
+                        "polished_deepslate_slab_double", 0),
+                variant("deepslate_brick_slab", "fd", "deepslate_bricks_slab", 0),
+                variant("deepslate_brick_double_slab", "fd", "deepslate_bricks_slab_double", 0),
+                variant("deepslate_tile_slab", "fd", "deepslate_tiles_slab", 0),
+                variant("deepslate_tile_double_slab", "fd", "deepslate_tiles_slab_double", 0),
+                variant("cobbled_deepslate_wall", "fd", "stone_wall", 5),
+                variant("polished_deepslate_wall", "fd", "stonebrick_wall", 10),
+                variant("deepslate_brick_wall", "fd", "stonebrick_wall", 11),
+                variant("deepslate_tile_wall", "fd", "stonebrick_wall", 12),
+                variant("deepslate_iron_ore", "fd", "ore", 0),
+                variant("deepslate_gold_ore", "fd", "ore", 1),
+                variant("deepslate_coal_ore", "fd", "ore", 3),
+                variant("deepslate_lapis_ore", "fd", "ore", 4),
+                variant("deepslate_diamond_ore", "fd", "ore", 5),
+                variant("deepslate_emerald_ore", "fd", "ore", 6)
+        };
+        return content("Future Decoration", ids("fd", "deepslate",
+                        "cobbled_deepslate_stairs", "polished_deepslate_stairs",
+                        "cobbled_deepslate_slab", "cobbled_deepslate_slab_double",
+                        "polished_deepslate_slab", "polished_deepslate_slab_double",
+                        "deepslate_redstone_ore"),
+                null, null, variants, variants);
+    }
+
+    private static ProviderSet futureDecorationRawOre() {
+        ContentVariant[] blocks = {
+                variant("raw_iron_block", "fd", "raw_ore_block", 0),
+                variant("raw_gold_block", "fd", "raw_ore_block", 1)
+        };
+        ContentVariant[] items = {
+                variant("raw_iron", "fd", "raw_ore", 0),
+                variant("raw_gold", "fd", "raw_ore", 1),
+                variant("raw_iron_block", "fd", "raw_ore_block", 0),
+                variant("raw_gold_block", "fd", "raw_ore_block", 1)
+        };
+        return content("Future Decoration", null, null, null, blocks, items);
+    }
+
+    private static ProviderSet futureDecorationCopper() {
+        ContentVariant[] blocks = {
+                variant("deepslate_copper_ore", "fd", "ore", 2),
+                variant("raw_copper_block", "fd", "raw_ore_block", 2)
+        };
+        ContentVariant[] items = {
+                variant("deepslate_copper_ore", "fd", "ore", 2),
+                variant("raw_copper", "fd", "raw_ore", 2),
+                variant("raw_copper_block", "fd", "raw_ore_block", 2)
+        };
+        return content("Future Decoration", ids("fd", "copper_ore", "copper_block"),
+                ids("fd", "copper_ingot"), null, blocks, items);
     }
 
     private static ProviderSet deeperDepthsCopper() {
@@ -653,6 +789,19 @@ public final class FFDCompat {
         return content("Unseens Nether Backport", null, null, null, variants, variants);
     }
 
+    private static ProviderSet rawOreProvider() {
+        String[] blocks = new String[FFDRawOres.NAMES.length];
+        String[] items = new String[FFDRawOres.NAMES.length * 2];
+        for (int i = 0; i < FFDRawOres.NAMES.length; i++) {
+            blocks[i] = FFDRawOres.externalRawBlockName(FFDRawOres.NAMES[i]);
+            items[i] = FFDRawOres.rawItemName(FFDRawOres.NAMES[i]);
+            items[FFDRawOres.NAMES.length + i] = FFDRawOres.externalRawBlockName(
+                    FFDRawOres.NAMES[i]);
+        }
+        return new ProviderSet("Raw Ore", ids("suikerawore", blocks),
+                ids("suikerawore", items), null, true);
+    }
+
     private static ProviderSet netherBackportChain() {
         ContentVariant[] variants = {
                 variant("iron_chain", "nb", "chain_block", 0)
@@ -697,13 +846,25 @@ public final class FFDCompat {
         private final ContentVariant[] blockVariants;
         private final ContentVariant[] itemVariants;
         private final String namespace;
+        private final boolean pendingRawOre;
 
         private ProviderSet(String name, String[] blocks, String[] items, String[] entities) {
-            this(name, blocks, items, entities, null, null);
+            this(name, blocks, items, entities, null, null, false);
+        }
+
+        private ProviderSet(String name, String[] blocks, String[] items, String[] entities,
+                            boolean pendingRawOre) {
+            this(name, blocks, items, entities, null, null, pendingRawOre);
         }
 
         private ProviderSet(String name, String[] blocks, String[] items, String[] entities,
                             ContentVariant[] blockVariants, ContentVariant[] itemVariants) {
+            this(name, blocks, items, entities, blockVariants, itemVariants, false);
+        }
+
+        private ProviderSet(String name, String[] blocks, String[] items, String[] entities,
+                            ContentVariant[] blockVariants, ContentVariant[] itemVariants,
+                            boolean pendingRawOre) {
             this.name = name;
             this.blocks = blocks;
             this.items = items;
@@ -711,6 +872,7 @@ public final class FFDCompat {
             this.blockVariants = blockVariants;
             this.itemVariants = itemVariants;
             this.namespace = namespace(blocks, items, entities);
+            this.pendingRawOre = pendingRawOre;
         }
 
         private IBlockState findBlock(String... paths) {
@@ -742,6 +904,10 @@ public final class FFDCompat {
         private EntityEntry findEntity(String... paths) {
             EntityEntry explicit = findRegisteredEntity(entities, paths);
             return explicit != null ? explicit : findRegisteredEntity(namespace, paths);
+        }
+
+        private boolean providesPendingRawOre(String... paths) {
+            return pendingRawOre && FFDRawOreOreDictionaryCompat.willRawOreProvide(paths);
         }
 
     }
@@ -971,6 +1137,18 @@ public final class FFDCompat {
 
     public static boolean isCompatibleGlowInkSac(ItemStack stack) {
         return isInOreDictionary(stack, GLOW_INK_SAC_ORE_DICTIONARY);
+    }
+
+    public static ItemStack firstOreDictionaryStack(String name) {
+        if (name == null || name.isEmpty()) {
+            return ItemStack.EMPTY;
+        }
+        for (ItemStack stack : OreDictionary.getOres(name)) {
+            if (stack != null && !stack.isEmpty()) {
+                return stack.copy();
+            }
+        }
+        return ItemStack.EMPTY;
     }
 
     private static boolean isInOreDictionary(ItemStack stack, String oreDictionaryName) {

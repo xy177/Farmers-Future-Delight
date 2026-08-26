@@ -20,6 +20,7 @@ import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.entity.projectile.EntityPotion;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemAxe;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemHoe;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemShears;
@@ -62,6 +63,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
+import net.minecraftforge.oredict.OreDictionary;
 
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.block.BlockAbstractCandle;
@@ -84,8 +86,10 @@ import xy177.farmersfuturedelight.common.entity.EntityAxolotl;
 import xy177.farmersfuturedelight.common.entity.ai.EntityAITrampleTurtleEgg;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDEntities;
+import xy177.farmersfuturedelight.common.registry.FFDCustomRawOres;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.registry.FFDPotions;
+import xy177.farmersfuturedelight.common.registry.FFDRawOres;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
 import xy177.farmersfuturedelight.core.FFDGameplayHooks;
 
@@ -152,44 +156,157 @@ public final class FFDGameplayEvents {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onVanillaOreHarvested(HarvestDropsEvent event) {
         if (!FFDConfig.oresDropRawMaterials || event.isSilkTouching()) {
             return;
         }
-        net.minecraft.item.Item raw;
-        int count;
-        if (event.getState().getBlock() == Blocks.IRON_ORE) {
-            if (!FFDItems.isRawOreEnabled()) {
-                return;
-            }
-            raw = FFDItems.RAW_IRON;
-            count = 1;
-        } else if (event.getState().getBlock() == Blocks.GOLD_ORE) {
-            if (!FFDItems.isRawOreEnabled()) {
-                return;
-            }
-            raw = FFDItems.RAW_GOLD;
-            count = 1;
-        } else if (DEEPER_DEPTHS_COPPER_ORE.equals(
-                event.getState().getBlock().getRegistryName())) {
-            if (!FFDItems.isCopperEnabled()) {
-                return;
-            }
-            raw = FFDItems.RAW_COPPER;
-            count = 2 + event.getWorld().rand.nextInt(4);
-        } else {
+        ItemStack ore = blockStack(event.getState());
+        FFDCustomRawOres.Entry custom = FFDCustomRawOres.findSource(ore);
+        if (custom != null) {
+            replaceCustomRawOreDrop(event, ore, custom);
             return;
+        }
+        int index = rawOreIndex(ore);
+        if (index < 0 || !FFDItems.isRawOreMaterialEnabled(FFDRawOres.NAMES[index])) {
+            return;
+        }
+        String material = FFDRawOres.NAMES[index];
+        ItemStack rawStack = FFDItems.effectiveStack(FFDItems.RAW_ORE_ITEMS[index]);
+        if (rawStack.isEmpty() || containsRefinedDrop(event, material)
+                || !removeOreDrops(event, ore, material)) {
+            return;
+        }
+        int count = FFDRawOres.isCopper(material)
+                ? 2 + event.getWorld().rand.nextInt(4) : FFDConfig.rawOreDropAmount;
+        if (FFDConfig.denseRawOreDrop && isDenseOre(ore)) {
+            count *= denseOreMultiplier();
         }
 
         if (event.getFortuneLevel() > 0) {
             int multiplier = event.getWorld().rand.nextInt(event.getFortuneLevel() + 2) - 1;
             count *= Math.max(0, multiplier) + 1;
         }
-        event.getDrops().clear();
-        ItemStack rawStack = FFDItems.effectiveStack(raw, count);
-        if (!rawStack.isEmpty()) {
-            event.getDrops().add(rawStack);
+        rawStack.setCount(count);
+        event.getDrops().add(rawStack);
+    }
+
+    private static void replaceCustomRawOreDrop(HarvestDropsEvent event, ItemStack ore,
+                                                 FFDCustomRawOres.Entry entry) {
+        ItemStack raw = entry.rawStack();
+        if (raw.isEmpty()) {
+            return;
+        }
+        for (ItemStack drop : event.getDrops()) {
+            if (entry.matchesSmeltResult(drop)) {
+                return;
+            }
+        }
+        boolean removed = false;
+        java.util.Iterator<ItemStack> iterator = event.getDrops().iterator();
+        while (iterator.hasNext()) {
+            ItemStack drop = iterator.next();
+            if (ItemStack.areItemsEqual(drop, ore) || entry.matchesSource(drop)) {
+                iterator.remove();
+                removed = true;
+            }
+        }
+        if (!removed) {
+            return;
+        }
+        int count = FFDConfig.rawOreDropAmount;
+        if (FFDConfig.denseRawOreDrop && isDenseOre(ore)) {
+            count *= denseOreMultiplier();
+        }
+        if (event.getFortuneLevel() > 0) {
+            int multiplier = event.getWorld().rand.nextInt(event.getFortuneLevel() + 2) - 1;
+            count *= Math.max(0, multiplier) + 1;
+        }
+        raw.setCount(count);
+        event.getDrops().add(raw);
+    }
+
+    private static ItemStack blockStack(IBlockState state) {
+        if (state == null) {
+            return ItemStack.EMPTY;
+        }
+        return new ItemStack(Item.getItemFromBlock(state.getBlock()), 1,
+                state.getBlock().getMetaFromState(state));
+    }
+
+    private static int rawOreIndex(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return -1;
+        }
+        for (int oreId : OreDictionary.getOreIDs(stack)) {
+            String oreName = OreDictionary.getOreName(oreId);
+            String normalized = oreName.endsWith("Dense")
+                    ? oreName.substring(0, oreName.length() - "Dense".length()) : oreName;
+            for (int i = 0; i < FFDRawOres.NAMES.length; i++) {
+                for (String refined : FFDRawOres.refinedOreNames(FFDRawOres.NAMES[i])) {
+                    String suffix = refined.startsWith("ingot")
+                            ? refined.substring("ingot".length())
+                            : FFDRawOres.capitalize(FFDRawOres.NAMES[i]);
+                    if (("ore" + suffix).equals(normalized)) {
+                        return i;
+                    }
+                }
+            }
+        }
+        return -1;
+    }
+
+    private static boolean containsRefinedDrop(HarvestDropsEvent event, String material) {
+        for (ItemStack drop : event.getDrops()) {
+            for (String refined : FFDRawOres.refinedOreNames(material)) {
+                int target = OreDictionary.getOreID(refined);
+                for (int oreId : OreDictionary.getOreIDs(drop)) {
+                    if (oreId == target) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private static boolean removeOreDrops(HarvestDropsEvent event, ItemStack ore,
+                                          String material) {
+        boolean removed = false;
+        java.util.Iterator<ItemStack> iterator = event.getDrops().iterator();
+        while (iterator.hasNext()) {
+            ItemStack drop = iterator.next();
+            if (ItemStack.areItemsEqual(drop, ore) || isMaterialOre(drop, material)) {
+                iterator.remove();
+                removed = true;
+            }
+        }
+        return removed;
+    }
+
+    private static boolean isMaterialOre(ItemStack stack, String material) {
+        int index = rawOreIndex(stack);
+        return index >= 0 && material.equals(FFDRawOres.NAMES[index]);
+    }
+
+    private static boolean isDenseOre(ItemStack stack) {
+        for (int oreId : OreDictionary.getOreIDs(stack)) {
+            if (OreDictionary.getOreName(oreId).endsWith("Dense")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static int denseOreMultiplier() {
+        if (!net.minecraftforge.fml.common.Loader.isModLoaded("densemetals")) {
+            return 2;
+        }
+        try {
+            Class<?> config = Class.forName("com.mcmoddev.densemetals.DenseMetalsConfig");
+            return Math.max(1, config.getField("denseOreValue").getInt(null));
+        } catch (Throwable ignored) {
+            return 2;
         }
     }
 
@@ -432,8 +549,10 @@ public final class FFDGameplayEvents {
 
     @SubscribeEvent
     public static void onAnvilUpdate(AnvilUpdateEvent event) {
+        ItemStack membrane = FFDItems.effectiveStack(FFDItems.PHANTOM_MEMBRANE);
         if (!FFDItems.isPhantomEnabled() || event.getLeft().getItem() != Items.ELYTRA
-                || event.getRight().getItem() != FFDItems.PHANTOM_MEMBRANE) {
+                || membrane.isEmpty()
+                || !ItemStack.areItemsEqual(event.getRight(), membrane)) {
             return;
         }
 

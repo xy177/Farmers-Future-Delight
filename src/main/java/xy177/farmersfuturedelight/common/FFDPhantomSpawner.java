@@ -35,7 +35,8 @@ public final class FFDPhantomSpawner {
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if (event.side != Side.SERVER || event.phase != TickEvent.Phase.END
-                || !(event.player instanceof EntityPlayerMP)) {
+                || !(event.player instanceof EntityPlayerMP)
+                || !FFDEntities.isLocalPhantomEnabled()) {
             return;
         }
         NBTTagCompound data = event.player.getEntityData();
@@ -51,18 +52,25 @@ public final class FFDPhantomSpawner {
 
     @SubscribeEvent
     public static void onPlayerWake(PlayerWakeUpEvent event) {
+        if (!FFDEntities.isLocalPhantomEnabled()) {
+            return;
+        }
         event.getEntityPlayer().getEntityData().setInteger(REST_TICKS, 0);
     }
 
     @SubscribeEvent
     public static void onPlayerDeath(LivingDeathEvent event) {
-        if (event.getEntityLiving() instanceof EntityPlayer) {
+        if (FFDEntities.isLocalPhantomEnabled()
+                && event.getEntityLiving() instanceof EntityPlayer) {
             event.getEntityLiving().getEntityData().setInteger(REST_TICKS, 0);
         }
     }
 
     @SubscribeEvent
     public static void onPlayerClone(PlayerEvent.Clone event) {
+        if (!FFDEntities.isLocalPhantomEnabled()) {
+            return;
+        }
         int restTicks = event.isWasDeath() ? 0
                 : event.getOriginal().getEntityData().getInteger(REST_TICKS);
         event.getEntityPlayer().getEntityData().setInteger(REST_TICKS, restTicks);
@@ -71,7 +79,7 @@ public final class FFDPhantomSpawner {
     @SubscribeEvent
     public static void onWorldTick(TickEvent.WorldTickEvent event) {
         if (event.side != Side.SERVER || event.phase != TickEvent.Phase.END
-                || !(event.world instanceof WorldServer) || !FFDEntities.isPhantomEnabled()) {
+                || !(event.world instanceof WorldServer) || !FFDEntities.isLocalPhantomEnabled()) {
             return;
         }
         WorldServer world = (WorldServer) event.world;

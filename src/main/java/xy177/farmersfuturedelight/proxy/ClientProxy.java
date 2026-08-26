@@ -1,5 +1,8 @@
 package xy177.farmersfuturedelight.proxy;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.BlockDoor;
 import net.minecraft.block.BlockFenceGate;
@@ -7,6 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMap;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
@@ -15,6 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
@@ -22,6 +27,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.client.particle.ParticleGlowSquid;
+import xy177.farmersfuturedelight.client.model.CustomRawOreModelLoader;
 import xy177.farmersfuturedelight.client.particle.ParticleDripstone;
 import xy177.farmersfuturedelight.client.particle.ParticleFallingNectar;
 import xy177.farmersfuturedelight.client.particle.ParticleHoneyDrip;
@@ -50,8 +56,10 @@ import xy177.farmersfuturedelight.common.block.BlockAmethystCluster;
 import xy177.farmersfuturedelight.common.block.BlockSmallDripleaf;
 import xy177.farmersfuturedelight.common.block.BlockHangingRoots;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
+import xy177.farmersfuturedelight.common.registry.FFDCustomRawOres;
 import xy177.farmersfuturedelight.common.registry.FFDEntities;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
+import xy177.farmersfuturedelight.common.registry.FFDRawOres;
 import xy177.farmersfuturedelight.common.item.ItemGoatHorn;
 import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiomeManager;
 
@@ -128,7 +136,7 @@ public class ClientProxy extends CommonProxy {
                     new ResourceLocation(FarmerFutureDelight.MODID, "goat_horn"),
                     new ResourceLocation(FarmerFutureDelight.MODID, "tooting_goat_horn"));
         }
-        if (FFDItems.isPhantomEnabled()) {
+        if (FFDItems.isItemRegistered(FFDItems.PHANTOM_MEMBRANE)) {
             ModelLoader.setCustomModelResourceLocation(FFDItems.PHANTOM_MEMBRANE, 0,
                     new ModelResourceLocation(FarmerFutureDelight.MODID + ":phantom_membrane", "inventory"));
         }
@@ -213,15 +221,13 @@ public class ClientProxy extends CommonProxy {
             registerModel(FFDItems.DEEPSLATE_EMERALD_ORE, "deepslate_emerald_ore");
         }
         if (FFDItems.isRawOreEnabled()) {
-            registerModel(FFDItems.RAW_IRON, "raw_iron");
-            registerModel(FFDItems.RAW_GOLD, "raw_gold");
-            registerModel(FFDItems.RAW_IRON_BLOCK, "raw_iron_block");
-            registerModel(FFDItems.RAW_GOLD_BLOCK, "raw_gold_block");
+            registerRawOreModels(false);
         }
         registerModel(FFDItems.COPPER_ORE, "copper_ore");
-        registerModel(FFDItems.RAW_COPPER, "raw_copper");
-        registerModel(FFDItems.RAW_COPPER_BLOCK, "raw_copper_block");
-        registerModel(FFDItems.COPPER_INGOT, "copper_ingot");
+        if (FFDItems.isCopperEnabled()) {
+            registerRawOreModels(true);
+            registerModel(FFDItems.COPPER_INGOT, "copper_ingot");
+        }
         registerModels(FFDItems.COPPER_BLOCK_ITEMS);
         registerModels(FFDItems.WAXED_COPPER_BLOCK_ITEMS);
         registerModels(FFDItems.CUT_COPPER_ITEMS);
@@ -334,6 +340,7 @@ public class ClientProxy extends CommonProxy {
                 new StateMap.Builder().ignore(BlockLiquid.LEVEL).build());
         registerStateMapper(FFDBlocks.BIG_DRIPLEAF_WATERLOGGED,
                 new StateMap.Builder().ignore(BlockLiquid.LEVEL).build());
+        registerCustomRawOreModels();
     }
 
     private static void registerModel(net.minecraft.item.Item item, String name) {
@@ -350,6 +357,46 @@ public class ClientProxy extends CommonProxy {
         }
     }
 
+    private static void registerRawOreModels(boolean copperOnly) {
+        for (int i = 0; i < FFDRawOres.NAMES.length; i++) {
+            if (FFDRawOres.isCopper(FFDRawOres.NAMES[i]) != copperOnly) {
+                continue;
+            }
+            if (FFDItems.isItemRegistered(FFDItems.RAW_ORE_ITEMS[i])) {
+                registerModel(FFDItems.RAW_ORE_ITEMS[i],
+                        FFDItems.RAW_ORE_ITEMS[i].getRegistryName().getResourcePath());
+            }
+            if (FFDItems.isItemRegistered(FFDItems.RAW_ORE_BLOCK_ITEMS[i])) {
+                registerModel(FFDItems.RAW_ORE_BLOCK_ITEMS[i],
+                        FFDItems.RAW_ORE_BLOCK_ITEMS[i].getRegistryName().getResourcePath());
+            }
+        }
+    }
+
+    private static void registerCustomRawOreModels() {
+        for (FFDCustomRawOres.Entry entry : FFDCustomRawOres.entries()) {
+            if (!entry.isRegistered() || !entry.isBlockRegistered()) {
+                continue;
+            }
+            ModelLoader.setCustomModelResourceLocation(entry.item(), 0,
+                    new ModelResourceLocation(FarmerFutureDelight.MODID
+                            + ":custom_raw_ore_item/" + entry.material(), "inventory"));
+            ModelLoader.setCustomModelResourceLocation(entry.blockItem(), 0,
+                    new ModelResourceLocation(FarmerFutureDelight.MODID
+                            + ":custom_raw_ore_block/" + entry.material(), "inventory"));
+            ModelLoader.setCustomStateMapper(entry.block(), block -> {
+                Map<IBlockState, ModelResourceLocation> models = new HashMap<>();
+                ModelResourceLocation location = new ModelResourceLocation(
+                        FarmerFutureDelight.MODID + ":custom_raw_ore_block/"
+                                + entry.material(), "normal");
+                for (IBlockState state : block.getBlockState().getValidStates()) {
+                    models.put(state, location);
+                }
+                return models;
+            });
+        }
+    }
+
     private static void registerStateMapper(net.minecraft.block.Block block,
                                             net.minecraft.client.renderer.block.statemap.IStateMapper mapper) {
         if (FFDItems.isBlockRegistered(block)) {
@@ -359,6 +406,7 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void preInit() {
+        ModelLoaderRegistry.registerLoader(CustomRawOreModelLoader.INSTANCE);
         RenderingRegistry.registerEntityRenderingHandler(EntityGlowSquid.class, RenderGlowSquid::new);
         RenderingRegistry.registerEntityRenderingHandler(EntityTurtle.class, RenderTurtle::new);
         RenderingRegistry.registerEntityRenderingHandler(EntityAxolotl.class, RenderAxolotl::new);
@@ -473,5 +521,11 @@ public class ClientProxy extends CommonProxy {
                 FFDVerticalBiomeManager.receiveClientData(world, chunkX, chunkZ, biomes);
             }
         });
+    }
+
+    @Override
+    public String getLanguageCode() {
+        return Minecraft.getMinecraft().getLanguageManager().getCurrentLanguage()
+                .getLanguageCode();
     }
 }

@@ -256,6 +256,13 @@ public final class FFDHeightHooks {
         return usesExtendedHeight(entity.world) ? minY(entity.world) - 64.0D : originalThreshold;
     }
 
+    public static int adjustVoidTriggerY(Entity entity, int originalTriggerY) {
+        if (entity == null || !isExtended(entity.world)) {
+            return originalTriggerY;
+        }
+        return originalTriggerY + minY(entity.world);
+    }
+
     public static int fallingBlockMinY(Entity entity) {
         return minY(entity.world) + 1;
     }

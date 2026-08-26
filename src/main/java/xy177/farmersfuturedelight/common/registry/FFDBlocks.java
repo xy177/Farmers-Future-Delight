@@ -224,6 +224,7 @@ public final class FFDBlocks {
     public static final BlockFutureMetal RAW_IRON_BLOCK = new BlockFutureMetal("raw_iron_block", 1);
     public static final BlockFutureMetal RAW_GOLD_BLOCK = new BlockFutureMetal("raw_gold_block", 2);
     public static final BlockFutureMetal RAW_COPPER_BLOCK = new BlockFutureMetal("raw_copper_block", 1);
+    public static final BlockFutureMetal[] RAW_ORE_BLOCKS = rawOreBlocks();
 
     public static final BlockWeatheringCopper[] COPPER_BLOCKS = new BlockWeatheringCopper[] {
             copperBlock("copper_block", CopperWeathering.WeatherState.UNAFFECTED, false),
@@ -371,6 +372,17 @@ public final class FFDBlocks {
                                                       CopperWeathering.WeatherState age,
                                                       boolean waxed) {
         return new BlockWeatheringCopper(name, age, waxed);
+    }
+
+    private static BlockFutureMetal[] rawOreBlocks() {
+        BlockFutureMetal[] blocks = new BlockFutureMetal[FFDRawOres.NAMES.length];
+        blocks[0] = RAW_GOLD_BLOCK;
+        blocks[1] = RAW_IRON_BLOCK;
+        blocks[2] = RAW_COPPER_BLOCK;
+        for (int i = 3; i < blocks.length; i++) {
+            blocks[i] = new BlockFutureMetal(FFDRawOres.rawBlockName(FFDRawOres.NAMES[i]), 1);
+        }
+        return blocks;
     }
 
     private static BlockWeatheringCopperStairs[] copperStairs(String[] names,

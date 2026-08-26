@@ -13,8 +13,10 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 import xy177.farmersfuturedelight.FarmerFutureDelight;
+import xy177.farmersfuturedelight.common.FFDConfig;
 import xy177.farmersfuturedelight.common.potion.PotionSlowFalling;
 
 @Mod.EventBusSubscriber(modid = FarmerFutureDelight.MODID)
@@ -25,6 +27,8 @@ public final class FFDPotions {
             new ResourceLocation("oe", "turtle_master_long");
     private static final ResourceLocation OE_STRONG_TURTLE_MASTER =
             new ResourceLocation("oe", "turtle_master_strong");
+    private static final ResourceLocation PHANTOMS_SLOW_FALLING =
+            new ResourceLocation("phantoms", "slow_falling");
     public static final Potion SLOW_FALLING = new PotionSlowFalling()
             .setRegistryName(FarmerFutureDelight.MODID, "slow_falling");
     public static final PotionType SLOW_FALLING_TYPE = slowFalling("slow_falling", 90 * 20);
@@ -36,19 +40,24 @@ public final class FFDPotions {
     private FFDPotions() {
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void registerPotions(RegistryEvent.Register<Potion> event) {
-        if (FFDItems.isPhantomEnabled()) {
+        if (shouldRegisterLocalSlowFalling(
+                event.getRegistry().containsKey(PHANTOMS_SLOW_FALLING))) {
             event.getRegistry().register(SLOW_FALLING);
         }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void registerPotionTypes(RegistryEvent.Register<PotionType> event) {
-        if (FFDItems.isPhantomEnabled()) {
+        if (shouldRegisterLocalSlowFalling(
+                ForgeRegistries.POTIONS.containsKey(PHANTOMS_SLOW_FALLING))) {
             event.getRegistry().registerAll(SLOW_FALLING_TYPE, LONG_SLOW_FALLING);
-            PotionHelper.addMix(PotionTypes.AWKWARD, FFDItems.PHANTOM_MEMBRANE,
-                    SLOW_FALLING_TYPE);
+            ItemStack membrane = FFDItems.effectiveStack(FFDItems.PHANTOM_MEMBRANE);
+            if (!membrane.isEmpty()) {
+                PotionHelper.addMix(PotionTypes.AWKWARD, membrane.getItem(),
+                        SLOW_FALLING_TYPE);
+            }
             PotionHelper.addMix(SLOW_FALLING_TYPE, Items.REDSTONE, LONG_SLOW_FALLING);
         }
 
@@ -82,6 +91,16 @@ public final class FFDPotions {
                 PotionHelper.addMix(turtleMaster, Items.GLOWSTONE_DUST, strongTurtleMaster);
             }
         }
+    }
+
+    private static boolean shouldRegisterLocalSlowFalling(boolean externalRegistered) {
+        if (FFDConfig.phantomMode == FFDConfig.FeatureMode.ENABLED) {
+            return true;
+        }
+        if (FFDConfig.phantomMode == FFDConfig.FeatureMode.DISABLED) {
+            return false;
+        }
+        return !externalRegistered;
     }
 
     private static PotionType slowFalling(String registryName, int duration) {

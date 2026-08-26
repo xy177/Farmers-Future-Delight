@@ -1,11 +1,14 @@
 package xy177.farmersfuturedelight.common;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
+
+import xy177.farmersfuturedelight.common.registry.FFDRawOres;
 
 public final class FFDConfig {
     public enum FeatureMode {
@@ -17,7 +20,7 @@ public final class FFDConfig {
             try {
                 return valueOf(value.trim().toUpperCase());
             } catch (IllegalArgumentException ex) {
-                return AUTO;
+                return ENABLED;
             }
         }
     }
@@ -43,7 +46,8 @@ public final class FFDConfig {
     private static final String CATEGORY_PARTICLES = "particles";
     private static final String CATEGORY_DEBUG = "debug";
     private static final String CATEGORY_INTERNAL = "internal";
-    private static final int CURRENT_CONFIG_VERSION = 5;
+    private static final String CATEGORY_COMPATIBILITY = "compatibility";
+    private static final int CURRENT_CONFIG_VERSION = 7;
 
     public static FeatureMode sweetBerryMode;
     public static FeatureMode honeyMode;
@@ -71,6 +75,7 @@ public final class FFDConfig {
     public static FeatureMode amethystMode;
     public static FeatureMode deepslateMode;
     public static FeatureMode rawOreMode;
+    public static String[] rawOreMaterialToggles;
     public static FeatureMode copperMode;
     public static FeatureMode dripstoneMode;
     public static FeatureMode ironChainMode;
@@ -92,6 +97,40 @@ public final class FFDConfig {
     public static boolean shovelCreatesDirtPath;
     public static boolean shearsStopPlantGrowth;
     public static boolean oresDropRawMaterials;
+    public static int rawOreDropAmount;
+    public static boolean denseRawOreDrop;
+    public static int furnaceOutputAmount;
+    public static boolean rawBlockSmelt;
+    public static int maceratorRawOutputAmount;
+    public static int ic2BlastFurnaceSteelOutputAmount;
+    public static int ic2BlastFurnaceSlagOutputAmount;
+    public static int enrichmentOutputAmount;
+    public static int purificationOutputAmount;
+    public static int chemicalInjectionChamberOutputAmount;
+    public static int chemicalDissolutionChamberMultiple;
+    public static int pulverizerOutputAmount;
+    public static int pulverizerSecondaryOutputAmount;
+    public static float magmaCrucibleOutputMultiple;
+    public static float fluidMultiple;
+    public static int inductionSmelterSandOutputAmount;
+    public static int inductionSmelterRichSlagOutputAmount;
+    public static int inductionSmelterCinnabarOutputAmount;
+    public static int metallurgyCrusherOutputAmount;
+    public static int galacticraftCompressedOutputAmount;
+    public static int galacticraftPlateOutputAmount;
+    public static int galaxySpaceModernStorageModuleOutputAmount;
+    public static int rollingMachinePlateOutputAmount;
+    public static int smallPlatePressOutputAmount;
+    public static int latheRodOutputAmount;
+    public static int arcFurnaceTitaniumIridiumOutputAmount;
+    public static int arcFurnaceTitaniumAluminideOutputAmount;
+    public static int techgunsYellowcakeOutputAmount;
+    public static int techgunsTitaniumOreOutputAmount;
+    public static int techgunsRawIronOutputAmount;
+    public static int techgunsChemicalLabAcidAmount;
+    public static int techgunsReactionChamberAcidAmount;
+    public static int cropariaRefinedOutputAmount;
+    public static int mysticalAgricultureRefinedOutputAmount;
     public static boolean modernCauldronFeatures;
     public static boolean enchantingTableEmitsLight;
     public static boolean pistonBreakParticles;
@@ -105,6 +144,7 @@ public final class FFDConfig {
     public static String[] powderSnowMobImmunities;
     public static String[] powderSnowAdditionalDamage;
     public static String[] powderSnowWalkableBoots;
+    public static String[] powderSnowFreezingArmor;
     public static float goatScreamingChance;
     public static float goatSingleHornChance;
     public static int goatLongJumpCooldownMinTicks;
@@ -317,6 +357,8 @@ public final class FFDConfig {
     public static int twistingVinesSpreadHeight;
     public static int twistingVinesMaxHeight;
 
+    private static Map<String, Boolean> rawOreMaterialStates = defaultRawOreMaterialStates();
+
     private FFDConfig() {
     }
 
@@ -357,6 +399,10 @@ public final class FFDConfig {
         amethystMode = readMode(config, "amethystMode", "紫水晶与紫水晶晶洞内容开关");
         deepslateMode = readMode(config, "deepslateMode", "深板岩、凝灰岩与深层矿石内容开关");
         rawOreMode = readMode(config, "rawOreMode", "粗铁、粗金及对应粗矿块内容开关");
+        rawOreMaterialToggles = config.getStringList(
+                "rawOreMaterialToggles", CATEGORY_FEATURES, defaultRawOreMaterialToggles(),
+                "逐种控制粗矿及其粗矿块、掉落替换和联动配方。格式为材质内部名称=true或false；默认全部为true。缺少的材质按true处理，修改后需重启游戏。");
+        rawOreMaterialStates = parseRawOreMaterialStates(rawOreMaterialToggles);
         copperMode = readMode(config, "copperMode", "铜矿石、粗铜与铜制内容开关");
         dripstoneMode = readMode(config, "dripstoneMode", "滴水石块与滴水石锥内容开关");
         ironChainMode = readMode(config, "ironChainMode", "铁链内容开关");
@@ -390,7 +436,107 @@ public final class FFDConfig {
         shearsStopPlantGrowth = config.getBoolean("shearsStopPlantGrowth", CATEGORY_GAMEPLAY,
                 true, "是否允许使用剪刀停止海带、洞穴藤蔓、垂泪藤和缠怨藤继续生长。");
         oresDropRawMaterials = config.getBoolean("oresDropRawMaterials", CATEGORY_GAMEPLAY,
-                true, "是否让铁矿石、金矿石和铜矿石掉落对应粗矿并支持时运；精准采集仍获得矿石方块。对所有世界类型生效。");
+                true, "是否让可识别的矿石掉落对应粗矿并支持时运；精准采集仍获得矿石方块，自动冶炼后的产物保持不变。对所有世界类型生效。");
+        rawOreDropAmount = config.getInt("rawOreDropAmount", CATEGORY_COMPATIBILITY,
+                1, 1, 64, "除铜外的所有受支持矿石被转换为粗矿时的基础掉落数量；Raw Ore 1.5.4 默认值为 1。");
+        denseRawOreDrop = config.getBoolean("denseRawOreDrop", CATEGORY_COMPATIBILITY,
+                true, "是否按 Dense Metals 的富集矿石倍率增加粗矿掉落；Raw Ore 1.5.4 默认开启。");
+        furnaceOutputAmount = config.getInt("furnaceOutputAmount", CATEGORY_COMPATIBILITY,
+                1, 1, 64, "熔炉处理粗矿时的锭产物数量；Raw Ore 1.5.4 默认值为 1。");
+        rawBlockSmelt = config.getBoolean("rawBlockSmelt", CATEGORY_COMPATIBILITY,
+                false, "是否允许粗矿块直接熔炼为对应锭块；Raw Ore 1.5.4 默认关闭。");
+        maceratorRawOutputAmount = config.getInt("maceratorRawOutputAmount",
+                CATEGORY_COMPATIBILITY, 2, 1, 64,
+                "工业时代粉碎机处理粗矿时的主产物数量；Raw Ore 1.5.4 默认值为 2。");
+        ic2BlastFurnaceSteelOutputAmount = config.getInt(
+                "ic2BlastFurnaceSteelOutputAmount", CATEGORY_COMPATIBILITY, 1, 1, 64,
+                "工业时代工业高炉处理粗铁时的钢锭产物数量；Raw Ore 1.5.4 默认值为 1。");
+        ic2BlastFurnaceSlagOutputAmount = config.getInt(
+                "ic2BlastFurnaceSlagOutputAmount", CATEGORY_COMPATIBILITY, 1, 1, 64,
+                "工业时代工业高炉处理粗铁时的炉渣副产物数量；Raw Ore 1.5.4 默认值为 1。");
+        enrichmentOutputAmount = config.getInt("enrichmentOutputAmount",
+                CATEGORY_COMPATIBILITY, 2, 1, 64,
+                "通用机械富集室处理粗矿时的主产物数量；Raw Ore 1.5.4 默认值为 2。");
+        purificationOutputAmount = config.getInt("purificationOutputAmount",
+                CATEGORY_COMPATIBILITY, 3, 1, 64,
+                "通用机械净化室处理粗矿时的主产物数量；Raw Ore 1.5.4 默认值为 3。");
+        chemicalInjectionChamberOutputAmount = config.getInt(
+                "chemicalInjectionChamberOutputAmount", CATEGORY_COMPATIBILITY, 4, 1, 64,
+                "通用机械化学注入室处理粗矿时的主产物数量；Raw Ore 1.5.4 默认值为 4。");
+        chemicalDissolutionChamberMultiple = config.getInt(
+                "chemicalDissolutionChamberMultiple", CATEGORY_COMPATIBILITY, 1, 1, 64,
+                "通用机械化学溶解室粗矿处理倍率；Raw Ore 1.5.4 默认值为 1。");
+        pulverizerOutputAmount = config.getInt("pulverizerOutputAmount",
+                CATEGORY_COMPATIBILITY, 2, 1, 64,
+                "热力膨胀粉碎机处理粗矿时的主产物数量；Raw Ore 1.5.4 默认值为 2。");
+        pulverizerSecondaryOutputAmount = config.getInt("pulverizerSecondaryOutputAmount",
+                CATEGORY_COMPATIBILITY, 1, 1, 64,
+                "热力膨胀粉碎机处理粗矿时的副产物数量；Raw Ore 1.5.4 默认值为 1。");
+        magmaCrucibleOutputMultiple = config.getFloat("magmaCrucibleOutputMultiple",
+                CATEGORY_COMPATIBILITY, 1.0F, 0.0F, 64.0F,
+                "热力膨胀岩浆熔炉粗矿流体输出倍率；Raw Ore 1.5.4 默认值为 1。");
+        fluidMultiple = config.getFloat("fluidMultiple", CATEGORY_COMPATIBILITY,
+                1.0F, 0.0F, 64.0F,
+                "匠魂粗矿熔融流体输出倍率；Raw Ore 1.5.4 默认值为 1。");
+        inductionSmelterSandOutputAmount = config.getInt("inductionSmelterSandOutputAmount",
+                CATEGORY_COMPATIBILITY, 2, 1, 64,
+                "热力膨胀感应炉使用沙处理粗矿时的主产物数量；Raw Ore 1.5.4 默认值为 2。");
+        inductionSmelterRichSlagOutputAmount = config.getInt(
+                "inductionSmelterRichSlagOutputAmount", CATEGORY_COMPATIBILITY, 3, 1, 64,
+                "热力膨胀感应炉使用富集炉渣处理粗矿时的主产物数量；Raw Ore 1.5.4 默认值为 3。");
+        inductionSmelterCinnabarOutputAmount = config.getInt(
+                "inductionSmelterCinnabarOutputAmount", CATEGORY_COMPATIBILITY, 3, 1, 64,
+                "热力膨胀感应炉使用朱砂处理粗矿时的主产物数量；Raw Ore 1.5.4 默认值为 3。");
+        metallurgyCrusherOutputAmount = config.getInt("metallurgyCrusherOutputAmount",
+                CATEGORY_COMPATIBILITY, 2, 1, 64,
+                "冶金4：重铸粉碎机处理粗矿时的产物数量；Raw Ore 1.5.4 默认值为 2。");
+        galacticraftCompressedOutputAmount = config.getInt(
+                "galacticraftCompressedOutputAmount", CATEGORY_COMPATIBILITY, 1, 1, 64,
+                "星系压缩机处理两个锭时的压缩材料产物数量；Raw Ore 1.5.4 默认值为 1。");
+        galacticraftPlateOutputAmount = config.getInt(
+                "galacticraftPlateOutputAmount", CATEGORY_COMPATIBILITY, 1, 1, 64,
+                "星系压缩机处理工业时代锭时的板材产物数量；Raw Ore 1.5.4 默认值为 1。");
+        galaxySpaceModernStorageModuleOutputAmount = config.getInt(
+                "galaxySpaceModernStorageModuleOutputAmount", CATEGORY_COMPATIBILITY, 1, 1, 64,
+                "Galaxy Space 现代储能模块配方的产物数量；Raw Ore 1.5.4 默认值为 1。");
+        rollingMachinePlateOutputAmount = config.getInt("rollingMachinePlateOutputAmount",
+                CATEGORY_COMPATIBILITY, 1, 1, 64,
+                "高级火箭轧制机处理粗矿时的板材产物数量；Raw Ore 1.5.4 默认值为 1。");
+        smallPlatePressOutputAmount = config.getInt("smallPlatePressOutputAmount",
+                CATEGORY_COMPATIBILITY, 4, 1, 64,
+                "高级火箭小型板材压机处理粗矿块时的板材产物数量；Raw Ore 1.5.4 默认值为 4。");
+        latheRodOutputAmount = config.getInt("latheRodOutputAmount",
+                CATEGORY_COMPATIBILITY, 2, 1, 64,
+                "高级火箭车床处理粗矿时的杆产物数量；Raw Ore 1.5.4 默认值为 2。");
+        arcFurnaceTitaniumIridiumOutputAmount = config.getInt(
+                "arcFurnaceTitaniumIridiumOutputAmount", CATEGORY_COMPATIBILITY, 2, 1, 64,
+                "高级火箭电弧高炉钛铱合金配方的产物数量；Raw Ore 1.5.4 默认值为 2。");
+        arcFurnaceTitaniumAluminideOutputAmount = config.getInt(
+                "arcFurnaceTitaniumAluminideOutputAmount", CATEGORY_COMPATIBILITY, 3, 1, 64,
+                "高级火箭电弧高炉钛铝合金配方的产物数量；Raw Ore 1.5.4 默认值为 3。");
+        techgunsYellowcakeOutputAmount = config.getInt("techgunsYellowcakeOutputAmount",
+                CATEGORY_COMPATIBILITY, 3, 1, 64,
+                "科技枪化学实验室处理粗铀时的黄饼产物数量；Raw Ore 1.5.4 默认值为 3。");
+        techgunsTitaniumOreOutputAmount = config.getInt("techgunsTitaniumOreOutputAmount",
+                CATEGORY_COMPATIBILITY, 2, 1, 64,
+                "科技枪反应室处理粗钛时的钛矿石产物数量；Raw Ore 1.5.4 默认值为 2。");
+        techgunsRawIronOutputAmount = config.getInt("techgunsRawIronOutputAmount",
+                CATEGORY_COMPATIBILITY, 1, 1, 64,
+                "科技枪反应室处理粗钛时的粗铁副产物数量；Raw Ore 1.5.4 默认值为 1。");
+        techgunsChemicalLabAcidAmount = config.getInt("techgunsChemicalLabAcidAmount",
+                CATEGORY_COMPATIBILITY,
+                250, 1, 16000,
+                "科技枪化学实验室粗铀配方消耗的酸液数量，单位为 mB；Raw Ore 1.5.4 默认值为 250。");
+        techgunsReactionChamberAcidAmount = config.getInt(
+                "techgunsReactionChamberAcidAmount", CATEGORY_COMPATIBILITY,
+                100, 1, 16000,
+                "科技枪反应室粗钛配方消耗的酸液数量，单位为 mB；Raw Ore 1.5.4 默认值为 100。");
+        cropariaRefinedOutputAmount = config.getInt("cropariaRefinedOutputAmount",
+                CATEGORY_COMPATIBILITY, 2, 1, 64,
+                "矿石作物果实配方的精炼产物数量；Raw Ore 1.5.4 默认值为 2。");
+        mysticalAgricultureRefinedOutputAmount = config.getInt(
+                "mysticalAgricultureRefinedOutputAmount", CATEGORY_COMPATIBILITY, 4, 1, 64,
+                "神秘农业精华配方的精炼产物数量；Raw Ore 1.5.4 默认值为 4。");
         modernCauldronFeatures = config.getBoolean("modernCauldronFeatures", CATEGORY_GAMEPLAY,
                 true, "是否启用熔岩炼药锅、细雪炼药锅、滴水石填充与降雪积累等高版本炼药锅行为。对所有世界类型生效。");
         enchantingTableEmitsLight = config.getBoolean("enchantingTableEmitsLight", CATEGORY_GAMEPLAY,
@@ -423,6 +569,9 @@ public final class FFDConfig {
         powderSnowWalkableBoots = config.getStringList(
                 "powderSnowWalkableBoots", CATEGORY_GAMEPLAY, new String[0],
                 "穿戴后可在细雪表面行走而不陷入的靴子物品注册名列表，例如 twilightforest:yeti_boots。皮革靴仍始终有效。");
+        powderSnowFreezingArmor = config.getStringList(
+                "powderSnowFreezingArmor", CATEGORY_GAMEPLAY, new String[0],
+                "穿戴后可免疫细雪冻结的盔甲物品注册名列表。任意装备栏中有一件匹配装备即可生效；原版皮革盔甲仍始终有效，例如 twilightforest:yeti_chestplate。");
         logAutoCompatibilityDecisions = config.getBoolean("logAutoCompatibilityDecisions", CATEGORY_DEBUG,
                 false, "是否在日志中逐项显示 AUTO 自动避让的内容与世界生成判定。默认关闭；仅建议排查兼容问题时开启。");
 
@@ -935,6 +1084,9 @@ public final class FFDConfig {
         if (CATEGORY_INTERNAL.equals(category)) {
             return "内部设置，请勿手动修改。\nInternal settings; do not edit manually.";
         }
+        if (CATEGORY_COMPATIBILITY.equals(category)) {
+            return "模组联动配方设置。\nCross-mod recipe compatibility settings.";
+        }
         return "配置分类：" + humanizeKey(category) + "。\nConfiguration category: "
                 + humanizeKey(category) + ".";
     }
@@ -952,9 +1104,12 @@ public final class FFDConfig {
     }
 
     private static String englishDescription(String category, String key) {
+        if ("rawOreMaterialToggles".equals(key)) {
+            return "Per-material raw-ore toggles in material=true or material=false form. Each entry controls that raw material, its storage block, ore-drop replacement, and compatibility recipes. Missing materials default to true. Restart required.";
+        }
         if (CATEGORY_FEATURES.equals(category)) {
             return "Feature mode for " + humanizeKey(key.replace("Mode", ""))
-                    + ". ENABLED uses this mod's implementation; DISABLED turns it off; AUTO resolves each compatible content unit independently and fills only missing units locally.";
+                    + ". ENABLED is the default and uses this mod's implementation; DISABLED turns it off; AUTO resolves each compatible content unit independently and fills only missing units locally.";
         }
         if ("sporeBlossomParticlesEnabled".equals(key)) {
             return "Enable falling spore particles from spore blossoms. Disabled by default.";
@@ -1002,7 +1157,109 @@ public final class FFDConfig {
             return "Allow shears to set kelp, cave vines, weeping vines, and twisting vines to their maximum growth age.";
         }
         if ("oresDropRawMaterials".equals(key)) {
-            return "Make iron, gold, and copper ores drop raw materials with Fortune support in every world type; Silk Touch still drops the ore block.";
+            return "Make recognized ores drop their matching raw materials with Fortune support in every world type; Silk Touch and auto-smelted outputs remain unchanged.";
+        }
+        if ("rawOreDropAmount".equals(key)) {
+            return "Base raw-material drop amount for every supported ore except copper. The Raw Ore 1.5.4 default is 1.";
+        }
+        if ("denseRawOreDrop".equals(key)) {
+            return "Apply the Dense Metals dense-ore multiplier to raw-material drops. Enabled by default, matching Raw Ore 1.5.4.";
+        }
+        if ("furnaceOutputAmount".equals(key)) {
+            return "Ingot output amount when a raw ore is smelted in a furnace. The Raw Ore 1.5.4 default is 1.";
+        }
+        if ("rawBlockSmelt".equals(key)) {
+            return "Allow raw ore blocks to be smelted directly into matching metal blocks. Disabled by default, matching Raw Ore 1.5.4.";
+        }
+        if ("maceratorRawOutputAmount".equals(key)) {
+            return "IndustrialCraft 2 Macerator raw-ore output amount. The Raw Ore 1.5.4 default is 2.";
+        }
+        if ("ic2BlastFurnaceSteelOutputAmount".equals(key)) {
+            return "IndustrialCraft 2 Blast Furnace steel output for raw iron. The Raw Ore 1.5.4 default is 1.";
+        }
+        if ("ic2BlastFurnaceSlagOutputAmount".equals(key)) {
+            return "IndustrialCraft 2 Blast Furnace slag output for raw iron. The Raw Ore 1.5.4 default is 1.";
+        }
+        if ("enrichmentOutputAmount".equals(key)) {
+            return "Mekanism Enrichment Chamber raw-ore output amount. The Raw Ore 1.5.4 default is 2.";
+        }
+        if ("purificationOutputAmount".equals(key)) {
+            return "Mekanism Purification Chamber raw-ore output amount. The Raw Ore 1.5.4 default is 3.";
+        }
+        if ("chemicalInjectionChamberOutputAmount".equals(key)) {
+            return "Mekanism Chemical Injection Chamber raw-ore output amount. The Raw Ore 1.5.4 default is 4.";
+        }
+        if ("chemicalDissolutionChamberMultiple".equals(key)) {
+            return "Mekanism Chemical Dissolution Chamber raw-ore processing multiplier. The Raw Ore 1.5.4 default is 1.";
+        }
+        if ("pulverizerOutputAmount".equals(key)) {
+            return "Thermal Expansion Pulverizer raw-ore primary output amount. The Raw Ore 1.5.4 default is 2.";
+        }
+        if ("pulverizerSecondaryOutputAmount".equals(key)) {
+            return "Thermal Expansion Pulverizer raw-ore secondary output amount. The Raw Ore 1.5.4 default is 1.";
+        }
+        if ("magmaCrucibleOutputMultiple".equals(key)) {
+            return "Thermal Expansion Magma Crucible raw-ore fluid output multiplier. The Raw Ore 1.5.4 default is 1.";
+        }
+        if ("fluidMultiple".equals(key)) {
+            return "Tinkers' Construct raw-ore melting fluid output multiplier. The Raw Ore 1.5.4 default is 1.";
+        }
+        if ("inductionSmelterSandOutputAmount".equals(key)) {
+            return "Thermal Expansion Induction Smelter primary output amount when processing raw ore with sand. The Raw Ore 1.5.4 default is 2.";
+        }
+        if ("inductionSmelterRichSlagOutputAmount".equals(key)) {
+            return "Thermal Expansion Induction Smelter primary output amount when processing raw ore with rich slag. The Raw Ore 1.5.4 default is 3.";
+        }
+        if ("inductionSmelterCinnabarOutputAmount".equals(key)) {
+            return "Thermal Expansion Induction Smelter primary output amount when processing raw ore with cinnabar. The Raw Ore 1.5.4 default is 3.";
+        }
+        if ("metallurgyCrusherOutputAmount".equals(key)) {
+            return "Metallurgy 4: Reforged Crusher raw-ore output amount. The Raw Ore 1.5.4 default is 2.";
+        }
+        if ("galacticraftCompressedOutputAmount".equals(key)) {
+            return "Galacticraft Compressor compressed-material output amount. The Raw Ore 1.5.4 default is 1.";
+        }
+        if ("galacticraftPlateOutputAmount".equals(key)) {
+            return "Galacticraft Compressor IndustrialCraft 2 plate output amount. The Raw Ore 1.5.4 default is 1.";
+        }
+        if ("galaxySpaceModernStorageModuleOutputAmount".equals(key)) {
+            return "Galaxy Space modern storage module recipe output amount. The Raw Ore 1.5.4 default is 1.";
+        }
+        if ("rollingMachinePlateOutputAmount".equals(key)) {
+            return "Advanced Rocketry Rolling Machine plate output amount. The Raw Ore 1.5.4 default is 1.";
+        }
+        if ("smallPlatePressOutputAmount".equals(key)) {
+            return "Advanced Rocketry Small Plate Press plate output amount. The Raw Ore 1.5.4 default is 4.";
+        }
+        if ("latheRodOutputAmount".equals(key)) {
+            return "Advanced Rocketry Lathe rod output amount. The Raw Ore 1.5.4 default is 2.";
+        }
+        if ("arcFurnaceTitaniumIridiumOutputAmount".equals(key)) {
+            return "Advanced Rocketry Electric Arc Furnace titanium-iridium alloy output amount. The Raw Ore 1.5.4 default is 2.";
+        }
+        if ("arcFurnaceTitaniumAluminideOutputAmount".equals(key)) {
+            return "Advanced Rocketry Electric Arc Furnace titanium-aluminide alloy output amount. The Raw Ore 1.5.4 default is 3.";
+        }
+        if ("techgunsYellowcakeOutputAmount".equals(key)) {
+            return "Techguns Chemical Lab yellowcake output amount for the raw uranium recipe. The Raw Ore 1.5.4 default is 3.";
+        }
+        if ("techgunsTitaniumOreOutputAmount".equals(key)) {
+            return "Techguns Reaction Chamber titanium ore output amount for the raw titanium recipe. The Raw Ore 1.5.4 default is 2.";
+        }
+        if ("techgunsRawIronOutputAmount".equals(key)) {
+            return "Techguns Reaction Chamber raw iron byproduct amount for the raw titanium recipe. The Raw Ore 1.5.4 default is 1.";
+        }
+        if ("techgunsChemicalLabAcidAmount".equals(key)) {
+            return "Techguns Chemical Lab acid input for the raw uranium recipe, in mB. The Raw Ore 1.5.4 default is 250.";
+        }
+        if ("techgunsReactionChamberAcidAmount".equals(key)) {
+            return "Techguns Reaction Chamber acid input for the raw titanium recipe, in mB. The Raw Ore 1.5.4 default is 100.";
+        }
+        if ("cropariaRefinedOutputAmount".equals(key)) {
+            return "Croparia fruit recipe refined-material output amount. The Raw Ore 1.5.4 default is 2.";
+        }
+        if ("mysticalAgricultureRefinedOutputAmount".equals(key)) {
+            return "Mystical Agriculture essence recipe refined-material output amount. The Raw Ore 1.5.4 default is 4.";
         }
         if ("modernCauldronFeatures".equals(key)) {
             return "Enable lava and powder snow cauldrons, pointed dripstone filling, and precipitation accumulation in every world type.";
@@ -1048,6 +1305,9 @@ public final class FFDConfig {
         }
         if ("powderSnowWalkableBoots".equals(key)) {
             return "Item registry names for boots that let their wearer walk on powder snow without sinking. Leather boots always work.";
+        }
+        if ("powderSnowFreezingArmor".equals(key)) {
+            return "Item registry names for armor that prevents powder-snow freezing. One matching item in any armor slot is enough; vanilla leather armor always works. For example twilightforest:yeti_chestplate.";
         }
         if ("goatScreamingChance".equals(key)) {
             return "Base chance for a spawned or bred goat to be a screaming goat. The 26.3 default is 0.02.";
@@ -1195,10 +1455,58 @@ public final class FFDConfig {
     }
 
     private static FeatureMode readMode(Configuration config, String key, String comment) {
-        String value = config.getString(key, CATEGORY_FEATURES, "AUTO",
-                comment + "。可选值：ENABLED、DISABLED、AUTO。AUTO 会逐个识别外部内容单元，并仅由本模组补齐缺失内容。",
+        String value = config.getString(key, CATEGORY_FEATURES, "ENABLED",
+                comment + "。默认值为 ENABLED，即关闭自动避让并使用本模组实现。可选值：ENABLED、DISABLED、AUTO。AUTO 会逐个识别外部内容单元，并仅由本模组补齐缺失内容。",
                 new String[]{"ENABLED", "DISABLED", "AUTO"});
         return FeatureMode.parse(value);
+    }
+
+    public static boolean isRawOreMaterialEnabled(String material) {
+        if (material == null) {
+            return false;
+        }
+        Boolean enabled = rawOreMaterialStates.get(material.trim().toLowerCase(Locale.ROOT));
+        return enabled == null || enabled;
+    }
+
+    private static String[] defaultRawOreMaterialToggles() {
+        String[] defaults = new String[FFDRawOres.NAMES.length];
+        for (int i = 0; i < FFDRawOres.NAMES.length; i++) {
+            defaults[i] = FFDRawOres.NAMES[i] + "=true";
+        }
+        return defaults;
+    }
+
+    private static Map<String, Boolean> defaultRawOreMaterialStates() {
+        Map<String, Boolean> states = new HashMap<>();
+        for (String material : FFDRawOres.NAMES) {
+            states.put(material, true);
+        }
+        return states;
+    }
+
+    private static Map<String, Boolean> parseRawOreMaterialStates(String[] entries) {
+        Map<String, Boolean> states = defaultRawOreMaterialStates();
+        if (entries == null) {
+            return states;
+        }
+        for (String entry : entries) {
+            if (entry == null) {
+                continue;
+            }
+            int separator = entry.indexOf('=');
+            if (separator <= 0 || separator >= entry.length() - 1) {
+                continue;
+            }
+            String material = entry.substring(0, separator).trim().toLowerCase(Locale.ROOT);
+            String value = entry.substring(separator + 1).trim().toLowerCase(Locale.ROOT);
+            if (!material.matches("[a-z0-9][a-z0-9_]{0,47}")
+                    || (!"true".equals(value) && !"false".equals(value))) {
+                continue;
+            }
+            states.put(material, Boolean.parseBoolean(value));
+        }
+        return states;
     }
 
     private static int readSeagrassAttempts(Configuration config, String key, int defaultValue, String biome) {

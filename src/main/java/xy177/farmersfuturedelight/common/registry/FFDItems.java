@@ -193,6 +193,8 @@ public final class FFDItems {
     public static final Item RAW_IRON = simpleItem("raw_iron");
     public static final Item RAW_GOLD = simpleItem("raw_gold");
     public static final Item RAW_COPPER = simpleItem("raw_copper");
+    public static final Item[] RAW_ORE_ITEMS = rawOreItems();
+    public static final Item[] RAW_ORE_BLOCK_ITEMS = rawOreBlockItems();
     public static final Item COPPER_INGOT = simpleItem("copper_ingot");
     public static final Item[] COPPER_BLOCK_ITEMS = blockItems(FFDBlocks.COPPER_BLOCKS);
     public static final Item[] WAXED_COPPER_BLOCK_ITEMS = blockItems(FFDBlocks.WAXED_COPPER_BLOCKS);
@@ -472,6 +474,11 @@ public final class FFDItems {
         return FFDCompat.isEnabled(FFDConfig.rawOreMode, FFDCompat.Feature.RAW_ORE);
     }
 
+    public static boolean isRawOreMaterialEnabled(String material) {
+        return FFDConfig.isRawOreMaterialEnabled(material)
+                && (FFDRawOres.isCopper(material) ? isCopperEnabled() : isRawOreEnabled());
+    }
+
     public static boolean isCopperEnabled() {
         return FFDCompat.isEnabled(FFDConfig.copperMode, FFDCompat.Feature.COPPER);
     }
@@ -527,15 +534,24 @@ public final class FFDItems {
     }
 
     public static boolean shouldRegisterBlock(Block block) {
+        String rawOreMaterial = rawOreMaterial(block);
+        if (rawOreMaterial != null && !isRawOreMaterialEnabled(rawOreMaterial)) {
+            return false;
+        }
         FeatureBinding binding = blockBinding(block);
         return binding == null || FFDCompat.isLocalBlockEnabled(
-                binding.mode, binding.feature, block);
+                binding.mode, binding.feature, block, rawBlockAliases(block));
     }
 
     public static boolean shouldRegisterItem(Item item) {
+        String rawOreMaterial = rawOreMaterial(item);
+        if (rawOreMaterial != null && !isRawOreMaterialEnabled(rawOreMaterial)) {
+            return false;
+        }
         FeatureBinding binding = itemBinding(item);
         return binding == null || FFDCompat.isLocalItemEnabled(
-                binding.mode, binding.feature, item, LOCAL_ITEM_BLOCKS.get(item));
+                binding.mode, binding.feature, item, LOCAL_ITEM_BLOCKS.get(item),
+                rawBlockAliases(LOCAL_ITEM_BLOCKS.get(item)));
     }
 
     public static boolean isBlockRegistered(Block block) {
@@ -557,6 +573,10 @@ public final class FFDItems {
     }
 
     public static ItemStack effectiveStack(Item local) {
+        String rawOreMaterial = rawOreMaterial(local);
+        if (rawOreMaterial != null && !FFDConfig.isRawOreMaterialEnabled(rawOreMaterial)) {
+            return ItemStack.EMPTY;
+        }
         if (isItemRegistered(local)) {
             return new ItemStack(local);
         }
@@ -564,10 +584,14 @@ public final class FFDItems {
         return binding == null || binding.mode != FFDConfig.FeatureMode.AUTO
                 || local.getRegistryName() == null ? ItemStack.EMPTY
                 : FFDCompat.getExternalItemStack(binding.feature,
-                        local.getRegistryName().getResourcePath());
+                        contentPaths(local));
     }
 
     public static Block effectiveBlock(Block local) {
+        String rawOreMaterial = rawOreMaterial(local);
+        if (rawOreMaterial != null && !FFDConfig.isRawOreMaterialEnabled(rawOreMaterial)) {
+            return null;
+        }
         if (isBlockRegistered(local)) {
             return local;
         }
@@ -577,7 +601,7 @@ public final class FFDItems {
             return null;
         }
         net.minecraft.block.state.IBlockState external = FFDCompat.getExternalBlockState(
-                binding.feature, local.getRegistryName().getResourcePath());
+                binding.feature, contentPaths(local));
         return external == null ? null : external.getBlock();
     }
 
@@ -647,7 +671,11 @@ public final class FFDItems {
         if (isDeepslateBlock(block)) {
             return binding(FFDConfig.deepslateMode, FFDCompat.Feature.DEEPSLATE);
         }
-        if (block == FFDBlocks.RAW_IRON_BLOCK || block == FFDBlocks.RAW_GOLD_BLOCK) {
+        if (isRawOreBlock(block)) {
+            if (FFDRawOres.isCopper(block.getRegistryName().getResourcePath()
+                    .replace("raw_", "").replace("_block", ""))) {
+                return binding(FFDConfig.copperMode, FFDCompat.Feature.COPPER);
+            }
             return binding(FFDConfig.rawOreMode, FFDCompat.Feature.RAW_ORE);
         }
         if (isCopperBlock(block)) {
@@ -733,13 +761,19 @@ public final class FFDItems {
         if (item == AXOLOTL_BUCKET) {
             return binding(FFDConfig.axolotlMode, FFDCompat.Feature.AXOLOTL);
         }
+        if (item == PHANTOM_MEMBRANE) {
+            return binding(FFDConfig.phantomMode, FFDCompat.Feature.PHANTOM);
+        }
         if (item == MUSIC_DISC_OTHERSIDE) {
             return binding(FFDConfig.othersideMode, FFDCompat.Feature.OTHERSIDE);
         }
         if (item == AMETHYST_SHARD) {
             return binding(FFDConfig.amethystMode, FFDCompat.Feature.AMETHYST);
         }
-        if (item == RAW_IRON || item == RAW_GOLD) {
+        if (arrayContains(item, RAW_ORE_ITEMS)) {
+            if (item == RAW_COPPER) {
+                return binding(FFDConfig.copperMode, FFDCompat.Feature.COPPER);
+            }
             return binding(FFDConfig.rawOreMode, FFDCompat.Feature.RAW_ORE);
         }
         if (item == RAW_COPPER || item == COPPER_INGOT || item == SPYGLASS) {
@@ -772,6 +806,63 @@ public final class FFDItems {
                 FFDBlocks.DEEPSLATE_GOLD_ORE, FFDBlocks.DEEPSLATE_REDSTONE_ORE,
                 FFDBlocks.DEEPSLATE_LAPIS_ORE, FFDBlocks.DEEPSLATE_DIAMOND_ORE,
                 FFDBlocks.DEEPSLATE_EMERALD_ORE);
+    }
+
+    private static boolean isRawOreBlock(Block block) {
+        return arrayContains(block, FFDBlocks.RAW_ORE_BLOCKS);
+    }
+
+    private static String rawOreMaterial(Block block) {
+        for (int i = 0; i < FFDBlocks.RAW_ORE_BLOCKS.length; i++) {
+            if (FFDBlocks.RAW_ORE_BLOCKS[i] == block) {
+                return FFDRawOres.NAMES[i];
+            }
+        }
+        return null;
+    }
+
+    private static String rawOreMaterial(Item item) {
+        for (int i = 0; i < RAW_ORE_ITEMS.length; i++) {
+            if (RAW_ORE_ITEMS[i] == item || RAW_ORE_BLOCK_ITEMS[i] == item) {
+                return FFDRawOres.NAMES[i];
+            }
+        }
+        return null;
+    }
+
+    private static String[] rawBlockAliases(Block block) {
+        if (block == null) {
+            return new String[0];
+        }
+        for (int i = 0; i < FFDBlocks.RAW_ORE_BLOCKS.length; i++) {
+            if (FFDBlocks.RAW_ORE_BLOCKS[i] == block) {
+                return new String[] {FFDRawOres.externalRawBlockName(FFDRawOres.NAMES[i])};
+            }
+        }
+        return new String[0];
+    }
+
+    private static String[] contentPaths(Item local) {
+        if (local == null || local.getRegistryName() == null) {
+            return new String[0];
+        }
+        return concat(new String[] {local.getRegistryName().getResourcePath()},
+                rawBlockAliases(LOCAL_ITEM_BLOCKS.get(local)));
+    }
+
+    private static String[] contentPaths(Block local) {
+        if (local == null || local.getRegistryName() == null) {
+            return new String[0];
+        }
+        return concat(new String[] {local.getRegistryName().getResourcePath()},
+                rawBlockAliases(local));
+    }
+
+    private static String[] concat(String[] first, String[] second) {
+        String[] result = new String[first.length + second.length];
+        System.arraycopy(first, 0, result, 0, first.length);
+        System.arraycopy(second, 0, result, first.length, second.length);
+        return result;
     }
 
     private static boolean isCopperBlock(Block block) {
@@ -876,6 +967,28 @@ public final class FFDItems {
         Item[] items = new Item[blocks.length];
         for (int i = 0; i < blocks.length; i++) {
             items[i] = blockItem(blocks[i]);
+        }
+        return items;
+    }
+
+    private static Item[] rawOreItems() {
+        Item[] items = new Item[FFDRawOres.NAMES.length];
+        items[0] = RAW_GOLD;
+        items[1] = RAW_IRON;
+        items[2] = RAW_COPPER;
+        for (int i = 3; i < items.length; i++) {
+            items[i] = simpleItem(FFDRawOres.rawItemName(FFDRawOres.NAMES[i]));
+        }
+        return items;
+    }
+
+    private static Item[] rawOreBlockItems() {
+        Item[] items = new Item[FFDRawOres.NAMES.length];
+        items[0] = RAW_GOLD_BLOCK;
+        items[1] = RAW_IRON_BLOCK;
+        items[2] = RAW_COPPER_BLOCK;
+        for (int i = 3; i < items.length; i++) {
+            items[i] = blockItem(FFDBlocks.RAW_ORE_BLOCKS[i]);
         }
         return items;
     }

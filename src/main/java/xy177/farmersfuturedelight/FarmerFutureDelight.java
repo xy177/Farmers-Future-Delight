@@ -5,6 +5,7 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -17,21 +18,25 @@ import xy177.farmersfuturedelight.common.advancement.FFDAdvancements;
 import xy177.farmersfuturedelight.common.registry.FFDEntities;
 import xy177.farmersfuturedelight.common.registry.FFDRecipes;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
+import xy177.farmersfuturedelight.common.registry.FFDCustomRawOres;
+import xy177.farmersfuturedelight.common.registry.FFDRawOreCompat;
+import xy177.farmersfuturedelight.common.registry.FFDRawOreOreDictionaryCompat;
 import xy177.farmersfuturedelight.common.registry.FFDTileEntities;
 import xy177.farmersfuturedelight.common.network.FFDNetwork;
 import xy177.farmersfuturedelight.common.world.FFDWorldTypes;
 import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiomeManager;
 import xy177.farmersfuturedelight.common.command.CommandLocateBiome;
+import xy177.farmersfuturedelight.common.command.CommandRawOre;
 import xy177.farmersfuturedelight.core.FFDCoreCompat;
 import xy177.farmersfuturedelight.core.FFDHeightHooks;
 import xy177.farmersfuturedelight.proxy.CommonProxy;
 
 @Mod(modid = FarmerFutureDelight.MODID, name = FarmerFutureDelight.NAME, version = FarmerFutureDelight.VERSION,
-        acceptedMinecraftVersions = "[1.12.2]")
+        acceptedMinecraftVersions = "[1.12.2]", dependencies = "before:jei")
 public class FarmerFutureDelight {
     public static final String MODID = "farmers_future_delight";
     public static final String NAME = "Farmer's Future Delight";
-    public static final String VERSION = "1.2.4";
+    public static final String VERSION = "1.3.0";
 
     @Mod.Instance(MODID)
     public static FarmerFutureDelight instance;
@@ -44,6 +49,7 @@ public class FarmerFutureDelight {
     public void preInit(FMLPreInitializationEvent event) {
         FFDWorldTypes.register();
         FFDConfig.load(event.getSuggestedConfigurationFile());
+        FFDCustomRawOres.load(event.getSuggestedConfigurationFile().getParentFile());
         FMLCommonHandler.instance().bus().register(FFDAxolotlSpawner.class);
         FFDGameplayHooks.applyModernBlockProperties();
         FFDNetwork.init();
@@ -69,7 +75,14 @@ public class FarmerFutureDelight {
     }
 
     @Mod.EventHandler
+    public void loadComplete(FMLLoadCompleteEvent event) {
+        FFDRawOreOreDictionaryCompat.register();
+        FFDRawOreCompat.register();
+    }
+
+    @Mod.EventHandler
     public void serverStarting(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandLocateBiome());
+        event.registerServerCommand(new CommandRawOre());
     }
 }

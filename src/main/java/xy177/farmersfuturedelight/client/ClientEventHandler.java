@@ -44,11 +44,13 @@ import net.minecraftforge.fml.relauncher.Side;
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.client.model.WaterloggedPlantBakedModel;
 import xy177.farmersfuturedelight.client.model.SpyglassBakedModel;
+import xy177.farmersfuturedelight.client.model.CustomRawOreModelLoader;
 import xy177.farmersfuturedelight.client.sound.MovingSoundBee;
 import xy177.farmersfuturedelight.common.FFDConfig;
 import xy177.farmersfuturedelight.common.FFDPowderSnowEvents;
 import xy177.farmersfuturedelight.common.entity.EntityBee;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
+import xy177.farmersfuturedelight.common.registry.FFDCustomRawOres;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiome;
 import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiomeManager;
@@ -176,6 +178,37 @@ public final class ClientEventHandler {
         registerWaterColor(event, FFDBlocks.SMALL_AMETHYST_BUD,
                 FFDBlocks.MEDIUM_AMETHYST_BUD, FFDBlocks.LARGE_AMETHYST_BUD,
                 FFDBlocks.AMETHYST_CLUSTER);
+        ArrayList<net.minecraft.block.Block> customBlocks = new ArrayList<>();
+        for (FFDCustomRawOres.Entry entry : FFDCustomRawOres.entries()) {
+            if (entry.isBlockRegistered()) {
+                customBlocks.add(entry.block());
+            }
+        }
+        if (!customBlocks.isEmpty()) {
+            event.getBlockColors().registerBlockColorHandler((state, world, pos, tintIndex) -> {
+                FFDCustomRawOres.Entry entry = FFDCustomRawOres.find(state.getBlock());
+                return entry == null ? 0xFFFFFF
+                        : CustomRawOreModelLoader.INSTANCE.color(entry, true, tintIndex);
+            }, customBlocks.toArray(new net.minecraft.block.Block[0]));
+        }
+    }
+
+    @SubscribeEvent
+    public static void registerCustomRawOreItemColors(ColorHandlerEvent.Item event) {
+        ArrayList<net.minecraft.item.Item> customItems = new ArrayList<>();
+        for (FFDCustomRawOres.Entry entry : FFDCustomRawOres.entries()) {
+            if (entry.isRegistered()) {
+                customItems.add(entry.item());
+                customItems.add(entry.blockItem());
+            }
+        }
+        if (!customItems.isEmpty()) {
+            event.getItemColors().registerItemColorHandler((stack, tintIndex) -> {
+                FFDCustomRawOres.Entry entry = FFDCustomRawOres.find(stack.getItem());
+                return entry == null ? 0xFFFFFF : CustomRawOreModelLoader.INSTANCE.color(
+                        entry, stack.getItem() == entry.blockItem(), tintIndex);
+            }, customItems.toArray(new net.minecraft.item.Item[0]));
+        }
     }
 
     private static void registerWaterColor(ColorHandlerEvent.Block event,
