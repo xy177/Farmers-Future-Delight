@@ -1,0 +1,6 @@
+{
+  "parent": "block/cube_all",
+  "textures": {
+    "all": "farmers_future_delight:block/raw_mithril_block"
+  }
+}
