@@ -19,6 +19,8 @@ import xy177.farmersfuturedelight.common.registry.FFDEntities;
 import xy177.farmersfuturedelight.common.registry.FFDRecipes;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.registry.FFDCustomRawOres;
+import xy177.farmersfuturedelight.common.registry.FFDCustomDeepslateOres;
+import xy177.farmersfuturedelight.common.registry.FFDDeepslateOreCompat;
 import xy177.farmersfuturedelight.common.registry.FFDRawOreCompat;
 import xy177.farmersfuturedelight.common.registry.FFDRawOreOreDictionaryCompat;
 import xy177.farmersfuturedelight.common.registry.FFDTileEntities;
@@ -36,7 +38,7 @@ import xy177.farmersfuturedelight.proxy.CommonProxy;
 public class FarmerFutureDelight {
     public static final String MODID = "farmers_future_delight";
     public static final String NAME = "Farmer's Future Delight";
-    public static final String VERSION = "1.3.0";
+    public static final String VERSION = "1.3.1";
 
     @Mod.Instance(MODID)
     public static FarmerFutureDelight instance;
@@ -50,6 +52,7 @@ public class FarmerFutureDelight {
         FFDWorldTypes.register();
         FFDConfig.load(event.getSuggestedConfigurationFile());
         FFDCustomRawOres.load(event.getSuggestedConfigurationFile().getParentFile());
+        FFDCustomDeepslateOres.load(event.getSuggestedConfigurationFile().getParentFile());
         FMLCommonHandler.instance().bus().register(FFDAxolotlSpawner.class);
         FFDGameplayHooks.applyModernBlockProperties();
         FFDNetwork.init();
@@ -77,6 +80,8 @@ public class FarmerFutureDelight {
     @Mod.EventHandler
     public void loadComplete(FMLLoadCompleteEvent event) {
         FFDRawOreOreDictionaryCompat.register();
+        FFDDeepslateOreCompat.registerOreDictionary();
+        FFDDeepslateOreCompat.registerRecipes();
         FFDRawOreCompat.register();
     }
 

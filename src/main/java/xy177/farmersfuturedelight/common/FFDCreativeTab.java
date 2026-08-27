@@ -10,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.registry.FFDCustomRawOres;
+import xy177.farmersfuturedelight.common.registry.FFDDeepslateOreCompat;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 
 public final class FFDCreativeTab extends CreativeTabs {
@@ -29,7 +30,41 @@ public final class FFDCreativeTab extends CreativeTabs {
     public void displayAllRelevantItems(NonNullList<ItemStack> items) {
         super.displayAllRelevantItems(items);
         items.removeIf(stack -> !FFDItems.shouldDisplayInCreativeTab(stack));
+        regroupDeepslateOres(items);
         regroupRawOres(items);
+    }
+
+    private static void regroupDeepslateOres(NonNullList<ItemStack> items) {
+        List<Item> order = new ArrayList<>();
+        order.add(FFDItems.COPPER_ORE);
+        order.add(FFDItems.DEEPSLATE_COAL_ORE);
+        order.add(FFDItems.DEEPSLATE_IRON_ORE);
+        order.add(FFDItems.DEEPSLATE_COPPER_ORE);
+        order.add(FFDItems.DEEPSLATE_GOLD_ORE);
+        order.add(FFDItems.DEEPSLATE_REDSTONE_ORE);
+        order.add(FFDItems.DEEPSLATE_LAPIS_ORE);
+        order.add(FFDItems.DEEPSLATE_DIAMOND_ORE);
+        order.add(FFDItems.DEEPSLATE_EMERALD_ORE);
+        order.addAll(FFDDeepslateOreCompat.items());
+
+        List<ItemStack> grouped = new ArrayList<>();
+        int firstIndex = -1;
+        for (Item item : order) {
+            for (int index = 0; index < items.size(); index++) {
+                if (items.get(index).getItem() == item) {
+                    if (firstIndex < 0 || index < firstIndex) {
+                        firstIndex = index;
+                    }
+                    grouped.add(items.get(index));
+                    break;
+                }
+            }
+        }
+        if (firstIndex < 0) {
+            return;
+        }
+        items.removeIf(stack -> order.contains(stack.getItem()));
+        items.addAll(firstIndex, grouped);
     }
 
     private static void regroupRawOres(NonNullList<ItemStack> items) {

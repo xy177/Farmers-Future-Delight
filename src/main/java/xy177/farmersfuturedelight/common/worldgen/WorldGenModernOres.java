@@ -7,6 +7,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import xy177.farmersfuturedelight.common.FFDConfig;
+import xy177.farmersfuturedelight.common.registry.FFDDeepslateOreCompat;
 import xy177.farmersfuturedelight.common.world.noise.FFDXoroshiroRandom;
 import xy177.farmersfuturedelight.common.world.terrain.FFDModernWorldgenData;
 
@@ -102,6 +103,12 @@ public final class WorldGenModernOres {
                     HeightRange.uniform(MIN_Y, 63), Vein.INFESTED, 9, 0.0F,
                     Filter.MOUNTAIN, access);
         }
+        if (stones.hasDeepBase()) {
+            for (FFDDeepslateOreCompat.Generation generation
+                    : FFDDeepslateOreCompat.generations()) {
+                placeCompatCount(chunkX, chunkZ, generation, access);
+            }
+        }
     }
 
     private void placeCount(int chunkX, int chunkZ, long salt, int count,
@@ -144,6 +151,101 @@ public final class WorldGenModernOres {
             int z = startZ + random.nextInt(16);
             if (filter == Filter.ANY || filter.matches(access.getBiome(x, z))) {
                 generateVein(x, y, z, scaledSize, vein, discardChance, access, random);
+            }
+        }
+    }
+
+    private void placeCompatCount(int chunkX, int chunkZ,
+                                  FFDDeepslateOreCompat.Generation generation, Access access) {
+        FFDXoroshiroRandom random = random(chunkX, chunkZ, generation.salt());
+        int count = generation.count();
+        int size = scaledSize(generation.size());
+        int startX = chunkX << 4;
+        int startZ = chunkZ << 4;
+        for (int attempt = 0; attempt < count; attempt++) {
+            int x = startX + random.nextInt(16);
+            int y = new HeightRange(generation.minY(), generation.maxY(),
+                    generation.trapezoid(), generation.plateau()).sample(random);
+            int z = startZ + random.nextInt(16);
+            generateCompatVein(x, y, z, size, generation.state(), MIN_Y,
+                    -1, generation.discardChance(), access, random);
+        }
+    }
+
+    private void generateCompatVein(int originX, int originY, int originZ, int size,
+                                    IBlockState replacement, int minimumY, int maximumY,
+                                    float discardChance, Access access,
+                                    FFDXoroshiroRandom random) {
+        int reach = maximumReach(size);
+        if (originX + reach < access.targetMinX() || originX - reach > access.targetMaxX()
+                || originZ + reach < access.targetMinZ() || originZ - reach > access.targetMaxZ()
+                || originY + reach < minimumY || originY - reach > maximumY) {
+            return;
+        }
+        float angle = random.nextFloat() * (float) Math.PI;
+        float horizontalRadius = size / 8.0F;
+        double startX = originX + Math.sin(angle) * horizontalRadius;
+        double endX = originX - Math.sin(angle) * horizontalRadius;
+        double startZ = originZ + Math.cos(angle) * horizontalRadius;
+        double endZ = originZ - Math.cos(angle) * horizontalRadius;
+        double startY = originY + random.nextInt(3) - 2;
+        double endY = originY + random.nextInt(3) - 2;
+        double[] spheres = new double[size * 4];
+        for (int index = 0; index < size; index++) {
+            float progress = index / (float) size;
+            double centerX = lerp(progress, startX, endX);
+            double centerY = lerp(progress, startY, endY);
+            double centerZ = lerp(progress, startZ, endZ);
+            double randomScale = random.nextDouble() * size / 16.0D;
+            double radius = ((Math.sin(Math.PI * progress) + 1.0D) * randomScale + 1.0D) / 2.0D;
+            int offset = index * 4;
+            spheres[offset] = centerX;
+            spheres[offset + 1] = centerY;
+            spheres[offset + 2] = centerZ;
+            spheres[offset + 3] = radius;
+        }
+        removeContainedSpheres(spheres, size);
+        for (int index = 0; index < size; index++) {
+            int offset = index * 4;
+            double radius = spheres[offset + 3];
+            if (radius < 0.0D) {
+                continue;
+            }
+            double centerX = spheres[offset];
+            double centerY = spheres[offset + 1];
+            double centerZ = spheres[offset + 2];
+            int minX = Math.max(access.targetMinX(), floor(centerX - radius));
+            int maxX = Math.min(access.targetMaxX(), floor(centerX + radius));
+            int minY = Math.max(minimumY, floor(centerY - radius));
+            int maxY = Math.min(maximumY, floor(centerY + radius));
+            int minZ = Math.max(access.targetMinZ(), floor(centerZ - radius));
+            int maxZ = Math.min(access.targetMaxZ(), floor(centerZ + radius));
+            for (int x = minX; x <= maxX; x++) {
+                double normalizedX = (x + 0.5D - centerX) / radius;
+                double xSquared = normalizedX * normalizedX;
+                if (xSquared >= 1.0D) {
+                    continue;
+                }
+                for (int y = minY; y <= maxY; y++) {
+                    double normalizedY = (y + 0.5D - centerY) / radius;
+                    double xySquared = xSquared + normalizedY * normalizedY;
+                    if (xySquared >= 1.0D) {
+                        continue;
+                    }
+                    for (int z = minZ; z <= maxZ; z++) {
+                        double normalizedZ = (z + 0.5D - centerZ) / radius;
+                        if (xySquared + normalizedZ * normalizedZ >= 1.0D) {
+                            continue;
+                        }
+                        IBlockState current = access.getState(x, y, z);
+                        if (stones.isDeepslateBase(current)
+                                && (discardChance <= 0.0F
+                                || random.nextFloat() >= discardChance
+                                || !isAdjacentToAir(access, x, y, z))) {
+                            access.setState(x, y, z, replacement);
+                        }
+                    }
+                }
             }
         }
     }
@@ -414,29 +516,30 @@ public final class WorldGenModernOres {
         private final int minimum;
         private final int maximum;
         private final boolean trapezoid;
+        private final int plateau;
 
-        private HeightRange(int minimum, int maximum, boolean trapezoid) {
+        private HeightRange(int minimum, int maximum, boolean trapezoid, int plateau) {
             this.minimum = minimum;
             this.maximum = maximum;
             this.trapezoid = trapezoid;
+            this.plateau = plateau;
         }
 
         static HeightRange uniform(int minimum, int maximum) {
-            return new HeightRange(minimum, maximum, false);
+            return new HeightRange(minimum, maximum, false, 0);
         }
 
         static HeightRange trapezoid(int minimum, int maximum) {
-            return new HeightRange(minimum, maximum, true);
+            return new HeightRange(minimum, maximum, true, 0);
         }
 
         int sample(FFDXoroshiroRandom random) {
             int range = maximum - minimum;
-            if (!trapezoid || range <= 0) {
+            if (!trapezoid || range <= 0 || plateau >= range) {
                 return minimum + (range <= 0 ? 0 : random.nextInt(range + 1));
             }
-            int lowerHalf = range / 2;
-            int upperHalf = range - lowerHalf;
-            return minimum + random.nextInt(upperHalf + 1) + random.nextInt(lowerHalf + 1);
+            int middle = (range - plateau) / 2;
+            return minimum + random.nextInt(range - middle + 1) + random.nextInt(middle + 1);
         }
     }
 }

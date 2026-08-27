@@ -760,9 +760,8 @@ public final class FFDCompat {
 
     private static ProviderSet netherWood(String name, String namespace, boolean crimson) {
         String prefix = crimson ? "crimson" : "warped";
-        String wart = crimson ? "nether_wart_block" : "warped_wart_block";
         return blocks(name, namespace, prefix + "_stem", "stripped_" + prefix + "_stem",
-                prefix + "_hyphae", "stripped_" + prefix + "_hyphae", wart,
+                prefix + "_hyphae", "stripped_" + prefix + "_hyphae",
                 prefix + "_planks", prefix + "_stairs", prefix + "_slab",
                 prefix + "_fence", prefix + "_fence_gate", prefix + "_door",
                 prefix + "_trapdoor", prefix + "_button", prefix + "_pressure_plate",
@@ -811,12 +810,9 @@ public final class FFDCompat {
 
     private static ProviderSet netherBackportWood(boolean crimson) {
         String prefix = crimson ? "crimson" : "warped";
-        String wart = crimson ? "crimson_wart" : "warped_wart";
         ContentVariant[] variants = {
                 variant(prefix + "_stem", "nb", prefix + "_stem", 0),
                 variant(prefix + "_hyphae", "nb", prefix + "_hyphae", 0),
-                variant(crimson ? "nether_wart_block" : "warped_wart_block",
-                        "nb", wart, 0),
                 variant(prefix + "_planks", "nb", prefix + "_planks", 0),
                 variant(prefix + "_stairs", "nb", prefix + "_stairs", 0),
                 variant(prefix + "_slab", "nb", prefix + "_slab_half", 0),

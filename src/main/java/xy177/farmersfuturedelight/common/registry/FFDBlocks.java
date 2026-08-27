@@ -329,8 +329,6 @@ public final class FFDBlocks {
     public static final BlockNetherStem STRIPPED_WARPED_STEM = new BlockNetherStem("stripped_warped_stem");
     public static final BlockNetherStem WARPED_HYPHAE = new BlockNetherStem("warped_hyphae");
     public static final BlockNetherStem STRIPPED_WARPED_HYPHAE = new BlockNetherStem("stripped_warped_hyphae");
-    public static final BlockNetherBlock NETHER_WART_BLOCK = new BlockNetherBlock("nether_wart_block",
-            net.minecraft.block.material.Material.GRASS, FFDSounds.WART_BLOCK, 1.0F);
     public static final BlockNetherBlock WARPED_WART_BLOCK = new BlockNetherBlock("warped_wart_block",
             net.minecraft.block.material.Material.GRASS, FFDSounds.WART_BLOCK, 1.0F);
     public static final BlockNetherBlock SHROOMLIGHT = new BlockNetherBlock("shroomlight",

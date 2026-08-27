@@ -41,6 +41,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
 
 import xy177.farmersfuturedelight.FarmerFutureDelight;
+import xy177.farmersfuturedelight.common.FFDCreativeTab;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 
@@ -81,6 +82,7 @@ public class BlockGlowLichen extends Block implements IGrowable {
         setSoundType(SoundType.PLANT);
         setLightOpacity(0);
         setLightLevel(7.0F / 15.0F);
+        setCreativeTab(FFDCreativeTab.INSTANCE);
         setDefaultState(blockState.getBaseState()
                 .withProperty(BlockLiquid.LEVEL, 0)
                 .withProperty(DOWN, false)

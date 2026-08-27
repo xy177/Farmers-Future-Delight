@@ -303,7 +303,6 @@ public final class FFDItems {
     public static final Item STRIPPED_WARPED_STEM = blockItem(FFDBlocks.STRIPPED_WARPED_STEM);
     public static final Item WARPED_HYPHAE = blockItem(FFDBlocks.WARPED_HYPHAE);
     public static final Item STRIPPED_WARPED_HYPHAE = blockItem(FFDBlocks.STRIPPED_WARPED_HYPHAE);
-    public static final Item NETHER_WART_BLOCK = blockItem(FFDBlocks.NETHER_WART_BLOCK);
     public static final Item WARPED_WART_BLOCK = blockItem(FFDBlocks.WARPED_WART_BLOCK);
     public static final Item SHROOMLIGHT = blockItem(FFDBlocks.SHROOMLIGHT);
     public static final Item CRIMSON_PLANKS = blockItem(FFDBlocks.CRIMSON_PLANKS);
@@ -885,7 +884,7 @@ public final class FFDItems {
     private static boolean isCrimsonWoodBlock(Block block) {
         return oneOf(block, FFDBlocks.CRIMSON_STEM, FFDBlocks.STRIPPED_CRIMSON_STEM,
                 FFDBlocks.CRIMSON_HYPHAE, FFDBlocks.STRIPPED_CRIMSON_HYPHAE,
-                FFDBlocks.NETHER_WART_BLOCK, FFDBlocks.CRIMSON_PLANKS,
+                FFDBlocks.CRIMSON_PLANKS,
                 FFDBlocks.CRIMSON_STAIRS, FFDBlocks.CRIMSON_SLAB,
                 FFDBlocks.CRIMSON_DOUBLE_SLAB, FFDBlocks.CRIMSON_FENCE,
                 FFDBlocks.CRIMSON_FENCE_GATE, FFDBlocks.CRIMSON_DOOR,

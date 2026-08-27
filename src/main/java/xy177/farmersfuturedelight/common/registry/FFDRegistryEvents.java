@@ -106,6 +106,8 @@ public final class FFDRegistryEvents {
         blocks.add(FFDBlocks.POWDER_SNOW_CAULDRON);
         if (FFDItems.isDeepslateEnabled()) {
             addDeepslateBlocks(blocks);
+            FFDDeepslateOreCompat.prepare(event.getRegistry());
+            blocks.addAll(FFDDeepslateOreCompat.blocks());
         }
         if (FFDItems.isRawOreEnabled()) {
             addRawOreBlocks(blocks, false);
@@ -175,7 +177,6 @@ public final class FFDRegistryEvents {
             blocks.add(FFDBlocks.STRIPPED_CRIMSON_STEM);
             blocks.add(FFDBlocks.CRIMSON_HYPHAE);
             blocks.add(FFDBlocks.STRIPPED_CRIMSON_HYPHAE);
-            blocks.add(FFDBlocks.NETHER_WART_BLOCK);
             blocks.add(FFDBlocks.CRIMSON_PLANKS);
             blocks.add(FFDBlocks.CRIMSON_STAIRS);
             blocks.add(FFDBlocks.CRIMSON_SLAB);
@@ -221,6 +222,17 @@ public final class FFDRegistryEvents {
     @SubscribeEvent
     public static void remapRawOreBlocks(
             RegistryEvent.MissingMappings<net.minecraft.block.Block> event) {
+        for (RegistryEvent.MissingMappings.Mapping<net.minecraft.block.Block> mapping
+                : event.getAllMappings()) {
+            if (isLegacyNetherWartBlock(mapping.key)) {
+                mapping.remap(net.minecraft.init.Blocks.NETHER_WART_BLOCK);
+                continue;
+            }
+            net.minecraft.block.Block legacyDeepslate = FFDDeepslateOreCompat.legacyBlock(mapping.key);
+            if (legacyDeepslate != null) {
+                mapping.remap(legacyDeepslate);
+            }
+        }
         if (Loader.isModLoaded("suikerawore")) {
             return;
         }
@@ -236,6 +248,17 @@ public final class FFDRegistryEvents {
     @SubscribeEvent
     public static void remapRawOreItems(
             RegistryEvent.MissingMappings<net.minecraft.item.Item> event) {
+        for (RegistryEvent.MissingMappings.Mapping<net.minecraft.item.Item> mapping : event.getAllMappings()) {
+            if (isLegacyNetherWartBlock(mapping.key)) {
+                mapping.remap(net.minecraft.item.Item.getItemFromBlock(
+                        net.minecraft.init.Blocks.NETHER_WART_BLOCK));
+                continue;
+            }
+            net.minecraft.item.Item legacyDeepslate = FFDDeepslateOreCompat.legacyItem(mapping.key);
+            if (legacyDeepslate != null) {
+                mapping.remap(legacyDeepslate);
+            }
+        }
         if (Loader.isModLoaded("suikerawore")) {
             return;
         }
@@ -266,6 +289,11 @@ public final class FFDRegistryEvents {
             }
         }
         return -1;
+    }
+
+    private static boolean isLegacyNetherWartBlock(ResourceLocation key) {
+        return key != null && FarmerFutureDelight.MODID.equals(key.getResourceDomain())
+                && "nether_wart_block".equals(key.getResourcePath());
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -435,6 +463,7 @@ public final class FFDRegistryEvents {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void registerItems(RegistryEvent.Register<net.minecraft.item.Item> event) {
         FFDRawOreOreDictionaryCompat.register();
+        FFDDeepslateOreCompat.registerItems();
         List<net.minecraft.item.Item> items = new ArrayList<>();
         if (FFDItems.isSweetBerryEnabled()) {
             items.add(FFDItems.SWEET_BERRIES);
@@ -533,6 +562,7 @@ public final class FFDRegistryEvents {
         }
         if (FFDItems.isDeepslateEnabled()) {
             addDeepslateItems(items);
+            items.addAll(FFDDeepslateOreCompat.items());
         }
         if (FFDItems.isRawOreEnabled()) {
             addRawOreItems(items, false);
@@ -582,7 +612,6 @@ public final class FFDRegistryEvents {
             items.add(FFDItems.STRIPPED_CRIMSON_STEM);
             items.add(FFDItems.CRIMSON_HYPHAE);
             items.add(FFDItems.STRIPPED_CRIMSON_HYPHAE);
-            items.add(FFDItems.NETHER_WART_BLOCK);
             items.add(FFDItems.CRIMSON_PLANKS);
             items.add(FFDItems.CRIMSON_STAIRS);
             items.add(FFDItems.CRIMSON_SLAB);
@@ -620,6 +649,7 @@ public final class FFDRegistryEvents {
         }
         items.removeIf(item -> !FFDItems.shouldRegisterItem(item));
         event.getRegistry().registerAll(items.toArray(new net.minecraft.item.Item[0]));
+        FFDDeepslateOreCompat.registerOreDictionary();
         if (FFDItems.isSweetBerryEnabled()) {
             registerOre("seedSweetBerry", FFDItems.SWEET_BERRIES);
             registerOre("cropSweetBerry", FFDItems.SWEET_BERRIES);

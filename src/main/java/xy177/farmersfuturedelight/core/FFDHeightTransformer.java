@@ -2324,8 +2324,36 @@ public final class FFDHeightTransformer implements IClassTransformer {
         }
         require(create != null, "Missing optimized section-manager factory");
         int rangesPatched = 0;
+        int rangeCallsPatched = 0;
         for (AbstractInsnNode instruction = create.instructions.getFirst(); instruction != null;
                 instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)
+                    || instruction.getOpcode() != Opcodes.INVOKESTATIC) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (!"com/dhj/actinium/compat/depthsupdate/DepthsUpdateCompat".equals(call.owner)
+                    || !"(Lnet/minecraft/world/World;)I".equals(call.desc)) {
+                continue;
+            }
+            if ("getMinSection".equals(call.name)) {
+                call.owner = HOOKS;
+                call.name = "minSectionY";
+                rangeCallsPatched++;
+            } else if ("getMaxSection".equals(call.name)) {
+                call.owner = HOOKS;
+                call.name = "maxSectionYExclusive";
+                rangeCallsPatched++;
+            }
+        }
+        require(rangeCallsPatched == 0 || rangeCallsPatched == 2,
+                "Expected both optimized renderer section-range calls, patched "
+                        + rangeCallsPatched);
+        if (rangeCallsPatched == 2) {
+            rangesPatched = 1;
+        }
+        for (AbstractInsnNode instruction = create.instructions.getFirst();
+                rangesPatched == 0 && instruction != null; instruction = instruction.getNext()) {
             if (!(instruction instanceof MethodInsnNode)
                     || instruction.getOpcode() != Opcodes.INVOKESPECIAL) {
                 continue;
@@ -2399,6 +2427,21 @@ public final class FFDHeightTransformer implements IClassTransformer {
         for (AbstractInsnNode instruction = prepare.instructions.getFirst(); instruction != null;
                 instruction = instruction.getNext()) {
             if (!(instruction instanceof MethodInsnNode)
+                    || instruction.getOpcode() != Opcodes.INVOKESTATIC) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if ("com/dhj/actinium/compat/depthsupdate/DepthsUpdateCompat".equals(call.owner)
+                    && "toStorageIndex".equals(call.name)
+                    && "(Lnet/minecraft/world/World;I)I".equals(call.desc)) {
+                call.owner = HOOKS;
+                call.name = "storageIndexForSectionY";
+                patched++;
+            }
+        }
+        for (AbstractInsnNode instruction = prepare.instructions.getFirst();
+                patched == 0 && instruction != null; instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)
                     || !"y".equals(((MethodInsnNode) instruction).name)
                     || !"()I".equals(((MethodInsnNode) instruction).desc)) {
                 continue;
@@ -2466,11 +2509,23 @@ public final class FFDHeightTransformer implements IClassTransformer {
 
     private static byte[] transformOptimizedClonedSection(byte[] basicClass) {
         ClassNode node = read(basicClass);
-        MethodNode method = findMethod(node, "getChunkSection", "getChunkSection",
-                "(Lnet/minecraft/world/chunk/Chunk;I)Lnet/minecraft/world/chunk/storage/ExtendedBlockStorage;");
+        String legacyDescriptor = "(Lnet/minecraft/world/chunk/Chunk;I)"
+                + "Lnet/minecraft/world/chunk/storage/ExtendedBlockStorage;";
+        MethodNode method = findMethodOptional(node, "getChunkSection", "getChunkSection",
+                legacyDescriptor);
+        int chunkLocal = 0;
+        int sectionLocal = 1;
+        if (method == null) {
+            method = findMethodOptional(node, "getChunkSection", "getChunkSection",
+                    "(Lnet/minecraft/world/World;Lnet/minecraft/world/chunk/Chunk;I)"
+                            + "Lnet/minecraft/world/chunk/storage/ExtendedBlockStorage;");
+            chunkLocal = 1;
+            sectionLocal = 2;
+        }
+        require(method != null, "Missing optimized cloned-section storage method");
         replace(method, list(
-                new VarInsnNode(Opcodes.ALOAD, 0),
-                new VarInsnNode(Opcodes.ILOAD, 1),
+                new VarInsnNode(Opcodes.ALOAD, chunkLocal),
+                new VarInsnNode(Opcodes.ILOAD, sectionLocal),
                 new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "getStorageForSectionY",
                         "(Lnet/minecraft/world/chunk/Chunk;I)Lnet/minecraft/world/chunk/storage/ExtendedBlockStorage;",
                         false),

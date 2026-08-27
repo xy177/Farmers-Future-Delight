@@ -47,7 +47,7 @@ public final class FFDConfig {
     private static final String CATEGORY_DEBUG = "debug";
     private static final String CATEGORY_INTERNAL = "internal";
     private static final String CATEGORY_COMPATIBILITY = "compatibility";
-    private static final int CURRENT_CONFIG_VERSION = 7;
+    private static final int CURRENT_CONFIG_VERSION = 8;
 
     public static FeatureMode sweetBerryMode;
     public static FeatureMode honeyMode;
@@ -74,6 +74,8 @@ public final class FFDConfig {
     public static FeatureMode othersideMode;
     public static FeatureMode amethystMode;
     public static FeatureMode deepslateMode;
+    public static String[] deepslateCompatToggles;
+    public static String[] deepslateCompatGenerationToggles;
     public static FeatureMode rawOreMode;
     public static String[] rawOreMaterialToggles;
     public static FeatureMode copperMode;
@@ -398,6 +400,39 @@ public final class FFDConfig {
         othersideMode = readMode(config, "othersideMode", "《otherside》音乐唱片内容开关");
         amethystMode = readMode(config, "amethystMode", "紫水晶与紫水晶晶洞内容开关");
         deepslateMode = readMode(config, "deepslateMode", "深板岩、凝灰岩与深层矿石内容开关");
+        deepslateCompatToggles = config.getStringList(
+                "deepslateCompatToggles", CATEGORY_FEATURES,
+                new String[]{"mekanism:osmium=true", "mekanism:tin=true",
+                        "mekanism:lead=true", "mekanism:uranium=true",
+                        "thermalfoundation:tin=true", "thermalfoundation:silver=true",
+                        "thermalfoundation:lead=true", "thermalfoundation:nickel=true",
+                        "immersiveengineering:aluminium=true", "immersiveengineering:lead=true",
+                        "immersiveengineering:silver=true", "immersiveengineering:nickel=true",
+                        "immersiveengineering:uranium=true", "techreborn:aluminium=true",
+                        "techreborn:iridium=true", "techreborn:lead=true",
+                        "techreborn:silver=true", "techreborn:tin=true",
+                        "simpleores:tin=true", "simpleores:mythril=true",
+                        "simpleores:adamantium=true"},
+                "逐个控制来源模组深层矿石兼容。格式为模组ID:材质=true或false；相同材质最终共用一个深层矿石对象；默认开启已确认的兼容对象，修改后需重启游戏。");
+        deepslateCompatGenerationToggles = config.getStringList(
+                "deepslateCompatGenerationToggles", CATEGORY_WORLDGEN,
+                new String[]{"mekanism:osmium=4,8,-64,-1,uniform,0.0", "mekanism:tin=4,6,-64,-1,uniform,0.0",
+                        "mekanism:lead=8,9,-88,64,trapezoid,0.25,0",
+                        "mekanism:uranium#small=4,4,-64,8,trapezoid,0.0,0",
+                        "mekanism:uranium#buried=7,9,-88,-8,trapezoid,0.75,16",
+                        "thermalfoundation:tin=6,8,-64,-1,uniform,0.0", "thermalfoundation:silver=4,8,-64,-1,uniform,0.0",
+                        "thermalfoundation:lead=6,8,-64,-1,uniform,0.0", "thermalfoundation:nickel=4,8,-64,-1,uniform,0.0",
+                        "immersiveengineering:aluminium=6,8,-64,-1,uniform,0.0", "immersiveengineering:lead=6,8,-64,-1,uniform,0.0",
+                        "immersiveengineering:silver=5,8,-64,-1,uniform,0.0", "immersiveengineering:nickel=4,6,-64,-1,uniform,0.0",
+                        "immersiveengineering:uranium=5,6,-64,-1,uniform,0.0", "techreborn:aluminium=4,6,-64,-1,uniform,0.0",
+                        "techreborn:iridium=2,3,-64,-1,uniform,0.0", "techreborn:lead=5,6,-64,-1,uniform,0.0",
+                        "techreborn:silver=5,6,-64,-1,uniform,0.0", "techreborn:tin=6,8,-64,-1,uniform,0.0",
+                        "simpleores:tin#intrusion=0,7,0,72,uniform,0.0",
+                        "simpleores:mythril#deposit=8,4,-63,32,trapezoid,0.0",
+                        "simpleores:mythril#intrusion=4,4,-64,35,uniform,0.0",
+                        "simpleores:adamantium#deposit=4,4,-63,-16,trapezoid,0.0",
+                        "simpleores:adamantium#intrusion=4,4,-64,20,uniform,0.0"},
+                "逐个控制来源模组深层矿石生成次数、矿脉大小和分布。格式为模组ID:材质=次数,大小；也可写为次数,大小,最低高度,最高高度,uniform或trapezoid,空气暴露跳过概率；梯形分布还可在末尾填写平顶宽度；相同材质的来源规则会生成到同一个深层矿石对象；修改后需重启游戏。");
         rawOreMode = readMode(config, "rawOreMode", "粗铁、粗金及对应粗矿块内容开关");
         rawOreMaterialToggles = config.getStringList(
                 "rawOreMaterialToggles", CATEGORY_FEATURES, defaultRawOreMaterialToggles(),
@@ -1107,6 +1142,12 @@ public final class FFDConfig {
         if ("rawOreMaterialToggles".equals(key)) {
             return "Per-material raw-ore toggles in material=true or material=false form. Each entry controls that raw material, its storage block, ore-drop replacement, and compatibility recipes. Missing materials default to true. Restart required.";
         }
+        if ("deepslateCompatToggles".equals(key)) {
+            return "Per-source deep-ore compatibility toggles in modid:material=true or modid:material=false form. Sources for the same material share one deep-ore object. Missing entries default to true for the built-in compatibility list. Restart required.";
+        }
+        if ("deepslateCompatGenerationToggles".equals(key)) {
+            return "Per-source deep-ore generation settings. Use modid:material=count,size or modid:material=count,size,minY,maxY,uniform|trapezoid,discardChance[,plateau]. Sources for the same material place into one shared deep-ore object. Plateau is optional and only affects trapezoid distributions. Missing entries use the built-in defaults. Restart required.";
+        }
         if (CATEGORY_FEATURES.equals(category)) {
             return "Feature mode for " + humanizeKey(key.replace("Mode", ""))
                     + ". ENABLED is the default and uses this mod's implementation; DISABLED turns it off; AUTO resolves each compatible content unit independently and fills only missing units locally.";
@@ -1467,6 +1508,148 @@ public final class FFDConfig {
         }
         Boolean enabled = rawOreMaterialStates.get(material.trim().toLowerCase(Locale.ROOT));
         return enabled == null || enabled;
+    }
+
+    public static boolean isDeepslateCompatEnabled(String key) {
+        if (key == null) {
+            return true;
+        }
+        if (deepslateCompatToggles == null) {
+            return true;
+        }
+        String normalized = key.trim().toLowerCase(Locale.ROOT);
+        for (String entry : deepslateCompatToggles) {
+            if (entry == null) {
+                continue;
+            }
+            int separator = entry.indexOf('=');
+            if (separator <= 0 || separator >= entry.length() - 1) {
+                continue;
+            }
+            if (normalized.equals(entry.substring(0, separator).trim().toLowerCase(Locale.ROOT))) {
+                return Boolean.parseBoolean(entry.substring(separator + 1).trim());
+            }
+        }
+        return true;
+    }
+
+    public static DeepslateGeneration deepslateCompatGeneration(String key, int defaultCount,
+                                                                int defaultSize, int defaultMinY,
+                                                                int defaultMaxY, boolean defaultTrapezoid,
+                                                                float defaultDiscardChance,
+                                                                int defaultPlateau) {
+        DeepslateGeneration result = new DeepslateGeneration(defaultCount, defaultSize,
+                defaultMinY, defaultMaxY, defaultTrapezoid, defaultDiscardChance,
+                defaultPlateau);
+        if (key == null || deepslateCompatGenerationToggles == null) {
+            return result;
+        }
+        String normalized = key.trim().toLowerCase(Locale.ROOT);
+        for (String entry : deepslateCompatGenerationToggles) {
+            if (entry == null) {
+                continue;
+            }
+            int separator = entry.indexOf('=');
+            if (separator <= 0 || separator >= entry.length() - 1
+                    || !normalized.equals(entry.substring(0, separator).trim().toLowerCase(Locale.ROOT))) {
+                continue;
+            }
+            String[] values = entry.substring(separator + 1).split(",");
+            if (values.length != 2 && values.length != 5
+                    && values.length != 6 && values.length != 7) {
+                return result;
+            }
+            try {
+                int count = Integer.parseInt(values[0].trim());
+                int size = Integer.parseInt(values[1].trim());
+                if (count >= 0 && count <= 1000 && size >= 1 && size <= 64) {
+                    int minY = defaultMinY;
+                    int maxY = defaultMaxY;
+                    boolean trapezoid = defaultTrapezoid;
+                    float discardChance = defaultDiscardChance;
+                    int plateau = defaultPlateau;
+                    if (values.length >= 5) {
+                        minY = Integer.parseInt(values[2].trim());
+                        maxY = Integer.parseInt(values[3].trim());
+                        String distribution = values[4].trim().toLowerCase(Locale.ROOT);
+                        if ("uniform".equals(distribution)) {
+                            trapezoid = false;
+                        } else if ("trapezoid".equals(distribution)) {
+                            trapezoid = true;
+                        } else {
+                            return result;
+                        }
+                    }
+                    if (values.length >= 6) {
+                        discardChance = Float.parseFloat(values[5].trim());
+                    }
+                    if (values.length == 7) {
+                        plateau = Integer.parseInt(values[6].trim());
+                    }
+                    if (minY < -320 || maxY > 319 || minY > maxY
+                            || Float.isNaN(discardChance) || Float.isInfinite(discardChance)
+                            || discardChance < 0.0F || discardChance > 1.0F
+                            || plateau < 0 || !trapezoid && plateau != 0) {
+                        return result;
+                    }
+                    return new DeepslateGeneration(count, size, minY, maxY,
+                            trapezoid, discardChance, plateau);
+                }
+            } catch (NumberFormatException ignored) {
+                return result;
+            }
+            return result;
+        }
+        return result;
+    }
+
+    public static final class DeepslateGeneration {
+        private final int count;
+        private final int size;
+        private final int minY;
+        private final int maxY;
+        private final boolean trapezoid;
+        private final float discardChance;
+        private final int plateau;
+
+        public DeepslateGeneration(int count, int size, int minY, int maxY,
+                                   boolean trapezoid, float discardChance, int plateau) {
+            this.count = count;
+            this.size = size;
+            this.minY = minY;
+            this.maxY = maxY;
+            this.trapezoid = trapezoid;
+            this.discardChance = discardChance;
+            this.plateau = plateau;
+        }
+
+        public int count() {
+            return count;
+        }
+
+        public int size() {
+            return size;
+        }
+
+        public int minY() {
+            return minY;
+        }
+
+        public int maxY() {
+            return maxY;
+        }
+
+        public boolean trapezoid() {
+            return trapezoid;
+        }
+
+        public float discardChance() {
+            return discardChance;
+        }
+
+        public int plateau() {
+            return plateau;
+        }
     }
 
     private static String[] defaultRawOreMaterialToggles() {

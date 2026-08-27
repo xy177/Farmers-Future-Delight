@@ -189,6 +189,10 @@ public final class FFDModernStoneProvider {
         return false;
     }
 
+    public boolean isDeepslateBase(IBlockState state) {
+        return deepslate != null && state.getBlock() == deepslate.getBlock();
+    }
+
     private IBlockState deepCopperOre(boolean localDeepslate, boolean localCopper) {
         if (normalCopperOre == null) {
             return null;

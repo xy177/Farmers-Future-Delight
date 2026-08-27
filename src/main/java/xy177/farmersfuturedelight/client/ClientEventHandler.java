@@ -45,12 +45,15 @@ import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.client.model.WaterloggedPlantBakedModel;
 import xy177.farmersfuturedelight.client.model.SpyglassBakedModel;
 import xy177.farmersfuturedelight.client.model.CustomRawOreModelLoader;
+import xy177.farmersfuturedelight.client.model.CustomDeepslateOreModelLoader;
 import xy177.farmersfuturedelight.client.sound.MovingSoundBee;
 import xy177.farmersfuturedelight.common.FFDConfig;
 import xy177.farmersfuturedelight.common.FFDPowderSnowEvents;
 import xy177.farmersfuturedelight.common.entity.EntityBee;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDCustomRawOres;
+import xy177.farmersfuturedelight.common.registry.FFDCustomDeepslateOres;
+import xy177.farmersfuturedelight.common.registry.FFDDeepslateOreCompat;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiome;
 import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiomeManager;
@@ -191,6 +194,20 @@ public final class ClientEventHandler {
                         : CustomRawOreModelLoader.INSTANCE.color(entry, true, tintIndex);
             }, customBlocks.toArray(new net.minecraft.block.Block[0]));
         }
+        ArrayList<net.minecraft.block.Block> compatDeepslateOres = new ArrayList<>();
+        for (FFDDeepslateOreCompat.EntryView entry : FFDDeepslateOreCompat.clientEntries()) {
+            compatDeepslateOres.add(entry.block());
+        }
+        if (!compatDeepslateOres.isEmpty()) {
+            event.getBlockColors().registerBlockColorHandler((state, world, pos, tintIndex) -> {
+                        FFDCustomDeepslateOres.Entry custom =
+                                FFDCustomDeepslateOres.find(state.getBlock());
+                        return custom == null
+                                ? FFDDeepslateOreCompat.color(state.getBlock(), tintIndex)
+                                : CustomDeepslateOreModelLoader.INSTANCE.color(custom, tintIndex);
+                    },
+                    compatDeepslateOres.toArray(new net.minecraft.block.Block[0]));
+        }
     }
 
     @SubscribeEvent
@@ -208,6 +225,20 @@ public final class ClientEventHandler {
                 return entry == null ? 0xFFFFFF : CustomRawOreModelLoader.INSTANCE.color(
                         entry, stack.getItem() == entry.blockItem(), tintIndex);
             }, customItems.toArray(new net.minecraft.item.Item[0]));
+        }
+        ArrayList<net.minecraft.item.Item> compatDeepslateOres = new ArrayList<>();
+        for (FFDDeepslateOreCompat.EntryView entry : FFDDeepslateOreCompat.clientEntries()) {
+            compatDeepslateOres.add(entry.item());
+        }
+        if (!compatDeepslateOres.isEmpty()) {
+            event.getItemColors().registerItemColorHandler((stack, tintIndex) -> {
+                        FFDCustomDeepslateOres.Entry custom =
+                                FFDCustomDeepslateOres.find(stack.getItem());
+                        return custom == null
+                                ? FFDDeepslateOreCompat.color(stack.getItem(), tintIndex)
+                                : CustomDeepslateOreModelLoader.INSTANCE.color(custom, tintIndex);
+                    },
+                    compatDeepslateOres.toArray(new net.minecraft.item.Item[0]));
         }
     }
 

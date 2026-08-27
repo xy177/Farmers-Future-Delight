@@ -432,6 +432,10 @@ public final class FFDHeightHooks {
         return storageIndex(sectionY << 4, world);
     }
 
+    public static int storageIndexForSectionY(World world, int sectionY) {
+        return storageIndexForSectionY(sectionY, world);
+    }
+
     public static int realisticPhysicsSectionIndex(World world, int sectionY) {
         return usesExtendedHeight(world) ? sectionY - (MIN_Y >> 4) : sectionY;
     }

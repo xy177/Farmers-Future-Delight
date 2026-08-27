@@ -2,6 +2,7 @@ package xy177.farmersfuturedelight.common.worldgen;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import xy177.farmersfuturedelight.common.FFDCompat;
 import xy177.farmersfuturedelight.common.FFDConfig;
@@ -55,9 +56,7 @@ public final class FFDNetherBlockProvider {
                 FFDBlocks.CRIMSON_STEM, "crimson_stem");
         warpedStem = resolve(FFDConfig.warpedWoodMode, FFDCompat.Feature.WARPED_WOOD,
                 FFDBlocks.WARPED_STEM, "warped_stem");
-        netherWartBlock = resolve(FFDConfig.crimsonWoodMode,
-                FFDCompat.Feature.CRIMSON_WOOD, FFDBlocks.NETHER_WART_BLOCK,
-                "nether_wart_block");
+        netherWartBlock = Blocks.NETHER_WART_BLOCK.getDefaultState();
         warpedWartBlock = resolve(FFDConfig.warpedWoodMode,
                 FFDCompat.Feature.WARPED_WOOD, FFDBlocks.WARPED_WART_BLOCK,
                 "warped_wart_block");

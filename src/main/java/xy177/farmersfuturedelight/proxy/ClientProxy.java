@@ -28,6 +28,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.client.particle.ParticleGlowSquid;
 import xy177.farmersfuturedelight.client.model.CustomRawOreModelLoader;
+import xy177.farmersfuturedelight.client.model.CustomDeepslateOreModelLoader;
 import xy177.farmersfuturedelight.client.particle.ParticleDripstone;
 import xy177.farmersfuturedelight.client.particle.ParticleFallingNectar;
 import xy177.farmersfuturedelight.client.particle.ParticleHoneyDrip;
@@ -59,6 +60,9 @@ import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDCustomRawOres;
 import xy177.farmersfuturedelight.common.registry.FFDEntities;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
+import xy177.farmersfuturedelight.common.registry.FFDDeepslateOreCompat;
+import xy177.farmersfuturedelight.client.FFDDeepslateOreCompatClient;
+import xy177.farmersfuturedelight.client.AquaAcrobaticsWaterCompat;
 import xy177.farmersfuturedelight.common.registry.FFDRawOres;
 import xy177.farmersfuturedelight.common.item.ItemGoatHorn;
 import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiomeManager;
@@ -272,7 +276,6 @@ public class ClientProxy extends CommonProxy {
             registerModel(FFDItems.STRIPPED_CRIMSON_STEM, "stripped_crimson_stem");
             registerModel(FFDItems.CRIMSON_HYPHAE, "crimson_hyphae");
             registerModel(FFDItems.STRIPPED_CRIMSON_HYPHAE, "stripped_crimson_hyphae");
-            registerModel(FFDItems.NETHER_WART_BLOCK, "nether_wart_block");
             registerModel(FFDItems.CRIMSON_PLANKS, "crimson_planks");
             registerModel(FFDItems.CRIMSON_STAIRS, "crimson_stairs");
             registerModel(FFDItems.CRIMSON_SLAB, "crimson_slab");
@@ -341,6 +344,7 @@ public class ClientProxy extends CommonProxy {
         registerStateMapper(FFDBlocks.BIG_DRIPLEAF_WATERLOGGED,
                 new StateMap.Builder().ignore(BlockLiquid.LEVEL).build());
         registerCustomRawOreModels();
+        FFDDeepslateOreCompatClient.registerModels();
     }
 
     private static void registerModel(net.minecraft.item.Item item, String name) {
@@ -407,6 +411,7 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void preInit() {
         ModelLoaderRegistry.registerLoader(CustomRawOreModelLoader.INSTANCE);
+        ModelLoaderRegistry.registerLoader(CustomDeepslateOreModelLoader.INSTANCE);
         RenderingRegistry.registerEntityRenderingHandler(EntityGlowSquid.class, RenderGlowSquid::new);
         RenderingRegistry.registerEntityRenderingHandler(EntityTurtle.class, RenderTurtle::new);
         RenderingRegistry.registerEntityRenderingHandler(EntityAxolotl.class, RenderAxolotl::new);
@@ -422,6 +427,7 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void init() {
+        AquaAcrobaticsWaterCompat.registerBiomeColors();
     }
 
     @Override

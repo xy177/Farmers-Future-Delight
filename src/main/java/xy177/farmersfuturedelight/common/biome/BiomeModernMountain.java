@@ -9,6 +9,7 @@ import xy177.farmersfuturedelight.FarmerFutureDelight;
 
 public final class BiomeModernMountain extends Biome {
     private final int skyColor;
+    private final int modernWaterColor;
 
     public BiomeModernMountain(String registryName, String displayName,
                                float temperature, float rainfall,
@@ -16,6 +17,7 @@ public final class BiomeModernMountain extends Biome {
                                SpawnProfile spawnProfile) {
         super(properties(displayName, temperature, rainfall, waterColor, snow));
         this.skyColor = skyColor;
+        this.modernWaterColor = waterColor;
         setRegistryName(FarmerFutureDelight.MODID, registryName);
         configureCreatureSpawns(spawnProfile);
     }
@@ -26,10 +28,14 @@ public final class BiomeModernMountain extends Biome {
         BiomeProperties properties = new BiomeProperties(name)
                 .setTemperature(temperature)
                 .setRainfall(rainfall)
-                .setWaterColor(waterColor)
+                .setWaterColor(0xFFFFFF)
                 .setBaseHeight(0.1F)
                 .setHeightVariation(0.2F);
         return snow ? properties.setSnowEnabled() : properties;
+    }
+
+    public int getModernWaterColor() {
+        return modernWaterColor;
     }
 
     private void configureCreatureSpawns(SpawnProfile profile) {

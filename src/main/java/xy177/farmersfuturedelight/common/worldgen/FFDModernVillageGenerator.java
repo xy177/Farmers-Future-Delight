@@ -42,6 +42,7 @@ public final class FFDModernVillageGenerator extends MapGenVillage {
 
     @Override
     public BlockPos getNearestStructurePos(World worldIn, BlockPos pos, boolean findUnexplored) {
+        this.world = worldIn;
         return findNearestStructurePosBySpacing(worldIn, this, pos, spacing(), SEPARATION,
                 SALT, false, 100, findUnexplored);
     }
