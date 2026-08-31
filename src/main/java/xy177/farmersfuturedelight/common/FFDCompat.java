@@ -1,5 +1,6 @@
 package xy177.farmersfuturedelight.common;
 
+import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -10,6 +11,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.oredict.OreDictionary;
@@ -31,6 +33,10 @@ public final class FFDCompat {
             new ResourceLocation("nb", "crimson_forest");
     private static final ResourceLocation NB_WARPED_FOREST =
             new ResourceLocation("nb", "warped_forest");
+    private static final ResourceLocation NETHERIZED_CRIMSON_FOREST =
+            new ResourceLocation("netherized", "crimson_forest");
+    private static final ResourceLocation NETHERIZED_WARPED_FOREST =
+            new ResourceLocation("netherized", "warped_forest");
     private static final Logger LOGGER = LogManager.getLogger("FFD Auto Compatibility");
     private static final Set<String> LOGGED_CONTENT = new HashSet<>();
     private static boolean honeycombCompatibilityRegistered;
@@ -110,11 +116,9 @@ public final class FFDCompat {
         if (mode != FFDConfig.FeatureMode.AUTO) {
             return mode == FFDConfig.FeatureMode.ENABLED;
         }
-        ResourceLocation externalBiome = warped ? NB_WARPED_FOREST : NB_CRIMSON_FOREST;
-        Biome biome = ForgeRegistries.BIOMES.getValue(externalBiome);
-        boolean externalWorldgen = biome != null && externalBiome.equals(biome.getRegistryName());
-        logWorldgenDecision(warped, externalWorldgen ? "Unseens Nether Backport" : null);
-        return !externalWorldgen;
+        ExternalBiome externalBiome = findExternalNetherForest(warped);
+        logWorldgenDecision(warped, externalBiome == null ? null : externalBiome.provider);
+        return externalBiome == null;
     }
 
     private static void logDecision(Feature feature, String type, String path,
@@ -145,6 +149,28 @@ public final class FFDCompat {
                 provider == null ? "using Farmer's Future Delight"
                         : "yielding to external biome",
                 provider == null ? "" : " (" + provider + ")");
+    }
+
+    private static ExternalBiome findExternalNetherForest(boolean warped) {
+        ResourceLocation[] biomes = warped
+                ? new ResourceLocation[] {NB_WARPED_FOREST, NETHERIZED_WARPED_FOREST}
+                : new ResourceLocation[] {NB_CRIMSON_FOREST, NETHERIZED_CRIMSON_FOREST};
+        String[] providers = warped
+                ? new String[] {"Unseens Nether Backport", "Netherized"}
+                : new String[] {"Unseens Nether Backport", "Netherized"};
+        for (int index = 0; index < biomes.length; index++) {
+            ResourceLocation key = biomes[index];
+            Biome biome = ForgeRegistries.BIOMES.getValue(key);
+            if (biome == null) {
+                biome = findPendingBiome(key);
+            }
+            if (biome != null && key.equals(biome.getRegistryName())
+                    && FFDConfig.isAutoCompatibilityEnabled(key.getResourcePath(),
+                    key.getResourceDomain())) {
+                return new ExternalBiome(providers[index], key);
+            }
+        }
+        return null;
     }
 
     private static String registryPath(ResourceLocation registryName) {
@@ -195,15 +221,29 @@ public final class FFDCompat {
     public enum Feature {
         SWEET_BERRY(
                 blocks("Future MC", "futuremc", "sweet_berry_bush"),
-                blocks("Future Decoration", "fd", "sweet_berry_bush")),
+                blocks("Future Decoration", "fd", "sweet_berry_bush"),
+                items("Future MC", "futuremc", "sweet_berries"),
+                items("Future Decoration", "fd", "sweet_berries")),
         MOSS(
                 blocks("Depths Update", "depthsupdate", "moss_block", "moss_carpet"),
                 blocks("Caves Not Cliffs", "cavesnotcliffs", "moss_block", "moss_carpet"),
-                blocks("Future Decoration", "fd", "moss_block", "moss_carpet")),
+                blocks("Future Decoration", "fd", "moss_block", "moss_carpet"),
+                blocks("BOMD + DA", "da", "moss_block", "moss_carpet")),
         GLOW_BERRY(
                 blocks("Depths Update", "depthsupdate", "cave_vines", "cave_vines_plant"),
                 blocks("Caves Not Cliffs", "cavesnotcliffs", "cave_vines", "cave_vines_plant"),
-                blocks("Future Decoration", "fd", "cave_vines", "cave_vines_plant")),
+                blocks("Future Decoration", "fd", "cave_vines", "cave_vines_plant"),
+                items("Depths Update", "depthsupdate", "glow_berries"),
+                items("Caves Not Cliffs", "cavesnotcliffs", "glow_berries"),
+                items("Future Decoration", "fd", "glow_berries"),
+                content("BOMD + DA", null, null, null,
+                        new ContentVariant[] {
+                                variant("cave_vines", "da", "aza_vines", 0),
+                                variant("cave_vines", "da", "aza_vines_berries", 0),
+                                variant("cave_vines_plant", "da", "aza_vines", 0),
+                                variant("cave_vines_plant", "da", "aza_vines_berries", 0)
+                        },
+                        new ContentVariant[] {variant("glow_berries", "da", "glow_berry", 0)})),
         AZALEA(
                 blocks("Depths Update", "depthsupdate", "azalea", "flowering_azalea",
                         "azalea_leaves", "flowering_azalea_leaves", "potted_azalea_bush",
@@ -211,7 +251,16 @@ public final class FFDCompat {
                 blocks("Caves Not Cliffs", "cavesnotcliffs", "azalea", "flowering_azalea",
                         "azalea_leaves", "flowering_azalea_leaves", "potted_azalea_bush",
                         "potted_flowering_azalea_bush"),
-                futureDecorationAzalea()),
+                futureDecorationAzalea(),
+                content("BOMD + DA", null, null, null,
+                        new ContentVariant[] {
+                                variant("azalea_leaves", "da", "azaela_leaf", 0),
+                                variant("flowering_azalea_leaves", "da", "azaela_leaf", 0)
+                        },
+                        new ContentVariant[] {
+                                variant("azalea_leaves", "da", "azaela_leaf", 0),
+                                variant("flowering_azalea_leaves", "da", "azaela_leaf", 0)
+                        })),
         DRIPLEAF(
                 blocks("Depths Update", "depthsupdate", "small_dripleaf", "big_dripleaf",
                         "big_dripleaf_stem"),
@@ -229,43 +278,56 @@ public final class FFDCompat {
                 blocks("Future Decoration", "fd", "hanging_roots")),
         SPORE_BLOSSOM(
                 blocks("Depths Update", "depthsupdate", "spore_blossom"),
-                blocks("Caves Not Cliffs", "cavesnotcliffs", "spore_blossom")),
+                blocks("Caves Not Cliffs", "cavesnotcliffs", "spore_blossom"),
+                blocks("BOMD + DA", "da", "spore_blossom")),
         HONEY(
                 blocks("Future MC", "futuremc", "honey_block", "honeycomb_block",
                         "bee_nest", "beehive"),
                 blocks("Caves Not Cliffs", "cavesnotcliffs", "honey_block",
-                        "honeycomb_block", "bee_nest", "beehive")),
+                        "honeycomb_block", "bee_nest", "beehive"),
+                items("Future MC", "futuremc", "honeycomb", "honey_bottle"),
+                items("Caves Not Cliffs", "cavesnotcliffs", "honeycomb", "honey_bottle"),
+                entities("Future MC", "futuremc", "bee")),
         KELP(
-                blocks("Oceanic Expanse", "oe", "kelp", "dried_kelp_block")),
+                blocks("Oceanic Expanse", "oe", "kelp", "dried_kelp_block"),
+                items("Oceanic Expanse", "oe", "kelp", "dried_kelp")),
         SEAGRASS(
                 blocks("Oceanic Expanse", "oe", "seagrass"),
                 blocks("Future MC", "futuremc", "seagrass")),
         SEA_PICKLE(
                 blocks("Oceanic Expanse", "oe", "sea_pickle")),
         TURTLE(
-                blocks("Oceanic Expanse", "oe", "turtle_egg")),
+                blocks("Oceanic Expanse", "oe", "turtle_egg"),
+                items("Oceanic Expanse", "oe", "turtle_scute", "turtle_helmet"),
+                entities("Oceanic Expanse", "oe", "turtle")),
         GLOW_SQUID(
-                items("Oceanic Expanse", "oe", "glow_ink_sac")),
+                items("Oceanic Expanse", "oe", "glow_ink_sac"),
+                entities("Oceanic Expanse", "oe", "glow_squid")),
         AXOLOTL(
-                items("Caves Not Cliffs", "cavesnotcliffs", "axolotl_bucket")),
+                items("Caves Not Cliffs", "cavesnotcliffs", "axolotl_bucket"),
+                entities("Caves Not Cliffs", "cavesnotcliffs", "axolotl")),
         PHANTOM(
                 content("Phantoms", null, ids("phantoms", "phantom_membrane"),
                         ids("phantoms", "phantom"))),
         OTHERSIDE(
                 items("Caves Not Cliffs", "cavesnotcliffs", "music_disc_otherside"),
-                items("Future MC", "futuremc", "record_otherside")),
+                contentWithLocalPaths("Future MC", ids("futuremc", "record_otherside"),
+                        null, null, null, null, "music_disc_otherside")),
         GLOW_ITEM_FRAME(
-                items("Oceanic Expanse", "oe", "glow_item_frame")),
+                items("Oceanic Expanse", "oe", "glow_item_frame"),
+                entities("Oceanic Expanse", "oe", "glow_item_frame")),
         AMETHYST(
                 blocks("Depths Update", "depthsupdate", "amethyst_block", "budding_amethyst",
                         "small_amethyst_bud", "medium_amethyst_bud", "large_amethyst_bud",
                         "amethyst_cluster", "calcite", "smooth_basalt", "tinted_glass"),
+                items("Depths Update", "depthsupdate", "amethyst_shard"),
                 deeperDepthsAmethyst(),
                 blocks("Unseens Nether Backport", "nb", "smooth_basalt"),
                 blocks("Caves Not Cliffs", "cavesnotcliffs", "amethyst_block",
                         "budding_amethyst", "small_amethyst_bud", "medium_amethyst_bud",
                         "large_amethyst_bud", "amethyst_cluster", "calcite", "smooth_basalt",
                         "tinted_glass"),
+                items("Caves Not Cliffs", "cavesnotcliffs", "amethyst_shard"),
                 futureDecorationAmethyst()),
         DEEPSLATE(
                 depthsUpdateDeepslate(),
@@ -274,7 +336,9 @@ public final class FFDCompat {
                 futureDecorationDeepslate()),
         RAW_ORE(
                 blocks("Depths Update", "depthsupdate", "raw_iron_block", "raw_gold_block"),
+                items("Depths Update", "depthsupdate", "raw_iron", "raw_gold"),
                 blocks("Caves Not Cliffs", "cavesnotcliffs", "raw_iron_block", "raw_gold_block"),
+                items("Caves Not Cliffs", "cavesnotcliffs", "raw_iron", "raw_gold"),
                 futureDecorationRawOre(),
                 rawOreProvider()),
         COPPER(
@@ -288,9 +352,12 @@ public final class FFDCompat {
                 blocks("Caves Not Cliffs", "cavesnotcliffs", "dripstone_block",
                         "pointed_dripstone")),
         IRON_CHAIN(
-                blocks("Future MC", "futuremc", "chain"),
-                blocks("Future Decoration", "fd", "chain"),
-                netherBackportChain()),
+                contentWithLocalPaths("Future MC", ids("futuremc", "chain"), null, null,
+                        null, null, "iron_chain"),
+                contentWithLocalPaths("Future Decoration", ids("fd", "chain"), null, null,
+                        null, null, "iron_chain"),
+                netherBackportChain(),
+                netherizedChain()),
         CANDLE(
                 candles("Deeper Depths", "deeperdepths"),
                 candles("Caves Not Cliffs", "cavesnotcliffs")),
@@ -299,16 +366,21 @@ public final class FFDCompat {
                         ids("cavesnotcliffs", "powder_snow_bucket"), null)),
         CRIMSON(
                 netherPlants("Future MC", "futuremc", true),
-                netherBackportPlants(true)),
+                netherBackportPlants(true),
+                netherizedPlants(true)),
         WARPED(
                 netherPlants("Future MC", "futuremc", false),
-                netherBackportPlants(false)),
+                netherBackportPlants(false),
+                netherizedPlants(false)),
         CRIMSON_WOOD(
                 netherWood("Future MC", "futuremc", true),
-                netherBackportWood(true)),
+                netherBackportWood(true),
+                netherizedWood(true)),
         WARPED_WOOD(
                 netherWood("Future MC", "futuremc", false),
-                netherBackportWood(false));
+                blocks("Future MC", "futuremc", "warped_wart_block"),
+                netherBackportWood(false),
+                netherizedWood(false));
 
         private final ProviderSet[] providers;
 
@@ -318,6 +390,9 @@ public final class FFDCompat {
 
         private ExternalBlock findBlock(String... paths) {
             for (ProviderSet provider : providers) {
+                if (!provider.isEnabled(paths)) {
+                    continue;
+                }
                 IBlockState state = provider.findBlock(paths);
                 if (state != null) {
                     return new ExternalBlock(provider, state);
@@ -328,6 +403,9 @@ public final class FFDCompat {
 
         private ProviderSet findBlockProvider(String... paths) {
             for (ProviderSet provider : providers) {
+                if (!provider.isEnabled(paths)) {
+                    continue;
+                }
                 if (provider.findBlock(paths) != null || provider.providesPendingRawOre(paths)) {
                     return provider;
                 }
@@ -337,6 +415,9 @@ public final class FFDCompat {
 
         private ExternalItem findItem(String... paths) {
             for (ProviderSet provider : providers) {
+                if (!provider.isEnabled(paths)) {
+                    continue;
+                }
                 ItemStack stack = provider.findItem(paths);
                 if (!stack.isEmpty()) {
                     return new ExternalItem(provider, stack);
@@ -347,6 +428,9 @@ public final class FFDCompat {
 
         private ProviderSet findItemProvider(String... paths) {
             for (ProviderSet provider : providers) {
+                if (!provider.isEnabled(paths)) {
+                    continue;
+                }
                 if (!provider.findItem(paths).isEmpty() || provider.providesPendingRawOre(paths)) {
                     return provider;
                 }
@@ -356,6 +440,9 @@ public final class FFDCompat {
 
         private ExternalEntity findEntity(String... paths) {
             for (ProviderSet provider : providers) {
+                if (!provider.isEnabled(paths)) {
+                    continue;
+                }
                 EntityEntry entity = provider.findEntity(paths);
                 if (entity != null) {
                     return new ExternalEntity(provider, entity);
@@ -387,6 +474,15 @@ public final class FFDCompat {
                                        String[] entities, ContentVariant[] blockVariants,
                                        ContentVariant[] itemVariants) {
         return new ProviderSet(name, blocks, items, entities, blockVariants, itemVariants);
+    }
+
+    private static ProviderSet contentWithLocalPaths(String name, String[] blocks,
+                                                     String[] items, String[] entities,
+                                                     ContentVariant[] blockVariants,
+                                                     ContentVariant[] itemVariants,
+                                                     String... localPaths) {
+        return new ProviderSet(name, blocks, items, entities, blockVariants, itemVariants,
+                false, localPaths);
     }
 
     private static ContentVariant variant(String path, String namespace,
@@ -753,9 +849,11 @@ public final class FFDCompat {
     private static ProviderSet netherPlants(String name, String namespace, boolean crimson) {
         return crimson
                 ? blocks(name, namespace, "crimson_nylium", "crimson_fungus", "crimson_roots",
-                        "weeping_vines", "weeping_vines_plant")
+                        "potted_crimson_fungus", "potted_crimson_roots", "weeping_vines",
+                        "weeping_vines_plant")
                 : blocks(name, namespace, "warped_nylium", "warped_fungus", "warped_roots",
-                        "nether_sprouts", "twisting_vines", "twisting_vines_plant");
+                        "potted_warped_fungus", "potted_warped_roots", "nether_sprouts",
+                        "twisting_vines", "twisting_vines_plant");
     }
 
     private static ProviderSet netherWood(String name, String namespace, boolean crimson) {
@@ -774,6 +872,8 @@ public final class FFDCompat {
                         variant("crimson_nylium", "nb", "crimson_grass", 0),
                         variant("crimson_fungus", "nb", "crimson_fungus", 0),
                         variant("crimson_roots", "nb", "crimson_roots", 0),
+                        variant("potted_crimson_fungus", "nb", "potted_crimson_fungus", 0),
+                        variant("potted_crimson_roots", "nb", "potted_crimson_roots", 0),
                         variant("weeping_vines", "nb", "crimson_vine", 0),
                         variant("weeping_vines_plant", "nb", "crimson_vine", 0)
                 }
@@ -781,6 +881,8 @@ public final class FFDCompat {
                         variant("warped_nylium", "nb", "warped_grass", 0),
                         variant("warped_fungus", "nb", "warped_fungus", 0),
                         variant("warped_roots", "nb", "warped_roots", 0),
+                        variant("potted_warped_fungus", "nb", "potted_warped_fungus", 0),
+                        variant("potted_warped_roots", "nb", "potted_warped_roots", 0),
                         variant("nether_sprouts", "nb", "warped_sprout", 0),
                         variant("twisting_vines", "nb", "warped_vine", 0),
                         variant("twisting_vines_plant", "nb", "warped_vine", 0)
@@ -791,14 +893,18 @@ public final class FFDCompat {
     private static ProviderSet rawOreProvider() {
         String[] blocks = new String[FFDRawOres.NAMES.length];
         String[] items = new String[FFDRawOres.NAMES.length * 2];
+        String[] localPaths = new String[FFDRawOres.NAMES.length * 2];
         for (int i = 0; i < FFDRawOres.NAMES.length; i++) {
             blocks[i] = FFDRawOres.externalRawBlockName(FFDRawOres.NAMES[i]);
             items[i] = FFDRawOres.rawItemName(FFDRawOres.NAMES[i]);
             items[FFDRawOres.NAMES.length + i] = FFDRawOres.externalRawBlockName(
                     FFDRawOres.NAMES[i]);
+            localPaths[i] = FFDRawOres.rawItemName(FFDRawOres.NAMES[i]);
+            localPaths[FFDRawOres.NAMES.length + i] = FFDRawOres.rawBlockName(
+                    FFDRawOres.NAMES[i]);
         }
         return new ProviderSet("Raw Ore", ids("suikerawore", blocks),
-                ids("suikerawore", items), null, true);
+                ids("suikerawore", items), null, null, null, true, localPaths);
     }
 
     private static ProviderSet netherBackportChain() {
@@ -808,12 +914,62 @@ public final class FFDCompat {
         return content("Unseens Nether Backport", null, null, null, variants, variants);
     }
 
+    private static ProviderSet netherizedChain() {
+        ContentVariant[] variants = {
+                variant("iron_chain", "netherized", "chain", 0)
+        };
+        return content("Netherized", null, null, null, variants, variants);
+    }
+
+    private static ProviderSet netherizedPlants(boolean crimson) {
+        ContentVariant[] variants = crimson
+                ? new ContentVariant[] {
+                        variant("crimson_nylium", "netherized", "crimson_nylium", 0),
+                        variant("crimson_fungus", "netherized", "crimson_fungus", 0),
+                        variant("crimson_roots", "netherized", "crimson_roots", 0),
+                        variant("weeping_vines", "netherized", "weeping_vines", 0),
+                        variant("weeping_vines_plant", "netherized", "weeping_vines", 0)
+                }
+                : new ContentVariant[] {
+                        variant("warped_nylium", "netherized", "warped_nylium", 0),
+                        variant("warped_fungus", "netherized", "warped_fungus", 0),
+                        variant("warped_roots", "netherized", "warped_roots", 0),
+                        variant("nether_sprouts", "netherized", "warped_sprouts", 0),
+                        variant("twisting_vines", "netherized", "twisting_vines", 0),
+                        variant("twisting_vines_plant", "netherized", "twisting_vines", 0)
+                };
+        return content("Netherized", null, null, null, variants, variants);
+    }
+
+    private static ProviderSet netherizedWood(boolean crimson) {
+        String prefix = crimson ? "crimson" : "warped";
+        ContentVariant[] variants = {
+                variant(prefix + "_stem", "netherized", prefix + "_stem", 0),
+                variant(prefix + "_planks", "netherized", prefix + "_planks", 0),
+                variant(prefix + "_stairs", "netherized", prefix + "_stairs", 0),
+                variant(prefix + "_slab", "netherized", prefix + "_slab", 0),
+                variant(prefix + "_double_slab", "netherized", prefix + "_slab_double", 0),
+                variant(prefix + "_fence", "netherized", prefix + "_fence", 0),
+                variant(prefix + "_fence_gate", "netherized", prefix + "_fence_gate", 0),
+                variant(prefix + "_door", "netherized", prefix + "_door", 0),
+                variant("shroomlight", "netherized", "shroomlight", 0)
+        };
+        if (!crimson) {
+            ContentVariant[] expanded = new ContentVariant[variants.length + 1];
+            System.arraycopy(variants, 0, expanded, 0, variants.length);
+            expanded[variants.length] = variant("warped_wart_block", "netherized",
+                    "warped_wart_block", 0);
+            variants = expanded;
+        }
+        return content("Netherized", null, null, null, variants, variants);
+    }
+
     private static ProviderSet netherBackportWood(boolean crimson) {
         String prefix = crimson ? "crimson" : "warped";
         ContentVariant[] variants = {
                 variant(prefix + "_stem", "nb", prefix + "_stem", 0),
                 variant(prefix + "_hyphae", "nb", prefix + "_hyphae", 0),
-                variant(prefix + "_planks", "nb", prefix + "_planks", 0),
+                 variant(prefix + "_planks", "nb", prefix + "_planks", 0),
                 variant(prefix + "_stairs", "nb", prefix + "_stairs", 0),
                 variant(prefix + "_slab", "nb", prefix + "_slab_half", 0),
                 variant(prefix + "_double_slab", "nb", prefix + "_slab_double", 0),
@@ -823,6 +979,13 @@ public final class FFDCompat {
                 variant(prefix + "_trapdoor", "nb", prefix + "_trapdoor", 0),
                 variant("shroomlight", "nb", "shroom_light", 0)
         };
+        if (!crimson) {
+            ContentVariant[] expanded = new ContentVariant[variants.length + 1];
+            System.arraycopy(variants, 0, expanded, 0, variants.length);
+            expanded[variants.length] = variant("warped_wart_block", "nb",
+                    "warped_wart_block", 0);
+            variants = expanded;
+        }
         return content("Unseens Nether Backport", null, null, null, variants, variants);
     }
 
@@ -841,6 +1004,7 @@ public final class FFDCompat {
         private final String[] entities;
         private final ContentVariant[] blockVariants;
         private final ContentVariant[] itemVariants;
+        private final String[] localPaths;
         private final String namespace;
         private final boolean pendingRawOre;
 
@@ -861,13 +1025,27 @@ public final class FFDCompat {
         private ProviderSet(String name, String[] blocks, String[] items, String[] entities,
                             ContentVariant[] blockVariants, ContentVariant[] itemVariants,
                             boolean pendingRawOre) {
+            this(name, blocks, items, entities, blockVariants, itemVariants,
+                    pendingRawOre, null);
+        }
+
+        private ProviderSet(String name, String[] blocks, String[] items, String[] entities,
+                            ContentVariant[] blockVariants, ContentVariant[] itemVariants,
+                            boolean pendingRawOre, String[] localPathsOverride) {
             this.name = name;
             this.blocks = blocks;
             this.items = items;
             this.entities = entities;
             this.blockVariants = blockVariants;
             this.itemVariants = itemVariants;
-            this.namespace = namespace(blocks, items, entities);
+            String resolvedNamespace = namespace(blocks, items, entities);
+            if (resolvedNamespace == null) {
+                resolvedNamespace = variantNamespace(blockVariants, itemVariants);
+            }
+            this.namespace = resolvedNamespace;
+            this.localPaths = localPathsOverride == null
+                    ? localPaths(blocks, items, entities, blockVariants, itemVariants)
+                    : localPathsOverride;
             this.pendingRawOre = pendingRawOre;
         }
 
@@ -906,6 +1084,85 @@ public final class FFDCompat {
             return pendingRawOre && FFDRawOreOreDictionaryCompat.willRawOreProvide(paths);
         }
 
+        private boolean isEnabled(String... paths) {
+            return FFDConfig.isAutoCompatibilityEnabled(
+                    paths == null || paths.length == 0 ? null : paths[0], namespace);
+        }
+
+        private void addDefaultEntries(Set<String> entries) {
+            if (namespace == null) {
+                return;
+            }
+            for (String path : localPaths) {
+                entries.add(path + "@" + namespace + "="
+                        + defaultAutoCompatibilityEnabled(path, namespace));
+            }
+        }
+
+    }
+
+    public static String[] defaultAutoCompatibilityToggles() {
+        LinkedHashSet<String> entries = new LinkedHashSet<>();
+        for (Feature feature : Feature.values()) {
+            for (ProviderSet provider : feature.providers) {
+                provider.addDefaultEntries(entries);
+            }
+        }
+        for (String material : FFDRawOres.NAMES) {
+            entries.add(FFDRawOres.rawItemName(material) + "@suikerawore=false");
+            entries.add(FFDRawOres.rawBlockName(material) + "@suikerawore=false");
+        }
+        entries.add("slow_falling@phantoms=false");
+        entries.add("crimson_forest@nb=false");
+        entries.add("warped_forest@nb=false");
+        entries.add("crimson_forest@netherized=false");
+        entries.add("warped_forest@netherized=false");
+        return entries.toArray(new String[0]);
+    }
+
+    private static boolean defaultAutoCompatibilityEnabled(String path, String namespace) {
+        if ("fd".equals(namespace) || "da".equals(namespace)
+                || "depthsupdate".equals(namespace)
+                || "cavesnotcliffs".equals(namespace) || "phantoms".equals(namespace)
+                || "suikerawore".equals(namespace) || "nb".equals(namespace)
+                || "netherized".equals(namespace)) {
+            return false;
+        }
+        if ("futuremc".equals(namespace) && "bee".equals(path)) {
+            return false;
+        }
+        if ("deeperdepths".equals(namespace)) {
+            return !isDeeperDepthsFfdPreferred(path);
+        }
+        return true;
+    }
+
+    private static boolean isDeeperDepthsFfdPreferred(String path) {
+        if ("tuff".equals(path) || "deepslate".equals(path)
+                || "cobbled_deepslate".equals(path) || "chiseled_deepslate".equals(path)
+                || "polished_deepslate".equals(path) || "deepslate_bricks".equals(path)
+                || "cracked_deepslate_bricks".equals(path) || "deepslate_tiles".equals(path)
+                || "cracked_deepslate_tiles".equals(path) || "infested_deepslate".equals(path)
+                || "cobbled_deepslate_stairs".equals(path)
+                || "polished_deepslate_stairs".equals(path)
+                || "deepslate_brick_stairs".equals(path)
+                || "deepslate_tile_stairs".equals(path)
+                || "cobbled_deepslate_slab".equals(path)
+                || "cobbled_deepslate_double_slab".equals(path)
+                || "polished_deepslate_slab".equals(path)
+                || "polished_deepslate_double_slab".equals(path)
+                || "deepslate_brick_slab".equals(path)
+                || "deepslate_brick_double_slab".equals(path)
+                || "deepslate_tile_slab".equals(path)
+                || "deepslate_tile_double_slab".equals(path)
+                || "cobbled_deepslate_wall".equals(path)
+                || "polished_deepslate_wall".equals(path)
+                || "deepslate_brick_wall".equals(path)
+                || "deepslate_tile_wall".equals(path)) {
+            return true;
+        }
+        return "candle".equals(path) || path.endsWith("_candle")
+                || "candle_cake".equals(path) || path.endsWith("_candle_cake");
     }
 
     private static IBlockState findRegisteredBlockVariant(ContentVariant[] variants,
@@ -919,6 +1176,9 @@ public final class FFDCompat {
             }
             ResourceLocation key = new ResourceLocation(variant.registryName);
             Block block = ForgeRegistries.BLOCKS.getValue(key);
+            if (block == null) {
+                block = findPendingBlock(key);
+            }
             if (block != null && key.equals(block.getRegistryName())) {
                 return block.getStateFromMeta(variant.metadata);
             }
@@ -937,6 +1197,9 @@ public final class FFDCompat {
             }
             ResourceLocation key = new ResourceLocation(variant.registryName);
             Item item = ForgeRegistries.ITEMS.getValue(key);
+            if (item == null) {
+                item = findPendingItem(key);
+            }
             if (item != null && key.equals(item.getRegistryName())) {
                 return new ItemStack(item, 1, variant.metadata);
             }
@@ -954,6 +1217,9 @@ public final class FFDCompat {
                 continue;
             }
             Block block = ForgeRegistries.BLOCKS.getValue(key);
+            if (block == null) {
+                block = findPendingBlock(key);
+            }
             if (block != null && key.equals(block.getRegistryName())) {
                 return block;
             }
@@ -968,6 +1234,9 @@ public final class FFDCompat {
         for (String path : paths) {
             ResourceLocation key = new ResourceLocation(namespace, path);
             Block block = ForgeRegistries.BLOCKS.getValue(key);
+            if (block == null) {
+                block = findPendingBlock(key);
+            }
             if (block != null && key.equals(block.getRegistryName())) {
                 return block;
             }
@@ -985,6 +1254,9 @@ public final class FFDCompat {
                 continue;
             }
             Item item = ForgeRegistries.ITEMS.getValue(key);
+            if (item == null) {
+                item = findPendingItem(key);
+            }
             if (item != null && key.equals(item.getRegistryName())) {
                 return item;
             }
@@ -999,6 +1271,9 @@ public final class FFDCompat {
         for (String path : paths) {
             ResourceLocation key = new ResourceLocation(namespace, path);
             Item item = ForgeRegistries.ITEMS.getValue(key);
+            if (item == null) {
+                item = findPendingItem(key);
+            }
             if (item != null && key.equals(item.getRegistryName())) {
                 return item;
             }
@@ -1037,6 +1312,70 @@ public final class FFDCompat {
         return null;
     }
 
+    private static Block findPendingBlock(ResourceLocation key) {
+        Object entry = findPendingEntry(key, false, false);
+        return entry instanceof Block ? (Block) entry : null;
+    }
+
+    private static Item findPendingItem(ResourceLocation key) {
+        Object entry = findPendingEntry(key, true, false);
+        return entry instanceof Item ? (Item) entry : null;
+    }
+
+    private static Biome findPendingBiome(ResourceLocation key) {
+        Object entry = findPendingEntry(key, false, true);
+        return entry instanceof Biome ? (Biome) entry : null;
+    }
+
+    private static Object findPendingEntry(ResourceLocation key, boolean item, boolean biome) {
+        if (key == null || !Loader.isModLoaded(key.getResourceDomain())) {
+            return null;
+        }
+        String className;
+        String fieldName;
+        if ("da".equals(key.getResourceDomain())) {
+            className = item ? "com.dungeon_additions.da.init.ModItems"
+                    : "com.dungeon_additions.da.init.ModBlocks";
+            fieldName = item ? "ITEMS" : "BLOCKS";
+        } else if ("netherized".equals(key.getResourceDomain())) {
+            if (biome) {
+                className = "mellohi138.netherized.init.NetherizedBiomes";
+                fieldName = "BIOME_LIST";
+            } else {
+                className = item ? "mellohi138.netherized.init.NetherizedItems"
+                        : "mellohi138.netherized.init.NetherizedBlocks";
+                fieldName = item ? "ITEM_LIST" : "BLOCK_LIST";
+            }
+        } else {
+            return null;
+        }
+        try {
+            Class<?> owner = Class.forName(className, true, FFDCompat.class.getClassLoader());
+            Field field = owner.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            Object values = field.get(null);
+            if (!(values instanceof Iterable<?>)) {
+                return null;
+            }
+            for (Object value : (Iterable<?>) values) {
+                if (value instanceof Block && !item && !biome
+                        && key.equals(((Block) value).getRegistryName())) {
+                    return value;
+                }
+                if (value instanceof Item && item && !biome
+                        && key.equals(((Item) value).getRegistryName())) {
+                    return value;
+                }
+                if (value instanceof Biome && biome
+                        && key.equals(((Biome) value).getRegistryName())) {
+                    return value;
+                }
+            }
+        } catch (Throwable ignored) {
+        }
+        return null;
+    }
+
     private static boolean containsPath(String[] paths, String target) {
         for (String path : paths) {
             if (target.equals(path)) {
@@ -1055,6 +1394,50 @@ public final class FFDCompat {
         return null;
     }
 
+    private static String[] localPaths(String[] blocks, String[] items, String[] entities,
+                                       ContentVariant[] blockVariants,
+                                       ContentVariant[] itemVariants) {
+        LinkedHashSet<String> paths = new LinkedHashSet<>();
+        addLocalPaths(paths, blocks);
+        addLocalPaths(paths, items);
+        addLocalPaths(paths, entities);
+        addVariantPaths(paths, blockVariants);
+        addVariantPaths(paths, itemVariants);
+        return paths.toArray(new String[0]);
+    }
+
+    private static void addLocalPaths(Set<String> paths, String[] ids) {
+        if (ids == null) {
+            return;
+        }
+        for (String id : ids) {
+            if (id != null && !id.isEmpty()) {
+                paths.add(new ResourceLocation(id).getResourcePath());
+            }
+        }
+    }
+
+    private static void addVariantPaths(Set<String> paths, ContentVariant[] variants) {
+        if (variants == null) {
+            return;
+        }
+        for (ContentVariant variant : variants) {
+            if (variant != null && variant.path != null && !variant.path.isEmpty()) {
+                paths.add(variant.path);
+            }
+        }
+    }
+
+    private static String variantNamespace(ContentVariant[]... groups) {
+        for (ContentVariant[] group : groups) {
+            if (group != null && group.length > 0 && group[0] != null
+                    && group[0].registryName != null) {
+                return new ResourceLocation(group[0].registryName).getResourceDomain();
+            }
+        }
+        return null;
+    }
+
     private static final class ExternalBlock {
         private final ProviderSet provider;
         private final IBlockState state;
@@ -1062,6 +1445,16 @@ public final class FFDCompat {
         private ExternalBlock(ProviderSet provider, IBlockState state) {
             this.provider = provider;
             this.state = state;
+        }
+    }
+
+    private static final class ExternalBiome {
+        private final String provider;
+        private final ResourceLocation registryName;
+
+        private ExternalBiome(String provider, ResourceLocation registryName) {
+            this.provider = provider;
+            this.registryName = registryName;
         }
     }
 

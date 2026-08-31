@@ -100,7 +100,8 @@ public final class FFDPotions {
         if (FFDConfig.phantomMode == FFDConfig.FeatureMode.DISABLED) {
             return false;
         }
-        return !externalRegistered;
+        return !externalRegistered || !FFDConfig.isAutoCompatibilityEnabled(
+                "slow_falling", "phantoms");
     }
 
     private static PotionType slowFalling(String registryName, int duration) {

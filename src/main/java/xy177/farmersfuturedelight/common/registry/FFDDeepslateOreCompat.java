@@ -313,7 +313,7 @@ public final class FFDDeepslateOreCompat {
         if (source == null || !sourceKey.equals(source.getRegistryName())) {
             return;
         }
-        net.minecraft.block.state.IBlockState sourceState = source.getStateFromMeta(metadata);
+        net.minecraft.block.state.IBlockState sourceState = stateFromMeta(source, metadata);
         if (sourceState == null) {
             return;
         }
@@ -337,6 +337,19 @@ public final class FFDDeepslateOreCompat {
         DEFINITIONS.add(new Definition(modid, sourceMaterial, rawMaterial, block,
                 sourceStack, buildGenerations(block, legacyPath, generationSpecs),
                 tintColor, modelPath, legacyPath));
+    }
+
+    private static net.minecraft.block.state.IBlockState stateFromMeta(Block source, int metadata) {
+        try {
+            net.minecraft.block.state.IBlockState state = source.getStateFromMeta(metadata);
+            if (state == null || state.getBlock() != source
+                    || source.getMetaFromState(state) != metadata) {
+                return null;
+            }
+            return state;
+        } catch (RuntimeException ignored) {
+            return null;
+        }
     }
 
     private static void addCustom(IForgeRegistry<Block> registry) {

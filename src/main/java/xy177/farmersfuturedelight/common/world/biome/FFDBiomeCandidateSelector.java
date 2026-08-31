@@ -64,6 +64,8 @@ final class FFDBiomeCandidateSelector {
     private final boolean biomesOPlentyLoaded;
     private final List<Entry> entries;
     private final List<Biome> spawnBiomes;
+    private final Entry iceAndFireGlacier;
+    private final double iceAndFireGlacierShare;
     private final ThreadLocal<CandidateScratch> candidateScratch =
             new ThreadLocal<CandidateScratch>() {
                 @Override
@@ -84,6 +86,9 @@ final class FFDBiomeCandidateSelector {
         biomesOPlentyLoaded = Loader.isModLoaded("biomesoplenty");
         entries = loadEntries();
         spawnBiomes = buildSpawnBiomes(entries);
+        iceAndFireGlacier = findIceAndFireGlacier(entries);
+        iceAndFireGlacierShare = sourcePoolShare(
+                iceAndFireGlacier == null ? null : iceAndFireGlacier.biome);
         LOGGER.info("Loaded {} unified climate-biome candidates for ffd_cac", entries.size());
     }
 
@@ -117,6 +122,9 @@ final class FFDBiomeCandidateSelector {
     }
 
     private Biome selectUncached(Sample sample, int blockX, int blockZ) {
+        if (useIceAndFireGlacier(sample, blockX, blockZ)) {
+            return iceAndFireGlacier.biome;
+        }
         Biome exactMountain = FFDBiomes.forModernBiome(sample.biome);
         if (exactMountain != null) {
             return exactMountain;
@@ -372,6 +380,47 @@ final class FFDBiomeCandidateSelector {
             }
         }
         return false;
+    }
+
+    private boolean useIceAndFireGlacier(Sample sample, int blockX, int blockZ) {
+        if (iceAndFireGlacier == null || iceAndFireGlacierShare <= 0.0D
+                || !FFDModernBiomeResolver.isCompatible(sample, iceAndFireGlacier.biome)) {
+            return false;
+        }
+        long region = regionSeed(blockX, blockZ, Family.GENERIC, 0, 0);
+        return unit01(region ^ iceAndFireGlacier.salt) < iceAndFireGlacierShare;
+    }
+
+    private static Entry findIceAndFireGlacier(List<Entry> entries) {
+        for (Entry entry : entries) {
+            ResourceLocation name = entry.biome.getRegistryName();
+            if (name != null && "iceandfire".equals(name.getResourceDomain())
+                    && "glacier".equalsIgnoreCase(name.getResourcePath())) {
+                return entry;
+            }
+        }
+        return null;
+    }
+
+    private static double sourcePoolShare(Biome target) {
+        if (target == null) {
+            return 0.0D;
+        }
+        double share = 0.0D;
+        for (BiomeManager.BiomeType type : BiomeManager.BiomeType.values()) {
+            int totalWeight = 0;
+            int targetWeight = 0;
+            for (BiomeManager.BiomeEntry entry : BiomeManager.getBiomes(type)) {
+                totalWeight += Math.max(0, entry.itemWeight);
+                if (entry.biome == target) {
+                    targetWeight += Math.max(0, entry.itemWeight);
+                }
+            }
+            if (targetWeight > 0 && totalWeight > 0) {
+                share = Math.max(share, targetWeight / (double) totalWeight);
+            }
+        }
+        return share;
     }
 
     private static Map<Biome, Integer> loadBiomesOPlentyWeights() {

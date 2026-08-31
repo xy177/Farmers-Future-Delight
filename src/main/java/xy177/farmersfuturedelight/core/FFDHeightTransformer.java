@@ -136,6 +136,9 @@ public final class FFDHeightTransformer implements IClassTransformer {
             "wolforce.minergolems.entities.ai.MinerAI_7_FindAndBreakBlock");
     private static final Set<String> ICE_AND_FIRE_WORLDGEN_EVENTS_CLASSES = names(
             "com.github.alexthe666.iceandfire.event.WorldGenEvents");
+    private static final Set<String> DEEPER_DEPTHS_STRUCTURE_GENERATOR_CLASSES = names(
+            "com.deeperdepths.common.world.chambers.WorldGenTrialChambers",
+            "com.deeperdepths.common.world.ancient_cities.WorldGenAncientCities");
     private static final Set<String> FORGE_HOOKS_CLIENT_CLASS = names(
             "net.minecraftforge.client.ForgeHooksClient");
     private static final Set<String> OPTIMIZED_WORLD_RENDERER_CLASSES = names(
@@ -196,6 +199,8 @@ public final class FFDHeightTransformer implements IClassTransformer {
             "net.blay09.mods.forgivingvoid.ForgivingVoid");
     private static final Set<String> UNFORGIVING_VOID_CLASSES = names(
             "the_fireplace.unforgivingvoid.UnforgivingVoid");
+    private static final Set<String> TAIGA_GENERATOR_CLASSES = names(
+            "com.sosnitzka.taiga.util.Generator");
     private static final Map<String, String> PULSAR_DEV_MIXIN_TARGETS = pulsarDevMixinTargets();
     private static final Map<String, String> PULSAR_DEV_METHOD_NAMES = pulsarDevMethodNames();
     private static final Map<String, String> PULSAR_DEV_FIELD_NAMES = pulsarDevFieldNames();
@@ -933,6 +938,24 @@ public final class FFDHeightTransformer implements IClassTransformer {
                         }
                     });
         }
+        if (TAIGA_GENERATOR_CLASSES.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformTaigaGenerator(bytes);
+                        }
+                    });
+        }
+        if (DEEPER_DEPTHS_STRUCTURE_GENERATOR_CLASSES.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformDeeperDepthsStructureGenerator(bytes);
+                        }
+                    });
+        }
         if (OPTIFINE_SHADER_VERTEX_BUILDER_CLASS.contains(transformedName)) {
             return transformOptionalCompat(transformedName, basicClass,
                     new OptionalTransformer() {
@@ -1586,6 +1609,47 @@ public final class FFDHeightTransformer implements IClassTransformer {
         return write(node);
     }
 
+    private static byte[] transformTaigaGenerator(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode method = findMethod(node, "generateOreDescending", "generateOreDescending",
+                "(Ljava/util/List;Lnet/minecraft/block/state/IBlockState;Ljava/util/Random;"
+                        + "II Lnet/minecraft/world/World;III)V".replace(" ", ""));
+        method.instructions.insert(list(
+                new VarInsnNode(Opcodes.ALOAD, 1),
+                new VarInsnNode(Opcodes.ALOAD, 5),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "beginTaigaEezoWorldgen",
+                        "(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/world/World;)V",
+                        false),
+                new VarInsnNode(Opcodes.ILOAD, 7),
+                new VarInsnNode(Opcodes.ALOAD, 1),
+                new VarInsnNode(Opcodes.ALOAD, 5),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "adjustTaigaEezoMinY",
+                        "(ILnet/minecraft/block/state/IBlockState;Lnet/minecraft/world/World;)I",
+                        false),
+                new VarInsnNode(Opcodes.ISTORE, 7),
+                new VarInsnNode(Opcodes.ILOAD, 8),
+                new VarInsnNode(Opcodes.ALOAD, 1),
+                new VarInsnNode(Opcodes.ALOAD, 5),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "adjustTaigaEezoMaxY",
+                        "(ILnet/minecraft/block/state/IBlockState;Lnet/minecraft/world/World;)I",
+                        false),
+                new VarInsnNode(Opcodes.ISTORE, 8)));
+        int returns = 0;
+        for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (instruction.getOpcode() != Opcodes.RETURN) {
+                continue;
+            }
+            method.instructions.insertBefore(instruction, new MethodInsnNode(
+                    Opcodes.INVOKESTATIC, HOOKS, "endExtendedWorldgenHeight", "()V", false));
+            returns++;
+        }
+        require(returns == 1,
+                "Expected one TAIGA descending-ore return, patched " + returns);
+        LOGGER.info("Patched TAIGA zero-ore generation for extended world height");
+        return write(node);
+    }
+
     private static byte[] transformLycanitesBlockSpawnLocation(byte[] basicClass) {
         ClassNode node = read(basicClass);
         MethodNode positions = findMethod(node, "getSpawnPositions", "getSpawnPositions",
@@ -2234,7 +2298,7 @@ public final class FFDHeightTransformer implements IClassTransformer {
         }
         require(patched == 3,
                 "Expected three Nether API generation-height calls, patched " + patched);
-        LOGGER.info("Patched Nether API to retain vanilla Nether generation height in ffd_cac");
+        LOGGER.info("Patched Nether API to retain vanilla Nether generation height");
         return write(node);
     }
 
@@ -3763,7 +3827,7 @@ public final class FFDHeightTransformer implements IClassTransformer {
                 new VarInsnNode(Opcodes.ALOAD, 1),
                 new VarInsnNode(Opcodes.ALOAD, 3),
                 new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS,
-                        "beginYungMineshaftStructure",
+                        "beginCompatStructure",
                         "(Lnet/minecraft/world/gen/structure/StructureStart;"
                                 + "Lnet/minecraft/world/World;"
                                 + "Lnet/minecraft/world/gen/structure/StructureBoundingBox;)V",
@@ -4052,7 +4116,54 @@ public final class FFDHeightTransformer implements IClassTransformer {
         }
         require(patched == 1,
                 "Expected one Ice and Fire degradeSurface lower bound, patched " + patched);
-        LOGGER.info("Patched Ice and Fire surface degradation for extended lower height");
+        MethodNode generate = findMethod(node, "generate", "generate",
+                "(Ljava/util/Random;IILnet/minecraft/world/World;"
+                        + "Lnet/minecraft/world/gen/IChunkGenerator;"
+                        + "Lnet/minecraft/world/chunk/IChunkProvider;)V");
+        int worldLocal = findWorldArgumentLocal(generate);
+        require(worldLocal >= 0, "Could not find Ice and Fire world argument");
+        generate.instructions.insert(list(
+                new VarInsnNode(Opcodes.ALOAD, worldLocal),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS,
+                        "beginIceAndFireWorldgen", "(Lnet/minecraft/world/World;)V", false)));
+        int returnsPatched = 0;
+        for (AbstractInsnNode instruction = generate.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (instruction.getOpcode() != Opcodes.RETURN) {
+                continue;
+            }
+            generate.instructions.insertBefore(instruction, new MethodInsnNode(Opcodes.INVOKESTATIC,
+                    HOOKS, "endExtendedWorldgenHeight", "()V", false));
+            returnsPatched++;
+        }
+        require(returnsPatched >= 1,
+                "Expected Ice and Fire worldgen returns, patched " + returnsPatched);
+        LOGGER.info("Patched Ice and Fire world generation for extended height");
+        return write(node);
+    }
+
+    private static byte[] transformDeeperDepthsStructureGenerator(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode generate = findMethod(node, "generate", "func_180709_b",
+                "(Lnet/minecraft/world/World;Ljava/util/Random;"
+                        + "Lnet/minecraft/util/math/BlockPos;)Z");
+        generate.instructions.insert(list(
+                new VarInsnNode(Opcodes.ALOAD, 1),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS,
+                        "beginDeeperDepthsStructure", "(Lnet/minecraft/world/World;)V", false)));
+        int returnsPatched = 0;
+        for (AbstractInsnNode instruction = generate.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (instruction.getOpcode() != Opcodes.IRETURN) {
+                continue;
+            }
+            generate.instructions.insertBefore(instruction, new MethodInsnNode(Opcodes.INVOKESTATIC,
+                    HOOKS, "endExtendedWorldgenHeight", "()V", false));
+            returnsPatched++;
+        }
+        require(returnsPatched >= 1,
+                "Expected Deeper Depths structure generator returns, patched " + returnsPatched);
+        LOGGER.info("Patched Deeper Depths structure generation for extended height");
         return write(node);
     }
 

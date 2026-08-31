@@ -1,7 +1,10 @@
 package xy177.farmersfuturedelight.common;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -47,7 +50,8 @@ public final class FFDConfig {
     private static final String CATEGORY_DEBUG = "debug";
     private static final String CATEGORY_INTERNAL = "internal";
     private static final String CATEGORY_COMPATIBILITY = "compatibility";
-    private static final int CURRENT_CONFIG_VERSION = 8;
+    private static final int CURRENT_CONFIG_VERSION = 10;
+    private static final String AUTO_COMPATIBILITY_COMMENT = "逐个控制 AUTO 自动避让的外部模组。仅当对应内容开关为 AUTO 时生效。每行格式为 内容注册名@外部模组ID=true或false：true 表示该模组提供对应内容时让位给它，false 表示忽略该模组并继续使用未世之乐内容。默认名单包含所有已支持的内容与模组组合，即使对应模组未安装也会保留；未列出的组合继续使用 AUTO 的正常判定。修改后需重启游戏。";
 
     public static FeatureMode sweetBerryMode;
     public static FeatureMode honeyMode;
@@ -64,6 +68,7 @@ public final class FFDConfig {
     public static int sporeBlossomParticleFrequency;
     public static int sporeBlossomParticleDensity;
     public static FeatureMode glowLichenMode;
+    public static String[] autoCompatibilityToggles;
     public static FeatureMode kelpMode;
     public static FeatureMode seagrassMode;
     public static FeatureMode seaPickleMode;
@@ -360,6 +365,7 @@ public final class FFDConfig {
     public static int twistingVinesMaxHeight;
 
     private static Map<String, Boolean> rawOreMaterialStates = defaultRawOreMaterialStates();
+    private static Map<String, Boolean> autoCompatibilityStates = new HashMap<>();
 
     private FFDConfig() {
     }
@@ -450,6 +456,28 @@ public final class FFDConfig {
         glowItemFrameMode = readMode(config, "glowItemFrameMode", "荧光物品展示框内容开关");
         signTextMode = readMode(config, "signTextMode", "告示牌文字染色与发光内容开关");
         lightBlockMode = readMode(config, "lightBlockMode", "光源方块内容开关");
+
+        String[] defaultAutoCompatibilityToggles = FFDCompat.defaultAutoCompatibilityToggles();
+        String[] configuredAutoCompatibilityToggles = config.getStringList(
+                "autoCompatibilityToggles", CATEGORY_FEATURES, defaultAutoCompatibilityToggles,
+                AUTO_COMPATIBILITY_COMMENT);
+        autoCompatibilityToggles = mergeAutoCompatibilityDefaults(
+                defaultAutoCompatibilityToggles, configuredAutoCompatibilityToggles);
+        if (!Arrays.equals(configuredAutoCompatibilityToggles, autoCompatibilityToggles)) {
+            config.get(CATEGORY_FEATURES, "autoCompatibilityToggles", defaultAutoCompatibilityToggles)
+                    .set(autoCompatibilityToggles);
+        }
+        autoCompatibilityStates = parseAutoCompatibilityStates(autoCompatibilityToggles);
+        config.getCategory(CATEGORY_FEATURES).setPropertyOrder(new ArrayList<>(Arrays.asList(
+                "sweetBerryMode", "honeyMode", "glowSquidMode", "glowBerryMode", "mossMode",
+                "lushCaveMode", "azaleaMode", "dripleafMode", "rootedDirtMode", "hangingRootsMode",
+                "sporeBlossomMode", "glowLichenMode", "kelpMode", "seagrassMode", "seaPickleMode",
+                "turtleMode", "axolotlMode", "goatMode", "phantomMode", "othersideMode",
+                "amethystMode", "deepslateMode", "deepslateCompatToggles", "rawOreMode",
+                "rawOreMaterialToggles", "copperMode", "dripstoneMode",
+                "ironChainMode", "candleMode", "powderSnowMode", "crimsonMode", "warpedMode",
+                "crimsonWoodMode", "warpedWoodMode", "glowItemFrameMode", "signTextMode", "lightBlockMode",
+                "autoCompatibilityToggles")));
 
         hostileMobsRequireZeroBlockLight = config.getBoolean(
                 "hostileMobsRequireZeroBlockLight", CATEGORY_GAMEPLAY, true,
@@ -1132,6 +1160,9 @@ public final class FFDConfig {
         if (marker >= 0) {
             primary = primary.substring(0, marker);
         }
+        if ("autoCompatibilityToggles".equals(key)) {
+            primary = AUTO_COMPATIBILITY_COMMENT;
+        }
         if (primary.isEmpty()) {
             primary = "配置项：" + key + "。";
         }
@@ -1139,6 +1170,9 @@ public final class FFDConfig {
     }
 
     private static String englishDescription(String category, String key) {
+        if ("autoCompatibilityToggles".equals(key)) {
+            return "Per-content AUTO compatibility overrides in content_path@mod_id=true or content_path@mod_id=false form. true yields to that mod when it provides the matching content; false ignores that mod for this content. The default list includes every supported content and mod combination, including mods that are not installed. Missing combinations use the normal AUTO decision. Restart required.";
+        }
         if ("rawOreMaterialToggles".equals(key)) {
             return "Per-material raw-ore toggles in material=true or material=false form. Each entry controls that raw material, its storage block, ore-drop replacement, and compatibility recipes. Missing materials default to true. Restart required.";
         }
@@ -1508,6 +1542,92 @@ public final class FFDConfig {
         }
         Boolean enabled = rawOreMaterialStates.get(material.trim().toLowerCase(Locale.ROOT));
         return enabled == null || enabled;
+    }
+
+    public static boolean isAutoCompatibilityEnabled(String contentPath, String modId) {
+        if (contentPath == null || contentPath.trim().isEmpty()
+                || modId == null || modId.trim().isEmpty()) {
+            return true;
+        }
+        String key = contentPath.trim().toLowerCase(Locale.ROOT)
+                + "@" + modId.trim().toLowerCase(Locale.ROOT);
+        Boolean enabled = autoCompatibilityStates.get(key);
+        return enabled == null || enabled;
+    }
+
+    private static Map<String, Boolean> parseAutoCompatibilityStates(String[] entries) {
+        Map<String, Boolean> states = new HashMap<>();
+        if (entries == null) {
+            return states;
+        }
+        for (String entry : entries) {
+            if (entry == null) {
+                continue;
+            }
+            int separator = entry.indexOf('=');
+            int providerSeparator = entry.lastIndexOf('@', separator < 0 ? entry.length() : separator);
+            if (separator <= 0 || providerSeparator <= 0 || providerSeparator >= separator - 1
+                    || separator >= entry.length() - 1) {
+                continue;
+            }
+            String contentPath = entry.substring(0, providerSeparator).trim()
+                    .toLowerCase(Locale.ROOT);
+            String modId = entry.substring(providerSeparator + 1, separator).trim()
+                    .toLowerCase(Locale.ROOT);
+            String value = entry.substring(separator + 1).trim();
+            if (contentPath.isEmpty() || modId.isEmpty()
+                    || !("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value))) {
+                continue;
+            }
+            states.put(contentPath + "@" + modId, Boolean.parseBoolean(value));
+        }
+        return states;
+    }
+
+    private static String[] mergeAutoCompatibilityDefaults(String[] defaults,
+                                                            String[] configured) {
+        Map<String, String> merged = new LinkedHashMap<>();
+        addAutoCompatibilityEntries(merged, defaults, false);
+        addAutoCompatibilityEntries(merged, configured, true);
+        return merged.values().toArray(new String[0]);
+    }
+
+    private static void addAutoCompatibilityEntries(Map<String, String> entries,
+                                                    String[] values, boolean override) {
+        if (values == null) {
+            return;
+        }
+        for (String value : values) {
+            String key = autoCompatibilityKey(value);
+            if (key == null) {
+                continue;
+            }
+            if (override || !entries.containsKey(key)) {
+                entries.put(key, value.trim());
+            }
+        }
+    }
+
+    private static String autoCompatibilityKey(String value) {
+        if (value == null) {
+            return null;
+        }
+        int separator = value.indexOf('=');
+        int providerSeparator = value.lastIndexOf('@', separator < 0 ? value.length() : separator);
+        if (separator <= 0 || providerSeparator <= 0 || providerSeparator >= separator - 1
+                || separator >= value.length() - 1) {
+            return null;
+        }
+        String contentPath = value.substring(0, providerSeparator).trim()
+                .toLowerCase(Locale.ROOT);
+        String modId = value.substring(providerSeparator + 1, separator).trim()
+                .toLowerCase(Locale.ROOT);
+        String setting = value.substring(separator + 1).trim();
+        if (contentPath.isEmpty() || modId.isEmpty()
+                || !("true".equalsIgnoreCase(setting) || "false".equalsIgnoreCase(setting))) {
+            return null;
+        }
+        return contentPath + "@" + modId;
     }
 
     public static boolean isDeepslateCompatEnabled(String key) {

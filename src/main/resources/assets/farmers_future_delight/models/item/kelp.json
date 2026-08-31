@@ -1,5 +1,5 @@
 {
-  "parent": "item/generated",
+  "parent": "farmers_future_delight:item/aquatic_plant_generated",
   "textures": {
     "layer0": "farmers_future_delight:item/kelp"
   }

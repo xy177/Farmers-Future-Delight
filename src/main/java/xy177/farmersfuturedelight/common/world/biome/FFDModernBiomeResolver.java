@@ -101,12 +101,21 @@ public final class FFDModernBiomeResolver {
     public Biome resolveLegacy(Sample sample, Biome candidate) {
         Biome mountain = FFDBiomes.forModernBiome(sample.biome);
         if (mountain != null) {
-            return mountain;
+            return isIceAndFireGlacier(candidate) && isCompatible(sample, candidate)
+                    ? candidate : mountain;
         }
         if (candidate != null && isCompatible(sample, candidate)) {
             return candidate;
         }
         return sample.fallbackBiome();
+    }
+
+    private static boolean isIceAndFireGlacier(Biome biome) {
+        if (biome == null || biome.getRegistryName() == null) {
+            return false;
+        }
+        return "iceandfire".equals(biome.getRegistryName().getResourceDomain())
+                && "glacier".equalsIgnoreCase(biome.getRegistryName().getResourcePath());
     }
 
     public boolean matches(Sample sample, String target) {
@@ -182,6 +191,13 @@ public final class FFDModernBiomeResolver {
                 return false;
             }
         } else if (candidateRole != TerrainRole.LAND) {
+            return false;
+        }
+
+        if ((sample.biome == ModernBiome.FROZEN_OCEAN
+                || sample.biome == ModernBiome.DEEP_FROZEN_OCEAN)
+                && !BiomeDictionary.hasType(candidate, BiomeDictionary.Type.COLD)
+                && !BiomeDictionary.hasType(candidate, BiomeDictionary.Type.SNOWY)) {
             return false;
         }
 

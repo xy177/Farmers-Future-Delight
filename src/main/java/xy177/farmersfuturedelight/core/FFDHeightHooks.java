@@ -24,6 +24,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ClassInheritanceMultiMap;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -123,19 +124,56 @@ public final class FFDHeightHooks {
         return minY(world) + 5;
     }
 
-    public static void beginYungMineshaftStructure(StructureStart start,
+    public static void beginCompatStructure(StructureStart start,
             World world, StructureBoundingBox box) {
-        boolean extended = isExtended(world) && start != null
-                && start.getClass().getName().startsWith(
-                        "com.yungnickyoung.minecraft.bettermineshafts.");
+        String className = start == null ? "" : start.getClass().getName();
+        boolean yungMineshaft = className.startsWith(
+                "com.yungnickyoung.minecraft.bettermineshafts.");
+        boolean deeperDepths = className.equals(
+                "com.deeperdepths.common.world.chambers.WorldGenTrialChambers$Start")
+                || className.equals(
+                "com.deeperdepths.common.world.ancient_cities.WorldGenAncientCities$Start");
+        boolean extended = isExtended(world) && (yungMineshaft || deeperDepths);
         if (extended && box.minY > MIN_Y) {
             box.minY = MIN_Y;
         }
         beginCompatExtendedWorldgen(extended);
     }
 
+    public static void beginIceAndFireWorldgen(World world) {
+        beginCompatExtendedWorldgen(isExtended(world));
+    }
+
+    public static void beginDeeperDepthsStructure(World world) {
+        beginCompatExtendedWorldgen(isExtended(world));
+    }
+
     public static void beginDeadlyWorldGeneration(World world) {
         beginCompatExtendedWorldgen(isExtended(world));
+    }
+
+    public static void beginTaigaEezoWorldgen(IBlockState replacementBlock, World world) {
+        beginCompatExtendedWorldgen(isTaigaEezo(replacementBlock) && isExtended(world));
+    }
+
+    public static int adjustTaigaEezoMinY(int original, IBlockState replacementBlock,
+            World world) {
+        return isTaigaEezo(replacementBlock) && isExtended(world) ? MIN_Y : original;
+    }
+
+    public static int adjustTaigaEezoMaxY(int original, IBlockState replacementBlock,
+            World world) {
+        return isTaigaEezo(replacementBlock) && isExtended(world)
+                ? MIN_Y + original : original;
+    }
+
+    private static boolean isTaigaEezo(IBlockState state) {
+        if (state == null || state.getBlock() == null) {
+            return false;
+        }
+        ResourceLocation id = state.getBlock().getRegistryName();
+        return id != null && "taiga".equals(id.getResourceDomain())
+                && "eezo_ore".equals(id.getResourcePath());
     }
 
     public static void endExtendedWorldgenHeight() {
@@ -197,7 +235,8 @@ public final class FFDHeightHooks {
     }
 
     public static int netherApiGenerationHeight(World world) {
-        return hasExtendedWorldType(world) ? 128 : world.getActualHeight();
+        return world != null && world.provider != null && world.provider.getDimension() == -1
+                ? 128 : world.getActualHeight();
     }
 
     public static int portalSearchHeight(World world) {

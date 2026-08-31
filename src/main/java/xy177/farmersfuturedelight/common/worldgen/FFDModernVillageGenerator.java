@@ -1,13 +1,17 @@
 package xy177.farmersfuturedelight.common.worldgen;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.structure.MapGenVillage;
 import net.minecraft.world.gen.structure.StructureStart;
 
 import xy177.farmersfuturedelight.common.FFDConfig;
+import xy177.farmersfuturedelight.common.registry.FFDBiomes;
 
 /**
  * Keeps the legacy village pieces and biome eligibility, but uses the 26.3
@@ -37,7 +41,7 @@ public final class FFDModernVillageGenerator extends MapGenVillage {
             return false;
         }
         return world.getBiomeProvider().areBiomesViable(
-                originalX * 16 + 8, originalZ * 16 + 8, 0, VILLAGE_SPAWN_BIOMES);
+                originalX * 16 + 8, originalZ * 16 + 8, 0, villageBiomes());
     }
 
     @Override
@@ -54,5 +58,15 @@ public final class FFDModernVillageGenerator extends MapGenVillage {
 
     private static int spacing() {
         return Math.max(SEPARATION + 1, FFDConfig.modernVillageSpacing);
+    }
+
+    private static List<Biome> villageBiomes() {
+        if (VILLAGE_SPAWN_BIOMES.contains(FFDBiomes.MEADOW)) {
+            return VILLAGE_SPAWN_BIOMES;
+        }
+        List<Biome> biomes = new ArrayList<>(VILLAGE_SPAWN_BIOMES.size() + 1);
+        biomes.addAll(VILLAGE_SPAWN_BIOMES);
+        biomes.add(FFDBiomes.MEADOW);
+        return biomes;
     }
 }

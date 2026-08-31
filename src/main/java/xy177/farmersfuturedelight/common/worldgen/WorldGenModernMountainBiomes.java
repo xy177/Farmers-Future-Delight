@@ -121,7 +121,8 @@ public final class WorldGenModernMountainBiomes {
             int x = startX + random.nextInt(16);
             int z = startZ + random.nextInt(16);
             BlockPos pos = surfacePosition(world, x, z);
-            if (isSurfaceBiome(world, pos, FFDVerticalBiome.GROVE)
+            FFDVerticalBiome biome = surfaceBiome(world, pos.down());
+            if ((biome == FFDVerticalBiome.GROVE || biome == FFDVerticalBiome.SNOWY_SLOPES)
                     && world.getBlockState(pos.down()).getBlock() == Blocks.GRASS) {
                 new WorldGenPumpkin().generate(world, random, pos);
             }
