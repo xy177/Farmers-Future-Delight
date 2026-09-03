@@ -249,6 +249,22 @@ public class EntityPhantom extends EntityMob {
         return getEntityId() * 3;
     }
 
+    public float getRenderPitch(float partialTicks) {
+        float pitch = prevRotationPitch + (rotationPitch - prevRotationPitch) * partialTicks;
+        if (Math.abs(pitch) > 0.01F) {
+            return MathHelper.clamp(pitch, -90.0F, 90.0F);
+        }
+        double movementX = posX - prevPosX;
+        double movementY = posY - prevPosY;
+        double movementZ = posZ - prevPosZ;
+        double horizontal = Math.sqrt(movementX * movementX + movementZ * movementZ);
+        if (horizontal <= 1.0E-5D || Math.abs(movementY) <= 1.0E-5D) {
+            return pitch;
+        }
+        return MathHelper.clamp((float) (MathHelper.atan2(movementY, horizontal)
+                * 57.2957763671875D), -90.0F, 90.0F);
+    }
+
     private void updatePhantomSizeInfo() {
         float scale = 1.0F + 0.15F * getPhantomSize();
         setSize(BASE_WIDTH * scale, BASE_HEIGHT * scale);

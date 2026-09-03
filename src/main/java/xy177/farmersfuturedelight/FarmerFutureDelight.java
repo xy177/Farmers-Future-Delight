@@ -38,7 +38,7 @@ import xy177.farmersfuturedelight.proxy.CommonProxy;
 public class FarmerFutureDelight {
     public static final String MODID = "farmers_future_delight";
     public static final String NAME = "Farmer's Future Delight";
-    public static final String VERSION = "1.3.1";
+    public static final String VERSION = "1.3.3";
 
     @Mod.Instance(MODID)
     public static FarmerFutureDelight instance;

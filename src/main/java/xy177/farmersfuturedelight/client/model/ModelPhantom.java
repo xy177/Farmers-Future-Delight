@@ -77,6 +77,8 @@ public class ModelPhantom extends ModelBase {
                                   float netHeadYaw, float headPitch, float scaleFactor,
                                   Entity entity) {
         EntityPhantom phantom = (EntityPhantom) entity;
+        float partialTicks = MathHelper.clamp(ageInTicks - phantom.ticksExisted, 0.0F, 1.0F);
+        body.rotateAngleX = -0.1F + phantom.getRenderPitch(partialTicks) * 0.017453292F;
         float animation = (phantom.getUniqueFlapTickOffset() + ageInTicks)
                 * 7.448451F * 0.017453292F;
         float wingAngle = MathHelper.cos(animation) * 16.0F * 0.017453292F;

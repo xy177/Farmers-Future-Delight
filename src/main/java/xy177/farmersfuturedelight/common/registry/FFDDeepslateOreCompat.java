@@ -513,8 +513,8 @@ public final class FFDDeepslateOreCompat {
             sourceMaterials.add(sourceMaterial);
             sourceStacks.add(sourceStack.copy());
             legacyPaths.add(legacyPath);
-            if ("mekanism".equals(modid)) {
-                modelPath = legacyPath;
+            if (!"mekanism".equals(modid) && !"custom".equals(modid)) {
+                modelPath = MODEL_PATH;
             }
         }
 

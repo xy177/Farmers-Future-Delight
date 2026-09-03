@@ -454,7 +454,7 @@ public final class FFDConfig {
         crimsonWoodMode = readMode(config, "crimsonWoodMode", "绯红木材内容开关");
         warpedWoodMode = readMode(config, "warpedWoodMode", "诡异木材内容开关");
         glowItemFrameMode = readMode(config, "glowItemFrameMode", "荧光物品展示框内容开关");
-        signTextMode = readMode(config, "signTextMode", "告示牌文字染色与发光内容开关");
+        signTextMode = readNonAvoidingMode(config, "signTextMode", "告示牌文字染色与发光功能开关");
         lightBlockMode = readMode(config, "lightBlockMode", "光源方块内容开关");
 
         String[] defaultAutoCompatibilityToggles = FFDCompat.defaultAutoCompatibilityToggles();
@@ -1173,6 +1173,9 @@ public final class FFDConfig {
         if ("autoCompatibilityToggles".equals(key)) {
             return "Per-content AUTO compatibility overrides in content_path@mod_id=true or content_path@mod_id=false form. true yields to that mod when it provides the matching content; false ignores that mod for this content. The default list includes every supported content and mod combination, including mods that are not installed. Missing combinations use the normal AUTO decision. Restart required.";
         }
+        if ("signTextMode".equals(key)) {
+            return "Enables or disables sign text dyeing and glowing. This behavior has no AUTO compatibility target; legacy AUTO values are treated as ENABLED. Restart required.";
+        }
         if ("rawOreMaterialToggles".equals(key)) {
             return "Per-material raw-ore toggles in material=true or material=false form. Each entry controls that raw material, its storage block, ore-drop replacement, and compatibility recipes. Missing materials default to true. Restart required.";
         }
@@ -1534,6 +1537,18 @@ public final class FFDConfig {
                 comment + "。默认值为 ENABLED，即关闭自动避让并使用本模组实现。可选值：ENABLED、DISABLED、AUTO。AUTO 会逐个识别外部内容单元，并仅由本模组补齐缺失内容。",
                 new String[]{"ENABLED", "DISABLED", "AUTO"});
         return FeatureMode.parse(value);
+    }
+
+    private static FeatureMode readNonAvoidingMode(Configuration config, String key, String comment) {
+        Property property = config.get(CATEGORY_FEATURES, key, "ENABLED",
+                comment + "。默认值为 ENABLED。可选值：ENABLED、DISABLED；此功能没有自动避让主体。");
+        property.setValidValues(new String[]{"ENABLED", "DISABLED"});
+        FeatureMode mode = FeatureMode.parse(property.getString());
+        if (mode == FeatureMode.AUTO) {
+            property.set("ENABLED");
+            return FeatureMode.ENABLED;
+        }
+        return mode == FeatureMode.DISABLED ? FeatureMode.DISABLED : FeatureMode.ENABLED;
     }
 
     public static boolean isRawOreMaterialEnabled(String material) {

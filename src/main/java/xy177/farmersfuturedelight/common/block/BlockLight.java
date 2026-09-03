@@ -23,6 +23,8 @@ import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -94,6 +96,14 @@ public class BlockLight extends Block {
     @Override
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
         return FarmerFutureDelight.proxy.getLightSelectionBox(source, pos);
+    }
+
+    @Override
+    @Nullable
+    public RayTraceResult collisionRayTrace(IBlockState state, World world, BlockPos pos,
+                                            Vec3d start, Vec3d end) {
+        AxisAlignedBB selectionBox = getBoundingBox(state, world, pos);
+        return selectionBox == NULL_AABB ? null : rayTrace(pos, start, end, selectionBox);
     }
 
     @Override

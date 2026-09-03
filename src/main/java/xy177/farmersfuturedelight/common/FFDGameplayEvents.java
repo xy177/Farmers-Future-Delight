@@ -422,11 +422,12 @@ public final class FFDGameplayEvents {
             return;
         }
 
-        event.setCanceled(true);
-        event.setCancellationResult(EnumActionResult.SUCCESS);
         if (event.getWorld().isRemote) {
             return;
         }
+
+        event.setCanceled(true);
+        event.setCancellationResult(EnumActionResult.SUCCESS);
 
         TileEntitySign sign = (TileEntitySign) tile;
         boolean changed;

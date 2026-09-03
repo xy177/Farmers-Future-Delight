@@ -39,15 +39,6 @@ public class RenderPhantom extends RenderLiving<EntityPhantom> {
         GlStateManager.translate(0.0F, 1.3125F, 0.1875F);
     }
 
-    @Override
-    protected void applyRotations(EntityPhantom phantom, float ageInTicks, float rotationYaw,
-                                  float partialTicks) {
-        super.applyRotations(phantom, ageInTicks, rotationYaw, partialTicks);
-        GlStateManager.rotate(phantom.prevRotationPitch
-                + (phantom.rotationPitch - phantom.prevRotationPitch) * partialTicks,
-                -1.0F, 0.0F, 0.0F);
-    }
-
     private static final class EyesLayer implements LayerRenderer<EntityPhantom> {
         private final RenderPhantom renderer;
 
