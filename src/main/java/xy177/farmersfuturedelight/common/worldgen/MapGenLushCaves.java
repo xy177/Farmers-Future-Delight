@@ -43,12 +43,6 @@ import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiome;
 import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiomeManager;
 import xy177.farmersfuturedelight.core.FFDHeightHooks;
 
-/**
- * Preserves the original cave carver, marks broad deterministic underground
- * regions as lush, and adds a connected chamber network where 1.12 terrain is
- * too sparse. Region-derived seeds keep both the mask and tunnels continuous at
- * chunk borders.
- */
 public final class MapGenLushCaves extends MapGenBase {
     private static final int REGION_SIZE_CHUNKS = 6;
     private static final long CAVERN_SALT = 0x4C55534843415645L;
@@ -427,7 +421,7 @@ public final class MapGenLushCaves extends MapGenBase {
         }
     }
 
-    private static boolean isClassicVineSupport(IBlockAccess access, BlockPos pos,
+    public static boolean isClassicVineSupport(IBlockAccess access, BlockPos pos,
                                                  EnumFacing supportFace) {
         IBlockState state = access.getBlockState(pos);
         Block block = state.getBlock();

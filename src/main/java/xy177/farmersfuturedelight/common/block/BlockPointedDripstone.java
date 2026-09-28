@@ -206,7 +206,7 @@ public class BlockPointedDripstone extends BlockFalling {
         Thickness thickness = calculateThickness(world, pos, direction,
                 current.getValue(THICKNESS) == Thickness.TIP_MERGE);
         if (current.getValue(THICKNESS) != thickness) {
-            world.setBlockState(pos, current.withProperty(THICKNESS, thickness), 2);
+            world.setBlockState(pos, current.withProperty(THICKNESS, thickness), 3);
         }
     }
 
@@ -259,11 +259,15 @@ public class BlockPointedDripstone extends BlockFalling {
         }
         int size = states.size();
         for (BlockPos pos : positions) {
-            world.setBlockState(pos, Blocks.AIR.getDefaultState(), 2);
+            xy177.farmersfuturedelight.api.WaterloggedBlockApi.restoreFluid(
+                    world, pos, world.getBlockState(pos), 2);
         }
         for (int index = 0; index < size; index++) {
             BlockPos pos = positions.get(index);
             IBlockState fallingState = states.get(index);
+            IBlockState dry = xy177.farmersfuturedelight.api.WaterloggedBlockApi
+                    .withWaterlogged(fallingState, false);
+            if (dry != null) fallingState = dry;
             EntityFallingBlock falling = new EntityFallingBlock(world,
                     pos.getX() + 0.5D, pos.getY(), pos.getZ() + 0.5D, fallingState);
             falling.fallTime = 1;
@@ -345,7 +349,8 @@ public class BlockPointedDripstone extends BlockFalling {
     }
 
     private void fillCauldronFromTip(World world, BlockPos tip) {
-        if (!FFDConfig.modernCauldronFeatures) {
+        if (!FFDConfig.modernCauldronFeatures
+                || xy177.farmersfuturedelight.api.WaterloggedBlockApi.isWaterlogged(world, tip)) {
             return;
         }
         FluidKind fluid = getFluidAboveStalactite(world, tip);
@@ -561,7 +566,8 @@ public class BlockPointedDripstone extends BlockFalling {
     }
 
     private void spawnDripParticle(World world, BlockPos tip, FluidKind fluid) {
-        if (!(world instanceof WorldServer)) {
+        if (!(world instanceof WorldServer)
+                || xy177.farmersfuturedelight.api.WaterloggedBlockApi.isWaterlogged(world, tip)) {
             return;
         }
         IBlockState state = world.getBlockState(tip);
@@ -573,7 +579,8 @@ public class BlockPointedDripstone extends BlockFalling {
 
     @Override
     public void randomDisplayTick(IBlockState state, World world, BlockPos pos, Random random) {
-        if (!isFreeHangingStalactite(state)) {
+        if (!isFreeHangingStalactite(state)
+                || xy177.farmersfuturedelight.api.WaterloggedBlockApi.isWaterlogged(world, pos)) {
             return;
         }
         float roll = random.nextFloat();

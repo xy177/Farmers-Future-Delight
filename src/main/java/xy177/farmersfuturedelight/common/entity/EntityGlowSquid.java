@@ -1,8 +1,7 @@
 package xy177.farmersfuturedelight.common.entity;
 
 import net.minecraft.block.material.Material;
-import net.minecraft.init.Blocks;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.passive.EntitySquid;
 import net.minecraft.item.ItemStack;
@@ -11,15 +10,11 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import xy177.farmersfuturedelight.FarmerFutureDelight;
@@ -36,16 +31,8 @@ public class EntityGlowSquid extends EntitySquid {
     private static final ResourceLocation LOOT_TABLE =
             new ResourceLocation(FarmerFutureDelight.MODID, "entities/glow_squid");
     private int growingAge;
-    private int fleeTicks;
-
     public EntityGlowSquid(World world) {
         super(world);
-    }
-
-    @Override
-    protected void initEntityAI() {
-        super.initEntityAI();
-        tasks.addTask(1, new AIFlee(this));
     }
 
     @Override
@@ -107,8 +94,8 @@ public class EntityGlowSquid extends EntitySquid {
             FarmerFutureDelight.proxy.spawnGlowParticle(this);
             return;
         }
-        if (isEntityAlive() && growingAge < 0) {
-            setGrowingAge(growingAge + 1);
+        if (isEntityAlive() && growingAge != 0) {
+            setGrowingAge(growingAge + (growingAge < 0 ? 1 : -1));
         }
         if (getDarkTicksRemaining() > 0) {
             setDarkTicks(getDarkTicksRemaining() - 1);
@@ -118,12 +105,8 @@ public class EntityGlowSquid extends EntitySquid {
     @Override
     public boolean attackEntityFrom(DamageSource source, float amount) {
         boolean hurt = super.attackEntityFrom(source, amount);
-        if (hurt && !world.isRemote) {
+        if (hurt && !world.isRemote && getRevengeTarget() != null) {
             setDarkTicks(100);
-            if (source.getTrueSource() instanceof EntityLivingBase) {
-                playSound(FFDSounds.GLOW_SQUID_SQUIRT, getSoundVolume(), 1.0F);
-                world.setEntityState(this, (byte) 20);
-            }
         }
         return hurt;
     }
@@ -144,9 +127,15 @@ public class EntityGlowSquid extends EntitySquid {
         return FFDEntities.isGlowSquidEnabled()
                 && world.provider.getDimension() == 0
                 && pos.getY() <= world.getSeaLevel() - FFDConfig.glowSquidDepthBelowSeaLevel
-                && world.getLight(pos, true) == 0
-                && world.getBlockState(pos).getBlock() == Blocks.WATER
+                && world.getLight(pos) == 0
+                && world.getBlockState(pos).getMaterial() == Material.WATER
                 && world.checkNoEntityCollision(getEntityBoundingBox(), this);
+    }
+
+    @Override
+    public boolean isCreatureType(EnumCreatureType type, boolean forSpawnCount) {
+        return !(forSpawnCount && type == EnumCreatureType.WATER_CREATURE)
+                && super.isCreatureType(type, forSpawnCount);
     }
 
     @Override
@@ -217,74 +206,6 @@ public class EntityGlowSquid extends EntitySquid {
 
     private void setDarkTicks(int ticks) {
         dataManager.set(DARK_TICKS, Math.max(0, ticks));
-    }
-
-    private void updateFleeBehavior() {
-        EntityLivingBase attacker = getRevengeTarget();
-        if (!isInWater() || attacker == null || !attacker.isEntityAlive()
-                || getDistanceSq(attacker) >= 100.0D) {
-            fleeTicks = 0;
-            return;
-        }
-
-        fleeTicks++;
-        Vec3d away = new Vec3d(posX - attacker.posX, posY - attacker.posY, posZ - attacker.posZ);
-        BlockPos targetPos = new BlockPos(posX + away.x, posY + away.y, posZ + away.z);
-        Material targetMaterial = world.getBlockState(targetPos).getMaterial();
-        if (targetMaterial == Material.WATER || world.isAirBlock(targetPos)) {
-            double distance = away.lengthVector();
-            if (distance > 0.0D) {
-                away.normalize();
-                double speed = 3.0D;
-                if (distance > 5.0D) {
-                    speed -= (distance - 5.0D) / 5.0D;
-                }
-                if (speed > 0.0D) {
-                    away = away.scale(speed);
-                }
-            }
-            if (world.isAirBlock(targetPos)) {
-                away = new Vec3d(away.x, 0.0D, away.z);
-            }
-            setMovementVector((float) (away.x / 20.0D),
-                    (float) (away.y / 20.0D),
-                    (float) (away.z / 20.0D));
-        }
-
-        if (fleeTicks % 10 == 5 && world instanceof WorldServer) {
-            ((WorldServer) world).spawnParticle(EnumParticleTypes.WATER_BUBBLE,
-                    posX, posY, posZ, 1, 0.0D, 0.0D, 0.0D, 0.0D);
-        }
-    }
-
-    private static final class AIFlee extends EntityAIBase {
-        private final EntityGlowSquid squid;
-
-        private AIFlee(EntityGlowSquid squid) {
-            this.squid = squid;
-        }
-
-        @Override
-        public boolean shouldExecute() {
-            EntityLivingBase attacker = squid.getRevengeTarget();
-            return squid.isInWater() && attacker != null && attacker.isEntityAlive()
-                    && squid.getDistanceSq(attacker) < 100.0D;
-        }
-
-        @Override
-        public void startExecuting() {
-            squid.fleeTicks = 0;
-        }
-
-        @Override
-        public void resetTask() {
-            squid.fleeTicks = 0;
-        }
-
-        @Override
-        public void updateTask() {
-            squid.updateFleeBehavior();
-        }
     }
 
     private static final class GlowSquidGroupData implements IEntityLivingData {

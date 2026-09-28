@@ -19,7 +19,6 @@ import xy177.farmersfuturedelight.common.block.BlockSmallDripleaf;
 import xy177.farmersfuturedelight.common.block.DripleafTilt;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 
-/** Resolves one coherent set of registered blocks for lush-cave generation. */
 public final class FFDLushCaveBlockProvider {
     private final IBlockState mossBlock;
     private final IBlockState mossCarpet;

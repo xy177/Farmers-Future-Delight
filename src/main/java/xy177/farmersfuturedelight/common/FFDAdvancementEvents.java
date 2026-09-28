@@ -20,6 +20,7 @@ import net.minecraftforge.event.entity.living.BabyEntitySpawnEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.ItemFishedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -100,6 +101,20 @@ public final class FFDAdvancementEvents {
         Entity source = event.getSource().getTrueSource();
         if (source instanceof EntityPlayerMP && "phantom".equals(entityPath(event.getEntityLiving()))) {
             FFDAdvancements.KILL_PHANTOM.trigger((EntityPlayerMP) source);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onItemFished(ItemFishedEvent event) {
+        if (!(event.getEntityPlayer() instanceof EntityPlayerMP)) {
+            return;
+        }
+        for (ItemStack drop : event.getDrops()) {
+            if (!drop.isEmpty() && drop.getItem() == net.minecraft.init.Items.FISH) {
+                FFDAdvancements.FISHY_BUSINESS.trigger(
+                        (EntityPlayerMP) event.getEntityPlayer());
+                return;
+            }
         }
     }
 

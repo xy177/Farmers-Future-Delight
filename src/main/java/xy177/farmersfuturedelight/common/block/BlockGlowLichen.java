@@ -41,16 +41,15 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
 
 import xy177.farmersfuturedelight.FarmerFutureDelight;
+import xy177.farmersfuturedelight.api.IWaterloggableBlock;
+import xy177.farmersfuturedelight.api.WaterloggedBlockApi;
 import xy177.farmersfuturedelight.common.FFDCreativeTab;
+import xy177.farmersfuturedelight.common.fluid.FFDStoredFluidStates;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
+import xy177.farmersfuturedelight.core.FFDHeightHooks;
 
-/**
- * Stores six attachment faces plus waterlogging across eight internal blocks.
- * The low four face bits remain ordinary 1.12 metadata and the block variant
- * carries the remaining two face bits and the water bit.
- */
-public class BlockGlowLichen extends Block implements IGrowable {
+public class BlockGlowLichen extends Block implements IGrowable, IWaterloggableBlock {
     public static final PropertyBool DOWN = PropertyBool.create("down");
     public static final PropertyBool UP = PropertyBool.create("up");
     public static final PropertyBool NORTH = PropertyBool.create("north");
@@ -82,6 +81,7 @@ public class BlockGlowLichen extends Block implements IGrowable {
         setSoundType(SoundType.PLANT);
         setLightOpacity(0);
         setLightLevel(7.0F / 15.0F);
+        setTickRandomly(true);
         setCreativeTab(FFDCreativeTab.INSTANCE);
         setDefaultState(blockState.getBaseState()
                 .withProperty(BlockLiquid.LEVEL, 0)
@@ -96,12 +96,12 @@ public class BlockGlowLichen extends Block implements IGrowable {
         return new ExtendedBlockState(this,
                 new net.minecraft.block.properties.IProperty<?>[] {
                         BlockLiquid.LEVEL, DOWN, UP, NORTH, SOUTH},
-                WaterloggedPlantFluid.extendedProperties());
+                WaterloggedBlockApi.extendedProperties());
     }
 
     @Override
     public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
-        return WaterloggedPlantFluid.getExtendedState(state, world, pos);
+        return WaterloggedBlockApi.getExtendedState(state, world, pos);
     }
 
     @Override
@@ -143,6 +143,16 @@ public class BlockGlowLichen extends Block implements IGrowable {
 
     public static boolean isWaterlogged(IBlockState state) {
         return isGlowLichen(state) && ((((BlockGlowLichen) state.getBlock()).variantIndex & 4) != 0);
+    }
+
+    @Override
+    public boolean isWaterloggedState(IBlockState state) {
+        return isWaterlogged(state);
+    }
+
+    @Override
+    public IBlockState setWaterloggedState(IBlockState state, boolean waterlogged) {
+        return stateFor(getFaceMask(state), waterlogged);
     }
 
     public static int getFaceMask(IBlockState state) {
@@ -214,14 +224,14 @@ public class BlockGlowLichen extends Block implements IGrowable {
         }
         int mask = getFaceMask(oldState) | faceBit(face);
         boolean waterlogged = isGlowLichen(oldState)
-                ? isWaterlogged(oldState) : WaterloggedPlantFluid.isSourceWater(oldState);
+                ? isWaterlogged(oldState) : WaterloggedBlockApi.containsWater(oldState);
         return stateFor(mask, waterlogged);
     }
 
     private static boolean canOccupy(IBlockAccess world, BlockPos pos) {
         IBlockState state = world.getBlockState(pos);
         return state.getMaterial() == Material.AIR || isGlowLichen(state)
-                || WaterloggedPlantFluid.isSourceWater(state);
+                || WaterloggedBlockApi.containsWater(state);
     }
 
     @Nullable
@@ -252,33 +262,62 @@ public class BlockGlowLichen extends Block implements IGrowable {
     @Override
     public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
         super.onBlockAdded(world, pos, state);
-        WaterloggedPlantFluid.onBlockAdded(world, pos, this);
+        WaterloggedBlockApi.onBlockAdded(world, pos, this);
     }
 
     @Override
     public void neighborChanged(IBlockState state, World world, BlockPos pos,
                                 Block blockIn, BlockPos fromPos) {
-        if (world.isRemote || !isGlowLichen(world.getBlockState(pos))) {
+        if (world.isRemote) {
+            return;
+        }
+        refreshSupport(world, pos);
+        IBlockState current = world.getBlockState(pos);
+        WaterloggedBlockApi.onNeighborChanged(world, pos, current.getBlock());
+    }
+
+    public static void refreshSupport(World world, BlockPos pos) {
+        if (world.isRemote || !world.isBlockLoaded(pos)) {
+            return;
+        }
+        IBlockState state = world.getBlockState(pos);
+        if (!isGlowLichen(state)) {
             return;
         }
         int oldMask = getFaceMask(state);
         int validMask = oldMask;
         for (EnumFacing face : EnumFacing.values()) {
-            if ((validMask & faceBit(face)) != 0 && !canAttachTo(world, pos, face)) {
+            if ((validMask & faceBit(face)) == 0) {
+                continue;
+            }
+            BlockPos supportPos = pos.offset(face);
+            if (supportPos.getY() < FFDHeightHooks.minY(world)
+                    || supportPos.getY() >= FFDHeightHooks.maxYExclusive(world)
+                    || world.isBlockLoaded(supportPos) && !canAttachTo(world, pos, face)) {
                 validMask &= ~faceBit(face);
             }
         }
-        if (validMask != oldMask) {
-            world.setBlockState(pos, stateFor(validMask, isWaterlogged(state)), 2);
+        if (validMask == 0) {
+            WaterloggedBlockApi.restoreFluid(world, pos, state, 2);
+        } else if (validMask != oldMask) {
+            IBlockState fluid = FFDStoredFluidStates.get(world, pos);
+            if (world.setBlockState(pos, stateFor(validMask, isWaterlogged(state)), 2)
+                    && fluid != null) {
+                FFDStoredFluidStates.set(world, pos, fluid);
+            }
         }
-        IBlockState current = world.getBlockState(pos);
-        WaterloggedPlantFluid.onNeighborChanged(world, pos, current.getBlock());
+    }
+
+    @Override
+    public void randomTick(World world, BlockPos pos, IBlockState state, Random random) {
+        refreshSupport(world, pos);
     }
 
     @Override
     public void updateTick(World world, BlockPos pos, IBlockState state, Random random) {
+        refreshSupport(world, pos);
         if (!world.isRemote && isWaterlogged(world.getBlockState(pos))) {
-            WaterloggedPlantFluid.updateTick(world, pos, world.getBlockState(pos));
+            WaterloggedBlockApi.updateTick(world, pos, world.getBlockState(pos));
         }
     }
 
@@ -286,18 +325,14 @@ public class BlockGlowLichen extends Block implements IGrowable {
     public boolean removedByPlayer(IBlockState state, World world, BlockPos pos,
                                    EntityPlayer player, boolean willHarvest) {
         onBlockHarvested(world, pos, state, player);
-        return world.setBlockState(pos, replacementState(state), world.isRemote ? 11 : 3);
+        return WaterloggedBlockApi.restoreFluid(world, pos, state, world.isRemote ? 11 : 3);
     }
 
     @Override
     public void onBlockExploded(World world, BlockPos pos, net.minecraft.world.Explosion explosion) {
         IBlockState state = world.getBlockState(pos);
-        world.setBlockState(pos, replacementState(state), 3);
+        WaterloggedBlockApi.restoreFluid(world, pos, state, 3);
         onBlockDestroyedByExplosion(world, pos, explosion);
-    }
-
-    private static IBlockState replacementState(IBlockState state) {
-        return isWaterlogged(state) ? Blocks.WATER.getDefaultState() : Blocks.AIR.getDefaultState();
     }
 
     @Override
@@ -395,7 +430,7 @@ public class BlockGlowLichen extends Block implements IGrowable {
         }
         if (place && world instanceof World) {
             boolean waterlogged = isGlowLichen(oldState)
-                    ? isWaterlogged(oldState) : WaterloggedPlantFluid.isSourceWater(oldState);
+                    ? isWaterlogged(oldState) : WaterloggedBlockApi.containsWater(oldState);
             ((World) world).setBlockState(pos,
                     stateFor(getFaceMask(oldState) | faceBit(face), waterlogged), 2);
         }
@@ -466,8 +501,7 @@ public class BlockGlowLichen extends Block implements IGrowable {
 
     @Override
     public Vec3d modifyAcceleration(World world, BlockPos pos, Entity entity, Vec3d motion) {
-        return isWaterlogged(world.getBlockState(pos))
-                ? Blocks.WATER.modifyAcceleration(world, pos, entity, motion) : motion;
+        return WaterloggedBlockApi.modifyAcceleration(world, pos, entity, motion);
     }
 
     @Override

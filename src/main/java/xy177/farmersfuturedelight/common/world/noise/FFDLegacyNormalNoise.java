@@ -2,7 +2,6 @@ package xy177.farmersfuturedelight.common.world.noise;
 
 import java.util.Random;
 
-/** The exact LegacyRandomSource initialization used by the modern geode feature. */
 public final class FFDLegacyNormalNoise {
     private static final double SECOND_INPUT_FACTOR = 1.0181268882175227D;
     private static final double INPUT_FACTOR = 1.0D / 16.0D;

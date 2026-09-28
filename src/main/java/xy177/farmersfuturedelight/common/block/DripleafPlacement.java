@@ -9,6 +9,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import xy177.farmersfuturedelight.api.WaterloggedBlockApi;
 import xy177.farmersfuturedelight.common.worldgen.FFDLushCaveBlockProvider;
 
 public final class DripleafPlacement {
@@ -17,7 +18,7 @@ public final class DripleafPlacement {
 
     public static boolean canReplace(World world, BlockPos pos) {
         IBlockState state = world.getBlockState(pos);
-        return world.isAirBlock(pos) || WaterloggedPlantFluid.isSourceWater(state)
+        return world.isAirBlock(pos) || WaterloggedBlockApi.containsWater(state)
                 || FFDLushCaveBlockProvider.get().isSmallDripleaf(state);
     }
 
@@ -115,11 +116,11 @@ public final class DripleafPlacement {
 
     public static IBlockState stemState(World world, BlockPos pos, EnumFacing facing) {
         return FFDLushCaveBlockProvider.get().bigDripleafStem(facing,
-                WaterloggedPlantFluid.isSourceWater(world, pos));
+                WaterloggedBlockApi.containsWater(world, pos));
     }
 
     public static IBlockState headState(World world, BlockPos pos, EnumFacing facing) {
         return FFDLushCaveBlockProvider.get().bigDripleaf(facing,
-                WaterloggedPlantFluid.isSourceWater(world, pos));
+                WaterloggedBlockApi.containsWater(world, pos));
     }
 }

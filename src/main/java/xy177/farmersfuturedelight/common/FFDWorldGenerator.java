@@ -5,9 +5,13 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.BlockLiquid;
-import net.minecraft.block.BlockLog;
+import net.minecraft.block.BlockNewLeaf;
+import net.minecraft.block.BlockNewLog;
+import net.minecraft.block.BlockOldLeaf;
+import net.minecraft.block.BlockOldLog;
+import net.minecraft.block.BlockPlanks;
+import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -24,9 +28,15 @@ import xy177.farmersfuturedelight.common.block.BlockBeehive;
 import xy177.farmersfuturedelight.common.block.BlockKelpHead;
 import xy177.farmersfuturedelight.common.block.BlockSeaPickle;
 import xy177.farmersfuturedelight.common.block.BlockSweetBerryBush;
+import xy177.farmersfuturedelight.common.block.WaterloggedPlantFluid;
+import xy177.farmersfuturedelight.common.biome.BiomeModernOcean;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.tile.TileEntityBeehive;
+import xy177.farmersfuturedelight.common.worldgen.WorldGenCoralReefs;
+import xy177.farmersfuturedelight.common.worldgen.WorldGenModernIcebergs;
+import xy177.farmersfuturedelight.common.worldgen.FFDOceanStructures;
+import xy177.farmersfuturedelight.common.worldgen.BeeNestLeaves;
 import xy177.farmersfuturedelight.core.FFDHeightHooks;
 
 public class FFDWorldGenerator implements IWorldGenerator {
@@ -41,9 +51,14 @@ public class FFDWorldGenerator implements IWorldGenerator {
         if (world.provider.getDimension() != 0) {
             return;
         }
-        try (FFDHeightHooks.WorldgenHeightScope ignored = FFDHeightHooks.enterExtendedWorldgenHeight()) {
+        try (FFDHeightHooks.WorldgenHeightScope ignored = FFDHeightHooks.enterExtendedWorldgenHeight();
+             WaterloggedPlantFluid.WorldgenScope ignoredFluid = WaterloggedPlantFluid.enterWorldgen()) {
             BlockPos chunkOrigin = new BlockPos(chunkX * 16, 0, chunkZ * 16);
             Biome biome = world.getBiome(chunkOrigin);
+            FFDOceanStructures.generate(world, chunkX, chunkZ);
+            if (!FFDHeightHooks.isExtended(world)) {
+                new WorldGenModernIcebergs(world.getSeed()).generate(world, chunkX, chunkZ);
+            }
             if (FFDItems.isBlockRegistered(FFDBlocks.SWEET_BERRY_BUSH)
                     && BiomeDictionary.hasType(biome, BiomeDictionary.Type.CONIFEROUS)) {
                 int rarity = BiomeDictionary.hasType(biome, BiomeDictionary.Type.SNOWY)
@@ -55,9 +70,10 @@ public class FFDWorldGenerator implements IWorldGenerator {
             }
 
             Biome aquaticBiome = world.getBiome(new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8));
+            WorldGenCoralReefs.generate(random, chunkX, chunkZ, world);
             if (FFDItems.isBlockRegistered(FFDBlocks.KELP)
                     && BiomeDictionary.hasType(aquaticBiome, BiomeDictionary.Type.OCEAN)
-                    && !isFrozenOcean(aquaticBiome)) {
+                    && !isFrozenOcean(aquaticBiome) && !isWarmOceanOnly(aquaticBiome)) {
                 generateKelp(random, chunkX, chunkZ, world, aquaticBiome);
             }
 
@@ -68,13 +84,24 @@ public class FFDWorldGenerator implements IWorldGenerator {
             }
 
             if (FFDItems.isBlockRegistered(FFDBlocks.SEA_PICKLE)
-                    && BlockSeaPickle.isSeaPickleBiome(aquaticBiome)
+                    && WorldGenCoralReefs.isWarmOceanClimate(world,
+                    chunkX * 16 + 8, chunkZ * 16 + 8)
                     && random.nextInt(FFDConfig.seaPickleRarity) == 0) {
                 generateSeaPickles(random, chunkX, chunkZ, world);
             }
 
             if (FFDItems.isBlockRegistered(FFDBlocks.BEE_NEST)) {
                 generateBeeNests(random, chunkX, chunkZ, world, biome);
+            }
+            if (seagrass != null) {
+                for (int x = chunkX - 1; x <= chunkX + 1; x++) {
+                    for (int z = chunkZ - 1; z <= chunkZ + 1; z++) {
+                        net.minecraft.world.chunk.Chunk chunk = chunkProvider.getLoadedChunk(x, z);
+                        if (chunk != null) {
+                            chunk.setLightPopulated(false);
+                        }
+                    }
+                }
             }
         }
     }
@@ -116,8 +143,8 @@ public class FFDWorldGenerator implements IWorldGenerator {
                 int bottomY = Math.max(FFDHeightHooks.minY(world) + 1, topY - 32);
                 for (int y = topY; y >= bottomY; y--) {
                     BlockPos trunkTop = new BlockPos(x, y, z);
-                    if (!isVerticalLog(world.getBlockState(trunkTop))
-                            || isVerticalLog(world.getBlockState(trunkTop.up()))
+                    if (!isVerticalLog(world, trunkTop)
+                            || isVerticalLog(world, trunkTop.up())
                             || !hasLeavesNearby(world, trunkTop, chunkX, chunkZ)) {
                         continue;
                     }
@@ -140,7 +167,7 @@ public class FFDWorldGenerator implements IWorldGenerator {
         pending.add(start);
         while (!pending.isEmpty()) {
             BlockPos current = pending.removeFirst();
-            if (!isInChunk(current, chunkX, chunkZ) || !isTreeLog(world.getBlockState(current))
+            if (!isInChunk(current, chunkX, chunkZ) || !isTreeLog(world, current)
                     || !visitedLogs.add(current)) {
                 continue;
             }
@@ -166,26 +193,43 @@ public class FFDWorldGenerator implements IWorldGenerator {
         return 0.0F;
     }
 
-    private static boolean isVerticalLog(IBlockState state) {
-        if (!isTreeLog(state)) {
+    private static boolean isVerticalLog(World world, BlockPos pos) {
+        if (!isTreeLog(world, pos)) {
             return false;
         }
-        return state.getValue(BlockLog.LOG_AXIS) == BlockLog.EnumAxis.Y;
+        IBlockState state = world.getBlockState(pos);
+        IProperty<?> axis = state.getBlock().getBlockState().getProperty("axis");
+        return axis == null || "y".equalsIgnoreCase(state.getProperties().get(axis).toString());
     }
 
-    private static boolean isTreeLog(IBlockState state) {
-        return state.getBlock() == Blocks.LOG || state.getBlock() == Blocks.LOG2;
+    private static boolean isTreeLog(World world, BlockPos pos) {
+        return world.getBlockState(pos).getBlock().isWood(world, pos);
     }
 
     private static boolean hasLeavesNearby(World world, BlockPos trunkTop, int chunkX, int chunkZ) {
+        IBlockState trunk = world.getBlockState(trunkTop);
         for (BlockPos.MutableBlockPos pos : BlockPos.getAllInBoxMutable(trunkTop.add(-2, 0, -2),
                 trunkTop.add(2, 4, 2))) {
-            if (isInChunk(pos, chunkX, chunkZ)
-                    && world.getBlockState(pos).getBlock() instanceof BlockLeaves) {
+            if (!isInChunk(pos, chunkX, chunkZ)) {
+                continue;
+            }
+            IBlockState leaves = world.getBlockState(pos);
+            if (leaves.getBlock().isLeaves(leaves, world, pos)
+                    && BeeNestLeaves.matches(leaves) && sameVanillaTree(trunk, leaves)) {
                 return true;
             }
         }
         return false;
+    }
+
+    private static boolean sameVanillaTree(IBlockState trunk, IBlockState leaves) {
+        BlockPlanks.EnumType logType = trunk.getBlock() == Blocks.LOG
+                ? trunk.getValue(BlockOldLog.VARIANT) : trunk.getBlock() == Blocks.LOG2
+                ? trunk.getValue(BlockNewLog.VARIANT) : null;
+        BlockPlanks.EnumType leafType = leaves.getBlock() == Blocks.LEAVES
+                ? leaves.getValue(BlockOldLeaf.VARIANT) : leaves.getBlock() == Blocks.LEAVES2
+                ? leaves.getValue(BlockNewLeaf.VARIANT) : null;
+        return logType == null || leafType == null || logType == leafType;
     }
 
     private static boolean placeBeeNest(Random random, World world, BlockPos trunkTop,
@@ -193,7 +237,7 @@ public class FFDWorldGenerator implements IWorldGenerator {
         EnumFacing[] directions = {EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST};
         for (int depth = 0; depth < 4; depth++) {
             BlockPos trunk = trunkTop.down(depth);
-            if (!isVerticalLog(world.getBlockState(trunk))) {
+            if (!isVerticalLog(world, trunk)) {
                 continue;
             }
             int start = random.nextInt(directions.length);
@@ -222,13 +266,16 @@ public class FFDWorldGenerator implements IWorldGenerator {
 
     public static boolean addGuaranteedBeeNest(Random random, World world, BlockPos trunkBase) {
         if (!FFDItems.isBlockRegistered(FFDBlocks.BEE_NEST)
-                || !isVerticalLog(world.getBlockState(trunkBase))) {
+                || !isVerticalLog(world, trunkBase)) {
             return false;
         }
         BlockPos trunkTop = trunkBase;
         while (trunkTop.getY() + 1 < FFDHeightHooks.maxYExclusive(world)
-                && isVerticalLog(world.getBlockState(trunkTop.up()))) {
+                && isVerticalLog(world, trunkTop.up())) {
             trunkTop = trunkTop.up();
+        }
+        if (!hasLeavesNearby(world, trunkTop, trunkBase.getX() >> 4, trunkBase.getZ() >> 4)) {
+            return false;
         }
         return placeBeeNest(random, world, trunkTop,
                 trunkBase.getX() >> 4, trunkBase.getZ() >> 4);
@@ -240,8 +287,8 @@ public class FFDWorldGenerator implements IWorldGenerator {
                 chunkZ * 16.0D / FFDConfig.kelpNoiseScale);
         int attempts = (int) Math.ceil(noise * ratio);
         for (int attempt = 0; attempt < attempts; attempt++) {
-            int x = chunkX * 16 + 8 + random.nextInt(16);
-            int z = chunkZ * 16 + 8 + random.nextInt(16);
+            int x = chunkX * 16 + random.nextInt(16);
+            int z = chunkZ * 16 + random.nextInt(16);
             Biome candidateBiome = world.getBiome(new BlockPos(x, 0, z));
             if (!BiomeDictionary.hasType(candidateBiome, BiomeDictionary.Type.OCEAN)
                     || isFrozenOcean(candidateBiome)
@@ -258,7 +305,8 @@ public class FFDWorldGenerator implements IWorldGenerator {
                 continue;
             }
 
-            int requestedBodyHeight = random.nextInt(FFDConfig.kelpWorldgenMaxBodyHeight + 1);
+            int requestedBodyHeight = FFDConfig.kelpWorldgenMaxBodyHeight <= 0 ? 0
+                    : 1 + random.nextInt(FFDConfig.kelpWorldgenMaxBodyHeight);
             int waterCells = 0;
             BlockPos cursor = pos;
             while (waterCells < requestedBodyHeight + 1
@@ -274,13 +322,14 @@ public class FFDWorldGenerator implements IWorldGenerator {
                 world.setBlockState(pos.up(i), FFDBlocks.KELP_PLANT.getDefaultState(), WORLDGEN_FLAGS);
             }
             world.setBlockState(pos.up(bodyHeight),
-                    BlockKelpHead.stateForAgeValue(20 + random.nextInt(4)), WORLDGEN_FLAGS);
+                    BlockKelpHead.stateForAgeValue(random.nextInt(23)), WORLDGEN_FLAGS);
         }
     }
 
     private static boolean isSourceWater(World world, BlockPos pos) {
         IBlockState state = world.getBlockState(pos);
-        return state.getBlock() == Blocks.WATER && state.getValue(BlockLiquid.LEVEL) == 0;
+        return (state.getBlock() == Blocks.WATER || state.getBlock() == Blocks.FLOWING_WATER)
+                && state.getValue(BlockLiquid.LEVEL) == 0;
     }
 
     private static BlockPos findWaterPlantBase(World world, int x, int z) {
@@ -302,17 +351,28 @@ public class FFDWorldGenerator implements IWorldGenerator {
     }
 
     private static boolean isWarmOcean(Biome biome) {
+        if (biome instanceof BiomeModernOcean) {
+            BiomeModernOcean.Type type = ((BiomeModernOcean) biome).getType();
+            return type == BiomeModernOcean.Type.WARM
+                    || type == BiomeModernOcean.Type.LUKEWARM
+                    || type == BiomeModernOcean.Type.DEEP_LUKEWARM;
+        }
         return biome.getDefaultTemperature() > 0.5F;
+    }
+
+    private static boolean isWarmOceanOnly(Biome biome) {
+        return biome instanceof BiomeModernOcean
+                && ((BiomeModernOcean) biome).getType() == BiomeModernOcean.Type.WARM;
     }
 
     private void generateSeagrass(Random random, int chunkX, int chunkZ, World world,
                                   SeagrassSettings settings) {
-        int baseX = chunkX * 16 + 8 + random.nextInt(16);
-        int baseZ = chunkZ * 16 + 8 + random.nextInt(16);
+        int baseX = chunkX * 16 + random.nextInt(16);
+        int baseZ = chunkZ * 16 + random.nextInt(16);
         for (int attempt = 0; attempt < settings.attempts; attempt++) {
             int x = baseX + triangleOffset(random, 7);
             int z = baseZ + triangleOffset(random, 7);
-            if (!isInPopulationArea(x, z, chunkX, chunkZ)) {
+            if (!isInChunk(x, z, chunkX, chunkZ)) {
                 continue;
             }
             Biome candidateBiome = world.getBiome(new BlockPos(x, 0, z));
@@ -382,19 +442,20 @@ public class FFDWorldGenerator implements IWorldGenerator {
     }
 
     private void generateSeaPickles(Random random, int chunkX, int chunkZ, World world) {
-        int baseX = chunkX * 16 + 8 + random.nextInt(16);
-        int baseZ = chunkZ * 16 + 8 + random.nextInt(16);
+        int baseX = chunkX * 16 + random.nextInt(16);
+        int baseZ = chunkZ * 16 + random.nextInt(16);
         for (int attempt = 0; attempt < FFDConfig.seaPickleWorldgenAttempts; attempt++) {
             int x = baseX + triangleOffset(random, FFDConfig.seaPickleWorldgenOffsetRadius);
             int z = baseZ + triangleOffset(random, FFDConfig.seaPickleWorldgenOffsetRadius);
-            if (!isInPopulationArea(x, z, chunkX, chunkZ)) {
+            if (!isInChunk(x, z, chunkX, chunkZ)) {
                 continue;
             }
             BlockPos pos = findWaterPlantBase(world, x, z);
             if (pos == null) {
                 continue;
             }
-            if (!isSourceWater(world, pos) || !BlockSeaPickle.isValidSeaPickleBed(world, pos)
+            if (!isSourceWater(world, pos)
+                    || !BlockSeaPickle.isSeaPickleBiome(world.getBiome(pos))
                     || !FFDBlocks.SEA_PICKLE.canPlaceBlockAt(world, pos)) {
                 continue;
             }
@@ -410,12 +471,6 @@ public class FFDWorldGenerator implements IWorldGenerator {
 
     private static boolean isInChunk(int x, int z, int chunkX, int chunkZ) {
         return x >> 4 == chunkX && z >> 4 == chunkZ;
-    }
-
-    private static boolean isInPopulationArea(int x, int z, int chunkX, int chunkZ) {
-        int minX = chunkX * 16 + 8;
-        int minZ = chunkZ * 16 + 8;
-        return x >= minX && x < minX + 16 && z >= minZ && z < minZ + 16;
     }
 
     private static int triangleOffset(Random random, int radius) {

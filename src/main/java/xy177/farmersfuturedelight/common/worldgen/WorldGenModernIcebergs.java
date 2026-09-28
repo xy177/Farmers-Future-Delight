@@ -10,7 +10,12 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
+import net.minecraftforge.common.BiomeDictionary;
 
+import xy177.farmersfuturedelight.common.biome.BiomeModernOcean;
+import xy177.farmersfuturedelight.common.registry.FFDBlocks;
+import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.world.biome.FFDModernBiomeResolver;
 import xy177.farmersfuturedelight.common.world.terrain.FFDModernWorldgenData;
 
@@ -27,6 +32,10 @@ public final class WorldGenModernIcebergs {
     private final long worldSeed;
     private final FFDModernBiomeResolver resolver;
 
+    public WorldGenModernIcebergs(long worldSeed) {
+        this(worldSeed, null);
+    }
+
     public WorldGenModernIcebergs(long worldSeed, FFDModernBiomeResolver resolver) {
         this.worldSeed = worldSeed;
         this.resolver = resolver;
@@ -40,16 +49,19 @@ public final class WorldGenModernIcebergs {
         for (int sourceX = targetChunkX - 1; sourceX <= targetChunkX + 1; sourceX++) {
             for (int sourceZ = targetChunkZ - 1; sourceZ <= targetChunkZ + 1; sourceZ++) {
                 generateCandidate(world, sourceX, sourceZ, minX, minZ, maxX, maxZ,
-                        16, PACKED_SALT);
-                generateCandidate(world, sourceX, sourceZ, minX, minZ, maxX, maxZ,
-                        200, BLUE_SALT);
+                        16, PACKED_SALT, PACKED_ICE);
+                Block blueIce = FFDItems.effectiveBlock(FFDBlocks.BLUE_ICE);
+                if (blueIce != null) {
+                    generateCandidate(world, sourceX, sourceZ, minX, minZ, maxX, maxZ,
+                            200, BLUE_SALT, blueIce.getDefaultState());
+                }
             }
         }
     }
 
     private void generateCandidate(World world, int sourceChunkX, int sourceChunkZ,
                                    int minX, int minZ, int maxX, int maxZ,
-                                   int chance, long salt) {
+                                   int chance, long salt, IBlockState icebergState) {
         Random random = chunkRandom(sourceChunkX, sourceChunkZ, salt);
         if (random.nextInt(chance) != 0) {
             return;
@@ -58,19 +70,29 @@ public final class WorldGenModernIcebergs {
         int originZ = (sourceChunkZ << 4) + random.nextInt(16);
         if (originX + MAX_RADIUS < minX || originX - MAX_RADIUS > maxX
                 || originZ + MAX_RADIUS < minZ || originZ - MAX_RADIUS > maxZ
-                || !isFrozenOcean(originX, originZ)) {
+                || !isFrozenOcean(world, originX, originZ)) {
             return;
         }
         IcebergPlan plan = new IcebergPlan(random,
-                new BlockPos(originX, FFDModernWorldgenData.SEA_LEVEL, originZ));
+                new BlockPos(originX, FFDModernWorldgenData.SEA_LEVEL, originZ), icebergState);
         plan.generate();
         plan.apply(world, minX, minZ, maxX, maxZ);
     }
 
-    private boolean isFrozenOcean(int x, int z) {
-        FFDModernBiomeResolver.Sample sample = resolver.sampleFuzzy(x, z);
-        return resolver.matches(sample, "minecraft:frozen_ocean")
-                || resolver.matches(sample, "minecraft:deep_frozen_ocean");
+    private boolean isFrozenOcean(World world, int x, int z) {
+        if (resolver != null) {
+            FFDModernBiomeResolver.Sample sample = resolver.sampleFuzzy(x, z);
+            return resolver.matches(sample, "minecraft:frozen_ocean")
+                    || resolver.matches(sample, "minecraft:deep_frozen_ocean");
+        }
+        Biome biome = world.getBiome(new BlockPos(x, 0, z));
+        if (biome instanceof BiomeModernOcean) {
+            BiomeModernOcean.Type type = ((BiomeModernOcean) biome).getType();
+            return type == BiomeModernOcean.Type.FROZEN
+                    || type == BiomeModernOcean.Type.DEEP_FROZEN;
+        }
+        return BiomeDictionary.hasType(biome, BiomeDictionary.Type.OCEAN)
+                && BiomeDictionary.hasType(biome, BiomeDictionary.Type.SNOWY);
     }
 
     private Random chunkRandom(int chunkX, int chunkZ, long salt) {
@@ -85,11 +107,13 @@ public final class WorldGenModernIcebergs {
     private static final class IcebergPlan {
         private final Random random;
         private final BlockPos origin;
+        private final IBlockState icebergState;
         private final Map<BlockPos, IBlockState> states = new HashMap<>();
 
-        private IcebergPlan(Random random, BlockPos origin) {
+        private IcebergPlan(Random random, BlockPos origin, IBlockState icebergState) {
             this.random = random;
             this.origin = origin;
+            this.icebergState = icebergState;
         }
 
         private void generate() {
@@ -209,7 +233,7 @@ public final class WorldGenModernIcebergs {
             int divisor = ellipse ? 3 : 2;
             IBlockState state = snowOnTop
                     && height - y <= random.nextInt(Math.max(1, height / divisor)) + height * 0.6D
-                    && randomness ? SNOW_BLOCK : PACKED_ICE;
+                    && randomness ? SNOW_BLOCK : icebergState;
             states.put(origin.add(x, y, z), state);
         }
 
@@ -321,10 +345,10 @@ public final class WorldGenModernIcebergs {
             }
         }
 
-        private static boolean isReplaceable(IBlockState state) {
+        private boolean isReplaceable(IBlockState state) {
             Block block = state.getBlock();
             return block == Blocks.AIR || block == Blocks.SNOW || block == Blocks.SNOW_LAYER
-                    || block == Blocks.ICE || block == Blocks.PACKED_ICE || isWater(state);
+                    || block == Blocks.ICE || isIcebergState(state) || isWater(state);
         }
 
         private static boolean isWater(IBlockState state) {
@@ -332,9 +356,10 @@ public final class WorldGenModernIcebergs {
             return block == Blocks.WATER || block == Blocks.FLOWING_WATER;
         }
 
-        private static boolean isIcebergState(IBlockState state) {
+        private boolean isIcebergState(IBlockState state) {
             Block block = state.getBlock();
-            return block == Blocks.PACKED_ICE || block == Blocks.SNOW;
+            return block == Blocks.PACKED_ICE || block == Blocks.SNOW
+                    || block == icebergState.getBlock();
         }
     }
 }

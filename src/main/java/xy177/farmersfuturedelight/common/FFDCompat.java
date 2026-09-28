@@ -7,6 +7,7 @@ import java.util.Set;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -94,6 +95,17 @@ public final class FFDCompat {
         ExternalEntity external = feature.findEntity(paths);
         logDecision(feature, "entity", paths[0], external == null ? null : external.provider);
         return external == null;
+    }
+
+    public static boolean isLocalEnchantmentEnabled(FFDConfig.FeatureMode mode, Feature feature,
+                                                     Enchantment local, String... aliases) {
+        if (mode != FFDConfig.FeatureMode.AUTO) {
+            return mode == FFDConfig.FeatureMode.ENABLED;
+        }
+        String[] paths = contentPaths(registryPath(local.getRegistryName()), aliases);
+        ProviderSet provider = feature.findEnchantmentProvider(paths);
+        logDecision(feature, "enchantment", paths[0], provider);
+        return provider == null;
     }
 
     public static IBlockState getExternalBlockState(Feature feature, String... paths) {
@@ -296,6 +308,51 @@ public final class FFDCompat {
                 blocks("Future MC", "futuremc", "seagrass")),
         SEA_PICKLE(
                 blocks("Oceanic Expanse", "oe", "sea_pickle")),
+        CORAL(oceanicExpanseCoral()),
+        AQUATIC_DECOR(
+                blocks("Future MC", "futuremc", "blue_ice",
+                        "bubble_column",
+                        "stripped_oak_log", "stripped_spruce_log", "stripped_birch_log",
+                        "stripped_jungle_log", "stripped_acacia_log", "stripped_dark_oak_log",
+                        "stripped_oak_wood", "stripped_spruce_wood", "stripped_birch_wood",
+                        "stripped_jungle_wood", "stripped_acacia_wood", "stripped_dark_oak_wood",
+                        "prismarine_stairs", "prismarine_brick_stairs",
+                        "dark_prismarine_stairs", "prismarine_slab",
+                        "prismarine_brick_slab", "dark_prismarine_slab",
+                        "prismarine_double_slab", "prismarine_brick_double_slab",
+                        "dark_prismarine_double_slab"),
+                items("Future MC", "futuremc", "blue_ice",
+                        "stripped_oak_log", "stripped_spruce_log", "stripped_birch_log",
+                        "stripped_jungle_log", "stripped_acacia_log", "stripped_dark_oak_log",
+                        "stripped_oak_wood", "stripped_spruce_wood", "stripped_birch_wood",
+                        "stripped_jungle_wood", "stripped_acacia_wood", "stripped_dark_oak_wood",
+                         "prismarine_stairs", "prismarine_brick_stairs",
+                         "dark_prismarine_stairs", "prismarine_slab",
+                         "prismarine_brick_slab", "dark_prismarine_slab", "nautilus_shell",
+                         "heart_of_the_sea"),
+                oceanicExpanseAquaticDecor()),
+        FISH(
+                content("Future MC", null,
+                        ids("futuremc", "cod_bucket", "salmon_bucket", "pufferfish_bucket",
+                                "tropical_fish_bucket"),
+                        ids("futuremc", "cod", "salmon", "pufferfish", "tropical_fish")),
+                content("Oceanic Expanse", null,
+                        ids("oe", "cod_bucket", "salmon_bucket", "pufferfish_bucket",
+                                "tropical_fish_bucket"),
+                        ids("oe", "cod", "salmon", "pufferfish", "tropical_fish"))),
+        DOLPHIN(
+                contentWithLocalPaths("Oceanic Expanse", null, null,
+                        ids("oe", "dolphin"), null, null,
+                        "dolphin", "dolphins_grace")),
+        DROWNED(
+                entities("Oceanic Expanse", "oe", "drowned")),
+        TRIDENT(
+                contentWithLocalPaths("Future MC", null, ids("futuremc", "trident"),
+                        null, null, null, "trident", "loyalty", "impaling", "riptide",
+                        "channeling"),
+                contentWithLocalPaths("Oceanic Expanse", null, ids("oe", "trident"),
+                        null, null, null, "trident", "loyalty", "impaling", "riptide",
+                        "channeling")),
         TURTLE(
                 blocks("Oceanic Expanse", "oe", "turtle_egg"),
                 items("Oceanic Expanse", "oe", "turtle_scute", "turtle_helmet"),
@@ -438,6 +495,18 @@ public final class FFDCompat {
             return null;
         }
 
+        private ProviderSet findEnchantmentProvider(String... paths) {
+            for (ProviderSet provider : providers) {
+                if (!provider.isEnabled(paths)) {
+                    continue;
+                }
+                if (provider.providesEnchantment(paths)) {
+                    return provider;
+                }
+            }
+            return null;
+        }
+
         private ExternalEntity findEntity(String... paths) {
             for (ProviderSet provider : providers) {
                 if (!provider.isEnabled(paths)) {
@@ -488,6 +557,45 @@ public final class FFDCompat {
     private static ContentVariant variant(String path, String namespace,
                                           String registryPath, int metadata) {
         return new ContentVariant(path, namespace + ':' + registryPath, metadata);
+    }
+
+    private static ProviderSet oceanicExpanseCoral() {
+        String[] localNames = {"tube", "brain", "bubble", "fire", "horn"};
+        String[] externalNames = {"blue", "pink", "purple", "red", "yellow"};
+        ContentVariant[] blocks = new ContentVariant[localNames.length * 8];
+        ContentVariant[] items = new ContentVariant[localNames.length * 6];
+        for (int index = 0; index < localNames.length; index++) {
+            String local = localNames[index];
+            String external = externalNames[index];
+            int blockOffset = index * 8;
+            blocks[blockOffset] = variant(local + "_coral_block", "oe",
+                    external + "_coral_block", 0);
+            blocks[blockOffset + 1] = variant("dead_" + local + "_coral_block", "oe",
+                    external + "_coral_block_dead", 0);
+            blocks[blockOffset + 2] = variant(local + "_coral", "oe",
+                    external + "_coral", 0);
+            blocks[blockOffset + 3] = variant("dead_" + local + "_coral", "oe",
+                    external + "_coral_dead", 0);
+            blocks[blockOffset + 4] = variant(local + "_coral_fan", "oe",
+                    external + "_coral_fan", 0);
+            blocks[blockOffset + 5] = variant("dead_" + local + "_coral_fan", "oe",
+                    external + "_coral_fan_dead", 0);
+            blocks[blockOffset + 6] = variant(local + "_coral_wall_fan", "oe",
+                    external + "_coral_fan", 0);
+            blocks[blockOffset + 7] = variant("dead_" + local + "_coral_wall_fan", "oe",
+                    external + "_coral_fan_dead", 0);
+            int itemOffset = index * 6;
+            System.arraycopy(blocks, blockOffset, items, itemOffset, 6);
+        }
+        return content("Oceanic Expanse", null, null, null, blocks, items);
+    }
+
+    private static ProviderSet oceanicExpanseAquaticDecor() {
+        return contentWithLocalPaths("Oceanic Expanse",
+                ids("oe", "blue_ice", "conduit"),
+                ids("oe", "blue_ice", "conduit", "nautilus_shell", "heart_of_the_sea"),
+                null, null, null, "blue_ice", "conduit", "conduit_power",
+                "nautilus_shell", "heart_of_the_sea");
     }
 
     private static ProviderSet depthsUpdateDeepslate() {
@@ -1080,6 +1188,41 @@ public final class FFDCompat {
             return explicit != null ? explicit : findRegisteredEntity(namespace, paths);
         }
 
+        private Enchantment findEnchantment(String... paths) {
+            if (namespace == null || paths == null) {
+                return null;
+            }
+            for (String path : paths) {
+                if (path == null || path.isEmpty()) {
+                    continue;
+                }
+                Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(
+                        new ResourceLocation(namespace, path));
+                if (enchantment != null) {
+                    return enchantment;
+                }
+            }
+            return null;
+        }
+
+        private boolean providesEnchantment(String... paths) {
+            if (findEnchantment(paths) != null) {
+                return true;
+            }
+            if (!("futuremc".equals(namespace) || "oe".equals(namespace))
+                    || findItem("trident").isEmpty()) {
+                return false;
+            }
+            for (String path : paths) {
+                if ("loyalty".equals(path) || "impaling".equals(path)
+                        || "is_watermob".equals(path) || "riptide".equals(path)
+                        || "channeling".equals(path)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         private boolean providesPendingRawOre(String... paths) {
             return pendingRawOre && FFDRawOreOreDictionaryCompat.willRawOreProvide(paths);
         }
@@ -1117,7 +1260,36 @@ public final class FFDCompat {
         entries.add("warped_forest@nb=false");
         entries.add("crimson_forest@netherized=false");
         entries.add("warped_forest@netherized=false");
+        entries.add("shipwreck@oe=true");
         return entries.toArray(new String[0]);
+    }
+
+    public static boolean shouldGenerateShipwreck() {
+        if (!Loader.isModLoaded("oe")
+                || !FFDConfig.isAutoCompatibilityEnabled("shipwreck", "oe")) {
+            return true;
+        }
+        boolean external = isOceanicExpanseShipwreckEnabled();
+        if (FFDConfig.logAutoCompatibilityDecisions
+                && LOGGED_CONTENT.add("OCEAN_STRUCTURE:worldgen:shipwreck")) {
+            LOGGER.info("AUTO ocean structure shipwreck: {}",
+                    external ? "yielding to Oceanic Expanse"
+                            : "using Farmer's Future Delight");
+        }
+        return !external;
+    }
+
+    private static boolean isOceanicExpanseShipwreckEnabled() {
+        try {
+            Class<?> configClass = Class.forName(
+                    "com.sirsquidly.oe.util.handlers.ConfigHandler", true,
+                    FFDCompat.class.getClassLoader());
+            Object worldGen = configClass.getField("worldGen").get(null);
+            Object shipwreck = worldGen.getClass().getField("shipwreck").get(worldGen);
+            return shipwreck.getClass().getField("enableShipwrecks").getBoolean(shipwreck);
+        } catch (Throwable ignored) {
+            return false;
+        }
     }
 
     private static boolean defaultAutoCompatibilityEnabled(String path, String namespace) {

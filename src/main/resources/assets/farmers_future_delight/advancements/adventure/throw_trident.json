@@ -1,0 +1,20 @@
+{
+  "conditions": [
+    {"type": "farmers_future_delight:feature_enabled", "feature": "trident"}
+  ],
+  "parent": "minecraft:adventure/kill_a_mob",
+  "display": {
+    "icon": {"item": "farmers_future_delight:trident"},
+    "title": {"translate": "advancements.farmers_future_delight.adventure.throw_trident.title"},
+    "description": {"translate": "advancements.farmers_future_delight.adventure.throw_trident.description"},
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "throw_trident": {
+      "trigger": "farmers_future_delight:throw_trident"
+    }
+  }
+}

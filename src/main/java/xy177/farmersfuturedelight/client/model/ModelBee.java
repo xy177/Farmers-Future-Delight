@@ -97,7 +97,8 @@ public class ModelBee extends ModelBase {
     public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks,
                                   float netHeadYaw, float headPitch, float scaleFactor,
                                   Entity entity) {
-        boolean flying = !entity.onGround;
+        boolean flying = !entity.onGround || entity.motionX * entity.motionX
+                + entity.motionY * entity.motionY + entity.motionZ * entity.motionZ >= 1.0E-7D;
         body.rotationPointY = 19.0F;
         body.rotateAngleX = 0.0F;
         leftAntenna.rotateAngleX = 0.0F;

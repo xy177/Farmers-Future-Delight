@@ -1,0 +1,6 @@
+{
+  "parent": "farmers_future_delight:block/template_orientable_trapdoor_bottom",
+  "textures": {
+    "texture": "farmers_future_delight:block/spruce_trapdoor"
+  }
+}

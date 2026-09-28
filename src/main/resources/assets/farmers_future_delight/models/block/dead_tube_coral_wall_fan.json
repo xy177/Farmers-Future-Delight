@@ -1,0 +1,6 @@
+{
+    "parent": "farmers_future_delight:block/coral_wall_fan",
+    "textures": {
+        "fan": "farmers_future_delight:block/dead_tube_coral_fan"
+    }
+}

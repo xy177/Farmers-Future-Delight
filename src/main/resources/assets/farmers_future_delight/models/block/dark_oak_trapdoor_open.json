@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/trapdoor_open",
+  "textures": {
+    "texture": "farmers_future_delight:block/dark_oak_trapdoor"
+  }
+}

@@ -23,7 +23,6 @@ import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.world.noise.FFDLegacyNormalNoise;
 
-/** Generates the 26.3 amethyst geode layers without loading neighboring chunks. */
 public final class WorldGenAmethystGeodes {
     private static final int SCAN_RADIUS = 16;
     private static final int INVALID_BLOCK_THRESHOLD = 1;

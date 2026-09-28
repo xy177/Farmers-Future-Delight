@@ -60,6 +60,11 @@ public class BlockSeagrass extends BlockUnderwaterPlant implements IGrowable {
     }
 
     @Override
+    public boolean isReplaceable(IBlockAccess world, BlockPos pos) {
+        return true;
+    }
+
+    @Override
     public boolean canGrow(World world, BlockPos pos, IBlockState state, boolean isClient) {
         return isFeatureEnabled() && isVanillaWaterBlock(world, pos.up());
     }

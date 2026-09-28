@@ -38,11 +38,13 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
 
 import xy177.farmersfuturedelight.FarmerFutureDelight;
+import xy177.farmersfuturedelight.api.IWaterloggableBlock;
+import xy177.farmersfuturedelight.api.WaterloggedBlockApi;
 import xy177.farmersfuturedelight.common.FFDCreativeTab;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
 
-public class BlockSmallDripleaf extends Block implements IGrowable {
+public class BlockSmallDripleaf extends Block implements IGrowable, IWaterloggableBlock {
     public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
     public static final PropertyEnum<BlockDoublePlant.EnumBlockHalf> HALF = BlockDoublePlant.HALF;
     public static final PropertyBool WATERLOGGED = PropertyBool.create("waterlogged");
@@ -69,12 +71,12 @@ public class BlockSmallDripleaf extends Block implements IGrowable {
         return new ExtendedBlockState(this,
                 new net.minecraft.block.properties.IProperty<?>[] {
                         BlockLiquid.LEVEL, FACING, HALF, WATERLOGGED},
-                WaterloggedPlantFluid.extendedProperties());
+                WaterloggedBlockApi.extendedProperties());
     }
 
     @Override
     public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
-        return WaterloggedPlantFluid.getExtendedState(state, world, pos);
+        return WaterloggedBlockApi.getExtendedState(state, world, pos);
     }
 
     @Override
@@ -84,6 +86,16 @@ public class BlockSmallDripleaf extends Block implements IGrowable {
 
     public static boolean isWaterlogged(IBlockState state) {
         return state.getBlock() instanceof BlockSmallDripleaf && state.getValue(WATERLOGGED);
+    }
+
+    @Override
+    public boolean isWaterloggedState(IBlockState state) {
+        return isWaterlogged(state);
+    }
+
+    @Override
+    public IBlockState setWaterloggedState(IBlockState state, boolean waterlogged) {
+        return state.withProperty(WATERLOGGED, waterlogged);
     }
 
 
@@ -117,7 +129,7 @@ public class BlockSmallDripleaf extends Block implements IGrowable {
         return getDefaultState()
                 .withProperty(FACING, placer.getHorizontalFacing().getOpposite())
                 .withProperty(HALF, BlockDoublePlant.EnumBlockHalf.LOWER)
-                .withProperty(WATERLOGGED, WaterloggedPlantFluid.isSourceWater(world, pos));
+                .withProperty(WATERLOGGED, WaterloggedBlockApi.containsWater(world, pos));
     }
 
     @Override
@@ -125,11 +137,11 @@ public class BlockSmallDripleaf extends Block implements IGrowable {
         return FFDItems.isDripleafEnabled() && canPlantReplace(world, pos)
                 && canPlantReplace(world, pos.up()) && canStayLower(world, pos,
                 getDefaultState().withProperty(WATERLOGGED,
-                        WaterloggedPlantFluid.isSourceWater(world, pos)));
+                        WaterloggedBlockApi.containsWater(world, pos)));
     }
 
     private static boolean canPlantReplace(World world, BlockPos pos) {
-        return world.isAirBlock(pos) || WaterloggedPlantFluid.isSourceWater(world, pos);
+        return world.isAirBlock(pos) || WaterloggedBlockApi.containsWater(world, pos);
     }
 
     private static boolean canStayLower(World world, BlockPos pos, IBlockState lower) {
@@ -154,7 +166,7 @@ public class BlockSmallDripleaf extends Block implements IGrowable {
     public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state,
                                 EntityLivingBase placer, ItemStack stack) {
         if (!world.isRemote && state.getValue(HALF) == BlockDoublePlant.EnumBlockHalf.LOWER) {
-            boolean upperWaterlogged = WaterloggedPlantFluid.isSourceWater(world, pos.up());
+            boolean upperWaterlogged = WaterloggedBlockApi.containsWater(world, pos.up());
             world.setBlockState(pos.up(), getDefaultState()
                     .withProperty(FACING, state.getValue(FACING))
                     .withProperty(HALF, BlockDoublePlant.EnumBlockHalf.UPPER)
@@ -165,7 +177,7 @@ public class BlockSmallDripleaf extends Block implements IGrowable {
     @Override
     public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
         super.onBlockAdded(world, pos, state);
-        WaterloggedPlantFluid.onBlockAdded(world, pos, this);
+        WaterloggedBlockApi.onBlockAdded(world, pos, this);
     }
 
     @Override
@@ -178,7 +190,7 @@ public class BlockSmallDripleaf extends Block implements IGrowable {
             restoreBoth(world, pos, state);
             return;
         }
-        WaterloggedPlantFluid.onNeighborChanged(world, pos, this);
+        WaterloggedBlockApi.onNeighborChanged(world, pos, this);
     }
 
     @Override
@@ -191,7 +203,7 @@ public class BlockSmallDripleaf extends Block implements IGrowable {
             return;
         }
         if (isWaterlogged(state)) {
-            WaterloggedPlantFluid.updateTick(world, pos, state);
+            WaterloggedBlockApi.updateTick(world, pos, state);
         }
     }
 
@@ -201,15 +213,11 @@ public class BlockSmallDripleaf extends Block implements IGrowable {
         IBlockState lower = world.getBlockState(lowerPos);
         IBlockState upper = world.getBlockState(upperPos);
         if (lower.getBlock() instanceof BlockSmallDripleaf) {
-            world.setBlockState(lowerPos, replacementState(lower), 2);
+            WaterloggedBlockApi.restoreFluid(world, lowerPos, lower, 2);
         }
         if (upper.getBlock() instanceof BlockSmallDripleaf) {
-            world.setBlockState(upperPos, replacementState(upper), 3);
+            WaterloggedBlockApi.restoreFluid(world, upperPos, upper, 3);
         }
-    }
-
-    private static IBlockState replacementState(IBlockState state) {
-        return isWaterlogged(state) ? Blocks.WATER.getDefaultState() : Blocks.AIR.getDefaultState();
     }
 
     @Override
@@ -277,8 +285,7 @@ public class BlockSmallDripleaf extends Block implements IGrowable {
 
     @Override
     public Vec3d modifyAcceleration(World world, BlockPos pos, Entity entity, Vec3d motion) {
-        return isWaterlogged(world.getBlockState(pos))
-                ? Blocks.WATER.modifyAcceleration(world, pos, entity, motion) : motion;
+        return WaterloggedBlockApi.modifyAcceleration(world, pos, entity, motion);
     }
 
     @Override

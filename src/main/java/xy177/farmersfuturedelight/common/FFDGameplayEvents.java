@@ -2,12 +2,17 @@ package xy177.farmersfuturedelight.common;
 
 import com.google.common.base.Predicate;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirt;
 import net.minecraft.block.BlockCake;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.BlockRotatedPillar;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.EntityAgeable;
+import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.monster.AbstractIllager;
@@ -16,7 +21,6 @@ import net.minecraft.entity.monster.EntityPigZombie;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.entity.projectile.EntityPotion;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemAxe;
@@ -40,6 +44,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.GameRules;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -57,20 +62,31 @@ import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent;
 import net.minecraftforge.event.entity.player.FillBucketEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.event.world.ChunkDataEvent;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidActionResult;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.items.ItemHandlerHelper;
 
 import xy177.farmersfuturedelight.FarmerFutureDelight;
-import xy177.farmersfuturedelight.common.block.BlockAbstractCandle;
 import xy177.farmersfuturedelight.common.block.BlockBigDripleaf;
 import xy177.farmersfuturedelight.common.block.BlockBigDripleafStem;
 import xy177.farmersfuturedelight.common.block.BlockAmethyst;
 import xy177.farmersfuturedelight.common.block.BlockCaveVines;
+import xy177.farmersfuturedelight.common.block.BlockCoralPlant;
+import xy177.farmersfuturedelight.common.block.BlockCoralWallFan;
 import xy177.farmersfuturedelight.common.block.CopperWeathering;
 import xy177.farmersfuturedelight.common.block.BlockGlowLichen;
 import xy177.farmersfuturedelight.common.block.BlockKelpHead;
@@ -79,19 +95,25 @@ import xy177.farmersfuturedelight.common.block.BlockSeaPickle;
 import xy177.farmersfuturedelight.common.block.BlockSmallDripleaf;
 import xy177.farmersfuturedelight.common.block.BlockHangingRoots;
 import xy177.farmersfuturedelight.common.block.BlockUnderwaterPlant;
-import xy177.farmersfuturedelight.common.block.WaterloggedPlantFluid;
+import xy177.farmersfuturedelight.api.WaterloggedBlockApi;
 import xy177.farmersfuturedelight.common.advancement.FFDAdvancements;
 import xy177.farmersfuturedelight.common.entity.EntityTurtle;
 import xy177.farmersfuturedelight.common.entity.EntityAxolotl;
+import xy177.farmersfuturedelight.common.entity.EntityDrowned;
 import xy177.farmersfuturedelight.common.entity.ai.EntityAITrampleTurtleEgg;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
+import xy177.farmersfuturedelight.common.registry.FFDCustomStrippedWoods;
 import xy177.farmersfuturedelight.common.registry.FFDEntities;
 import xy177.farmersfuturedelight.common.registry.FFDCustomRawOres;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.registry.FFDPotions;
 import xy177.farmersfuturedelight.common.registry.FFDRawOres;
+import xy177.farmersfuturedelight.common.registry.FFDRawOreDropHooks;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
+import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiome;
+import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiomeManager;
 import xy177.farmersfuturedelight.core.FFDGameplayHooks;
+import xy177.farmersfuturedelight.core.FFDHeightHooks;
 
 @Mod.EventBusSubscriber(modid = FarmerFutureDelight.MODID)
 public final class FFDGameplayEvents {
@@ -101,9 +123,31 @@ public final class FFDGameplayEvents {
     private static final String TURTLE_ZOMBIE_AI_TAG = FarmerFutureDelight.MODID + ".turtleZombieAi";
     private static final String AXOLOTL_GUARDIAN_AI_TAG =
             FarmerFutureDelight.MODID + ".axolotlGuardianAi";
+    private static final String DROWNED_SUBMERGED_TICKS_TAG =
+            FarmerFutureDelight.MODID + ".drownedSubmergedTicks";
+    private static final String DROWNED_CONVERSION_TICKS_TAG =
+            FarmerFutureDelight.MODID + ".drownedConversionTicks";
     private static final double SLOW_FALLING_GRAVITY_COMPENSATION = 0.08D - 0.01D;
+    private static Biome.SpawnListEntry dripstoneDrownedSpawn;
 
     private FFDGameplayEvents() {
+    }
+
+    @SubscribeEvent
+    public static void onWaterLightingLoad(ChunkDataEvent.Load event) {
+        FFDHeightHooks.loadWaterLighting(event.getChunk(), event.getData());
+    }
+
+    @SubscribeEvent
+    public static void onWaterLightingSave(ChunkDataEvent.Save event) {
+        FFDHeightHooks.saveWaterLighting(event.getChunk(), event.getData());
+    }
+
+    @SubscribeEvent
+    public static void onWaterLightingTick(TickEvent.WorldTickEvent event) {
+        if (event.phase == TickEvent.Phase.END && !event.world.isRemote) {
+            FFDHeightHooks.syncWaterLighting(event.world);
+        }
     }
 
     @SubscribeEvent
@@ -113,6 +157,33 @@ public final class FFDGameplayEvents {
         }
         GameRules rules = event.getWorld().getGameRules();
         FFDGameplayHooks.ensureSleepingPercentageRule(rules);
+    }
+
+    @SubscribeEvent
+    public static void onPotentialSpawns(WorldEvent.PotentialSpawns event) {
+        if (event.getType() != EnumCreatureType.MONSTER
+                || !FFDEntities.isLocalDrownedEnabled()
+                || FFDConfig.drownedDripstoneCaveSpawnWeight <= 0
+                || FFDVerticalBiomeManager.getBiome(event.getWorld(), event.getPos())
+                != FFDVerticalBiome.DRIPSTONE_CAVES) {
+            return;
+        }
+        java.util.Iterator<Biome.SpawnListEntry> iterator = event.getList().iterator();
+        while (iterator.hasNext()) {
+            if (iterator.next().entityClass == EntityDrowned.class) {
+                iterator.remove();
+            }
+        }
+        event.getList().add(dripstoneDrownedSpawn());
+    }
+
+    private static synchronized Biome.SpawnListEntry dripstoneDrownedSpawn() {
+        if (dripstoneDrownedSpawn == null
+                || dripstoneDrownedSpawn.itemWeight != FFDConfig.drownedDripstoneCaveSpawnWeight) {
+            dripstoneDrownedSpawn = new Biome.SpawnListEntry(EntityDrowned.class,
+                    FFDConfig.drownedDripstoneCaveSpawnWeight, 4, 4);
+        }
+        return dripstoneDrownedSpawn;
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -180,7 +251,7 @@ public final class FFDGameplayEvents {
         int count = FFDRawOres.isCopper(material)
                 ? 2 + event.getWorld().rand.nextInt(4) : FFDConfig.rawOreDropAmount;
         if (FFDConfig.denseRawOreDrop && isDenseOre(ore)) {
-            count *= denseOreMultiplier();
+            count *= FFDRawOreDropHooks.denseOreMultiplier(ore);
         }
 
         if (event.getFortuneLevel() > 0) {
@@ -216,7 +287,7 @@ public final class FFDGameplayEvents {
         }
         int count = FFDConfig.rawOreDropAmount;
         if (FFDConfig.denseRawOreDrop && isDenseOre(ore)) {
-            count *= denseOreMultiplier();
+            count *= FFDRawOreDropHooks.denseOreMultiplier(ore);
         }
         if (event.getFortuneLevel() > 0) {
             int multiplier = event.getWorld().rand.nextInt(event.getFortuneLevel() + 2) - 1;
@@ -296,18 +367,6 @@ public final class FFDGameplayEvents {
             }
         }
         return false;
-    }
-
-    private static int denseOreMultiplier() {
-        if (!net.minecraftforge.fml.common.Loader.isModLoaded("densemetals")) {
-            return 2;
-        }
-        try {
-            Class<?> config = Class.forName("com.mcmoddev.densemetals.DenseMetalsConfig");
-            return Math.max(1, config.getField("denseOreValue").getInt(null));
-        } catch (Throwable ignored) {
-            return 2;
-        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -435,8 +494,6 @@ public final class FFDGameplayEvents {
             changed = FFDSignText.setGlowing(sign, true);
         } else if (held.getMetadata() == EnumDyeColor.BLACK.getDyeDamage()
                 && FFDSignText.isGlowing(sign)) {
-            // In 1.17+, a normal ink sac removes the glowing flag instead of
-            // changing an already glowing sign to black text.
             changed = FFDSignText.setGlowing(sign, false);
         } else {
             changed = FFDSignText.applyDye(sign,
@@ -622,6 +679,67 @@ public final class FFDGameplayEvents {
         entity.motionY += 0.07D - 0.0525D * lift;
     }
 
+    @SubscribeEvent
+    public static void onZombieDrownedConversion(LivingUpdateEvent event) {
+        if (!FFDEntities.isLocalDrownedEnabled()
+                || event.getEntityLiving().world.isRemote
+                || !(event.getEntityLiving() instanceof EntityZombie)
+                || !FFDConfig.isConfiguredEntity(FFDConfig.drownedTransformationMobs,
+                        event.getEntityLiving())) {
+            return;
+        }
+        EntityZombie zombie = (EntityZombie) event.getEntityLiving();
+        if (!zombie.isEntityAlive() || zombie.isAIDisabled()) {
+            return;
+        }
+        net.minecraft.nbt.NBTTagCompound data = zombie.getEntityData();
+        if (!zombie.isInsideOfMaterial(Material.WATER)) {
+            data.setInteger(DROWNED_SUBMERGED_TICKS_TAG, -1);
+            data.removeTag(DROWNED_CONVERSION_TICKS_TAG);
+            return;
+        }
+        if (data.hasKey(DROWNED_CONVERSION_TICKS_TAG, 3)) {
+            int conversionTicks = data.getInteger(DROWNED_CONVERSION_TICKS_TAG) - 1;
+            if (conversionTicks < 0) {
+                if (EntityDrowned.convertFrom(zombie)) {
+                    if (!zombie.isSilent()) {
+                        zombie.world.playSound(null, new BlockPos(zombie),
+                                FFDSounds.ZOMBIE_CONVERTED_TO_DROWNED,
+                                SoundCategory.HOSTILE, 1.0F, 1.0F);
+                    }
+                } else {
+                    data.setInteger(DROWNED_CONVERSION_TICKS_TAG, conversionTicks);
+                }
+            } else {
+                data.setInteger(DROWNED_CONVERSION_TICKS_TAG, conversionTicks);
+            }
+            return;
+        }
+        int submergedTicks = data.getInteger(DROWNED_SUBMERGED_TICKS_TAG) + 1;
+        data.setInteger(DROWNED_SUBMERGED_TICKS_TAG, submergedTicks);
+        if (submergedTicks >= 600) {
+            data.setInteger(DROWNED_CONVERSION_TICKS_TAG, 300);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onConduitPowerBreakSpeed(PlayerEvent.BreakSpeed event) {
+        EntityPlayer player = event.getEntityPlayer();
+        int conduitAmplifier = FFDPotions.conduitPowerAmplifier(player);
+        if (conduitAmplifier < 0) {
+            return;
+        }
+        int hasteAmplifier = player.isPotionActive(MobEffects.HASTE)
+                ? player.getActivePotionEffect(MobEffects.HASTE).getAmplifier() : -1;
+        if (conduitAmplifier <= hasteAmplifier) {
+            return;
+        }
+        float currentMultiplier = hasteAmplifier < 0 ? 1.0F
+                : 1.0F + (hasteAmplifier + 1) * 0.2F;
+        float targetMultiplier = 1.0F + (conduitAmplifier + 1) * 0.2F;
+        event.setNewSpeed(event.getNewSpeed() * targetMultiplier / currentMultiplier);
+    }
+
     private static boolean hasSlowFalling(EntityLivingBase entity) {
         return FFDItems.isPhantomEnabled() && entity.isPotionActive(FFDPotions.SLOW_FALLING);
     }
@@ -657,7 +775,19 @@ public final class FFDGameplayEvents {
         }
 
         IBlockState dryState = withWaterlogged(state, false);
-        if (dryState == null || event.getEmptyBucket().getItem() != Items.BUCKET) {
+        boolean stored = xy177.farmersfuturedelight.common.fluid.FFDStoredFluidStates
+                .has(event.getWorld(), pos);
+        if (stored && dryState == null) dryState = state;
+        Fluid fluid = WaterloggedBlockApi.getContainedFluid(event.getWorld(), pos);
+        if (dryState == null || fluid == null
+                || WaterloggedBlockApi.getSourceFluid(event.getWorld(), pos) == null) {
+            return;
+        }
+        FluidActionResult filled = FluidUtil.tryFillContainer(event.getEmptyBucket(),
+                new net.minecraftforge.fluids.FluidTank(
+                        new FluidStack(fluid, Fluid.BUCKET_VOLUME), Fluid.BUCKET_VOLUME),
+                Fluid.BUCKET_VOLUME, null, true);
+        if (!filled.isSuccess()) {
             return;
         }
         net.minecraft.entity.player.EntityPlayer player = event.getEntityPlayer();
@@ -669,26 +799,53 @@ public final class FFDGameplayEvents {
         }
 
         event.getWorld().setBlockState(pos, dryState, 11);
+        WaterloggedBlockApi.recordContainedFluid(event.getWorld(), pos, null);
+        if (dryState.getBlock() instanceof BlockCoralPlant) {
+            ((BlockCoralPlant) dryState.getBlock()).scheduleDeath(event.getWorld(), pos);
+        } else if (dryState.getBlock() instanceof BlockCoralWallFan) {
+            ((BlockCoralWallFan) dryState.getBlock()).scheduleDeath(event.getWorld(), pos);
+        }
         player.addStat(StatList.getObjectUseStats(Items.BUCKET));
-        player.playSound(SoundEvents.ITEM_BUCKET_FILL, 1.0F, 1.0F);
-        event.setFilledBucket(new ItemStack(Items.WATER_BUCKET));
+        player.playSound(fluid.getFillSound(new FluidStack(fluid, Fluid.BUCKET_VOLUME)),
+                1.0F, 1.0F);
+        event.setFilledBucket(filled.getResult());
         event.setResult(Event.Result.ALLOW);
     }
 
     @SubscribeEvent
     public static void onWaterBucketUse(PlayerInteractEvent.RightClickBlock event) {
-        if (event.getItemStack().getItem() != Items.WATER_BUCKET) {
+        FluidStack contained = FluidUtil.getFluidContained(event.getItemStack());
+        if (contained == null || contained.amount < Fluid.BUCKET_VOLUME
+                || !FFDConfig.isFluidAllowed(event.getWorld(), contained.getFluid())) {
             return;
         }
-        IBlockState state = event.getWorld().getBlockState(event.getPos());
+        BlockPos clickedPos = event.getPos();
+        EnumFacing side = event.getFace() == null ? EnumFacing.UP : event.getFace();
+        IBlockState state = event.getWorld().getBlockState(clickedPos);
+        BlockPos targetPos = clickedPos;
         IBlockState wetState = withWaterlogged(state, true);
+        if (wetState == null) {
+            if (tryExtraFluidBucket(event, clickedPos, contained, side)) return;
+            boolean replaceable = state.getBlock().isReplaceable(event.getWorld(), clickedPos);
+            targetPos = replaceable && side == EnumFacing.UP
+                    ? clickedPos : clickedPos.offset(side);
+            wetState = withWaterlogged(event.getWorld().getBlockState(targetPos), true);
+            if (wetState == null && tryExtraFluidBucket(event, targetPos, contained, side)) return;
+        }
         if (wetState == null) {
             return;
         }
 
-        EnumFacing side = event.getFace() == null ? EnumFacing.UP : event.getFace();
-        if (!event.getWorld().isBlockModifiable(event.getEntityPlayer(), event.getPos())
-                || !event.getEntityPlayer().canPlayerEdit(event.getPos(), side,
+        ItemStack drainedContainer = null;
+        if (!event.getEntityPlayer().capabilities.isCreativeMode) {
+            drainedContainer = drainFluidContainer(event.getItemStack(), contained);
+            if (drainedContainer == null) {
+                return;
+            }
+        }
+
+        if (!event.getWorld().isBlockModifiable(event.getEntityPlayer(), targetPos)
+                || !event.getEntityPlayer().canPlayerEdit(targetPos, side,
                         event.getItemStack())) {
             event.setCanceled(true);
             event.setCancellationResult(EnumActionResult.FAIL);
@@ -697,21 +854,100 @@ public final class FFDGameplayEvents {
 
         event.setCanceled(true);
         event.setCancellationResult(EnumActionResult.SUCCESS);
-        if (!event.getWorld().isRemote) {
-            event.getWorld().setBlockState(event.getPos(), wetState, 11);
-            event.getWorld().scheduleUpdate(event.getPos(), wetState.getBlock(), 5);
-            event.getEntityPlayer().addStat(StatList.getObjectUseStats(Items.WATER_BUCKET));
-            if (!event.getEntityPlayer().capabilities.isCreativeMode) {
-                event.getEntityPlayer().setHeldItem(event.getHand(), new ItemStack(Items.BUCKET));
-            }
+        if (event.getWorld().isRemote) {
+            return;
         }
-        event.getWorld().playSound(event.getEntityPlayer(), event.getPos(),
-                SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.BLOCKS, 1.0F, 1.0F);
+        if (!event.getWorld().setBlockState(targetPos, wetState, 11)) {
+            return;
+        }
+        Fluid fluid = contained.getFluid();
+        WaterloggedBlockApi.recordContainedFluid(event.getWorld(), targetPos, fluid);
+        event.getWorld().scheduleUpdate(targetPos, wetState.getBlock(),
+                WaterloggedBlockApi.fluidTickRate(event.getWorld(), fluid));
+        event.getEntityPlayer().addStat(StatList.getObjectUseStats(event.getItemStack().getItem()));
+        consumeFluidContainer(event, drainedContainer);
+        event.getWorld().playSound(null, targetPos, fluid.getEmptySound(contained),
+                SoundCategory.BLOCKS, 1.0F, 1.0F);
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onFluidloggedBlockPlace(BlockEvent.PlaceEvent event) {
+        if (event.getWorld().isRemote || !WaterloggedBlockApi.isWaterlogged(event.getState())) {
+            return;
+        }
+        IBlockState replaced = event.getBlockSnapshot().getReplacedBlock();
+        Fluid fluid = WaterloggedBlockApi.getFluidForBlock(replaced.getBlock());
+        if (fluid != null && FFDConfig.isFluidAllowed(fluid)
+                && xy177.farmersfuturedelight.common.block.WaterloggedPlantFluid
+                        .isSourceFluid(replaced)) {
+            WaterloggedBlockApi.recordContainedFluid(event.getWorld(), event.getPos(), fluid);
+        }
+    }
+
+    private static boolean tryExtraFluidBucket(PlayerInteractEvent.RightClickBlock event,
+            BlockPos pos, FluidStack fluid, EnumFacing side) {
+        IBlockState state = event.getWorld().getBlockState(pos);
+        if (!FFDConfig.isAdditionalWaterloggingBlock(event.getWorld(), state.getBlock())
+                || WaterloggedBlockApi.isWaterlogged(event.getWorld(), pos)) return false;
+        if (!event.getWorld().isBlockModifiable(event.getEntityPlayer(), pos)
+                || !event.getEntityPlayer().canPlayerEdit(pos, side, event.getItemStack())) return false;
+        ItemStack emptied = null;
+        if (!event.getEntityPlayer().capabilities.isCreativeMode) {
+            emptied = drainFluidContainer(event.getItemStack(), fluid);
+            if (emptied == null) return false;
+        }
+        event.setCanceled(true);
+        event.setCancellationResult(EnumActionResult.SUCCESS);
+        if (!event.getWorld().isRemote) {
+            xy177.farmersfuturedelight.common.fluid.FFDStoredFluidStates.set(
+                    event.getWorld(), pos, WaterloggedBlockApi.sourceState(fluid.getFluid()));
+            event.getWorld().scheduleUpdate(pos, state.getBlock(),
+                    WaterloggedBlockApi.fluidTickRate(event.getWorld(), fluid.getFluid()));
+            event.getWorld().notifyNeighborsOfStateChange(pos, state.getBlock(), false);
+            consumeFluidContainer(event, emptied);
+            event.getWorld().playSound(null, pos, fluid.getFluid().getEmptySound(fluid),
+                    SoundCategory.BLOCKS, 1, 1);
+        }
+        return true;
+    }
+
+    @Nullable
+    private static ItemStack drainFluidContainer(ItemStack stack, FluidStack fluid) {
+        ItemStack single = stack.copy();
+        single.setCount(1);
+        IFluidHandlerItem handler = FluidUtil.getFluidHandler(single);
+        if (handler == null) {
+            return null;
+        }
+        FluidStack requested = new FluidStack(fluid.getFluid(), Fluid.BUCKET_VOLUME);
+        FluidStack simulated = handler.drain(requested, false);
+        if (simulated == null || simulated.amount != Fluid.BUCKET_VOLUME
+                || !simulated.isFluidEqual(requested)) {
+            return null;
+        }
+        FluidStack drained = handler.drain(requested, true);
+        return drained != null && drained.amount == Fluid.BUCKET_VOLUME
+                && drained.isFluidEqual(requested) ? handler.getContainer() : null;
+    }
+
+    private static void consumeFluidContainer(PlayerInteractEvent.RightClickBlock event,
+                                               @Nullable ItemStack result) {
+        EntityPlayer player = event.getEntityPlayer();
+        if (player.capabilities.isCreativeMode) {
+            return;
+        }
+        ItemStack held = event.getItemStack();
+        held.shrink(1);
+        if (held.isEmpty()) {
+            player.setHeldItem(event.getHand(), result == null ? ItemStack.EMPTY : result);
+        } else if (result != null && !result.isEmpty()) {
+            ItemHandlerHelper.giveItemToPlayer(player, result);
+        }
     }
 
     private static IBlockState withWaterlogged(IBlockState state, boolean waterlogged) {
-        IBlockState result = WaterloggedPlantFluid.withWaterlogged(state, waterlogged);
-        return result == null || WaterloggedPlantFluid.isWaterlogged(state) == waterlogged
+        IBlockState result = WaterloggedBlockApi.withWaterlogged(state, waterlogged);
+        return result == null || WaterloggedBlockApi.isWaterlogged(state) == waterlogged
                 ? null : result;
     }
 
@@ -739,14 +975,6 @@ public final class FFDGameplayEvents {
             return;
         }
         IBlockState state = event.getEntity().world.getBlockState(hit.getBlockPos());
-        if (FFDItems.isCandleEnabled() && event.getEntity() instanceof EntityArrow
-                && event.getEntity().isBurning()
-                && state.getBlock() instanceof BlockAbstractCandle) {
-            BlockAbstractCandle candle = (BlockAbstractCandle) state.getBlock();
-            if (candle.canLight(state)) {
-                candle.setLit(event.getEntity().world, hit.getBlockPos(), state, true);
-            }
-        }
         if (BlockBigDripleaf.isBigDripleaf(state)) {
             BlockBigDripleaf.tiltFully(event.getEntity().world, hit.getBlockPos(), state);
         }
@@ -767,18 +995,27 @@ public final class FFDGameplayEvents {
     }
 
     @SubscribeEvent
-    public static void onNetherStemStripped(PlayerInteractEvent.RightClickBlock event) {
-        if (event.getWorld().isRemote || !(event.getItemStack().getItem() instanceof ItemAxe)) {
+    public static void onLogStripped(PlayerInteractEvent.RightClickBlock event) {
+        if (!(event.getItemStack().getItem() instanceof ItemAxe)
+                || event.getFace() == null
+                || !event.getEntityPlayer().canPlayerEdit(event.getPos(), event.getFace(),
+                        event.getItemStack())
+                || !event.getWorld().isBlockModifiable(event.getEntityPlayer(), event.getPos())) {
             return;
         }
         IBlockState state = event.getWorld().getBlockState(event.getPos());
-        Block stripped = strippedVariant(state.getBlock());
-        if (stripped == null) {
+        IBlockState strippedState = strippedVariant(state);
+        if (strippedState == null) {
             return;
         }
-        IBlockState strippedState = stripped.getDefaultState().withProperty(BlockRotatedPillar.AXIS,
-                state.getValue(BlockRotatedPillar.AXIS));
-        event.getWorld().setBlockState(event.getPos(), strippedState, 11);
+        if (event.getWorld().isRemote) {
+            event.setCanceled(true);
+            event.setCancellationResult(EnumActionResult.SUCCESS);
+            return;
+        }
+        if (!event.getWorld().setBlockState(event.getPos(), strippedState, 11)) {
+            return;
+        }
         ItemStack held = event.getItemStack();
         if (!event.getEntityPlayer().capabilities.isCreativeMode) {
             held.damageItem(1, event.getEntityPlayer());
@@ -786,6 +1023,7 @@ public final class FFDGameplayEvents {
         event.getWorld().playSound(null, event.getPos(), FFDSounds.AXE_STRIP,
                 SoundCategory.BLOCKS, 1.0F, 1.0F);
         event.setCanceled(true);
+        event.setCancellationResult(EnumActionResult.SUCCESS);
     }
 
     @SubscribeEvent
@@ -811,20 +1049,60 @@ public final class FFDGameplayEvents {
         event.setCancellationResult(EnumActionResult.SUCCESS);
     }
 
-    private static Block strippedVariant(Block block) {
+    private static IBlockState strippedVariant(IBlockState state) {
+        Block block = state.getBlock();
+        FFDCustomStrippedWoods.Entry customEntry = FFDCustomStrippedWoods.findSource(state);
+        IBlockState custom = customEntry == null ? null : customEntry.strippedState(state);
+        if (custom != null) {
+            return custom;
+        }
         if (block == FFDBlocks.CRIMSON_STEM) {
-            return FFDItems.effectiveBlock(FFDBlocks.STRIPPED_CRIMSON_STEM);
+            return strippedState(FFDItems.effectiveBlock(FFDBlocks.STRIPPED_CRIMSON_STEM),
+                    state.getValue(BlockRotatedPillar.AXIS));
         }
         if (block == FFDBlocks.CRIMSON_HYPHAE) {
-            return FFDItems.effectiveBlock(FFDBlocks.STRIPPED_CRIMSON_HYPHAE);
+            return strippedState(FFDItems.effectiveBlock(FFDBlocks.STRIPPED_CRIMSON_HYPHAE),
+                    state.getValue(BlockRotatedPillar.AXIS));
         }
         if (block == FFDBlocks.WARPED_STEM) {
-            return FFDItems.effectiveBlock(FFDBlocks.STRIPPED_WARPED_STEM);
+            return strippedState(FFDItems.effectiveBlock(FFDBlocks.STRIPPED_WARPED_STEM),
+                    state.getValue(BlockRotatedPillar.AXIS));
         }
         if (block == FFDBlocks.WARPED_HYPHAE) {
-            return FFDItems.effectiveBlock(FFDBlocks.STRIPPED_WARPED_HYPHAE);
+            return strippedState(FFDItems.effectiveBlock(FFDBlocks.STRIPPED_WARPED_HYPHAE),
+                    state.getValue(BlockRotatedPillar.AXIS));
         }
-        return null;
+        if (!FFDItems.isStrippedWoodEnabled() || block != Blocks.LOG && block != Blocks.LOG2) {
+            return null;
+        }
+        int metadata = block.getMetaFromState(state);
+        int index = block == Blocks.LOG ? metadata & 3 : 4 + (metadata & 1);
+        net.minecraft.block.BlockLog.EnumAxis oldAxis =
+                state.getValue(net.minecraft.block.BlockLog.LOG_AXIS);
+        Block target = FFDItems.effectiveBlock(oldAxis == net.minecraft.block.BlockLog.EnumAxis.NONE
+                ? FFDBlocks.STRIPPED_WOODS[index] : FFDBlocks.STRIPPED_LOGS[index]);
+        EnumFacing.Axis axis = oldAxis == net.minecraft.block.BlockLog.EnumAxis.X
+                ? EnumFacing.Axis.X : oldAxis == net.minecraft.block.BlockLog.EnumAxis.Z
+                ? EnumFacing.Axis.Z : EnumFacing.Axis.Y;
+        return strippedState(target, axis);
+    }
+
+    private static IBlockState strippedState(Block block, EnumFacing.Axis axis) {
+        if (block == null) {
+            return null;
+        }
+        IBlockState state = block.getDefaultState();
+        if (state.getPropertyKeys().contains(BlockRotatedPillar.AXIS)) {
+            return state.withProperty(BlockRotatedPillar.AXIS, axis);
+        }
+        if (state.getPropertyKeys().contains(net.minecraft.block.BlockLog.LOG_AXIS)) {
+            net.minecraft.block.BlockLog.EnumAxis oldAxis = axis == EnumFacing.Axis.X
+                    ? net.minecraft.block.BlockLog.EnumAxis.X : axis == EnumFacing.Axis.Z
+                    ? net.minecraft.block.BlockLog.EnumAxis.Z
+                    : net.minecraft.block.BlockLog.EnumAxis.Y;
+            return state.withProperty(net.minecraft.block.BlockLog.LOG_AXIS, oldAxis);
+        }
+        return state;
     }
 
     @SubscribeEvent
@@ -833,9 +1111,13 @@ public final class FFDGameplayEvents {
             return;
         }
 
-        if (FFDEntities.isLocalTurtleEnabled() && event.getEntity() instanceof EntityZombie
-                && !(event.getEntity() instanceof EntityPigZombie)) {
-            addTurtleTargeting((EntityZombie) event.getEntity());
+        if (FFDItems.isTurtleEnabled() && event.getEntity() instanceof EntityCreature
+                && !(event.getEntity() instanceof EntityPigZombie)
+                && (FFDConfig.isConfiguredEntity(FFDConfig.turtleEggDestroyingMobs,
+                        event.getEntity())
+                || FFDConfig.isConfiguredEntity(FFDConfig.turtleBabyPredatorMobs,
+                        event.getEntity()))) {
+            addTurtleTargeting((EntityCreature) event.getEntity());
         }
         if (FFDEntities.isLocalAxolotlEnabled()
                 && event.getEntity() instanceof EntityGuardian) {
@@ -843,19 +1125,29 @@ public final class FFDGameplayEvents {
         }
     }
 
-    private static void addTurtleTargeting(EntityZombie zombie) {
-        if (zombie.getEntityData().getBoolean(TURTLE_ZOMBIE_AI_TAG)) {
+    private static void addTurtleTargeting(EntityCreature creature) {
+        if (creature.getEntityData().getBoolean(TURTLE_ZOMBIE_AI_TAG)) {
             return;
         }
-        zombie.tasks.addTask(4, new EntityAITrampleTurtleEgg(zombie));
-        zombie.targetTasks.addTask(5, new EntityAINearestAttackableTarget<EntityTurtle>(zombie,
-                EntityTurtle.class, 10, true, false, new Predicate<EntityTurtle>() {
+        if (FFDConfig.isConfiguredEntity(FFDConfig.turtleEggDestroyingMobs, creature)) {
+            creature.tasks.addTask(4, new EntityAITrampleTurtleEgg(creature));
+        }
+        if (FFDConfig.isConfiguredEntity(FFDConfig.turtleBabyPredatorMobs, creature)) {
+            creature.targetTasks.addTask(5,
+                    new EntityAINearestAttackableTarget<EntityLivingBase>(creature,
+                EntityLivingBase.class, 10, true, false, new Predicate<EntityLivingBase>() {
                     @Override
-                    public boolean apply(EntityTurtle turtle) {
-                        return turtle.isChild() && !turtle.isInWater();
+                    public boolean apply(EntityLivingBase turtle) {
+                        return isBabyTurtleTarget(turtle);
                     }
                 }));
-        zombie.getEntityData().setBoolean(TURTLE_ZOMBIE_AI_TAG, true);
+        }
+        creature.getEntityData().setBoolean(TURTLE_ZOMBIE_AI_TAG, true);
+    }
+
+    private static boolean isBabyTurtleTarget(EntityLivingBase entity) {
+        return FFDConfig.isTurtleEntity(entity) && entity instanceof EntityAgeable
+                && ((EntityAgeable) entity).isChild() && !entity.isInWater();
     }
 
     private static void addAxolotlTargeting(EntityGuardian guardian) {

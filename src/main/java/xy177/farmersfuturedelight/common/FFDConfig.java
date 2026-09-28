@@ -8,8 +8,17 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 import xy177.farmersfuturedelight.common.registry.FFDRawOres;
 
@@ -20,10 +29,14 @@ public final class FFDConfig {
         AUTO;
 
         public static FeatureMode parse(String value) {
+            return parse(value, ENABLED);
+        }
+
+        public static FeatureMode parse(String value, FeatureMode defaultMode) {
             try {
                 return valueOf(value.trim().toUpperCase());
             } catch (IllegalArgumentException ex) {
-                return ENABLED;
+                return defaultMode;
             }
         }
     }
@@ -42,6 +55,34 @@ public final class FFDConfig {
         }
     }
 
+    public enum WaterVisualMode {
+        MODERN,
+        LEGACY;
+
+        public static WaterVisualMode parse(String value) {
+            try {
+                return valueOf(value.trim().toUpperCase(Locale.ROOT));
+            } catch (IllegalArgumentException ex) {
+                return MODERN;
+            }
+        }
+    }
+
+    public enum FluidloggingScope {
+        WATER,
+        ALL_FLUIDS,
+        WHITELIST,
+        BLACKLIST;
+
+        public static FluidloggingScope parse(String value) {
+            try {
+                return valueOf(value.trim().toUpperCase(Locale.ROOT));
+            } catch (IllegalArgumentException ex) {
+                return WATER;
+            }
+        }
+    }
+
     private static final String CATEGORY_FEATURES = "features";
     private static final String CATEGORY_GAMEPLAY = "gameplay";
     private static final String CATEGORY_WORLDGEN = "worldgen";
@@ -50,7 +91,7 @@ public final class FFDConfig {
     private static final String CATEGORY_DEBUG = "debug";
     private static final String CATEGORY_INTERNAL = "internal";
     private static final String CATEGORY_COMPATIBILITY = "compatibility";
-    private static final int CURRENT_CONFIG_VERSION = 10;
+    private static final int CURRENT_CONFIG_VERSION = 17;
     private static final String AUTO_COMPATIBILITY_COMMENT = "逐个控制 AUTO 自动避让的外部模组。仅当对应内容开关为 AUTO 时生效。每行格式为 内容注册名@外部模组ID=true或false：true 表示该模组提供对应内容时让位给它，false 表示忽略该模组并继续使用未世之乐内容。默认名单包含所有已支持的内容与模组组合，即使对应模组未安装也会保留；未列出的组合继续使用 AUTO 的正常判定。修改后需重启游戏。";
 
     public static FeatureMode sweetBerryMode;
@@ -72,6 +113,17 @@ public final class FFDConfig {
     public static FeatureMode kelpMode;
     public static FeatureMode seagrassMode;
     public static FeatureMode seaPickleMode;
+    public static FeatureMode coralMode;
+    public static FeatureMode blueIceMode;
+    public static FeatureMode strippedWoodMode;
+    public static FeatureMode pumpkinMode;
+    public static FeatureMode prismarineDecorMode;
+    public static FeatureMode conduitMode;
+    public static FeatureMode bubbleColumnMode;
+    public static FeatureMode fishMode;
+    public static FeatureMode dolphinMode;
+    public static FeatureMode drownedMode;
+    public static FeatureMode tridentMode;
     public static FeatureMode turtleMode;
     public static FeatureMode axolotlMode;
     public static FeatureMode goatMode;
@@ -95,10 +147,19 @@ public final class FFDConfig {
     public static FeatureMode glowItemFrameMode;
     public static FeatureMode signTextMode;
     public static FeatureMode lightBlockMode;
+    public static FeatureMode waterloggingMode;
+    public static FluidloggingScope fluidloggingScope;
+    public static String[] fluidloggingFluidList;
+    public static String[] waterloggingAdditionalBlocks = new String[0];
+    private static File configurationFile;
+    public static FeatureMode aquaAcrobaticsMode;
+    public static String[] conduitFrameBlocks;
+    public static FeatureMode commandCompletionMode;
 
     public static boolean hostileMobsRequireZeroBlockLight;
     public static CloudHeightMode cloudHeightMode;
     public static boolean smoothBiomeSkyColors;
+    public static WaterVisualMode waterVisualMode;
     public static boolean modernWorldLoadingScreen;
     public static boolean cavesAndCliffsBackgroundMusic;
     public static boolean shovelCreatesDirtPath;
@@ -106,6 +167,7 @@ public final class FFDConfig {
     public static boolean oresDropRawMaterials;
     public static int rawOreDropAmount;
     public static boolean denseRawOreDrop;
+    public static int osvDenseRawOreMultiplier;
     public static int furnaceOutputAmount;
     public static boolean rawBlockSmelt;
     public static int maceratorRawOutputAmount;
@@ -152,6 +214,11 @@ public final class FFDConfig {
     public static String[] powderSnowAdditionalDamage;
     public static String[] powderSnowWalkableBoots;
     public static String[] powderSnowFreezingArmor;
+    public static String[] turtleEggDestroyingMobs;
+    public static String[] turtleBabyPredatorMobs;
+    public static String[] waterSinkingMobs;
+    public static String[] waterDrowningImmuneMobs;
+    public static String[] drownedTransformationMobs;
     public static float goatScreamingChance;
     public static float goatSingleHornChance;
     public static int goatLongJumpCooldownMinTicks;
@@ -262,9 +329,18 @@ public final class FFDConfig {
     public static int seaPickleWorldgenAttempts;
     public static int seaPickleWorldgenOffsetRadius;
     public static int seaPickleSpreadChanceRoll;
+    public static int coralReefNoiseRatio;
+    public static int coralReefNoiseScale;
     public static int turtleSpawnWeight;
     public static int turtleMinGroupSize;
     public static int turtleMaxGroupSize;
+    public static int dolphinSpawnWeight;
+    public static int dolphinMinGroupSize;
+    public static int dolphinMaxGroupSize;
+    public static int drownedOceanSpawnWeight;
+    public static int drownedRiverSpawnWeight;
+    public static int drownedFrozenRiverSpawnWeight;
+    public static int drownedDripstoneCaveSpawnWeight;
     public static float turtleEggHatchChance;
     public static int axolotlSpawnCheckIntervalTicks;
     public static int axolotlSpawnAttemptsPerPlayer;
@@ -277,6 +353,7 @@ public final class FFDConfig {
     public static float beeNestPlainsChance;
     public static float beeNestFlowerForestChance;
     public static float beeNestForestChance;
+    public static String[] beeNestAllowedLeaves;
     public static int beeNestMinBees;
     public static int beeNestMaxBees;
     public static int lushCaveMinY;
@@ -371,6 +448,7 @@ public final class FFDConfig {
     }
 
     public static void load(File file) {
+        configurationFile = file;
         Configuration config = new Configuration(file);
         int loadedConfigVersion = config.hasKey(CATEGORY_INTERNAL, "configVersion")
                 ? config.get(CATEGORY_INTERNAL, "configVersion", CURRENT_CONFIG_VERSION).getInt()
@@ -399,6 +477,17 @@ public final class FFDConfig {
         kelpMode = readMode(config, "kelpMode", "海带内容开关");
         seagrassMode = readMode(config, "seagrassMode", "海草内容开关");
         seaPickleMode = readMode(config, "seaPickleMode", "海泡菜内容开关");
+        coralMode = readMode(config, "coralMode", "珊瑚、珊瑚块与珊瑚扇内容开关");
+        blueIceMode = readMode(config, "blueIceMode", "蓝冰内容开关");
+        strippedWoodMode = readMode(config, "strippedWoodMode", "原版去皮原木、去皮木及主世界木材装饰内容开关");
+        pumpkinMode = readMode(config, "pumpkinMode", "无脸南瓜内容开关");
+        prismarineDecorMode = readMode(config, "prismarineDecorMode", "海晶石楼梯与台阶内容开关");
+        conduitMode = readMode(config, "conduitMode", "潮涌核心、鹦鹉螺壳与海洋之心内容开关");
+        bubbleColumnMode = readMode(config, "bubbleColumnMode", "气泡柱内容开关");
+        fishMode = readMode(config, "fishMode", "鳕鱼、鲑鱼、河豚、热带鱼及其鱼桶内容开关");
+        dolphinMode = readMode(config, "dolphinMode", "海豚与海豚的恩惠内容开关");
+        drownedMode = readMode(config, "drownedMode", "溺尸、自然生成与僵尸转化内容开关");
+        tridentMode = readMode(config, "tridentMode", "三叉戟与对应投射物内容开关");
         turtleMode = readMode(config, "turtleMode", "海龟内容开关");
         axolotlMode = readMode(config, "axolotlMode", "美西螈与美西螈桶内容开关");
         goatMode = readMode(config, "goatMode", "山羊与山羊角内容开关");
@@ -456,6 +545,26 @@ public final class FFDConfig {
         glowItemFrameMode = readMode(config, "glowItemFrameMode", "荧光物品展示框内容开关");
         signTextMode = readNonAvoidingMode(config, "signTextMode", "告示牌文字染色与发光功能开关");
         lightBlockMode = readMode(config, "lightBlockMode", "光源方块内容开关");
+        waterloggingMode = readMode(config, "waterloggingMode",
+                "通用含水系统开关。AUTO 在检测到 Fluidlogged API 时让位给它");
+        fluidloggingScope = FluidloggingScope.parse(config.getString(
+                "fluidloggingScope", CATEGORY_FEATURES, "WATER",
+                "含水方块允许容纳的流体范围。WATER 仅允许水；ALL_FLUIDS 允许全部可放置流体；WHITELIST 仅允许 fluidloggingFluidList 中的流体；BLACKLIST 允许名单外的全部可放置流体。默认 WATER，修改后需重启游戏。",
+                new String[]{"WATER", "ALL_FLUIDS", "WHITELIST", "BLACKLIST"}));
+        fluidloggingFluidList = config.getStringList(
+                "fluidloggingFluidList", CATEGORY_FEATURES, new String[0],
+                "含水流体白名单或黑名单。每行填写 Forge 流体注册名，例如 water 或 lava；也可填写该流体方块的完整注册名，例如 minecraft:lava。仅在 fluidloggingScope 为 WHITELIST 或 BLACKLIST 时生效，修改后需重启游戏。");
+        waterloggingAdditionalBlocks = config.getStringList(
+                "waterloggingAdditionalBlocks", CATEGORY_FEATURES, new String[0],
+                "额外允许含液的方块注册名。默认留空，使用 Java 26.3 对应范围。旧存档迁移选择转换时只加入所需方块，不改变其他方块的默认规则。");
+        aquaAcrobaticsMode = readMode(config, "aquaAcrobaticsMode",
+                "水游技艺兼容开关。ENABLED 或 AUTO 在检测到水游技艺时让位给它；DISABLED 保留未世之乐的游泳与水体实现");
+        conduitFrameBlocks = config.getStringList(
+                "conduitFrameBlocks", CATEGORY_FEATURES,
+                new String[]{"minecraft:prismarine", "minecraft:sea_lantern"},
+                "潮涌核心框架方块列表。格式为 namespace:block 或 namespace:block:metadata；不填写 metadata 时接受该方块的全部变体。默认包括海晶石全部变体和海晶灯，修改后需重启游戏。");
+        commandCompletionMode = readMode(config, "commandCompletionMode",
+                "高版本风格指令补全开关。AUTO 在检测到 Cleanroom Loader 时让位给它");
 
         String[] defaultAutoCompatibilityToggles = FFDCompat.defaultAutoCompatibilityToggles();
         String[] configuredAutoCompatibilityToggles = config.getStringList(
@@ -472,11 +581,16 @@ public final class FFDConfig {
                 "sweetBerryMode", "honeyMode", "glowSquidMode", "glowBerryMode", "mossMode",
                 "lushCaveMode", "azaleaMode", "dripleafMode", "rootedDirtMode", "hangingRootsMode",
                 "sporeBlossomMode", "glowLichenMode", "kelpMode", "seagrassMode", "seaPickleMode",
+                "coralMode", "blueIceMode", "strippedWoodMode", "pumpkinMode", "prismarineDecorMode", "conduitMode",
+                "bubbleColumnMode", "fishMode", "dolphinMode", "drownedMode", "tridentMode",
                 "turtleMode", "axolotlMode", "goatMode", "phantomMode", "othersideMode",
                 "amethystMode", "deepslateMode", "deepslateCompatToggles", "rawOreMode",
                 "rawOreMaterialToggles", "copperMode", "dripstoneMode",
                 "ironChainMode", "candleMode", "powderSnowMode", "crimsonMode", "warpedMode",
                 "crimsonWoodMode", "warpedWoodMode", "glowItemFrameMode", "signTextMode", "lightBlockMode",
+                "waterloggingMode", "fluidloggingScope", "fluidloggingFluidList", "waterloggingAdditionalBlocks",
+                "aquaAcrobaticsMode", "conduitFrameBlocks",
+                "commandCompletionMode",
                 "autoCompatibilityToggles")));
 
         hostileMobsRequireZeroBlockLight = config.getBoolean(
@@ -488,6 +602,10 @@ public final class FFDConfig {
                 new String[]{"DISABLED", "CAVES_CLIFFS_ONLY", "ALL_WORLDS"}));
         smoothBiomeSkyColors = config.getBoolean("smoothBiomeSkyColors", CATEGORY_GAMEPLAY,
                 true, "是否在群系边界平滑混合天空颜色。关闭时直接使用玩家所在位置群系的天空颜色。仅影响客户端显示。");
+        waterVisualMode = WaterVisualMode.parse(config.getString("waterVisualMode",
+                CATEGORY_GAMEPLAY, "MODERN",
+                "水体视觉模式。MODERN 使用 1.13 风格灰度水纹理、群系染色、水下雾色和逐步提升的水下能见度；LEGACY 保留 1.12.2 水体视觉。仅影响客户端显示，修改后需重启游戏。",
+                new String[]{"MODERN", "LEGACY"}));
         modernWorldLoadingScreen = config.getBoolean("modernWorldLoadingScreen",
                 CATEGORY_GAMEPLAY, false,
                 "是否在创建或进入世界时使用高版本风格的加载画面。关闭时所有世界类型均使用原版 1.12.2 加载画面。仅影响客户端显示。");
@@ -504,6 +622,8 @@ public final class FFDConfig {
                 1, 1, 64, "除铜外的所有受支持矿石被转换为粗矿时的基础掉落数量；Raw Ore 1.5.4 默认值为 1。");
         denseRawOreDrop = config.getBoolean("denseRawOreDrop", CATEGORY_COMPATIBILITY,
                 true, "是否按 Dense Metals 的富集矿石倍率增加粗矿掉落；Raw Ore 1.5.4 默认开启。");
+        osvDenseRawOreMultiplier = config.getInt("osvDenseRawOreMultiplier", CATEGORY_COMPATIBILITY,
+                2, 1, 64, "矿石石材变种致密矿转换为粗矿时的掉落倍率，仅影响 osv 的致密矿，不影响其他模组；默认值为 2。");
         furnaceOutputAmount = config.getInt("furnaceOutputAmount", CATEGORY_COMPATIBILITY,
                 1, 1, 64, "熔炉处理粗矿时的锭产物数量；Raw Ore 1.5.4 默认值为 1。");
         rawBlockSmelt = config.getBoolean("rawBlockSmelt", CATEGORY_COMPATIBILITY,
@@ -635,6 +755,31 @@ public final class FFDConfig {
         powderSnowFreezingArmor = config.getStringList(
                 "powderSnowFreezingArmor", CATEGORY_GAMEPLAY, new String[0],
                 "穿戴后可免疫细雪冻结的盔甲物品注册名列表。任意装备栏中有一件匹配装备即可生效；原版皮革盔甲仍始终有效，例如 twilightforest:yeti_chestplate。");
+        turtleEggDestroyingMobs = config.getStringList(
+                "turtleEggDestroyingMobs", CATEGORY_GAMEPLAY,
+                new String[]{"minecraft:zombie", "minecraft:husk", "minecraft:zombie_villager"},
+                "会主动寻找并破坏海龟蛋的生物注册名列表。默认保持僵尸、尸壳和僵尸村民行为；受 mobGriefing 规则影响，海龟和蝙蝠始终排除。");
+        turtleBabyPredatorMobs = config.getStringList(
+                "turtleBabyPredatorMobs", CATEGORY_GAMEPLAY,
+                new String[]{"minecraft:zombie", "minecraft:husk", "minecraft:zombie_villager"},
+                "会主动攻击离水幼年海龟的生物注册名列表。默认保持僵尸、尸壳和僵尸村民行为；无效注册名或不支持生物 AI 的实体会被安全忽略。");
+        waterSinkingMobs = config.getStringList(
+                "waterSinkingMobs", CATEGORY_GAMEPLAY,
+                new String[]{"minecraft:zombie", "minecraft:zombie_villager", "minecraft:husk",
+                        "minecraft:zombie_pigman", "minecraft:skeleton", "minecraft:stray",
+                        "minecraft:wither_skeleton"},
+                "在水中不能主动游泳、只会下沉的生物注册名列表。默认包含 26.3 中在 1.12.2 可对应的僵尸和骷髅变种；无效注册名不会产生效果。");
+        waterDrowningImmuneMobs = config.getStringList(
+                "waterDrowningImmuneMobs", CATEGORY_GAMEPLAY,
+                new String[]{"minecraft:zombie", "minecraft:zombie_villager", "minecraft:husk",
+                        "minecraft:zombie_pigman", "minecraft:skeleton", "minecraft:stray",
+                        "minecraft:wither_skeleton", "minecraft:skeleton_horse",
+                        "minecraft:zombie_horse", "minecraft:wither"},
+                "不会溺水的生物注册名列表");
+        drownedTransformationMobs = config.getStringList(
+                "drownedTransformationMobs", CATEGORY_GAMEPLAY,
+                new String[]{"minecraft:zombie"},
+                "连续浸水后转化为溺尸的僵尸类生物注册名列表。每项必须是 EntityZombie 或其子类的注册名；默认仅包含僵尸。");
         logAutoCompatibilityDecisions = config.getBoolean("logAutoCompatibilityDecisions", CATEGORY_DEBUG,
                 false, "是否在日志中逐项显示 AUTO 自动避让的内容与世界生成判定。默认关闭；仅建议排查兼容问题时开启。");
 
@@ -811,15 +956,15 @@ public final class FFDConfig {
                 "幻翼开始获得生成概率前所需的未休息时间，单位为 tick；26.3 默认为 72000 tick。");
 
         kelpColdNoiseRatio = config.getInt("kelpColdNoiseRatio", CATEGORY_WORLDGEN,
-                120, 0, 1000, "海带冷水海洋噪声密度比例，26.3 默认为 120。");
+                120, 0, 1000, "海带普通与冷水海洋噪声密度比例，1.13.2 默认为 120。");
         kelpWarmNoiseRatio = config.getInt("kelpWarmNoiseRatio", CATEGORY_WORLDGEN,
-                80, 0, 1000, "海带暖水海洋噪声密度比例，26.3 默认为 80。");
+                80, 0, 1000, "海带温水海洋噪声密度比例，1.13.2 默认为 80。");
         kelpNoiseScale = config.getInt("kelpNoiseScale", CATEGORY_WORLDGEN,
-                80, 1, 10000, "海带噪声采样尺度，26.3 默认为 80。");
+                80, 1, 10000, "海带噪声采样尺度，1.13.2 默认为 80。");
         kelpWorldgenMaxBodyHeight = config.getInt("kelpWorldgenMaxBodyHeight", CATEGORY_WORLDGEN,
-                9, 0, 64, "海带世界生成时植株中段的最大高度，26.3 默认为 9。");
+                10, 0, 64, "海带世界生成时植株中段的最大高度；0 仅生成顶部，1.13.2 默认为 10。");
         kelpGrowthChance = config.getFloat("kelpGrowthChance", CATEGORY_GROWTH,
-                0.14F, 0.0F, 1.0F, "海带每次随机刻生长的概率，26.3 默认为 0.14。");
+                0.14F, 0.0F, 1.0F, "海带每次随机刻生长的概率，1.13.2 默认为 0.14。");
 
         seagrassWarmAttempts = readSeagrassAttempts(config, "seagrassWarmAttempts", 80, "暖水海洋");
         seagrassNormalAttempts = readSeagrassAttempts(config, "seagrassNormalAttempts", 48, "普通海洋");
@@ -840,13 +985,33 @@ public final class FFDConfig {
         seagrassDeepColdTallPercent = readTallPercent(config, "seagrassDeepColdTallPercent", 80, "深冷水海洋");
 
         seaPickleRarity = config.getInt("seaPickleRarity", CATEGORY_WORLDGEN,
-                16, 1, 10000, "海泡菜区块生成触发概率的分母，26.3 默认为 16。");
+                16, 1, 10000, "暖水海洋中海泡菜区块生成触发概率的分母，1.13.2 默认为 16。");
         seaPickleWorldgenAttempts = config.getInt("seaPickleWorldgenAttempts", CATEGORY_WORLDGEN,
-                20, 0, 1000, "海泡菜触发生成后进行的放置尝试次数，26.3 默认为 20。");
+                20, 0, 1000, "海泡菜触发生成后进行的放置尝试次数，1.13.2 默认为 20。");
         seaPickleWorldgenOffsetRadius = config.getInt("seaPickleWorldgenOffsetRadius", CATEGORY_WORLDGEN,
-                7, 0, 64, "海泡菜生成点相对区块内基点的三角分布半径，26.3 默认为 7。");
+                7, 0, 64, "海泡菜生成点相对区块内基点的三角分布半径，1.13.2 默认为 7。");
         seaPickleSpreadChanceRoll = config.getInt("seaPickleSpreadChanceRoll", CATEGORY_GROWTH,
                 6, 1, 1000, "海泡菜使用骨粉时每个候选位置扩散成功概率的分母，26.3 默认为 6。");
+        coralReefNoiseRatio = config.getInt("coralReefNoiseRatio", CATEGORY_WORLDGEN,
+                20, 0, 1000, "暖水海洋珊瑚礁噪声密度比例，1.13.2 默认为 20。");
+        coralReefNoiseScale = config.getInt("coralReefNoiseScale", CATEGORY_WORLDGEN,
+                400, 1, 10000, "暖水海洋珊瑚礁噪声采样尺度，1.13.2 默认为 400。");
+
+        dolphinSpawnWeight = config.getInt("dolphinSpawnWeight", CATEGORY_WORLDGEN,
+                1, 0, 1000, "海豚在普通海洋中的生成权重；暖水与温水海洋会使用两倍权重，1.13.2 默认为 1。");
+        dolphinMinGroupSize = config.getInt("dolphinMinGroupSize", CATEGORY_WORLDGEN,
+                1, 1, 64, "海豚自然生成群体的最小数量，1.13.2 默认为 1。");
+        dolphinMaxGroupSize = Math.max(dolphinMinGroupSize, config.getInt(
+                "dolphinMaxGroupSize", CATEGORY_WORLDGEN, 2, 1, 64,
+                "海豚自然生成群体的最大数量，1.13.2 默认为 2。"));
+        drownedOceanSpawnWeight = config.getInt("drownedOceanSpawnWeight", CATEGORY_WORLDGEN,
+                5, 0, 1000, "溺尸在海洋群系怪物生成表中的权重，26.3 默认为 5。");
+        drownedRiverSpawnWeight = config.getInt("drownedRiverSpawnWeight", CATEGORY_WORLDGEN,
+                100, 0, 1000, "溺尸在普通河流群系怪物生成表中的权重，26.3 默认为 100。");
+        drownedFrozenRiverSpawnWeight = config.getInt("drownedFrozenRiverSpawnWeight", CATEGORY_WORLDGEN,
+                1, 0, 1000, "溺尸在冻河群系怪物生成表中的权重，26.3 默认为 1。");
+        drownedDripstoneCaveSpawnWeight = config.getInt("drownedDripstoneCaveSpawnWeight", CATEGORY_WORLDGEN,
+                95, 0, 1000, "溺尸在滴水石洞穴本地怪物生成表中的权重，26.3 默认为 95。");
 
         turtleSpawnWeight = config.getInt("turtleSpawnWeight", CATEGORY_WORLDGEN,
                 5, 0, 1000, "海龟在海滩生成的权重，26.3 默认为 5。");
@@ -880,6 +1045,9 @@ public final class FFDConfig {
                 "goatMaxGroupSize", CATEGORY_WORLDGEN, 3, 1, 64,
                 "山羊自然生成群体的最大数量，26.3 默认值为 3。"));
 
+        beeNestAllowedLeaves = config.getStringList("beeNestAllowedLeaves", CATEGORY_WORLDGEN,
+                new String[]{"minecraft:leaves[variant=oak]", "minecraft:leaves[variant=birch]"},
+                "允许自然蜂巢生成的树叶列表，默认仅橡树和白桦树叶。支持 模组ID:方块ID、模组ID:方块ID@metadata、模组ID:方块ID[属性=值,属性=值]；不限定衰变状态，除非显式指定。空列表禁用自然蜂巢，包括草甸树木。模组方块仍需通过 Forge 树叶/木材识别，修改后重启生效。");
         beeNestPlainsChance = config.getFloat("beeNestPlainsChance", CATEGORY_WORLDGEN,
                 0.05F, 0.0F, 1.0F, "平原和向日葵平原中每棵合适树木生成蜂巢的概率，26.3 默认值为 0.05。");
         beeNestFlowerForestChance = config.getFloat("beeNestFlowerForestChance", CATEGORY_WORLDGEN,
@@ -1087,6 +1255,10 @@ public final class FFDConfig {
     }
 
     private static void migrateLegacyDefaults(Configuration config, int loadedConfigVersion) {
+        if (loadedConfigVersion < 12 && drownedRiverSpawnWeight == 1) {
+            drownedRiverSpawnWeight = 100;
+            config.get(CATEGORY_WORLDGEN, "drownedRiverSpawnWeight", 100).set(100);
+        }
         if (loadedConfigVersion < 4 && axolotlSpawnAttemptsPerPlayer == 3) {
             axolotlSpawnAttemptsPerPlayer = 16;
             config.get(CATEGORY_WORLDGEN, "axolotlSpawnAttemptsPerPlayer", 16).set(16);
@@ -1185,18 +1357,40 @@ public final class FFDConfig {
         if ("deepslateCompatGenerationToggles".equals(key)) {
             return "Per-source deep-ore generation settings. Use modid:material=count,size or modid:material=count,size,minY,maxY,uniform|trapezoid,discardChance[,plateau]. Sources for the same material place into one shared deep-ore object. Plateau is optional and only affects trapezoid distributions. Missing entries use the built-in defaults. Restart required.";
         }
+        if ("lightBlockMode".equals(key)) {
+            return "Feature mode for the invisible administrator light block. ENABLED uses this mod's implementation; DISABLED turns it off; AUTO is enabled unless a compatible provider is added.";
+        }
+        if ("waterloggingMode".equals(key)) {
+            return "Feature mode for universal waterlogging. Defaults to AUTO. ENABLED uses this mod's system; DISABLED turns it off; AUTO yields to Fluidlogged API when it is installed. Restart required.";
+        }
+        if ("fluidloggingScope".equals(key)) {
+            return "Fluid scope for fluidlogged blocks. WATER accepts only water; ALL_FLUIDS accepts every placeable fluid; WHITELIST accepts only entries in fluidloggingFluidList; BLACKLIST accepts every placeable fluid except listed entries. Defaults to WATER. Restart required.";
+        }
+        if ("fluidloggingFluidList".equals(key)) {
+            return "Fluid whitelist or blacklist used by fluidloggingScope. Enter one Forge fluid registry name per line, such as water or lava; a full fluid-block registry name such as minecraft:lava is also accepted. Restart required.";
+        }
+        if ("waterloggingAdditionalBlocks".equals(key)) {
+            return "Additional fluidloggable block registry names. Empty by default; built-in support follows the corresponding Java 26.3 blocks. Confirmed legacy-world migrations add only the required blocks.";
+        }
+        if ("aquaAcrobaticsMode".equals(key)) {
+            return "Aqua Acrobatics compatibility mode. Defaults to AUTO. ENABLED and AUTO yield to Aqua Acrobatics when it is detected; DISABLED keeps Farmer's Future Delight swimming and water rendering active. Restart required.";
+        }
+        if ("conduitFrameBlocks".equals(key)) {
+            return "Conduit frame block list. Use namespace:block or namespace:block:metadata; omitting metadata accepts every variant of that block. The default list includes all prismarine variants and sea lanterns. Restart required.";
+        }
+        if ("commandCompletionMode".equals(key)) {
+            return "Feature mode for the high-version-style command completion screen. ENABLED uses this mod's screen; DISABLED turns it off; AUTO yields to Cleanroom Loader when it is detected. Restart required.";
+        }
         if (CATEGORY_FEATURES.equals(category)) {
             return "Feature mode for " + humanizeKey(key.replace("Mode", ""))
-                    + ". ENABLED is the default and uses this mod's implementation; DISABLED turns it off; AUTO resolves each compatible content unit independently and fills only missing units locally.";
+                    + ". Defaults to " + defaultFeatureMode(key).name()
+                    + ". ENABLED uses this mod's implementation; DISABLED turns it off; AUTO resolves each compatible content unit independently and fills only missing units locally.";
         }
         if ("sporeBlossomParticlesEnabled".equals(key)) {
             return "Enable falling spore particles from spore blossoms. Disabled by default.";
         }
         if ("logAutoCompatibilityDecisions".equals(key)) {
             return "Log each AUTO compatibility content and world-generation decision. Disabled by default; enable only when diagnosing compatibility issues.";
-        }
-        if ("lightBlockMode".equals(key)) {
-            return "Feature mode for the invisible administrator light block. ENABLED uses this mod's implementation; DISABLED turns it off; AUTO is enabled unless a compatible provider is added.";
         }
         if ("sporeBlossomParticleFrequency".equals(key)) {
             return "Emission frequency denominator per random display tick. 1 emits every display tick; larger values reduce the frequency.";
@@ -1222,6 +1416,9 @@ public final class FFDConfig {
         if ("smoothBiomeSkyColors".equals(key)) {
             return "Smoothly blend sky colors across biome borders. When disabled, use the sky color of the biome at the player's position. Client-side display only.";
         }
+        if ("waterVisualMode".equals(key)) {
+            return "Water visual mode. MODERN uses 1.13-style grayscale water textures, biome tinting, underwater fog colors, and gradually improving underwater visibility; LEGACY preserves the 1.12.2 water visuals. Client-side only. Restart required.";
+        }
         if ("modernWorldLoadingScreen".equals(key)) {
             return "Use the modern-style loading screen while creating or entering a world. Disabled by default; when disabled, every world type uses the original 1.12.2 loading screen. Client-side display only.";
         }
@@ -1242,6 +1439,9 @@ public final class FFDConfig {
         }
         if ("denseRawOreDrop".equals(key)) {
             return "Apply the Dense Metals dense-ore multiplier to raw-material drops. Enabled by default, matching Raw Ore 1.5.4.";
+        }
+        if ("osvDenseRawOreMultiplier".equals(key)) {
+            return "Raw-material drop multiplier for Ore Stone Variants dense ores. This only affects dense ores from osv and does not affect other mods. The default is 2.";
         }
         if ("furnaceOutputAmount".equals(key)) {
             return "Ingot output amount when a raw ore is smelted in a furnace. The Raw Ore 1.5.4 default is 1.";
@@ -1369,6 +1569,9 @@ public final class FFDConfig {
         if ("illagersIgnoreBabyVillagers".equals(key)) {
             return "Prevent illagers from targeting or damaging baby villagers in every world type.";
         }
+        if ("beeNestAllowedLeaves".equals(key)) {
+            return "Leaves allowed for naturally generated bee nests; defaults to oak and birch. Supports modid:block, modid:block@metadata and modid:block[property=value,property=value]. Decay flags are unrestricted unless specified. An empty list disables natural nests, including meadow trees. Modded leaves and trunks must be recognized by the Forge leaf/wood hooks. Restart required.";
+        }
         if ("beeAdditionalPollinationTargets".equals(key)) {
             return "Additional blocks or block states that bees can pollinate. Supported formats: modid:block, modid:block@metadata, and modid:block[property=value,property=value].";
         }
@@ -1386,6 +1589,21 @@ public final class FFDConfig {
         }
         if ("powderSnowFreezingArmor".equals(key)) {
             return "Item registry names for armor that prevents powder-snow freezing. One matching item in any armor slot is enough; vanilla leather armor always works. For example twilightforest:yeti_chestplate.";
+        }
+        if ("turtleEggDestroyingMobs".equals(key)) {
+            return "Entity registry names that actively seek and destroy turtle eggs. Defaults to zombies, husks, and zombie villagers; mobGriefing still applies and turtles and bats remain excluded.";
+        }
+        if ("turtleBabyPredatorMobs".equals(key)) {
+            return "Entity registry names that actively attack baby turtles outside water. Defaults to zombies, husks, and zombie villagers; invalid IDs and entities without supported AI are ignored safely.";
+        }
+        if ("waterSinkingMobs".equals(key)) {
+            return "Entity registry names that cannot actively swim and only sink in water. Defaults to the zombie and skeleton variants present in 1.12.2 that sink in 26.3; invalid IDs have no effect.";
+        }
+        if ("waterDrowningImmuneMobs".equals(key)) {
+            return "Entity registry names that do not lose air or drown in water, independently of the sinking list. Defaults to 26.3 undead types present in 1.12.2; innate underwater breathing, lava damage, and in-wall suffocation are unchanged.";
+        }
+        if ("drownedTransformationMobs".equals(key)) {
+            return "Entity registry names for zombie-derived mobs that transform into drowned after remaining submerged. Entries must be EntityZombie subclasses; only minecraft:zombie is enabled by default.";
         }
         if ("goatScreamingChance".equals(key)) {
             return "Base chance for a spawned or bred goat to be a screaming goat. The 26.3 default is 0.02.";
@@ -1443,6 +1661,27 @@ public final class FFDConfig {
         }
         if ("goatSpawnWeight".equals(key)) {
             return "Goat spawn weight in modern mountain biomes. The 26.3 default is 5.";
+        }
+        if ("dolphinSpawnWeight".equals(key)) {
+            return "Dolphin spawn weight in neutral oceans. Warm and lukewarm oceans use twice this weight. The 1.13.2 default is 1.";
+        }
+        if ("dolphinMinGroupSize".equals(key)) {
+            return "Minimum number of dolphins in a natural spawn group. The 1.13.2 default is 1.";
+        }
+        if ("dolphinMaxGroupSize".equals(key)) {
+            return "Maximum number of dolphins in a natural spawn group. The 1.13.2 default is 2.";
+        }
+        if ("drownedOceanSpawnWeight".equals(key)) {
+            return "Drowned spawn-list weight in ocean biomes. The 26.3 default is 5.";
+        }
+        if ("drownedRiverSpawnWeight".equals(key)) {
+            return "Drowned spawn-list weight in ordinary river biomes. The 26.3 default is 100.";
+        }
+        if ("drownedFrozenRiverSpawnWeight".equals(key)) {
+            return "Drowned spawn-list weight in frozen river biomes. The 26.3 default is 1.";
+        }
+        if ("drownedDripstoneCaveSpawnWeight".equals(key)) {
+            return "Local drowned spawn-list weight in dripstone caves. The 26.3 default is 95.";
         }
         if ("goatMinGroupSize".equals(key)) {
             return "Minimum number of goats in a natural spawn group. The 26.3 default is 1.";
@@ -1532,11 +1771,40 @@ public final class FFDConfig {
         return lower;
     }
 
+    private static FeatureMode defaultFeatureMode(String key) {
+        switch (key) {
+            case "kelpMode":
+            case "seagrassMode":
+            case "seaPickleMode":
+            case "coralMode":
+            case "blueIceMode":
+            case "strippedWoodMode":
+            case "prismarineDecorMode":
+            case "conduitMode":
+            case "bubbleColumnMode":
+            case "fishMode":
+            case "dolphinMode":
+            case "drownedMode":
+            case "tridentMode":
+            case "turtleMode":
+            case "axolotlMode":
+            case "glowSquidMode":
+            case "glowItemFrameMode":
+            case "waterloggingMode":
+            case "aquaAcrobaticsMode":
+                return FeatureMode.AUTO;
+            default:
+                return FeatureMode.ENABLED;
+        }
+    }
+
     private static FeatureMode readMode(Configuration config, String key, String comment) {
-        String value = config.getString(key, CATEGORY_FEATURES, "ENABLED",
-                comment + "。默认值为 ENABLED，即关闭自动避让并使用本模组实现。可选值：ENABLED、DISABLED、AUTO。AUTO 会逐个识别外部内容单元，并仅由本模组补齐缺失内容。",
+        FeatureMode defaultMode = defaultFeatureMode(key);
+        String value = config.getString(key, CATEGORY_FEATURES, defaultMode.name(),
+                comment + "。默认值为 " + defaultMode.name()
+                        + "。可选值：ENABLED、DISABLED、AUTO。ENABLED 关闭自动避让并使用本模组实现；AUTO 会逐个识别外部内容单元，并仅由本模组补齐缺失内容。",
                 new String[]{"ENABLED", "DISABLED", "AUTO"});
-        return FeatureMode.parse(value);
+        return FeatureMode.parse(value, defaultMode);
     }
 
     private static FeatureMode readNonAvoidingMode(Configuration config, String key, String comment) {
@@ -1557,6 +1825,298 @@ public final class FFDConfig {
         }
         Boolean enabled = rawOreMaterialStates.get(material.trim().toLowerCase(Locale.ROOT));
         return enabled == null || enabled;
+    }
+
+    public static boolean isWaterloggingEnabled() {
+        if (waterloggingMode == FeatureMode.DISABLED) {
+            return false;
+        }
+        if (waterloggingMode == FeatureMode.AUTO) {
+            return !Loader.isModLoaded("fluidlogged_api");
+        }
+        return true;
+    }
+
+    public static boolean isAquaAcrobaticsCompatibilityEnabled() {
+        if (!Loader.isModLoaded("aquaacrobatics")) {
+            return false;
+        }
+        return aquaAcrobaticsMode == FeatureMode.ENABLED
+                || aquaAcrobaticsMode == FeatureMode.AUTO;
+    }
+
+    public static boolean isConduitFrameBlock(IBlockState state) {
+        if (state == null || state.getBlock() == null
+                || state.getBlock().getRegistryName() == null
+                || conduitFrameBlocks == null) {
+            return false;
+        }
+        ResourceLocation registryName = state.getBlock().getRegistryName();
+        int metadata;
+        try {
+            metadata = state.getBlock().getMetaFromState(state);
+        } catch (RuntimeException ignored) {
+            metadata = -1;
+        }
+        for (String entry : conduitFrameBlocks) {
+            if (entry == null) {
+                continue;
+            }
+            String value = entry.trim();
+            if (value.isEmpty()) {
+                continue;
+            }
+            int separator = value.lastIndexOf(':');
+            String id = value;
+            Integer requestedMetadata = null;
+            if (separator > 0 && separator < value.length() - 1) {
+                String suffix = value.substring(separator + 1).trim();
+                try {
+                    requestedMetadata = Integer.valueOf(suffix);
+                    id = value.substring(0, separator).trim();
+                } catch (NumberFormatException ignored) {
+                }
+            }
+            ResourceLocation configured;
+            try {
+                configured = new ResourceLocation(id);
+            } catch (IllegalArgumentException ignored) {
+                continue;
+            }
+            Block configuredBlock = ForgeRegistries.BLOCKS.getValue(configured);
+            if (configuredBlock != state.getBlock()) {
+                continue;
+            }
+            if (requestedMetadata == null || requestedMetadata.intValue() == metadata) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isConfiguredEntity(String[] entries, Entity entity) {
+        if (entries == null || entity == null) {
+            return false;
+        }
+        ResourceLocation id = EntityList.getKey(entity);
+        if (id == null) {
+            return false;
+        }
+        String normalized = id.toString().toLowerCase(Locale.ROOT);
+        for (String entry : entries) {
+            if (entry != null && normalized.equals(entry.trim().toLowerCase(Locale.ROOT))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isTurtleEntity(Entity entity) {
+        if (entity == null) {
+            return false;
+        }
+        ResourceLocation id = EntityList.getKey(entity);
+        if (id == null) {
+            return false;
+        }
+        String path = id.getResourcePath();
+        return "turtle".equals(path) || "sea_turtle".equals(path);
+    }
+
+    public static boolean isFluidAllowed(Fluid fluid) {
+        if (!isWaterloggingEnabled() || fluid == null || fluid.getBlock() == null) {
+            return false;
+        }
+        FluidloggingScope scope = fluidloggingScope == null
+                ? FluidloggingScope.WATER : fluidloggingScope;
+        if (scope == FluidloggingScope.WATER) {
+            return fluid == FluidRegistry.WATER;
+        }
+        if (scope == FluidloggingScope.ALL_FLUIDS) {
+            return true;
+        }
+        boolean listed = isFluidListed(fluid);
+        return scope == FluidloggingScope.WHITELIST ? listed : !listed;
+    }
+
+    private static boolean isFluidListed(Fluid fluid) {
+        if (fluidloggingFluidList == null) {
+            return false;
+        }
+        String fluidName = fluid.getName();
+        String blockName = fluid.getBlock() == null || fluid.getBlock().getRegistryName() == null
+                ? null : fluid.getBlock().getRegistryName().toString();
+        for (String entry : fluidloggingFluidList) {
+            if (entry == null) {
+                continue;
+            }
+            String normalized = entry.trim();
+            if (normalized.equalsIgnoreCase(fluidName)
+                    || blockName != null && normalized.equalsIgnoreCase(blockName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isAdditionalWaterloggingBlock(Block block) {
+        if (block == null || block.getRegistryName() == null) {
+            return false;
+        }
+        for (String name : waterloggingAdditionalBlocks) {
+            if (name != null && block.getRegistryName().toString().equals(name.trim())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static final java.util.Map<net.minecraft.world.World, net.minecraft.nbt.NBTTagCompound>
+            remoteFluidPolicies = new java.util.WeakHashMap<>();
+
+    public static synchronized void receiveFluidPolicy(net.minecraft.world.World world,
+                                                        net.minecraft.nbt.NBTTagCompound policy) {
+        if (world.isRemote) remoteFluidPolicies.put(world, policy.copy());
+    }
+
+    public static net.minecraft.nbt.NBTTagCompound fluidPolicy() {
+        net.minecraft.nbt.NBTTagCompound policy = new net.minecraft.nbt.NBTTagCompound();
+        policy.setBoolean("Enabled", isWaterloggingEnabled());
+        policy.setString("Scope", fluidloggingScope == null ? "WATER" : fluidloggingScope.name());
+        net.minecraft.nbt.NBTTagList blocks = new net.minecraft.nbt.NBTTagList();
+        for (String value : waterloggingAdditionalBlocks)
+            blocks.appendTag(new net.minecraft.nbt.NBTTagString(value));
+        policy.setTag("Blocks", blocks);
+        net.minecraft.nbt.NBTTagList fluids = new net.minecraft.nbt.NBTTagList();
+        for (String value : fluidloggingFluidList)
+            fluids.appendTag(new net.minecraft.nbt.NBTTagString(value));
+        policy.setTag("Fluids", fluids);
+        return policy;
+    }
+
+    public static synchronized boolean isAdditionalWaterloggingBlock(
+            net.minecraft.world.IBlockAccess access, Block block) {
+        net.minecraft.world.World world =
+                xy177.farmersfuturedelight.common.fluid.FFDFluidloggedData.resolveWorld(access);
+        net.minecraft.nbt.NBTTagCompound policy = remoteFluidPolicies.get(world);
+        if (policy == null) return isAdditionalWaterloggingBlock(block);
+        if (!policy.getBoolean("Enabled") || block.getRegistryName() == null) return false;
+        net.minecraft.nbt.NBTTagList list = policy.getTagList("Blocks", 8);
+        for (int i = 0; i < list.tagCount(); i++)
+            if (block.getRegistryName().toString().equals(list.getStringTagAt(i).trim())) return true;
+        return false;
+    }
+
+    public static synchronized boolean isFluidAllowed(net.minecraft.world.IBlockAccess access, Fluid fluid) {
+        net.minecraft.world.World world =
+                xy177.farmersfuturedelight.common.fluid.FFDFluidloggedData.resolveWorld(access);
+        net.minecraft.nbt.NBTTagCompound policy = remoteFluidPolicies.get(world);
+        if (policy == null) return isFluidAllowed(fluid);
+        if (!policy.getBoolean("Enabled") || fluid == null || fluid.getBlock() == null) return false;
+        FluidloggingScope scope = FluidloggingScope.parse(policy.getString("Scope"));
+        if (scope == FluidloggingScope.WATER) return fluid == FluidRegistry.WATER;
+        if (scope == FluidloggingScope.ALL_FLUIDS) return true;
+        boolean listed = false;
+        net.minecraft.nbt.NBTTagList list = policy.getTagList("Fluids", 8);
+        for (int i = 0; i < list.tagCount(); i++) {
+            String name = list.getStringTagAt(i).trim();
+            listed |= name.equalsIgnoreCase(fluid.getName())
+                    || name.equalsIgnoreCase(String.valueOf(fluid.getBlock().getRegistryName()));
+        }
+        return scope == FluidloggingScope.WHITELIST ? listed : !listed;
+    }
+
+    public static synchronized void allowMigratedFluid(Block host, Fluid fluid)
+            throws java.io.IOException {
+        if (configurationFile == null) {
+            throw new java.io.IOException("Configuration path is unavailable");
+        }
+        java.util.LinkedHashSet<String> blocks =
+                new java.util.LinkedHashSet<>(Arrays.asList(waterloggingAdditionalBlocks));
+        if (!xy177.farmersfuturedelight.api.WaterloggedBlockApi
+                .canBeWaterlogged(host.getDefaultState())) {
+            blocks.add(host.getRegistryName().toString());
+        }
+        java.util.List<String> fluids = new ArrayList<>(Arrays.asList(fluidloggingFluidList));
+        FluidloggingScope scope = fluidloggingScope == null
+                ? FluidloggingScope.WATER : fluidloggingScope;
+        if (scope == FluidloggingScope.WATER && fluid != FluidRegistry.WATER) {
+            scope = FluidloggingScope.WHITELIST;
+            fluids.clear();
+            fluids.add("water");
+            fluids.add(fluid.getName());
+        } else if (scope == FluidloggingScope.WHITELIST && !isFluidListed(fluid)) {
+            fluids.add(fluid.getName());
+        } else if (scope == FluidloggingScope.BLACKLIST) {
+            String blockName = fluid.getBlock().getRegistryName().toString();
+            fluids.removeIf(name -> name.trim().equalsIgnoreCase(fluid.getName())
+                    || name.trim().equalsIgnoreCase(blockName));
+        }
+        java.nio.file.Path target = configurationFile.toPath().toAbsolutePath();
+        java.nio.file.Path staged = java.nio.file.Files.createTempFile(
+                target.getParent(), "ffd-migration-", ".cfg");
+        try {
+        if (java.nio.file.Files.exists(target)) java.nio.file.Files.copy(target, staged,
+                java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        Configuration config = new Configuration(staged.toFile());
+        config.get(CATEGORY_FEATURES, "waterloggingAdditionalBlocks", new String[0])
+                .set(blocks.toArray(new String[0]));
+        config.get(CATEGORY_FEATURES, "fluidloggingScope", "WATER").set(scope.name());
+        config.get(CATEGORY_FEATURES, "fluidloggingFluidList", new String[0])
+                .set(fluids.toArray(new String[0]));
+        if (waterloggingMode == FeatureMode.DISABLED) {
+            config.get(CATEGORY_FEATURES, "waterloggingMode", "AUTO").set("AUTO");
+        }
+        config.save();
+        Configuration verify = new Configuration(staged.toFile());
+        if (!Arrays.equals(verify.get(CATEGORY_FEATURES, "waterloggingAdditionalBlocks",
+                        new String[0]).getStringList(), blocks.toArray(new String[0]))
+                || !scope.name().equals(verify.get(CATEGORY_FEATURES,
+                        "fluidloggingScope", "WATER").getString())
+                || !Arrays.equals(verify.get(CATEGORY_FEATURES, "fluidloggingFluidList",
+                        new String[0]).getStringList(), fluids.toArray(new String[0]))
+                || "DISABLED".equals(verify.get(CATEGORY_FEATURES,
+                        "waterloggingMode", "AUTO").getString())) {
+            throw new java.io.IOException("Could not persist migration configuration");
+        }
+        try {
+            java.nio.file.Files.move(staged, target, java.nio.file.StandardCopyOption.ATOMIC_MOVE,
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        } catch (java.nio.file.AtomicMoveNotSupportedException unsupported) {
+            java.nio.file.Files.move(staged, target, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        }
+        } finally {
+            java.nio.file.Files.deleteIfExists(staged);
+        }
+        waterloggingAdditionalBlocks = blocks.toArray(new String[0]);
+        fluidloggingScope = scope;
+        fluidloggingFluidList = fluids.toArray(new String[0]);
+        if (waterloggingMode == FeatureMode.DISABLED) {
+            waterloggingMode = FeatureMode.AUTO;
+        }
+    }
+
+    public static boolean isCommandCompletionEnabled() {
+        if (commandCompletionMode == FeatureMode.DISABLED) {
+            return false;
+        }
+        if (commandCompletionMode == FeatureMode.AUTO) {
+            return !isCleanroomLoaderPresent();
+        }
+        return true;
+    }
+
+    private static boolean isCleanroomLoaderPresent() {
+        if (Loader.isModLoaded("cleanroomloader")) {
+            return true;
+        }
+        try {
+            Class.forName("com.cleanroommc.cleanmix.service.CleanMixService", false,
+                    FFDConfig.class.getClassLoader());
+            return true;
+        } catch (ClassNotFoundException | LinkageError ignored) {
+            return false;
+        }
     }
 
     public static boolean isAutoCompatibilityEnabled(String contentPath, String modId) {
@@ -1829,12 +2389,12 @@ public final class FFDConfig {
 
     private static int readSeagrassAttempts(Configuration config, String key, int defaultValue, String biome) {
         return config.getInt(key, CATEGORY_WORLDGEN, defaultValue, 0, 1000,
-                biome + "每区块海草生成尝试次数，26.3 默认为 " + defaultValue + "。");
+                biome + "每区块海草生成尝试次数，1.13.2 默认为 " + defaultValue + "。");
     }
 
     private static int readTallPercent(Configuration config, String key, int defaultValue, String biome) {
         return config.getInt(key, CATEGORY_WORLDGEN, defaultValue, 0, 100,
-                biome + "生成高海草的百分比，26.3 默认为 " + defaultValue + "% 。");
+                biome + "生成高海草的百分比，1.13.2 默认为 " + defaultValue + "% 。");
     }
 
     private static int oreCount(Configuration config, String key, int defaultValue, String feature) {

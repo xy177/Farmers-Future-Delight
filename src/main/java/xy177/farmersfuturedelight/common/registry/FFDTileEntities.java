@@ -6,6 +6,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.tile.TileEntityBeehive;
 import xy177.farmersfuturedelight.common.tile.TileEntityCaveVines;
+import xy177.farmersfuturedelight.common.tile.TileEntityConduit;
 import xy177.farmersfuturedelight.common.tile.TileEntityNetherVines;
 
 public final class FFDTileEntities {
@@ -19,5 +20,7 @@ public final class FFDTileEntities {
                 new ResourceLocation(FarmerFutureDelight.MODID, "cave_vines"));
         GameRegistry.registerTileEntity(TileEntityNetherVines.class,
                 new ResourceLocation(FarmerFutureDelight.MODID, "nether_vines"));
+        GameRegistry.registerTileEntity(TileEntityConduit.class,
+                new ResourceLocation(FarmerFutureDelight.MODID, "conduit"));
     }
 }

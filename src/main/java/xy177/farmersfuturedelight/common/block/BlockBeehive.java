@@ -149,9 +149,9 @@ public class BlockBeehive extends Block {
             return;
         }
         FarmerFutureDelight.proxy.spawnHoneyDripParticle(world,
-                pos.getX() + 0.1D + random.nextDouble() * 0.8D,
+                pos.getX() + random.nextDouble(),
                 pos.getY() - 0.05D,
-                pos.getZ() + 0.1D + random.nextDouble() * 0.8D);
+                pos.getZ() + random.nextDouble());
     }
 
     @Override

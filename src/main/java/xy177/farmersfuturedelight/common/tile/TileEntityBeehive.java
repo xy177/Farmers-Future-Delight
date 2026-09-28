@@ -224,6 +224,9 @@ public class TileEntityBeehive extends TileEntity implements ITickable {
         }
         for (BlockPos.MutableBlockPos cursor : BlockPos.getAllInBoxMutable(pos.add(-1, -1, -1),
                 pos.add(1, 1, 1))) {
+            if (!world.isBlockLoaded(cursor)) {
+                continue;
+            }
             IBlockState state = world.getBlockState(cursor);
             if (state.getBlock() == Blocks.FIRE || state.getMaterial() == Material.FIRE) {
                 return true;

@@ -1,0 +1,7 @@
+{
+  "parent": "block/cube_column",
+  "textures": {
+    "end": "farmers_future_delight:block/stripped_birch_log",
+    "side": "farmers_future_delight:block/stripped_birch_log"
+  }
+}

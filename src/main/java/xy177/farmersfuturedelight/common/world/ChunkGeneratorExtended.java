@@ -3,6 +3,7 @@ package xy177.farmersfuturedelight.common.world;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
+import net.minecraft.block.BlockVine;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
@@ -24,18 +25,20 @@ import xy177.farmersfuturedelight.common.world.biome.FFDModernBiomeResolver;
 import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiomeSampler;
 import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiomeZoomer;
 import xy177.farmersfuturedelight.common.block.BlockGlowLichen;
-import xy177.farmersfuturedelight.common.block.WaterloggedPlantFluid;
+import xy177.farmersfuturedelight.api.WaterloggedBlockApi;
 import xy177.farmersfuturedelight.common.worldgen.WorldGenAmethystGeodes;
 import xy177.farmersfuturedelight.common.worldgen.WorldGenModernOreVeins;
 import xy177.farmersfuturedelight.common.worldgen.WorldGenModernFossils;
 import xy177.farmersfuturedelight.common.worldgen.WorldGenModernIcebergs;
 import xy177.farmersfuturedelight.common.worldgen.WorldGenModernOres;
+import xy177.farmersfuturedelight.common.worldgen.WorldGenUnderwaterMagma;
 import xy177.farmersfuturedelight.common.worldgen.WorldGenModernMountainBiomes;
 import xy177.farmersfuturedelight.common.worldgen.WorldGenVerticalCaveBiomes;
 import xy177.farmersfuturedelight.common.worldgen.WorldGenModernCarvers;
 import xy177.farmersfuturedelight.common.worldgen.FFDStructureHooks;
 import xy177.farmersfuturedelight.common.worldgen.FFDLushCaveBlockProvider;
 import xy177.farmersfuturedelight.common.worldgen.FFDModernStoneProvider;
+import xy177.farmersfuturedelight.common.worldgen.MapGenLushCaves;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiome;
@@ -62,6 +65,7 @@ public final class ChunkGeneratorExtended extends ChunkGeneratorOverworld {
     private final WorldGenModernOreVeins modernOreVeins;
     private final WorldGenModernFossils modernFossils;
     private final WorldGenModernOres modernOres;
+    private final WorldGenUnderwaterMagma underwaterMagma;
     private final WorldGenVerticalCaveBiomes caveBiomes;
     private final WorldGenModernCarvers modernCarvers;
     private final WorldGenModernIcebergs modernIcebergs;
@@ -87,6 +91,7 @@ public final class ChunkGeneratorExtended extends ChunkGeneratorOverworld {
         this.modernStones = new FFDModernStoneProvider();
         this.lushBlocks = FFDLushCaveBlockProvider.get();
         this.modernOres = new WorldGenModernOres(seed, modernStones);
+        this.underwaterMagma = new WorldGenUnderwaterMagma(seed);
         this.caveBiomes = new WorldGenVerticalCaveBiomes(seed, modernStones);
         this.modernCarvers = new WorldGenModernCarvers(seed);
         this.mountainBiomes = new WorldGenModernMountainBiomes(seed);
@@ -109,7 +114,6 @@ public final class ChunkGeneratorExtended extends ChunkGeneratorOverworld {
         world.setSeaLevel(FFDModernWorldgenData.SEA_LEVEL);
     }
 
-    /** Returns the unmodified 26.3 preliminary surface estimate. */
     public int estimateModernSurfaceHeight(int x, int z) {
         return worldgenData.preliminarySurfaceLevel(x, z);
     }
@@ -245,9 +249,14 @@ public final class ChunkGeneratorExtended extends ChunkGeneratorOverworld {
             profileStages[8] = System.nanoTime() - profileStageStart;
             profileStageStart = System.nanoTime();
         }
-        caveBiomes.generateUndergroundDecoration(chunkX, chunkZ, verticalBiomes, caveAccess);
+        generateUnderwaterMagma(chunk, chunkX, chunkZ, generationRegion);
         if (FFDWorldgenProfiler.ENABLED) {
             profileStages[9] = System.nanoTime() - profileStageStart;
+            profileStageStart = System.nanoTime();
+        }
+        caveBiomes.generateUndergroundDecoration(chunkX, chunkZ, verticalBiomes, caveAccess);
+        if (FFDWorldgenProfiler.ENABLED) {
+            profileStages[10] = System.nanoTime() - profileStageStart;
             profileStageStart = System.nanoTime();
         }
         caveAccess.setPostCarverNeighbors(false);
@@ -255,7 +264,7 @@ public final class ChunkGeneratorExtended extends ChunkGeneratorOverworld {
         caveAccess.setPostCarverNeighbors(true);
         validateGeneratedGlowLichen(caveAccess, generatedGlowLichen, chunkX, chunkZ);
         if (FFDWorldgenProfiler.ENABLED) {
-            profileStages[10] = System.nanoTime() - profileStageStart;
+            profileStages[11] = System.nanoTime() - profileStageStart;
             profileStageStart = System.nanoTime();
         }
         FFDVerticalBiomeManager.put(world, chunkX, chunkZ, verticalBiomes);
@@ -332,6 +341,47 @@ public final class ChunkGeneratorExtended extends ChunkGeneratorOverworld {
             @Override
             public int targetMaxZ() {
                 return startZ + 15;
+            }
+        });
+    }
+
+    private void generateUnderwaterMagma(Chunk chunk, int chunkX, int chunkZ,
+                                         GenerationRegion generationRegion) {
+        underwaterMagma.generateChunk(chunkX, chunkZ, new WorldGenUnderwaterMagma.Access() {
+            @Override
+            public IBlockState getState(int x, int y, int z) {
+                if (y < FFDModernWorldgenData.MIN_Y
+                        || y >= FFDModernWorldgenData.MIN_Y + FFDModernWorldgenData.HEIGHT) {
+                    return Blocks.AIR.getDefaultState();
+                }
+                if (x >> 4 == chunkX && z >> 4 == chunkZ) {
+                    return chunk.getBlockState(new BlockPos(x, y, z));
+                }
+                int sampleChunkX = x >> 4;
+                int sampleChunkZ = z >> 4;
+                TerrainSample sample = generationRegion.sample(sampleChunkX, sampleChunkZ);
+                return sample.baseStateAt(x - (sampleChunkX << 4), y,
+                        z - (sampleChunkZ << 4), x, z, surfaceRules);
+            }
+
+            @Override
+            public void setState(int x, int y, int z, IBlockState state) {
+                setDirect(chunk, x & 15, y, z & 15, state);
+            }
+
+            @Override
+            public int surfaceY(int x, int z) {
+                int sampleChunkX = x >> 4;
+                int sampleChunkZ = z >> 4;
+                TerrainSample sample = generationRegion.sample(sampleChunkX, sampleChunkZ);
+                return sample.surfaceY(x - (sampleChunkX << 4),
+                        z - (sampleChunkZ << 4), surfaceRules);
+            }
+
+            @Override
+            public BlockFaceShape getFaceShape(int x, int y, int z, EnumFacing face) {
+                BlockPos pos = new BlockPos(x, y, z);
+                return getState(x, y, z).getBlockFaceShape(world, pos, face);
             }
         });
     }
@@ -840,7 +890,7 @@ public final class ChunkGeneratorExtended extends ChunkGeneratorOverworld {
             return true;
         } else if (block == Blocks.FLOWING_WATER || block == Blocks.FLOWING_LAVA) {
             world.scheduleUpdate(pos, block, block.tickRate(world));
-        } else if (WaterloggedPlantFluid.isWaterlogged(state)) {
+        } else if (WaterloggedBlockApi.isWaterlogged(state)) {
             world.scheduleUpdate(pos, block, 5);
         }
         return false;
@@ -921,11 +971,6 @@ public final class ChunkGeneratorExtended extends ChunkGeneratorOverworld {
                 worldgenData, densityGridCache, modernCarvers, chunkX, chunkZ);
     }
 
-    /**
-     * Holds the detached 1.12 section objects while the modern base terrain is built.
-     * Keeping the section lookup outside the voxel loop removes the legacy primer copy
-     * without changing the final Chunk storage or Forge populate path.
-     */
     private static final class ExtendedChunkBuffer {
         private final World world;
         private final ExtendedBlockStorage[] sections;
@@ -1124,6 +1169,51 @@ public final class ChunkGeneratorExtended extends ChunkGeneratorOverworld {
         List<Integer> restoredFluidUpdates = clearLegacyBedrockAfterPopulate(chunk, x, z);
         scheduleFluidUpdates(chunk, x, z);
         scheduleFluidUpdates(chunk, x, z, restoredFluidUpdates);
+        validateGeneratedVines(x, z);
+        xy177.farmersfuturedelight.common.worldgen.GlowLichenSupport
+                .validatePopulatedRegion(world, x, z);
+    }
+
+    private void validateGeneratedVines(int chunkX, int chunkZ) {
+        int startX = (chunkX << 4) + 8;
+        int startZ = (chunkZ << 4) + 8;
+        if (!world.isAreaLoaded(new BlockPos(startX - 1, FFDModernWorldgenData.MIN_Y, startZ - 1),
+                new BlockPos(startX + 16, FFDModernWorldgenData.MIN_Y, startZ + 16))) {
+            return;
+        }
+        for (int x = startX; x < startX + 16; x++) {
+            for (int z = startZ; z < startZ + 16; z++) {
+                Chunk chunk = world.getChunkFromChunkCoords(x >> 4, z >> 4);
+                for (int y = FFDModernWorldgenData.MIN_Y + FFDModernWorldgenData.HEIGHT - 1;
+                     y >= FFDModernWorldgenData.MIN_Y; y--) {
+                    IBlockState state = getDirect(chunk, x & 15, y, z & 15);
+                    if (state.getBlock() != Blocks.VINE) {
+                        continue;
+                    }
+                    BlockPos pos = new BlockPos(x, y, z);
+                    if (!FFDVerticalBiomeManager.isBiome(world, pos, FFDVerticalBiome.LUSH_CAVES)) {
+                        continue;
+                    }
+                    IBlockState validState = state;
+                    IBlockState above = world.getBlockState(pos.up());
+                    for (EnumFacing face : EnumFacing.Plane.HORIZONTAL) {
+                        if (state.getValue(BlockVine.getPropertyFor(face))
+                                && !MapGenLushCaves.isClassicVineSupport(world,
+                                pos.offset(face), face.getOpposite())
+                                && !(above.getBlock() == Blocks.VINE
+                                && above.getValue(BlockVine.getPropertyFor(face)))) {
+                            validState = validState.withProperty(BlockVine.getPropertyFor(face), false);
+                        }
+                    }
+                    if (BlockVine.getNumGrownFaces(validState) == 0) {
+                        validState = Blocks.AIR.getDefaultState();
+                    }
+                    if (validState != state) {
+                        world.setBlockState(pos, validState, 2);
+                    }
+                }
+            }
+        }
     }
 
     @Override

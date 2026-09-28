@@ -90,7 +90,8 @@ public class ModelBeeBaby extends ModelBase {
     public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks,
                                   float netHeadYaw, float headPitch, float scaleFactor,
                                   Entity entity) {
-        boolean flying = !entity.onGround;
+        boolean flying = !entity.onGround || entity.motionX * entity.motionX
+                + entity.motionY * entity.motionY + entity.motionZ * entity.motionZ >= 1.0E-7D;
         bone.rotationPointY = 19.6667F;
         bone.rotateAngleX = 0.0F;
         float wingAngle = flying ? MathHelper.cos(ageInTicks * 2.1F) * 0.4712F : 0.0F;

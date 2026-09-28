@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-/** Ports the 26.3 overworld cave and canyon carvers used after noise terrain. */
 public final class WorldGenModernCarvers {
     private static final int SOURCE_RANGE = 8;
     private static final int CARVER_RANGE = 4;

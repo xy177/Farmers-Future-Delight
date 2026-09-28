@@ -32,9 +32,11 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
+import xy177.farmersfuturedelight.api.IWaterloggableBlock;
+import xy177.farmersfuturedelight.api.WaterloggedBlockApi;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 
-public class BlockAmethystCluster extends BlockAmethyst {
+public class BlockAmethystCluster extends BlockAmethyst implements IWaterloggableBlock {
     public static final PropertyDirection FACING = PropertyDirection.create("facing");
     public static final PropertyBool WATERLOGGED = PropertyBool.create("waterlogged");
 
@@ -69,12 +71,12 @@ public class BlockAmethystCluster extends BlockAmethyst {
         return new ExtendedBlockState(this,
                 new net.minecraft.block.properties.IProperty<?>[] {
                         BlockLiquid.LEVEL, FACING, WATERLOGGED},
-                WaterloggedPlantFluid.extendedProperties());
+                WaterloggedBlockApi.extendedProperties());
     }
 
     @Override
     public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
-        return WaterloggedPlantFluid.getExtendedState(state, world, pos);
+        return WaterloggedBlockApi.getExtendedState(state, world, pos);
     }
 
     @Override
@@ -110,13 +112,23 @@ public class BlockAmethystCluster extends BlockAmethyst {
     }
 
     @Override
+    public boolean isWaterloggedState(IBlockState state) {
+        return isWaterlogged(state);
+    }
+
+    @Override
+    public IBlockState setWaterloggedState(IBlockState state, boolean waterlogged) {
+        return state.withProperty(WATERLOGGED, waterlogged);
+    }
+
+    @Override
     public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing,
                                             float hitX, float hitY, float hitZ, int meta,
                                             EntityLivingBase placer, net.minecraft.util.EnumHand hand) {
         return getDefaultState()
                 .withProperty(BlockLiquid.LEVEL, 0)
                 .withProperty(FACING, facing)
-                .withProperty(WATERLOGGED, WaterloggedPlantFluid.isSourceWater(world, pos));
+                .withProperty(WATERLOGGED, WaterloggedBlockApi.containsWater(world, pos));
     }
 
     @Override
@@ -142,7 +154,7 @@ public class BlockAmethystCluster extends BlockAmethyst {
     @Override
     public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
         super.onBlockAdded(world, pos, state);
-        WaterloggedPlantFluid.onBlockAdded(world, pos, this);
+        WaterloggedBlockApi.onBlockAdded(world, pos, this);
     }
 
     @Override
@@ -152,35 +164,31 @@ public class BlockAmethystCluster extends BlockAmethyst {
             return;
         }
         if (!canAttach(world, pos, state.getValue(FACING))) {
-            world.setBlockState(pos, replacementState(state), 3);
+            WaterloggedBlockApi.restoreFluid(world, pos, state, 3);
             return;
         }
-        WaterloggedPlantFluid.onNeighborChanged(world, pos, this);
+        WaterloggedBlockApi.onNeighborChanged(world, pos, this);
     }
 
     @Override
     public void updateTick(World world, BlockPos pos, IBlockState state, Random random) {
         if (!world.isRemote && isWaterlogged(state)) {
-            WaterloggedPlantFluid.updateTick(world, pos, state);
+            WaterloggedBlockApi.updateTick(world, pos, state);
         }
     }
 
     @Override
     public boolean removedByPlayer(IBlockState state, World world, BlockPos pos,
                                    EntityPlayer player, boolean willHarvest) {
-        return world.setBlockState(pos, replacementState(state), world.isRemote ? 11 : 3);
+        return WaterloggedBlockApi.restoreFluid(world, pos, state, world.isRemote ? 11 : 3);
     }
 
     @Override
     public void onBlockExploded(World world, BlockPos pos, net.minecraft.world.Explosion explosion) {
         IBlockState state = world.getBlockState(pos);
         dropBlockAsItemWithChance(world, pos, state, 1.0F, 0);
-        world.setBlockState(pos, replacementState(state), 3);
+        WaterloggedBlockApi.restoreFluid(world, pos, state, 3);
         onBlockDestroyedByExplosion(world, pos, explosion);
-    }
-
-    private static IBlockState replacementState(IBlockState state) {
-        return isWaterlogged(state) ? Blocks.WATER.getDefaultState() : Blocks.AIR.getDefaultState();
     }
 
     @Override
@@ -223,8 +231,7 @@ public class BlockAmethystCluster extends BlockAmethyst {
 
     @Override
     public Vec3d modifyAcceleration(World world, BlockPos pos, Entity entity, Vec3d motion) {
-        return isWaterlogged(world.getBlockState(pos))
-                ? Blocks.WATER.modifyAcceleration(world, pos, entity, motion) : motion;
+        return WaterloggedBlockApi.modifyAcceleration(world, pos, entity, motion);
     }
 
     @Override

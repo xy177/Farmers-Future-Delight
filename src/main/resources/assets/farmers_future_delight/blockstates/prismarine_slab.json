@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "half=bottom,variant=default": { "model": "farmers_future_delight:prismarine_slab" },
+    "half=top,variant=default": { "model": "farmers_future_delight:prismarine_slab_top" }
+  }
+}

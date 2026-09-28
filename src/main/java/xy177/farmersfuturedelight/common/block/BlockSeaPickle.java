@@ -1,5 +1,7 @@
 package xy177.farmersfuturedelight.common.block;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import javax.annotation.Nullable;
@@ -26,6 +28,7 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -36,11 +39,15 @@ import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.BiomeDictionary;
 
 import xy177.farmersfuturedelight.FarmerFutureDelight;
+import xy177.farmersfuturedelight.api.IWaterloggableBlock;
+import xy177.farmersfuturedelight.api.WaterloggedBlockApi;
+import xy177.farmersfuturedelight.common.FFDCompat;
 import xy177.farmersfuturedelight.common.FFDConfig;
 import xy177.farmersfuturedelight.common.FFDCreativeTab;
+import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 
-public class BlockSeaPickle extends BlockBush implements IGrowable {
+public class BlockSeaPickle extends BlockBush implements IGrowable, IWaterloggableBlock {
     public static final PropertyInteger PICKLES = PropertyInteger.create("pickles", 1, 4);
     public static final PropertyBool WATERLOGGED = PropertyBool.create("waterlogged");
     private static final AxisAlignedBB[] PICKLE_AABBS = {
@@ -67,12 +74,12 @@ public class BlockSeaPickle extends BlockBush implements IGrowable {
         return new ExtendedBlockState(this,
                 new net.minecraft.block.properties.IProperty<?>[] {
                         BlockLiquid.LEVEL, PICKLES, WATERLOGGED},
-                WaterloggedPlantFluid.extendedProperties());
+                WaterloggedBlockApi.extendedProperties());
     }
 
     @Override
     public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
-        return WaterloggedPlantFluid.getExtendedState(state, world, pos);
+        return WaterloggedBlockApi.getExtendedState(state, world, pos);
     }
 
     @Override
@@ -84,8 +91,18 @@ public class BlockSeaPickle extends BlockBush implements IGrowable {
         return state.getBlock() instanceof BlockSeaPickle && state.getValue(WATERLOGGED);
     }
 
+    @Override
+    public boolean isWaterloggedState(IBlockState state) {
+        return isWaterlogged(state);
+    }
+
+    @Override
+    public IBlockState setWaterloggedState(IBlockState state, boolean waterlogged) {
+        return state.withProperty(WATERLOGGED, waterlogged);
+    }
+
     public IBlockState getPlacementState(World world, BlockPos pos) {
-        boolean waterlogged = WaterloggedPlantFluid.isSourceWater(world, pos);
+        boolean waterlogged = WaterloggedBlockApi.isWaterSource(world, pos);
         return getDefaultState().withProperty(WATERLOGGED, waterlogged).withProperty(PICKLES, 1);
     }
 
@@ -112,7 +129,22 @@ public class BlockSeaPickle extends BlockBush implements IGrowable {
     private boolean canStayOn(World world, BlockPos supportPos) {
         IBlockState support = world.getBlockState(supportPos);
         return support.isSideSolid(world, supportPos, EnumFacing.UP)
-                || support.getBlock().canPlaceTorchOnTop(support, world, supportPos);
+                || support.getBlock().canPlaceTorchOnTop(support, world, supportPos)
+                || hasTopCollisionFace(world, supportPos, support);
+    }
+
+    private static boolean hasTopCollisionFace(World world, BlockPos pos, IBlockState state) {
+        double top = pos.getY() + 1.0D;
+        AxisAlignedBB slice = new AxisAlignedBB(pos.getX(), top - 1.0E-4D, pos.getZ(),
+                pos.getX() + 1.0D, top + 1.0E-4D, pos.getZ() + 1.0D);
+        List<AxisAlignedBB> boxes = new ArrayList<>();
+        state.getBlock().addCollisionBoxToList(state, world, pos, slice, boxes, null, false);
+        for (AxisAlignedBB box : boxes) {
+            if (box.maxY >= top && box.maxX > box.minX && box.maxZ > box.minZ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -120,29 +152,27 @@ public class BlockSeaPickle extends BlockBush implements IGrowable {
                                 Block blockIn, BlockPos fromPos) {
         super.neighborChanged(state, world, pos, blockIn, fromPos);
         if (world.getBlockState(pos).getBlock() == this) {
-            WaterloggedPlantFluid.onNeighborChanged(world, pos, this);
+            WaterloggedBlockApi.onNeighborChanged(world, pos, this);
         }
     }
 
     @Override
     public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
         super.onBlockAdded(world, pos, state);
-        WaterloggedPlantFluid.onBlockAdded(world, pos, this);
+        WaterloggedBlockApi.onBlockAdded(world, pos, this);
     }
 
     @Override
     public void updateTick(World world, BlockPos pos, IBlockState state, Random random) {
         super.updateTick(world, pos, state, random);
         if (world.getBlockState(pos).getBlock() == this && isWaterlogged(state)) {
-            WaterloggedPlantFluid.updateTick(world, pos, state);
+            WaterloggedBlockApi.updateTick(world, pos, state);
         }
     }
 
     @Override
     public Vec3d modifyAcceleration(World world, BlockPos pos, Entity entity, Vec3d motion) {
-        return isWaterlogged(world.getBlockState(pos))
-                ? Blocks.WATER.modifyAcceleration(world, pos, entity, motion)
-                : motion;
+        return WaterloggedBlockApi.modifyAcceleration(world, pos, entity, motion);
     }
 
     @Override
@@ -151,25 +181,21 @@ public class BlockSeaPickle extends BlockBush implements IGrowable {
             if (FFDItems.isSeaPickleEnabled()) {
                 dropBlockAsItem(world, pos, state, 0);
             }
-            world.setBlockState(pos, replacementState(state), 3);
+            WaterloggedBlockApi.restoreFluid(world, pos, state, 3);
         }
-    }
-
-    private IBlockState replacementState(IBlockState state) {
-        return state.getValue(WATERLOGGED) ? Blocks.WATER.getDefaultState() : Blocks.AIR.getDefaultState();
     }
 
     @Override
     public boolean removedByPlayer(IBlockState state, World world, BlockPos pos,
                                    EntityPlayer player, boolean willHarvest) {
         onBlockHarvested(world, pos, state, player);
-        return world.setBlockState(pos, replacementState(state), world.isRemote ? 11 : 3);
+        return WaterloggedBlockApi.restoreFluid(world, pos, state, world.isRemote ? 11 : 3);
     }
 
     @Override
     public void onBlockExploded(World world, BlockPos pos, net.minecraft.world.Explosion explosion) {
         IBlockState state = world.getBlockState(pos);
-        world.setBlockState(pos, replacementState(state), 3);
+        WaterloggedBlockApi.restoreFluid(world, pos, state, 3);
         onBlockDestroyedByExplosion(world, pos, explosion);
     }
 
@@ -301,13 +327,29 @@ public class BlockSeaPickle extends BlockBush implements IGrowable {
     }
 
     public static boolean isValidSeaPickleBed(World world, BlockPos pos) {
-        Biome biome = world.getBiome(pos);
-        if (!isSeaPickleBiome(biome)) {
-            return false;
-        }
         IBlockState support = world.getBlockState(pos.down());
-        return support.isSideSolid(world, pos.down(), EnumFacing.UP)
-                || support.getBlock().canPlaceTorchOnTop(support, world, pos.down());
+        for (Block coral : FFDBlocks.CORAL_BLOCKS) {
+            IBlockState effective = effectiveCoralState(coral);
+            if (effective != null && sameBlockVariant(support, effective)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static IBlockState effectiveCoralState(Block local) {
+        if (FFDItems.isBlockRegistered(local)) {
+            return local.getDefaultState();
+        }
+        ResourceLocation registryName = local.getRegistryName();
+        return registryName == null ? null : FFDCompat.getExternalBlockState(
+                FFDCompat.Feature.CORAL, registryName.getResourcePath());
+    }
+
+    private static boolean sameBlockVariant(IBlockState first, IBlockState second) {
+        Block block = first.getBlock();
+        return block == second.getBlock()
+                && block.getMetaFromState(first) == block.getMetaFromState(second);
     }
 
     public static boolean isSeaPickleBiome(Biome biome) {

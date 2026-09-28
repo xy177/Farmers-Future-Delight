@@ -44,7 +44,7 @@ public abstract class BlockAbstractCandle extends Block {
         return state.getBlock() == this && state.getValue(LIT);
     }
 
-    public final boolean canLight(IBlockState state) {
+    public boolean canLight(IBlockState state) {
         return state.getBlock() == this && !state.getValue(LIT);
     }
 
@@ -65,7 +65,7 @@ public abstract class BlockAbstractCandle extends Block {
             extinguish(world, pos, state);
             return true;
         }
-        if (state.getValue(LIT)
+        if (!canLight(state)
                 || held.getItem() != Items.FLINT_AND_STEEL
                 && held.getItem() != Items.FIRE_CHARGE) {
             return false;

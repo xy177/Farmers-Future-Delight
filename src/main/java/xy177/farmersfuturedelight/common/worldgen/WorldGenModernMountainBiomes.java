@@ -49,8 +49,8 @@ public final class WorldGenModernMountainBiomes {
     }
 
     private void generateMeadow(World world, Random random, int chunkX, int chunkZ) {
-        int startX = (chunkX << 4) + 8;
-        int startZ = (chunkZ << 4) + 8;
+        int startX = chunkX << 4;
+        int startZ = chunkZ << 4;
         double noise = biomeInfoNoise.getValue(startX / 200.0D, startZ / 200.0D);
 
         if (noise > -0.8D && random.nextInt(32) < 7) {
@@ -70,12 +70,14 @@ public final class WorldGenModernMountainBiomes {
         for (int attempt = 0; attempt < 96; attempt++) {
             BlockPos pos = flowerOrigin.add(triangle(random, 6), triangle(random, 2),
                     triangle(random, 6));
-            placeMeadowPlant(world, pos);
+            if (isInChunk(pos, chunkX, chunkZ)) {
+                placeMeadowPlant(world, pos);
+            }
         }
 
         if (random.nextInt(100) == 0) {
-            int treeX = startX + random.nextInt(16);
-            int treeZ = startZ + random.nextInt(16);
+            int treeX = startX + 4 + random.nextInt(8);
+            int treeZ = startZ + 4 + random.nextInt(8);
             BlockPos treePos = surfacePosition(world, treeX, treeZ);
             if (isSurfaceBiome(world, treePos, FFDVerticalBiome.MEADOW)
                     && canGrowTreeOn(world.getBlockState(treePos.down()))) {
@@ -92,12 +94,12 @@ public final class WorldGenModernMountainBiomes {
     }
 
     private void generateGrove(World world, Random random, int chunkX, int chunkZ) {
-        int startX = (chunkX << 4) + 8;
-        int startZ = (chunkZ << 4) + 8;
+        int startX = chunkX << 4;
+        int startZ = chunkZ << 4;
         int treeCount = 10 + (random.nextInt(10) == 0 ? 1 : 0);
         for (int attempt = 0; attempt < treeCount; attempt++) {
-            int x = startX + random.nextInt(16);
-            int z = startZ + random.nextInt(16);
+            int x = startX + 4 + random.nextInt(8);
+            int z = startZ + 4 + random.nextInt(8);
             BlockPos treePos = surfacePosition(world, x, z);
             if (!isSurfaceBiome(world, treePos, FFDVerticalBiome.GROVE)) {
                 continue;
@@ -130,8 +132,8 @@ public final class WorldGenModernMountainBiomes {
     }
 
     private void freezeTopLayer(World world, int chunkX, int chunkZ) {
-        int startX = (chunkX << 4) + 8;
-        int startZ = (chunkZ << 4) + 8;
+        int startX = chunkX << 4;
+        int startZ = chunkZ << 4;
         for (int offsetX = 0; offsetX < 16; offsetX++) {
             for (int offsetZ = 0; offsetZ < 16; offsetZ++) {
                 BlockPos top = surfacePosition(world, startX + offsetX, startZ + offsetZ);
@@ -170,7 +172,8 @@ public final class WorldGenModernMountainBiomes {
         for (int attempt = 0; attempt < attempts; attempt++) {
             BlockPos pos = origin.add(triangle(random, horizontalOffset),
                     triangle(random, verticalOffset), triangle(random, horizontalOffset));
-            if (isSurfaceBiome(world, pos, biome)) {
+            if (isInChunk(pos, startX >> 4, startZ >> 4)
+                    && isSurfaceBiome(world, pos, biome)) {
                 placePlant(world, pos, plant);
             }
         }
@@ -300,6 +303,10 @@ public final class WorldGenModernMountainBiomes {
 
     private static int triangle(Random random, int radius) {
         return random.nextInt(radius + 1) - random.nextInt(radius + 1);
+    }
+
+    private static boolean isInChunk(BlockPos pos, int chunkX, int chunkZ) {
+        return (pos.getX() >> 4) == chunkX && (pos.getZ() >> 4) == chunkZ;
     }
 
     private double temperatureAt(FFDVerticalBiome biome, BlockPos pos) {

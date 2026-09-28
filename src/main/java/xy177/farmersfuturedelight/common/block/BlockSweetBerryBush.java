@@ -35,6 +35,7 @@ import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
 import xy177.farmersfuturedelight.common.worldgen.FFDLushCaveBlockProvider;
+import xy177.farmersfuturedelight.core.FFDGameplayHooks;
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 
 public class BlockSweetBerryBush extends BlockBush implements net.minecraft.block.IGrowable {
@@ -106,13 +107,10 @@ public class BlockSweetBerryBush extends BlockBush implements net.minecraft.bloc
         if (!(entity instanceof EntityLivingBase) || isImmuneToBush(entity)) {
             return;
         }
-        double movementX = entity.posX - entity.prevPosX;
-        double movementZ = entity.posZ - entity.prevPosZ;
-        entity.motionX *= 0.8D;
-        entity.motionY *= 0.75D;
-        entity.motionZ *= 0.8D;
-        if (!world.isRemote && state.getValue(AGE) > 0
-                && (Math.abs(movementX) >= 0.003D || Math.abs(movementZ) >= 0.003D)) {
+        FFDGameplayHooks.markSweetBerrySlowdown(entity);
+        if (!world.isRemote && state.getValue(AGE) != 0
+                && (Math.abs(entity.posX - entity.prevPosX) >= (double) 0.003F
+                        || Math.abs(entity.posZ - entity.prevPosZ) >= (double) 0.003F)) {
             entity.attackEntityFrom(SWEET_BERRY_DAMAGE, 1.0F);
         }
     }

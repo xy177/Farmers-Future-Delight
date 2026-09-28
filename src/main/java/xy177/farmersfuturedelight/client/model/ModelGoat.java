@@ -93,8 +93,7 @@ public class ModelGoat extends ModelBase {
                                   float netHeadYaw, float headPitch, float scale,
                                   Entity entity) {
         EntityGoat goat = (EntityGoat) entity;
-        head.rotateAngleY = MathHelper.clamp(MathHelper.wrapDegrees(netHeadYaw),
-                -15.0F, 15.0F) * 0.017453292F;
+        head.rotateAngleY = netHeadYaw * 0.017453292F;
         float rammingRotation = goat.getRammingXHeadRot();
         head.rotateAngleX = rammingRotation == 0.0F
                 ? headPitch * 0.017453292F : rammingRotation;

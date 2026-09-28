@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-/** Exact surface-biome parameter map ported from 26.3 OverworldBiomeBuilder. */
 final class FFDModernSurfaceBiomeMap {
     private static final Range FULL = range(-1.0F, 1.0F);
     private static final Range[] TEMPERATURES = ranges(
@@ -526,7 +525,6 @@ final class FFDModernSurfaceBiomeMap {
         }
     }
 
-    /** Five-dimensional specialization of 26.3 Climate.RTree. */
     private static final class RTree {
         private static final int DIMENSIONS = 5;
         private static final int CHILDREN_PER_NODE = 6;

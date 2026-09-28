@@ -207,6 +207,9 @@ public class EntityTurtle extends net.minecraft.entity.passive.EntityAnimal {
 
     @Override
     public boolean processInteract(EntityPlayer player, EnumHand hand) {
+        if (world.isRemote && isBreedingItem(player.getHeldItem(hand))) {
+            return true;
+        }
         if (hasEgg() && isBreedingItem(player.getHeldItem(hand))) {
             return false;
         }

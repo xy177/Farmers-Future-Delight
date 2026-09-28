@@ -14,7 +14,7 @@ public final class ParticleFallingNectar extends Particle {
         super(world, x, y, z);
         setSize(0.01F, 0.01F);
         setRBGColorF(0.92F, 0.782F, 0.72F);
-        particleScale = 0.7F;
+        particleScale = 1.0F + rand.nextFloat();
         particleMaxAge = (int) (16.0D / (rand.nextFloat() * 0.8F + 0.2F));
         particleGravity = 0.007F;
         setParticleTexture(Minecraft.getMinecraft().getTextureMapBlocks()
@@ -40,9 +40,9 @@ public final class ParticleFallingNectar extends Particle {
             setExpired();
             return;
         }
-        motionX *= 0.98D;
-        motionY *= 0.98D;
-        motionZ *= 0.98D;
+        motionX *= 0.98F;
+        motionY *= 0.98F;
+        motionZ *= 0.98F;
     }
 
     @Override

@@ -63,6 +63,8 @@ public final class CopperWeathering {
         registerEffectiveFamily(FFDBlocks.CUT_COPPER_DOUBLE_SLABS,
                 FFDBlocks.WAXED_CUT_COPPER_DOUBLE_SLABS);
         registerEffectiveFamily(FFDBlocks.LIGHTNING_RODS, FFDBlocks.WAXED_LIGHTNING_RODS);
+        registerEffectiveFamily(FFDBlocks.LIGHTNING_RODS_WATERLOGGED,
+                FFDBlocks.WAXED_LIGHTNING_RODS_WATERLOGGED);
     }
 
     private static void registerEffectiveFamily(Block[] unwaxed, Block[] waxed) {

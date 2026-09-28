@@ -7,6 +7,5 @@ public final class FFDWorldTypes {
     }
 
     public static void register() {
-        // Loading this class registers the WorldType through its constructor.
     }
 }

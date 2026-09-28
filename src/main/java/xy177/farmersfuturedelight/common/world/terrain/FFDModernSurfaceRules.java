@@ -13,6 +13,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
+import net.minecraft.world.gen.NoiseGeneratorOctaves;
+import net.minecraft.world.gen.NoiseGeneratorPerlin;
 import xy177.farmersfuturedelight.common.FFDCompat;
 import xy177.farmersfuturedelight.common.FFDConfig;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
@@ -36,13 +38,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
-/**
- * Evaluates the bundled 26.3 material-rule graph against the extended 1.12
- * chunk. Missing modern blocks are left as stone so optional backport mods can
- * provide them without forcing a hard dependency.
- */
 public final class FFDModernSurfaceRules {
     private static final String RESOURCE_ROOT =
             "/assets/farmers_future_delight/worldgen/26_3/";
@@ -59,6 +57,9 @@ public final class FFDModernSurfaceRules {
     private final IBlockState[] clayBands;
     private final FFDXoroshiroRandom.PositionalFactory deepslateRandom;
     private final Rule overworldRule;
+    private final NoiseGeneratorPerlin legacySurfaceNoise;
+    private final NoiseGeneratorPerlin frozenIceNoise;
+    private final NoiseGeneratorPerlin frozenPillarNoise;
 
     public FFDModernSurfaceRules(World world, FFDModernWorldgenData data,
                                  FFDVerticalBiomeSampler verticalBiomeSampler,
@@ -71,6 +72,14 @@ public final class FFDModernSurfaceRules {
         clayBands = generateClayBands(data.randomFromHashOf("minecraft:clay_bands"));
         deepslateRandom = data.positionalFactory("minecraft:deepslate");
         overworldRule = ruleReference("minecraft:overworld");
+        Random legacyRandom = new Random(world.getSeed());
+        new NoiseGeneratorOctaves(legacyRandom, 16);
+        new NoiseGeneratorOctaves(legacyRandom, 16);
+        new NoiseGeneratorOctaves(legacyRandom, 8);
+        legacySurfaceNoise = new NoiseGeneratorPerlin(legacyRandom, 4);
+        Random frozenRandom = new Random(world.getSeed());
+        frozenIceNoise = new NoiseGeneratorPerlin(frozenRandom, 4);
+        frozenPillarNoise = new NoiseGeneratorPerlin(frozenRandom, 1);
     }
 
     public IBlockState stoneStateAt(int x, int y, int z) {
@@ -83,6 +92,7 @@ public final class FFDModernSurfaceRules {
                       FFDBiomeTerrainBridge terrainBridge, int startX, int startZ) {
         SurfaceStateReader stateReader = new SurfaceStateReader(chunk);
         int[] heights = worldSurfaceHeights(stateReader);
+        applyFrozenOceanTerrain(chunk, stateReader, terrainBridge, heights, startX, startZ);
         Context context = new Context(chunk, biomes, verticalBiomes, terrainBridge,
                 heights, startX, startZ);
 
@@ -128,6 +138,69 @@ public final class FFDModernSurfaceRules {
                     IBlockState replacement = overworldRule.apply(context);
                     if (replacement != null && replacement != old) {
                         setDirect(chunk, localX, y, localZ, replacement);
+                    }
+                }
+            }
+        }
+    }
+
+    private void applyFrozenOceanTerrain(Chunk chunk, SurfaceStateReader stateReader,
+                                         FFDBiomeTerrainBridge terrainBridge, int[] heights,
+                                         int startX, int startZ) {
+        double[] surfaceNoise = legacySurfaceNoise.getRegion(null, startX, startZ,
+                16, 16, 0.0625D, 0.0625D, 1.0D);
+        int seaLevel = world.getSeaLevel();
+        for (int localX = 0; localX < 16; localX++) {
+            for (int localZ = 0; localZ < 16; localZ++) {
+                int x = startX + localX;
+                int z = startZ + localZ;
+                if (!terrainBridge.matchesModernBiome(x, z, "minecraft:frozen_ocean")
+                        && !terrainBridge.matchesModernBiome(x, z,
+                        "minecraft:deep_frozen_ocean")) {
+                    continue;
+                }
+                double noiseValue = surfaceNoise[localZ * 16 + localX];
+                double iceNoise = Math.min(Math.abs(noiseValue),
+                        frozenIceNoise.getValue(x * 0.1D, z * 0.1D));
+                if (iceNoise <= 1.8D) {
+                    continue;
+                }
+                double upperIce = iceNoise * iceNoise * 1.2D;
+                upperIce = Math.min(upperIce, Math.ceil(Math.abs(frozenPillarNoise.getValue(
+                        x * 0.09765625D, z * 0.09765625D)) * 40.0D) + 14.0D);
+                Biome biome = world.getBiome(new BlockPos(x, 63, z));
+                if (biome.getTemperature(new BlockPos(x, 63, z)) > 0.1F) {
+                    upperIce -= 2.0D;
+                }
+                if (upperIce <= 2.0D) {
+                    continue;
+                }
+                double lowerIce = seaLevel - upperIce - 7.0D;
+                upperIce += seaLevel;
+                Random random = new Random(world.getSeed() ^ x * 341873128712L
+                        ^ z * 132897987541L);
+                random.nextDouble();
+                int snowCapLimit = 2 + random.nextInt(4);
+                int snowCapMinimumY = seaLevel + 18 + random.nextInt(10);
+                int snowCaps = 0;
+                int columnIndex = index(localX, localZ);
+                int top = Math.max(heights[columnIndex], (int) upperIce + 1);
+                for (int y = top; y >= FFDModernWorldgenData.MIN_Y; y--) {
+                    IBlockState state = stateReader.get(localX, y, localZ);
+                    if (isAir(state) && y < (int) upperIce && random.nextDouble() > 0.01D) {
+                        setDirect(chunk, localX, y, localZ, Blocks.PACKED_ICE.getDefaultState());
+                        state = Blocks.PACKED_ICE.getDefaultState();
+                        heights[columnIndex] = Math.max(heights[columnIndex], y);
+                    } else if (state.getMaterial() == net.minecraft.block.material.Material.WATER
+                            && y > (int) lowerIce && y < seaLevel
+                            && lowerIce != 0.0D && random.nextDouble() > 0.15D) {
+                        setDirect(chunk, localX, y, localZ, Blocks.PACKED_ICE.getDefaultState());
+                        state = Blocks.PACKED_ICE.getDefaultState();
+                    }
+                    if (state.getBlock() == Blocks.PACKED_ICE && snowCaps <= snowCapLimit
+                            && y > snowCapMinimumY) {
+                        setDirect(chunk, localX, y, localZ, Blocks.SNOW.getDefaultState());
+                        snowCaps++;
                     }
                 }
             }

@@ -67,6 +67,11 @@ public final class FFDAdvancements {
     public static final SimpleTrigger VISIT_JAGGED_PEAKS = register("visit_jagged_peaks");
     public static final SimpleTrigger VISIT_FROZEN_PEAKS = register("visit_frozen_peaks");
     public static final SimpleTrigger VISIT_STONY_PEAKS = register("visit_stony_peaks");
+    public static final SimpleTrigger FISHY_BUSINESS = register("fishy_business");
+    public static final SimpleTrigger TACTICAL_FISHING = register("tactical_fishing");
+    public static final SimpleTrigger THROW_TRIDENT = register("throw_trident");
+    public static final SimpleTrigger VERY_VERY_FRIGHTENING =
+            register("very_very_frightening");
 
     private FFDAdvancements() {
     }

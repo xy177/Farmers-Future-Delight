@@ -44,7 +44,6 @@ public final class FFDMineshaftHooks {
     private FFDMineshaftHooks() {
     }
 
-    /** Places mineshafts using the 26.3 below-sea-level height rule. */
     public static void adjustModernMineshaftHeight(StructureMineshaftStart start, World world,
                                                    java.util.Random random,
                                                    net.minecraft.world.gen.structure.MapGenMineshaft.Type type,
@@ -205,7 +204,6 @@ public final class FFDMineshaftHooks {
                 return result;
             }
         } catch (ReflectiveOperationException | RuntimeException exception) {
-            // Optional compatibility: the external mod may change its private fields.
         }
         return java.util.Collections.emptyList();
     }

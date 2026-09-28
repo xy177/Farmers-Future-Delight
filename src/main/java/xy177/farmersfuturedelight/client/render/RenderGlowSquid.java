@@ -28,17 +28,24 @@ public class RenderGlowSquid extends RenderSquid {
                          float partialTicks) {
         EntityGlowSquid squid = (EntityGlowSquid) entity;
         mainModel = squid.isChild() ? babyModel : adultModel;
-        shadowSize = squid.isChild() ? 0.35F : 0.7F;
+        shadowSize = 0.7F;
         super.doRender(entity, x, y, z, entityYaw, partialTicks);
     }
 
     @Override
     protected void applyRotations(EntitySquid entity, float ageInTicks, float rotationYaw,
                                   float partialTicks) {
-        super.applyRotations(entity, ageInTicks, rotationYaw, partialTicks);
-        if (entity instanceof EntityGlowSquid && ((EntityGlowSquid) entity).isChild()) {
-            GlStateManager.translate(0.0F, 0.35F, 0.0F);
-        }
+        float pitch = entity.prevSquidPitch
+                + (entity.squidPitch - entity.prevSquidPitch) * partialTicks;
+        float yaw = entity.prevSquidYaw
+                + (entity.squidYaw - entity.prevSquidYaw) * partialTicks;
+        boolean child = entity instanceof EntityGlowSquid
+                && ((EntityGlowSquid) entity).isChild();
+        GlStateManager.translate(0.0F, child ? 0.25F : 0.5F, 0.0F);
+        GlStateManager.rotate(180.0F - rotationYaw, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate(pitch, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate(yaw, 0.0F, 1.0F, 0.0F);
+        GlStateManager.translate(0.0F, child ? -0.6F : -1.2F, 0.0F);
     }
 
     @Override

@@ -6,6 +6,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
+import net.minecraftforge.fml.common.event.FMLModIdMappingEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -20,15 +21,20 @@ import xy177.farmersfuturedelight.common.registry.FFDRecipes;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.registry.FFDCustomRawOres;
 import xy177.farmersfuturedelight.common.registry.FFDCustomDeepslateOres;
+import xy177.farmersfuturedelight.common.registry.FFDCustomStrippedWoods;
 import xy177.farmersfuturedelight.common.registry.FFDDeepslateOreCompat;
 import xy177.farmersfuturedelight.common.registry.FFDRawOreCompat;
 import xy177.farmersfuturedelight.common.registry.FFDRawOreOreDictionaryCompat;
 import xy177.farmersfuturedelight.common.registry.FFDTileEntities;
 import xy177.farmersfuturedelight.common.network.FFDNetwork;
+import xy177.farmersfuturedelight.api.WaterloggedBlockApi;
 import xy177.farmersfuturedelight.common.world.FFDWorldTypes;
 import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiomeManager;
+import xy177.farmersfuturedelight.common.fluid.FFDFluidloggedData;
+import xy177.farmersfuturedelight.common.worldgen.FFDOceanStructures;
 import xy177.farmersfuturedelight.common.command.CommandLocateBiome;
 import xy177.farmersfuturedelight.common.command.CommandRawOre;
+import xy177.farmersfuturedelight.common.command.CommandStrippedWood;
 import xy177.farmersfuturedelight.core.FFDCoreCompat;
 import xy177.farmersfuturedelight.core.FFDHeightHooks;
 import xy177.farmersfuturedelight.proxy.CommonProxy;
@@ -38,7 +44,7 @@ import xy177.farmersfuturedelight.proxy.CommonProxy;
 public class FarmerFutureDelight {
     public static final String MODID = "farmers_future_delight";
     public static final String NAME = "Farmer's Future Delight";
-    public static final String VERSION = "1.3.3";
+    public static final String VERSION = "1.4.0";
 
     @Mod.Instance(MODID)
     public static FarmerFutureDelight instance;
@@ -53,20 +59,26 @@ public class FarmerFutureDelight {
         FFDConfig.load(event.getSuggestedConfigurationFile());
         FFDCustomRawOres.load(event.getSuggestedConfigurationFile().getParentFile());
         FFDCustomDeepslateOres.load(event.getSuggestedConfigurationFile().getParentFile());
+        FFDCustomStrippedWoods.load(event.getSuggestedConfigurationFile().getParentFile());
         FMLCommonHandler.instance().bus().register(FFDAxolotlSpawner.class);
         FFDGameplayHooks.applyModernBlockProperties();
         FFDNetwork.init();
         FFDAdvancements.init();
         FFDTileEntities.register();
+        FFDOceanStructures.init();
         MinecraftForge.EVENT_BUS.register(FFDVerticalBiomeManager.class);
+        MinecraftForge.EVENT_BUS.register(FFDFluidloggedData.class);
+        MinecraftForge.EVENT_BUS.register(xy177.farmersfuturedelight.common.fluid.FFDStoredFluidStates.class);
+        MinecraftForge.EVENT_BUS.register(xy177.farmersfuturedelight.common.fluid.FFDFluidMigration.class);
         MinecraftForge.TERRAIN_GEN_BUS.register(xy177.farmersfuturedelight.common.worldgen.FFDWorldgenEvents.class);
         MinecraftForge.ORE_GEN_BUS.register(xy177.farmersfuturedelight.common.worldgen.FFDWorldgenEvents.class);
-        proxy.preInit();
+        proxy.preInit(event);
         GameRegistry.registerWorldGenerator(new FFDWorldGenerator(), 0);
     }
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
+        WaterloggedBlockApi.initializeUniversalStateMappings();
         FFDCoreCompat.validateCaveBiomesHeightRange(
                 FFDHeightHooks.MIN_Y, FFDHeightHooks.MAX_Y_EXCLUSIVE);
         FFDCoreCompat.validateDepthsUpdateHeightRange(
@@ -75,6 +87,11 @@ public class FarmerFutureDelight {
         FFDDispenserBehaviors.register();
         FFDRecipes.init();
         FFDEntities.registerSpawns();
+    }
+
+    @Mod.EventHandler
+    public void idMapping(FMLModIdMappingEvent event) {
+        WaterloggedBlockApi.initializeUniversalStateMappings();
     }
 
     @Mod.EventHandler
@@ -89,5 +106,7 @@ public class FarmerFutureDelight {
     public void serverStarting(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandLocateBiome());
         event.registerServerCommand(new CommandRawOre());
+        event.registerServerCommand(new CommandStrippedWood());
+        event.registerServerCommand(new xy177.farmersfuturedelight.common.command.CommandFluidMigration());
     }
 }

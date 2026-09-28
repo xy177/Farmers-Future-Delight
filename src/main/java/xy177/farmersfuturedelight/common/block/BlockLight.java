@@ -32,12 +32,6 @@ import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 
-/**
- * Invisible administrator light source from Minecraft 1.17.
- *
- * <p>The 1.12 metadata stores the complete 0-15 light level. Waterlogging is
- * intentionally deferred to the project's later system-wide waterlogging pass.</p>
- */
 public class BlockLight extends Block {
     public static final PropertyInteger LEVEL = PropertyInteger.create("level", 0, 15);
 

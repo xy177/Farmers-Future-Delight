@@ -16,7 +16,6 @@ import net.minecraft.util.text.ITextComponent;
 
 import xy177.farmersfuturedelight.common.FFDSignText;
 
-/** Vanilla sign renderer with the 26.3 full-bright text pass. */
 public class RenderSign extends TileEntitySpecialRenderer<TileEntitySign> {
     private static final ResourceLocation SIGN_TEXTURE = new ResourceLocation("textures/entity/sign.png");
     private final ModelSign model = new ModelSign();

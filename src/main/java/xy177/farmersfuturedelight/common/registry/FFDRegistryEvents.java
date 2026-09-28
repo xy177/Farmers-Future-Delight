@@ -24,12 +24,19 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 
 import xy177.farmersfuturedelight.FarmerFutureDelight;
+import xy177.farmersfuturedelight.api.WaterloggedBlockApi;
 import xy177.farmersfuturedelight.common.FFDCompat;
 import xy177.farmersfuturedelight.common.block.CopperWeathering;
 
 @Mod.EventBusSubscriber(modid = FarmerFutureDelight.MODID)
 public final class FFDRegistryEvents {
     private FFDRegistryEvents() {
+    }
+
+    @SubscribeEvent
+    public static void registerEnchantments(
+            RegistryEvent.Register<net.minecraft.enchantment.Enchantment> event) {
+        FFDEnchantments.register(event.getRegistry());
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -127,6 +134,8 @@ public final class FFDRegistryEvents {
             Collections.addAll(blocks, FFDBlocks.WAXED_CUT_COPPER_DOUBLE_SLABS);
             Collections.addAll(blocks, FFDBlocks.LIGHTNING_RODS);
             Collections.addAll(blocks, FFDBlocks.WAXED_LIGHTNING_RODS);
+            Collections.addAll(blocks, FFDBlocks.LIGHTNING_RODS_WATERLOGGED);
+            Collections.addAll(blocks, FFDBlocks.WAXED_LIGHTNING_RODS_WATERLOGGED);
             if (FFDItems.isDeepslateEnabled()) {
                 blocks.add(FFDBlocks.DEEPSLATE_COPPER_ORE);
             }
@@ -143,6 +152,52 @@ public final class FFDRegistryEvents {
         }
         if (FFDItems.isSeaPickleEnabled()) {
             blocks.add(FFDBlocks.SEA_PICKLE);
+        }
+        if (FFDItems.isCoralEnabled()) {
+            Collections.addAll(blocks, FFDBlocks.CORAL_BLOCKS);
+            Collections.addAll(blocks, FFDBlocks.DEAD_CORAL_BLOCKS);
+            Collections.addAll(blocks, FFDBlocks.CORALS);
+            Collections.addAll(blocks, FFDBlocks.DEAD_CORALS);
+            Collections.addAll(blocks, FFDBlocks.CORAL_FANS);
+            Collections.addAll(blocks, FFDBlocks.DEAD_CORAL_FANS);
+            Collections.addAll(blocks, FFDBlocks.CORAL_WALL_FANS);
+            Collections.addAll(blocks, FFDBlocks.DEAD_CORAL_WALL_FANS);
+        }
+        if (FFDItems.isBlueIceEnabled()) {
+            blocks.add(FFDBlocks.BLUE_ICE);
+        }
+        if (FFDItems.isConduitEnabled()) {
+            blocks.add(FFDBlocks.CONDUIT);
+        }
+        if (FFDItems.isBubbleColumnEnabled()) {
+            blocks.add(FFDBlocks.BUBBLE_COLUMN);
+        }
+        if (FFDItems.isStrippedWoodEnabled()) {
+            FFDCustomStrippedWoods.prepare(event.getRegistry());
+            Collections.addAll(blocks, FFDBlocks.STRIPPED_LOGS);
+            Collections.addAll(blocks, FFDBlocks.STRIPPED_WOODS);
+            Collections.addAll(blocks, FFDBlocks.OVERWORLD_TRAPDOORS);
+            Collections.addAll(blocks, FFDBlocks.OVERWORLD_TRAPDOORS_WATERLOGGED);
+            Collections.addAll(blocks, FFDBlocks.OVERWORLD_BUTTONS);
+            Collections.addAll(blocks, FFDBlocks.OVERWORLD_PRESSURE_PLATES);
+            for (FFDCustomStrippedWoods.Entry entry : FFDCustomStrippedWoods.entries()) {
+                if (entry.isEnabled()) {
+                    if (entry.logBlock() != null) {
+                        blocks.add(entry.logBlock());
+                    }
+                    if (entry.woodBlock() != null) {
+                        blocks.add(entry.woodBlock());
+                    }
+                }
+            }
+        }
+        if (FFDItems.isPumpkinEnabled()) {
+            blocks.add(FFDBlocks.PUMPKIN);
+        }
+        if (FFDItems.isPrismarineDecorEnabled()) {
+            Collections.addAll(blocks, FFDBlocks.PRISMARINE_STAIRS);
+            Collections.addAll(blocks, FFDBlocks.PRISMARINE_SLABS);
+            Collections.addAll(blocks, FFDBlocks.PRISMARINE_DOUBLE_SLABS);
         }
         if (FFDItems.isTurtleEnabled()) {
             blocks.add(FFDBlocks.TURTLE_EGG);
@@ -185,6 +240,7 @@ public final class FFDRegistryEvents {
             blocks.add(FFDBlocks.CRIMSON_FENCE_GATE);
             blocks.add(FFDBlocks.CRIMSON_DOOR);
             blocks.add(FFDBlocks.CRIMSON_TRAPDOOR);
+            blocks.add(FFDBlocks.CRIMSON_TRAPDOOR_WATERLOGGED);
             blocks.add(FFDBlocks.CRIMSON_BUTTON);
             blocks.add(FFDBlocks.CRIMSON_PRESSURE_PLATE);
         }
@@ -202,6 +258,7 @@ public final class FFDRegistryEvents {
             blocks.add(FFDBlocks.WARPED_FENCE_GATE);
             blocks.add(FFDBlocks.WARPED_DOOR);
             blocks.add(FFDBlocks.WARPED_TRAPDOOR);
+            blocks.add(FFDBlocks.WARPED_TRAPDOOR_WATERLOGGED);
             blocks.add(FFDBlocks.WARPED_BUTTON);
             blocks.add(FFDBlocks.WARPED_PRESSURE_PLATE);
         }
@@ -215,6 +272,7 @@ public final class FFDRegistryEvents {
         }
         blocks.removeIf(block -> !FFDItems.shouldRegisterBlock(block));
         event.getRegistry().registerAll(blocks.toArray(new net.minecraft.block.Block[0]));
+        WaterloggedBlockApi.prepareUniversalStateCarriers(event.getRegistry());
         CopperWeathering.rebuildEffectiveMappings();
         registerFlammability();
     }
@@ -346,6 +404,59 @@ public final class FFDRegistryEvents {
                     xy177.farmersfuturedelight.common.entity.EntityGlowItemFrame.class,
                     "glow_item_frame", 4, 64, 1));
         }
+        if (FFDEntities.isLocalCodEnabled()) {
+            entities.add(entity(FFDEntities.COD_ID,
+                    xy177.farmersfuturedelight.common.entity.EntityCod.class,
+                    "cod", 7, 64, 3, 0xC1A76A, 0xE5D5EB));
+            net.minecraft.entity.EntitySpawnPlacementRegistry.setPlacementType(
+                    xy177.farmersfuturedelight.common.entity.EntityCod.class,
+                    net.minecraft.entity.EntityLiving.SpawnPlacementType.IN_WATER);
+        }
+        if (FFDEntities.isLocalSalmonEnabled()) {
+            entities.add(entity(FFDEntities.SALMON_ID,
+                    xy177.farmersfuturedelight.common.entity.EntitySalmon.class,
+                    "salmon", 8, 64, 3, 0xA02E30, 0x0E1215));
+            net.minecraft.entity.EntitySpawnPlacementRegistry.setPlacementType(
+                    xy177.farmersfuturedelight.common.entity.EntitySalmon.class,
+                    net.minecraft.entity.EntityLiving.SpawnPlacementType.IN_WATER);
+        }
+        if (FFDEntities.isLocalPufferfishEnabled()) {
+            entities.add(entity(FFDEntities.PUFFERFISH_ID,
+                    xy177.farmersfuturedelight.common.entity.EntityPufferfish.class,
+                    "pufferfish", 9, 64, 3, 0xF6A25A, 0x37C9D2));
+            net.minecraft.entity.EntitySpawnPlacementRegistry.setPlacementType(
+                    xy177.farmersfuturedelight.common.entity.EntityPufferfish.class,
+                    net.minecraft.entity.EntityLiving.SpawnPlacementType.IN_WATER);
+        }
+        if (FFDEntities.isLocalTropicalFishEnabled()) {
+            entities.add(entity(FFDEntities.TROPICAL_FISH_ID,
+                    xy177.farmersfuturedelight.common.entity.EntityTropicalFish.class,
+                    "tropical_fish", 10, 64, 3, 0xEF6915, 0xFFF9EF));
+            net.minecraft.entity.EntitySpawnPlacementRegistry.setPlacementType(
+                    xy177.farmersfuturedelight.common.entity.EntityTropicalFish.class,
+                    net.minecraft.entity.EntityLiving.SpawnPlacementType.IN_WATER);
+        }
+        if (FFDEntities.isLocalDolphinEnabled()) {
+            entities.add(entity(FFDEntities.DOLPHIN_ID,
+                    xy177.farmersfuturedelight.common.entity.EntityDolphin.class,
+                    "dolphin", 11, 80, 3, 0x223B4D, 0xF9F9F9));
+            net.minecraft.entity.EntitySpawnPlacementRegistry.setPlacementType(
+                    xy177.farmersfuturedelight.common.entity.EntityDolphin.class,
+                    net.minecraft.entity.EntityLiving.SpawnPlacementType.IN_WATER);
+        }
+        if (FFDEntities.isLocalDrownedEnabled()) {
+            entities.add(entity(FFDEntities.DROWNED_ID,
+                    xy177.farmersfuturedelight.common.entity.EntityDrowned.class,
+                    "drowned", 12, 80, 3, 0x8FF1D7, 0x799C65));
+            net.minecraft.entity.EntitySpawnPlacementRegistry.setPlacementType(
+                    xy177.farmersfuturedelight.common.entity.EntityDrowned.class,
+                    net.minecraft.entity.EntityLiving.SpawnPlacementType.IN_WATER);
+        }
+        if (FFDEntities.isLocalTridentProjectileEnabled()) {
+            entities.add(entity(FFDEntities.TRIDENT_ID,
+                    xy177.farmersfuturedelight.common.entity.EntityTrident.class,
+                    "trident", 13, 64, 10));
+        }
         event.getRegistry().registerAll(entities.toArray(new EntityEntry[0]));
     }
 
@@ -423,6 +534,21 @@ public final class FFDRegistryEvents {
         setFireInfoIfRegistered(FFDBlocks.SPORE_BLOSSOM, 60, 100);
         setFireInfoIfRegistered(FFDBlocks.BEE_NEST, 30, 20);
         setFireInfoIfRegistered(FFDBlocks.BEEHIVE, 5, 20);
+        for (net.minecraft.block.Block block : FFDBlocks.STRIPPED_LOGS) {
+            setFireInfoIfRegistered(block, 5, 5);
+        }
+        for (net.minecraft.block.Block block : FFDBlocks.STRIPPED_WOODS) {
+            setFireInfoIfRegistered(block, 5, 5);
+        }
+        for (net.minecraft.block.Block block : FFDBlocks.OVERWORLD_TRAPDOORS) {
+            setFireInfoIfRegistered(block, 5, 20);
+        }
+        for (net.minecraft.block.Block block : FFDBlocks.OVERWORLD_BUTTONS) {
+            setFireInfoIfRegistered(block, 5, 20);
+        }
+        for (net.minecraft.block.Block block : FFDBlocks.OVERWORLD_PRESSURE_PLATES) {
+            setFireInfoIfRegistered(block, 5, 20);
+        }
     }
 
     private static void setFireInfoIfRegistered(net.minecraft.block.Block block,
@@ -435,6 +561,7 @@ public final class FFDRegistryEvents {
     @SubscribeEvent
     public static void registerBiomes(RegistryEvent.Register<Biome> event) {
         event.getRegistry().registerAll(FFDBiomes.MOUNTAIN_BIOMES);
+        event.getRegistry().registerAll(FFDBiomes.OCEAN_BIOMES);
         BiomeDictionary.addTypes(FFDBiomes.MEADOW, BiomeDictionary.Type.MOUNTAIN,
                 BiomeDictionary.Type.PLAINS, BiomeDictionary.Type.LUSH);
         BiomeDictionary.addTypes(FFDBiomes.GROVE, BiomeDictionary.Type.MOUNTAIN,
@@ -448,6 +575,20 @@ public final class FFDRegistryEvents {
                 BiomeDictionary.Type.COLD, BiomeDictionary.Type.SNOWY, BiomeDictionary.Type.SPARSE);
         BiomeDictionary.addTypes(FFDBiomes.STONY_PEAKS, BiomeDictionary.Type.MOUNTAIN,
                 BiomeDictionary.Type.HOT, BiomeDictionary.Type.DRY, BiomeDictionary.Type.SPARSE);
+        BiomeDictionary.addTypes(FFDBiomes.WARM_OCEAN, BiomeDictionary.Type.OCEAN,
+                BiomeDictionary.Type.HOT, BiomeDictionary.Type.WET);
+        BiomeDictionary.addTypes(FFDBiomes.LUKEWARM_OCEAN, BiomeDictionary.Type.OCEAN,
+                BiomeDictionary.Type.WET);
+        BiomeDictionary.addTypes(FFDBiomes.COLD_OCEAN, BiomeDictionary.Type.OCEAN,
+                BiomeDictionary.Type.COLD, BiomeDictionary.Type.WET);
+        BiomeDictionary.addTypes(FFDBiomes.FROZEN_OCEAN, BiomeDictionary.Type.OCEAN,
+                BiomeDictionary.Type.COLD, BiomeDictionary.Type.SNOWY, BiomeDictionary.Type.WET);
+        BiomeDictionary.addTypes(FFDBiomes.DEEP_LUKEWARM_OCEAN, BiomeDictionary.Type.OCEAN,
+                BiomeDictionary.Type.WET);
+        BiomeDictionary.addTypes(FFDBiomes.DEEP_COLD_OCEAN, BiomeDictionary.Type.OCEAN,
+                BiomeDictionary.Type.COLD, BiomeDictionary.Type.WET);
+        BiomeDictionary.addTypes(FFDBiomes.DEEP_FROZEN_OCEAN, BiomeDictionary.Type.OCEAN,
+                BiomeDictionary.Type.COLD, BiomeDictionary.Type.SNOWY, BiomeDictionary.Type.WET);
         if (FFDItems.isCrimsonEnabled()) {
             event.getRegistry().register(FFDBiomes.CRIMSON_FOREST);
             BiomeDictionary.addTypes(FFDBiomes.CRIMSON_FOREST, BiomeDictionary.Type.NETHER,
@@ -513,6 +654,52 @@ public final class FFDRegistryEvents {
         }
         if (FFDItems.isSeaPickleEnabled()) {
             items.add(FFDItems.SEA_PICKLE);
+        }
+        if (FFDItems.isCoralEnabled()) {
+            Collections.addAll(items, FFDItems.CORAL_BLOCK_ITEMS);
+            Collections.addAll(items, FFDItems.DEAD_CORAL_BLOCK_ITEMS);
+            Collections.addAll(items, FFDItems.CORAL_ITEMS);
+            Collections.addAll(items, FFDItems.DEAD_CORAL_ITEMS);
+            Collections.addAll(items, FFDItems.CORAL_FAN_ITEMS);
+            Collections.addAll(items, FFDItems.DEAD_CORAL_FAN_ITEMS);
+        }
+        if (FFDItems.isBlueIceEnabled()) {
+            items.add(FFDItems.BLUE_ICE);
+        }
+        if (FFDItems.isStrippedWoodEnabled()) {
+            Collections.addAll(items, FFDItems.STRIPPED_LOG_ITEMS);
+            Collections.addAll(items, FFDItems.STRIPPED_WOOD_ITEMS);
+            Collections.addAll(items, FFDItems.OVERWORLD_TRAPDOOR_ITEMS);
+            Collections.addAll(items, FFDItems.OVERWORLD_BUTTON_ITEMS);
+            Collections.addAll(items, FFDItems.OVERWORLD_PRESSURE_PLATE_ITEMS);
+            for (FFDCustomStrippedWoods.Entry entry : FFDCustomStrippedWoods.entries()) {
+                if (entry.isEnabled()) {
+                    if (entry.logItem() != null) {
+                        items.add(entry.logItem());
+                    }
+                    if (entry.woodItem() != null) {
+                        items.add(entry.woodItem());
+                    }
+                }
+            }
+        }
+        if (FFDItems.isPumpkinEnabled()) {
+            items.add(FFDItems.PUMPKIN);
+        }
+        if (FFDItems.isPrismarineDecorEnabled()) {
+            Collections.addAll(items, FFDItems.PRISMARINE_STAIR_ITEMS);
+            Collections.addAll(items, FFDItems.PRISMARINE_SLAB_ITEMS);
+        }
+        if (FFDItems.isConduitEnabled()) {
+            items.add(FFDItems.NAUTILUS_SHELL);
+            items.add(FFDItems.HEART_OF_THE_SEA);
+            items.add(FFDItems.CONDUIT);
+        }
+        if (FFDItems.isTridentEnabled()) {
+            items.add(FFDItems.TRIDENT);
+        }
+        if (FFDItems.isFishEnabled()) {
+            Collections.addAll(items, FFDItems.FISH_BUCKETS);
         }
         if (FFDItems.isTurtleEnabled()) {
             items.add(FFDItems.TURTLE_EGG);
@@ -680,6 +867,26 @@ public final class FFDRegistryEvents {
         }
         if (FFDItems.isSeagrassEnabled()) {
             registerOre("cropSeaweed", FFDItems.SEAGRASS);
+        }
+        if (FFDItems.isBlueIceEnabled()) {
+            registerOre("blockBlueIce", FFDItems.BLUE_ICE);
+        }
+        if (FFDItems.isStrippedWoodEnabled()) {
+            for (net.minecraft.item.Item item : FFDItems.STRIPPED_LOG_ITEMS) {
+                registerOre("logWood", item);
+            }
+            for (net.minecraft.item.Item item : FFDItems.STRIPPED_WOOD_ITEMS) {
+                registerOre("logWood", item);
+            }
+            for (net.minecraft.item.Item item : FFDItems.OVERWORLD_TRAPDOOR_ITEMS) {
+                registerOre("trapdoorWood", item);
+            }
+            for (net.minecraft.item.Item item : FFDItems.OVERWORLD_BUTTON_ITEMS) {
+                registerOre("buttonWood", item);
+            }
+            for (net.minecraft.item.Item item : FFDItems.OVERWORLD_PRESSURE_PLATE_ITEMS) {
+                registerOre("pressurePlateWood", item);
+            }
         }
         if (FFDItems.isHoneyEnabled()) {
             registerOre("wax", FFDItems.HONEYCOMB);
@@ -898,6 +1105,7 @@ public final class FFDRegistryEvents {
                         .setRegistryName(FarmerFutureDelight.MODID, "dried_kelp"));
             }
         }
+        addAquaticDecorRecipes(recipes);
         if (FFDItems.isHoneyEnabled()) {
             ResourceLocation honeyGroup = new ResourceLocation(FarmerFutureDelight.MODID, "honey");
             ItemStack bottle = FFDItems.effectiveStack(FFDItems.HONEY_BOTTLE);
@@ -960,6 +1168,103 @@ public final class FFDRegistryEvents {
         }
         if (!recipes.isEmpty()) {
             event.getRegistry().registerAll(recipes.toArray(new IRecipe[0]));
+        }
+    }
+
+    private static void addAquaticDecorRecipes(List<IRecipe> recipes) {
+        ResourceLocation group = new ResourceLocation(FarmerFutureDelight.MODID, "aquatic_decor");
+        if (FFDItems.isItemRegistered(FFDItems.BLUE_ICE)) {
+            recipes.add(new ShapedOreRecipe(group, new ItemStack(FFDItems.BLUE_ICE),
+                    "III", "III", "III", 'I', net.minecraft.init.Blocks.PACKED_ICE)
+                    .setRegistryName(FarmerFutureDelight.MODID, "blue_ice"));
+        }
+        if (FFDItems.isItemRegistered(FFDItems.CONDUIT)) {
+            ItemStack shell = FFDItems.effectiveStack(FFDItems.NAUTILUS_SHELL);
+            ItemStack heart = FFDItems.effectiveStack(FFDItems.HEART_OF_THE_SEA);
+            if (!shell.isEmpty() && !heart.isEmpty()) {
+                recipes.add(new ShapedOreRecipe(group, new ItemStack(FFDItems.CONDUIT),
+                        "SSS", "SHS", "SSS", 'S', shell, 'H', heart)
+                        .setRegistryName(FarmerFutureDelight.MODID, "conduit"));
+            }
+        }
+        for (int i = 0; i < FFDBlocks.OVERWORLD_WOOD_NAMES.length; i++) {
+            ItemStack strippedLog = FFDItems.effectiveStack(FFDItems.STRIPPED_LOG_ITEMS[i]);
+            ItemStack strippedWood = FFDItems.effectiveStack(FFDItems.STRIPPED_WOOD_ITEMS[i]);
+            String wood = FFDBlocks.OVERWORLD_WOOD_NAMES[i];
+            if (FFDItems.isItemRegistered(FFDItems.STRIPPED_WOOD_ITEMS[i])
+                    && !strippedLog.isEmpty()) {
+                recipes.add(new ShapedOreRecipe(group,
+                        new ItemStack(FFDItems.STRIPPED_WOOD_ITEMS[i], 3),
+                        "LL", "LL", 'L', strippedLog)
+                        .setRegistryName(FarmerFutureDelight.MODID,
+                                "stripped_" + wood + "_wood"));
+            }
+            if (!strippedLog.isEmpty()) {
+                recipes.add(new ShapelessOreRecipe(group,
+                        new ItemStack(net.minecraft.init.Blocks.PLANKS, 4, i), strippedLog)
+                        .setRegistryName(FarmerFutureDelight.MODID,
+                                "planks_from_stripped_" + wood + "_log"));
+            }
+            if (!strippedWood.isEmpty()) {
+                recipes.add(new ShapelessOreRecipe(group,
+                        new ItemStack(net.minecraft.init.Blocks.PLANKS, 4, i), strippedWood)
+                        .setRegistryName(FarmerFutureDelight.MODID,
+                                "planks_from_stripped_" + wood + "_wood"));
+            }
+        }
+        addOverworldWoodRecipes(recipes);
+        if (FFDItems.isItemRegistered(FFDItems.PUMPKIN)) {
+            net.minecraft.init.Blocks.PUMPKIN.setUnlocalizedName(
+                    FarmerFutureDelight.MODID + ".carved_pumpkin");
+            recipes.add(new ShapelessOreRecipe(null, new ItemStack(Items.PUMPKIN_SEEDS, 4),
+                    new ItemStack(FFDItems.PUMPKIN)).setRegistryName("minecraft", "pumpkin_seeds"));
+            recipes.add(new ShapelessOreRecipe(null, new ItemStack(Items.PUMPKIN_PIE),
+                    new ItemStack(FFDItems.PUMPKIN), Items.SUGAR, Items.EGG)
+                    .setRegistryName("minecraft", "pumpkin_pie"));
+        }
+        for (int i = 0; i < FFDItems.PRISMARINE_STAIR_ITEMS.length; i++) {
+            ItemStack material = new ItemStack(net.minecraft.init.Blocks.PRISMARINE, 1, i);
+            if (FFDItems.isItemRegistered(FFDItems.PRISMARINE_STAIR_ITEMS[i])) {
+                recipes.add(new ShapedOreRecipe(group,
+                        new ItemStack(FFDItems.PRISMARINE_STAIR_ITEMS[i], 4),
+                        "P  ", "PP ", "PPP", 'P', material)
+                        .setRegistryName(FarmerFutureDelight.MODID,
+                                FFDBlocks.PRISMARINE_STAIRS[i].getRegistryName().getResourcePath()));
+            }
+            if (FFDItems.isItemRegistered(FFDItems.PRISMARINE_SLAB_ITEMS[i])) {
+                recipes.add(new ShapedOreRecipe(group,
+                        new ItemStack(FFDItems.PRISMARINE_SLAB_ITEMS[i], 6),
+                        "PPP", 'P', material)
+                        .setRegistryName(FarmerFutureDelight.MODID,
+                                FFDBlocks.PRISMARINE_SLABS[i].getRegistryName().getResourcePath()));
+            }
+        }
+    }
+
+    private static void addOverworldWoodRecipes(List<IRecipe> recipes) {
+        ResourceLocation group = new ResourceLocation(FarmerFutureDelight.MODID,
+                "overworld_wood");
+        for (int i = 0; i < FFDBlocks.OVERWORLD_WOOD_NAMES.length; i++) {
+            String prefix = FFDBlocks.OVERWORLD_WOOD_NAMES[i];
+            ItemStack planks = new ItemStack(net.minecraft.init.Blocks.PLANKS, 1, i);
+            if (FFDItems.isItemRegistered(FFDItems.OVERWORLD_TRAPDOOR_ITEMS[i])) {
+                recipes.add(new ShapedOreRecipe(group,
+                        new ItemStack(FFDItems.OVERWORLD_TRAPDOOR_ITEMS[i], 2),
+                        "PPP", "PPP", 'P', planks)
+                        .setRegistryName(FarmerFutureDelight.MODID, prefix + "_trapdoor"));
+            }
+            if (FFDItems.isItemRegistered(FFDItems.OVERWORLD_BUTTON_ITEMS[i])) {
+                recipes.add(new ShapelessOreRecipe(group,
+                        new ItemStack(FFDItems.OVERWORLD_BUTTON_ITEMS[i]), planks)
+                        .setRegistryName(FarmerFutureDelight.MODID, prefix + "_button"));
+            }
+            if (FFDItems.isItemRegistered(FFDItems.OVERWORLD_PRESSURE_PLATE_ITEMS[i])) {
+                recipes.add(new ShapedOreRecipe(group,
+                        new ItemStack(FFDItems.OVERWORLD_PRESSURE_PLATE_ITEMS[i]),
+                        "PP", 'P', planks)
+                        .setRegistryName(FarmerFutureDelight.MODID,
+                                prefix + "_pressure_plate"));
+            }
         }
     }
 

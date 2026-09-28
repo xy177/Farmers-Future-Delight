@@ -94,7 +94,8 @@ public class BlockTurtleEgg extends Block {
     }
 
     private boolean canDestroyEgg(World world, BlockPos pos, Entity entity) {
-        if (entity instanceof EntityTurtle || entity instanceof EntityBat) {
+        if (FFDConfig.isTurtleEntity(entity) || entity instanceof EntityTurtle
+                || entity instanceof EntityBat) {
             return false;
         }
         if (entity instanceof EntityPlayer) {
@@ -204,6 +205,9 @@ public class BlockTurtleEgg extends Block {
     @Override
     public boolean removedByPlayer(IBlockState state, World world, BlockPos pos,
                                    EntityPlayer player, boolean willHarvest) {
+        if (player.capabilities.isCreativeMode) {
+            return super.removedByPlayer(state, world, pos, player, willHarvest);
+        }
         if (!world.isRemote) {
             decreaseEggs(world, pos, state);
         }

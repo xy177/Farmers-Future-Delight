@@ -16,6 +16,7 @@ public final class FFDSounds {
     public static final SoundEvent GLOW_SQUID_HURT = sound("entity.glow_squid.hurt");
     public static final SoundEvent GLOW_SQUID_DEATH = sound("entity.glow_squid.death");
     public static final SoundEvent GLOW_SQUID_SQUIRT = sound("entity.glow_squid.squirt");
+    public static final SoundEvent SQUID_SQUIRT = sound("entity.squid.squirt");
     public static final SoundEvent PHANTOM_AMBIENT = sound("entity.phantom.ambient");
     public static final SoundEvent PHANTOM_BITE = sound("entity.phantom.bite");
     public static final SoundEvent PHANTOM_DEATH = sound("entity.phantom.death");
@@ -36,6 +37,8 @@ public final class FFDSounds {
     public static final SoundEvent SWEET_BERRY_BUSH_PLACE = sound("block.sweet_berry_bush.place");
     public static final SoundEvent SWEET_BERRY_BUSH_PICK_BERRIES =
             sound("block.sweet_berry_bush.pick_berries");
+    public static final SoundEvent PLAYER_HURT_SWEET_BERRY_BUSH =
+            sound("entity.player.hurt_sweet_berry_bush");
     public static final SoundEvent CAVE_VINES_BREAK = sound("block.cave_vines.break");
     public static final SoundEvent CAVE_VINES_STEP = sound("block.cave_vines.step");
     public static final SoundEvent CAVE_VINES_PLACE = sound("block.cave_vines.place");
@@ -113,6 +116,57 @@ public final class FFDSounds {
     public static final SoundEvent AXOLOTL_SWIM = sound("entity.axolotl.swim");
     public static final SoundEvent BUCKET_FILL_AXOLOTL = sound("item.bucket.fill_axolotl");
     public static final SoundEvent BUCKET_EMPTY_AXOLOTL = sound("item.bucket.empty_axolotl");
+    public static final SoundEvent BUCKET_FILL_FISH = sound("item.bucket.fill_fish");
+    public static final SoundEvent BUCKET_EMPTY_FISH = sound("item.bucket.empty_fish");
+    public static final SoundEvent COD_AMBIENT = sound("entity.cod.ambient");
+    public static final SoundEvent COD_DEATH = sound("entity.cod.death");
+    public static final SoundEvent COD_FLOP = sound("entity.cod.flop");
+    public static final SoundEvent COD_HURT = sound("entity.cod.hurt");
+    public static final SoundEvent FISH_SWIM = sound("entity.fish.swim");
+    public static final SoundEvent SALMON_AMBIENT = sound("entity.salmon.ambient");
+    public static final SoundEvent SALMON_DEATH = sound("entity.salmon.death");
+    public static final SoundEvent SALMON_FLOP = sound("entity.salmon.flop");
+    public static final SoundEvent SALMON_HURT = sound("entity.salmon.hurt");
+    public static final SoundEvent PUFFERFISH_AMBIENT = sound("entity.puffer_fish.ambient");
+    public static final SoundEvent PUFFERFISH_BLOW_OUT = sound("entity.puffer_fish.blow_out");
+    public static final SoundEvent PUFFERFISH_BLOW_UP = sound("entity.puffer_fish.blow_up");
+    public static final SoundEvent PUFFERFISH_DEATH = sound("entity.puffer_fish.death");
+    public static final SoundEvent PUFFERFISH_FLOP = sound("entity.puffer_fish.flop");
+    public static final SoundEvent PUFFERFISH_HURT = sound("entity.puffer_fish.hurt");
+    public static final SoundEvent PUFFERFISH_STING = sound("entity.puffer_fish.sting");
+    public static final SoundEvent TROPICAL_FISH_AMBIENT = sound("entity.tropical_fish.ambient");
+    public static final SoundEvent TROPICAL_FISH_DEATH = sound("entity.tropical_fish.death");
+    public static final SoundEvent TROPICAL_FISH_FLOP = sound("entity.tropical_fish.flop");
+    public static final SoundEvent TROPICAL_FISH_HURT = sound("entity.tropical_fish.hurt");
+    public static final SoundEvent DOLPHIN_AMBIENT = sound("entity.dolphin.ambient");
+    public static final SoundEvent DOLPHIN_AMBIENT_WATER = sound("entity.dolphin.ambient_water");
+    public static final SoundEvent DOLPHIN_ATTACK = sound("entity.dolphin.attack");
+    public static final SoundEvent DOLPHIN_DEATH = sound("entity.dolphin.death");
+    public static final SoundEvent DOLPHIN_EAT = sound("entity.dolphin.eat");
+    public static final SoundEvent DOLPHIN_HURT = sound("entity.dolphin.hurt");
+    public static final SoundEvent DOLPHIN_JUMP = sound("entity.dolphin.jump");
+    public static final SoundEvent DOLPHIN_PLAY = sound("entity.dolphin.play");
+    public static final SoundEvent DOLPHIN_SPLASH = sound("entity.dolphin.splash");
+    public static final SoundEvent DOLPHIN_SWIM = sound("entity.dolphin.swim");
+    public static final SoundEvent DROWNED_AMBIENT = sound("entity.drowned.ambient");
+    public static final SoundEvent DROWNED_AMBIENT_WATER = sound("entity.drowned.ambient_water");
+    public static final SoundEvent DROWNED_DEATH = sound("entity.drowned.death");
+    public static final SoundEvent DROWNED_DEATH_WATER = sound("entity.drowned.death_water");
+    public static final SoundEvent DROWNED_HURT = sound("entity.drowned.hurt");
+    public static final SoundEvent DROWNED_HURT_WATER = sound("entity.drowned.hurt_water");
+    public static final SoundEvent DROWNED_SHOOT = sound("entity.drowned.shoot");
+    public static final SoundEvent DROWNED_STEP = sound("entity.drowned.step");
+    public static final SoundEvent DROWNED_SWIM = sound("entity.drowned.swim");
+    public static final SoundEvent ZOMBIE_CONVERTED_TO_DROWNED =
+            sound("entity.zombie.converted_to_drowned");
+    public static final SoundEvent TRIDENT_THROW = sound("item.trident.throw");
+    public static final SoundEvent TRIDENT_HIT = sound("item.trident.hit");
+    public static final SoundEvent TRIDENT_HIT_GROUND = sound("item.trident.hit_ground");
+    public static final SoundEvent TRIDENT_RETURN = sound("item.trident.return");
+    public static final SoundEvent TRIDENT_RIPTIDE_1 = sound("item.trident.riptide_1");
+    public static final SoundEvent TRIDENT_RIPTIDE_2 = sound("item.trident.riptide_2");
+    public static final SoundEvent TRIDENT_RIPTIDE_3 = sound("item.trident.riptide_3");
+    public static final SoundEvent TRIDENT_THUNDER = sound("item.trident.thunder");
     public static final SoundEvent GOAT_AMBIENT = sound("entity.goat.ambient");
     public static final SoundEvent GOAT_DEATH = sound("entity.goat.death");
     public static final SoundEvent GOAT_EAT = sound("entity.goat.eat");
@@ -249,6 +303,25 @@ public final class FFDSounds {
             sound("entity.skeleton.converted_to_stray");
     public static final SoundEvent PLAYER_HURT_FREEZE =
             sound("entity.player.hurt_freeze");
+    public static final SoundEvent BEACON_ACTIVATE = sound("block.beacon.activate");
+    public static final SoundEvent BEACON_AMBIENT = sound("block.beacon.ambient");
+    public static final SoundEvent BEACON_DEACTIVATE = sound("block.beacon.deactivate");
+    public static final SoundEvent BEACON_POWER_SELECT = sound("block.beacon.power_select");
+    public static final SoundEvent CONDUIT_ACTIVATE = sound("block.conduit.activate");
+    public static final SoundEvent CONDUIT_AMBIENT = sound("block.conduit.ambient");
+    public static final SoundEvent CONDUIT_AMBIENT_SHORT = sound("block.conduit.ambient_short");
+    public static final SoundEvent CONDUIT_ATTACK_TARGET = sound("block.conduit.attack_target");
+    public static final SoundEvent CONDUIT_DEACTIVATE = sound("block.conduit.deactivate");
+    public static final SoundEvent BUBBLE_COLUMN_UPWARDS_AMBIENT =
+            sound("block.bubble_column.upwards_ambient");
+    public static final SoundEvent BUBBLE_COLUMN_WHIRLPOOL_AMBIENT =
+            sound("block.bubble_column.whirlpool_ambient");
+    public static final SoundEvent BUBBLE_COLUMN_UPWARDS_INSIDE =
+            sound("block.bubble_column.upwards_inside");
+    public static final SoundEvent BUBBLE_COLUMN_WHIRLPOOL_INSIDE =
+            sound("block.bubble_column.whirlpool_inside");
+    public static final SoundEvent VINE_STEP = sound("block.vine.step");
+    public static final SoundEvent PUMPKIN_CARVE = sound("block.pumpkin.carve");
 
     private FFDSounds() {
     }

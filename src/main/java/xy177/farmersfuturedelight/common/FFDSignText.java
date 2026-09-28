@@ -6,7 +6,6 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 
-/** Shared sign text state and dye operations for both logical sides. */
 public final class FFDSignText {
     private static final String GLOW_KEY = "glowingText";
 

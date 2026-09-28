@@ -25,12 +25,12 @@ public class BlockNetherButton extends BlockButtonWood {
     @Override
     protected void playClickSound(@Nullable EntityPlayer player, World world, BlockPos pos) {
         world.playSound(player, pos, FFDSounds.NETHER_WOOD_BUTTON_CLICK_ON,
-                SoundCategory.BLOCKS, 0.3F, 0.6F);
+                SoundCategory.BLOCKS, 1.0F, 1.0F);
     }
 
     @Override
     protected void playReleaseSound(World world, BlockPos pos) {
         world.playSound(null, pos, FFDSounds.NETHER_WOOD_BUTTON_CLICK_OFF,
-                SoundCategory.BLOCKS, 0.3F, 0.5F);
+                SoundCategory.BLOCKS, 1.0F, 1.0F);
     }
 }

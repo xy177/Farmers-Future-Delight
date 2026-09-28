@@ -56,7 +56,28 @@ public class ModelTurtleBaby extends ModelBase {
     public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks,
                                   float netHeadYaw, float headPitch, float scale, Entity entity) {
         EntityTurtle turtle = (EntityTurtle) entity;
-        float swing = MathHelper.cos(limbSwing * 0.6662F * (turtle.isInWater() ? 0.6F : 1.0F))
+        rightHindLeg.rotateAngleX = 0.0F;
+        leftHindLeg.rotateAngleX = 0.0F;
+        rightHindLeg.rotateAngleY = 0.0F;
+        leftHindLeg.rotateAngleY = 0.0F;
+        rightFrontLeg.rotateAngleY = 0.0F;
+        leftFrontLeg.rotateAngleY = 0.0F;
+        rightFrontLeg.rotateAngleZ = 0.0F;
+        leftFrontLeg.rotateAngleZ = 0.0F;
+        if (!turtle.isInWater() && turtle.onGround) {
+            float frontSwing = MathHelper.cos(limbSwing * 5.0F)
+                    * 8.0F * limbSwingAmount;
+            float rearSwing = MathHelper.cos(limbSwing * 5.0F)
+                    * 3.0F * limbSwingAmount;
+            rightFrontLeg.rotateAngleY = -frontSwing;
+            leftFrontLeg.rotateAngleY = frontSwing;
+            rightHindLeg.rotateAngleY = -rearSwing;
+            leftHindLeg.rotateAngleY = rearSwing;
+            head.rotateAngleX = headPitch * 0.017453292F;
+            head.rotateAngleY = netHeadYaw * 0.017453292F;
+            return;
+        }
+        float swing = MathHelper.cos(limbSwing * 0.6662F * 0.6F)
                 * 0.5F * limbSwingAmount;
         rightHindLeg.rotateAngleX = swing;
         leftHindLeg.rotateAngleX = -swing;

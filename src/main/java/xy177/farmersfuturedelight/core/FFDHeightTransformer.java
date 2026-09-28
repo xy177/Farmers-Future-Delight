@@ -36,7 +36,15 @@ public final class FFDHeightTransformer implements IClassTransformer {
     private static final Logger LOGGER = LogManager.getLogger("FFD Height Core");
     private static final String HOOKS = Type.getInternalName(FFDHeightHooks.class);
     private static final String GAMEPLAY_HOOKS = Type.getInternalName(FFDGameplayHooks.class);
+    private static final String SQUID_AGE_HOOKS =
+            "xy177/farmersfuturedelight/core/FFDSquidAgeHooks";
+    private static final String SQUID_BEHAVIOR_HOOKS =
+            "xy177/farmersfuturedelight/core/FFDSquidBehaviorHooks";
     private static final String CLIENT_HOOKS = Type.getInternalName(FFDClientHeightHooks.class);
+    private static final String CLIENT_SWIMMING_HOOKS =
+            "xy177/farmersfuturedelight/client/FFDClientSwimmingHooks";
+    private static final String CLIENT_BUBBLE_COLUMN_HOOKS =
+            "xy177/farmersfuturedelight/client/FFDClientBubbleColumnHooks";
     private static final String PULSAR_HOOKS = Type.getInternalName(FFDPulsarHooks.class);
     private static final String MINESHAFT_HOOKS = Type.getInternalName(FFDMineshaftHooks.class);
     private static final String WEATHER2_HOOKS = Type.getInternalName(FFDWeather2CompatHooks.class);
@@ -62,6 +70,12 @@ public final class FFDHeightTransformer implements IClassTransformer {
     private static final Set<String> WORLD_SERVER_CLASS = names("net.minecraft.world.WorldServer");
     private static final Set<String> WORLD_ENTITY_SPAWNER_CLASS = names("net.minecraft.world.WorldEntitySpawner");
     private static final Set<String> BLOCK_CLASS = names("net.minecraft.block.Block");
+    private static final Set<String> BLOCK_FENCE_CLASS = names("net.minecraft.block.BlockFence");
+    private static final Set<String> ITEM_BLOCK_CLASS = names("net.minecraft.item.ItemBlock");
+    private static final Set<String> BLOCK_STATE_CONTAINER_CLASS = names(
+            "net.minecraft.block.state.BlockStateContainer");
+    private static final Set<String> STATE_MAPPER_BASE_CLASS = names(
+            "net.minecraft.client.renderer.block.statemap.StateMapperBase");
     private static final Set<String> BLOCK_PISTON_BASE_CLASS = names("net.minecraft.block.BlockPistonBase");
     private static final Set<String> BLOCK_FALLING_CLASS = names("net.minecraft.block.BlockFalling");
     private static final Set<String> BLOCK_DRAGON_EGG_CLASS = names("net.minecraft.block.BlockDragonEgg");
@@ -70,22 +84,40 @@ public final class FFDHeightTransformer implements IClassTransformer {
     private static final Set<String> BLOCK_MUSHROOM_CLASS = names("net.minecraft.block.BlockMushroom");
     private static final Set<String> BLOCK_LILY_PAD_CLASS = names("net.minecraft.block.BlockLilyPad");
     private static final Set<String> BLOCK_GRASS_CLASS = names("net.minecraft.block.BlockGrass");
+    private static final Set<String> BLOCK_LIQUID_CLASS = names("net.minecraft.block.BlockLiquid");
     private static final Set<String> BLOCK_DYNAMIC_LIQUID_CLASS = names(
             "net.minecraft.block.BlockDynamicLiquid");
     private static final Set<String> BLOCK_STATIC_LIQUID_CLASS = names("net.minecraft.block.BlockStaticLiquid");
+    private static final Set<String> FORGE_BLOCK_FLUID_BASE_CLASS = names(
+            "net.minecraftforge.fluids.BlockFluidBase");
+    private static final Set<String> FORGE_BLOCK_FLUID_CLASSIC_CLASS = names(
+            "net.minecraftforge.fluids.BlockFluidClassic");
+    private static final Set<String> BLOCK_FLUID_RENDERER_CLASS = names(
+            "net.minecraft.client.renderer.BlockFluidRenderer");
+    private static final Set<String> BLOCK_RENDERER_DISPATCHER_CLASS = names(
+            "net.minecraft.client.renderer.BlockRendererDispatcher");
     private static final Set<String> FLUIDLOGGED_FLUID_STATE_CLASS = names(
             "git.jbredwards.fluidlogged_api.api.util.FluidState");
     private static final Set<String> BLOCK_CHORUS_FLOWER_CLASS = names("net.minecraft.block.BlockChorusFlower");
     private static final Set<String> PATH_NAVIGATE_GROUND_CLASS = names("net.minecraft.pathfinding.PathNavigateGround");
     private static final Set<String> WALK_NODE_PROCESSOR_CLASS = names("net.minecraft.pathfinding.WalkNodeProcessor");
     private static final Set<String> ENTITY_LIVING_BASE_CLASS = names("net.minecraft.entity.EntityLivingBase");
+    private static final Set<String> ENTITY_PLAYER_CLASS = names("net.minecraft.entity.player.EntityPlayer");
+    private static final Set<String> ENTITY_PLAYER_SP_CLASS = names("net.minecraft.client.entity.EntityPlayerSP");
+    private static final Set<String> ENTITY_RENDERER_CLASS = names(
+            "net.minecraft.client.renderer.EntityRenderer");
+    private static final Set<String> MODEL_BIPED_CLASS = names("net.minecraft.client.model.ModelBiped");
+    private static final Set<String> RENDER_PLAYER_CLASS = names("net.minecraft.client.renderer.entity.RenderPlayer");
     private static final Set<String> ENTITY_BAT_CLASS = names("net.minecraft.entity.passive.EntityBat");
     private static final Set<String> ENTITY_SHULKER_CLASS = names("net.minecraft.entity.monster.EntityShulker");
+    private static final Set<String> ENTITY_ARROW_CLASS = names("net.minecraft.entity.projectile.EntityArrow");
     private static final Set<String> ENTITY_XP_ORB_CLASS = names("net.minecraft.entity.item.EntityXPOrb");
     private static final Set<String> CHUNK_CLASS = names("net.minecraft.world.chunk.Chunk");
     private static final Set<String> EMPTY_CHUNK_CLASS = names("net.minecraft.world.chunk.EmptyChunk");
     private static final Set<String> ENTITY_CLASS = names("net.minecraft.entity.Entity");
     private static final Set<String> BOAT_CLASS = names("net.minecraft.entity.item.EntityBoat");
+    private static final Set<String> RENDER_BOAT_CLASS = names(
+            "net.minecraft.client.renderer.entity.RenderBoat");
     private static final Set<String> MINECART_CLASS = names("net.minecraft.entity.item.EntityMinecart");
     private static final Set<String> FALLING_BLOCK_CLASS = names("net.minecraft.entity.item.EntityFallingBlock");
     private static final Set<String> REALISTIC_PHYSICS_CHUNK_CLASS = names(
@@ -100,6 +132,8 @@ public final class FFDHeightTransformer implements IClassTransformer {
             "xbigellx.rbp.internal.physics.BlockOperationScheduler");
     private static final Set<String> CAULDRON_CLASS = names("net.minecraft.block.BlockCauldron");
     private static final Set<String> JUKEBOX_CLASS = names("net.minecraft.block.BlockJukebox");
+    private static final Set<String> BEACON_TILE_ENTITY_CLASS = names(
+            "net.minecraft.tileentity.TileEntityBeacon");
     private static final Set<String> PLAYER_MP_CLASS = names("net.minecraft.entity.player.EntityPlayerMP");
     private static final Set<String> PLAYER_LIST_CLASS = names("net.minecraft.server.management.PlayerList");
     private static final Set<String> TELEPORTER_CLASS = names("net.minecraft.world.Teleporter");
@@ -117,6 +151,7 @@ public final class FFDHeightTransformer implements IClassTransformer {
             "net.optifine.util.RenderChunkUtils");
     private static final Set<String> OPTIFINE_SHADER_VERTEX_BUILDER_CLASS = names(
             "net.optifine.shaders.SVertexBuilder");
+    private static final Set<String> OPTIFINE_CLEAR_WATER_CLASS = names("net.optifine.ClearWater");
     private static final Set<String> HWYLA_BLOCK_HUD_CLASSES = names(
             "mcp.mobius.waila.addons.core.HUDHandlerBlocks");
     private static final Set<String> PLAYER_CHUNK_ENTRY_CLASS = names("net.minecraft.server.management.PlayerChunkMapEntry");
@@ -201,6 +236,10 @@ public final class FFDHeightTransformer implements IClassTransformer {
             "the_fireplace.unforgivingvoid.UnforgivingVoid");
     private static final Set<String> TAIGA_GENERATOR_CLASSES = names(
             "com.sosnitzka.taiga.util.Generator");
+    private static final Set<String> HBM_BEDROCK_ORE_CLASSES = names(
+            "com.hbm.world.feature.BedrockOre");
+    private static final Set<String> HBM_BEDROCK_OIL_CLASSES = names(
+            "com.hbm.world.feature.BedrockOilDeposit");
     private static final Map<String, String> PULSAR_DEV_MIXIN_TARGETS = pulsarDevMixinTargets();
     private static final Map<String, String> PULSAR_DEV_METHOD_NAMES = pulsarDevMethodNames();
     private static final Map<String, String> PULSAR_DEV_FIELD_NAMES = pulsarDevFieldNames();
@@ -947,6 +986,24 @@ public final class FFDHeightTransformer implements IClassTransformer {
                         }
                     });
         }
+        if (HBM_BEDROCK_ORE_CLASSES.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformHbmBedrockOre(bytes);
+                        }
+                    });
+        }
+        if (HBM_BEDROCK_OIL_CLASSES.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformHbmBedrockOilDeposit(bytes);
+                        }
+                    });
+        }
         if (DEEPER_DEPTHS_STRUCTURE_GENERATOR_CLASSES.contains(transformedName)) {
             return transformOptionalCompat(transformedName, basicClass,
                     new OptionalTransformer() {
@@ -962,6 +1019,15 @@ public final class FFDHeightTransformer implements IClassTransformer {
                         @Override
                         public byte[] transform(byte[] bytes) {
                             return transformOptiFineShaderVertexBuilder(bytes);
+                        }
+                    });
+        }
+        if (OPTIFINE_CLEAR_WATER_CLASS.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformOptiFineClearWater(bytes);
                         }
                     });
         }
@@ -1056,6 +1122,13 @@ public final class FFDHeightTransformer implements IClassTransformer {
                 && (CAVE_BIOMES_HEIGHT_CORE || DEPTHS_UPDATE_HEIGHT_CORE)) {
             return transformEntityGameplayOnly(basicClass);
         }
+        if ("net.minecraft.entity.item.EntityItem".equals(transformedName)) {
+            return transformItemBuoyancy(basicClass);
+        }
+        if ("net.minecraft.block.BlockStem".equals(transformedName)
+                || "net.minecraft.world.gen.feature.WorldGenPumpkin".equals(transformedName)) {
+            return transformUncarvedPumpkin(basicClass);
+        }
         if (CAVE_BIOMES_HEIGHT_CORE) {
             if (WORLD_PROVIDER_CLASS.contains(transformedName)) {
                 return transformWorldProviderCloudOnly(basicClass);
@@ -1084,6 +1157,45 @@ public final class FFDHeightTransformer implements IClassTransformer {
         if (MINECRAFT_CLIENT_CLASS.contains(transformedName)) {
             return transformMinecraftClient(basicClass);
         }
+        if (BLOCK_FLUID_RENDERER_CLASS.contains(transformedName)) {
+            return transformBlockFluidRenderer(basicClass);
+        }
+        if (FORGE_BLOCK_FLUID_BASE_CLASS.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformForgeBlockFluidBase(bytes);
+                        }
+                    });
+        }
+        if (FORGE_BLOCK_FLUID_CLASSIC_CLASS.contains(transformedName)) {
+            return transformOptionalCompat(transformedName, basicClass,
+                    new OptionalTransformer() {
+                        @Override
+                        public byte[] transform(byte[] bytes) {
+                            return transformForgeBlockFluidClassic(bytes);
+                        }
+                    });
+        }
+        if (BLOCK_RENDERER_DISPATCHER_CLASS.contains(transformedName)) {
+            return transformBlockRendererDispatcher(basicClass);
+        }
+        if (ENTITY_PLAYER_CLASS.contains(transformedName)) {
+            return transformEntityPlayer(basicClass);
+        }
+        if (ENTITY_PLAYER_SP_CLASS.contains(transformedName)) {
+            return transformEntityPlayerSP(basicClass);
+        }
+        if (ENTITY_RENDERER_CLASS.contains(transformedName)) {
+            return transformEntityRendererSwimmingCamera(basicClass);
+        }
+        if (MODEL_BIPED_CLASS.contains(transformedName)) {
+            return transformModelBiped(basicClass);
+        }
+        if (RENDER_PLAYER_CLASS.contains(transformedName)) {
+            return transformRenderPlayerSwimming(basicClass);
+        }
         if (COMMAND_BASE_CLASS.contains(transformedName)) {
             return transformCommandBase(basicClass);
         }
@@ -1103,8 +1215,26 @@ public final class FFDHeightTransformer implements IClassTransformer {
         if (WORLD_ENTITY_SPAWNER_CLASS.contains(transformedName)) {
             return transformWorldEntitySpawner(basicClass);
         }
+        if ("net.minecraft.world.biome.Biome".equals(transformedName)) {
+            return transformBiomeCreatureTypeSwitch(basicClass);
+        }
         if (BLOCK_CLASS.contains(transformedName)) {
             return transformBlock(basicClass);
+        }
+        if (BLOCK_FENCE_CLASS.contains(transformedName)) {
+            return transformBlockFence(basicClass);
+        }
+        if (ITEM_BLOCK_CLASS.contains(transformedName)) {
+            return transformItemBlock(basicClass);
+        }
+        if ("net.minecraft.item.ItemShears".equals(transformedName)) {
+            return transformItemShears(basicClass);
+        }
+        if (BLOCK_STATE_CONTAINER_CLASS.contains(transformedName)) {
+            return transformBlockStateContainer(basicClass);
+        }
+        if (STATE_MAPPER_BASE_CLASS.contains(transformedName)) {
+            return transformStateMapperBase(basicClass);
         }
         if (BLOCK_PISTON_BASE_CLASS.contains(transformedName)) {
             return transformPistonBase(basicClass);
@@ -1138,6 +1268,9 @@ public final class FFDHeightTransformer implements IClassTransformer {
         if (BLOCK_GRASS_CLASS.contains(transformedName)) {
             return transformGrass(basicClass);
         }
+        if (BLOCK_LIQUID_CLASS.contains(transformedName)) {
+            return transformLiquid(basicClass);
+        }
         if (BLOCK_DYNAMIC_LIQUID_CLASS.contains(transformedName)) {
             return transformDynamicLiquid(basicClass);
         }
@@ -1150,6 +1283,9 @@ public final class FFDHeightTransformer implements IClassTransformer {
         if (ENTITY_SHULKER_CLASS.contains(transformedName)) {
             return transformShulker(basicClass);
         }
+        if (ENTITY_ARROW_CLASS.contains(transformedName)) {
+            return transformEntityArrow(basicClass);
+        }
         if (PATH_NAVIGATE_GROUND_CLASS.contains(transformedName)) {
             return transformPathNavigateGround(basicClass);
         }
@@ -1158,6 +1294,9 @@ public final class FFDHeightTransformer implements IClassTransformer {
         }
         if (ENTITY_LIVING_BASE_CLASS.contains(transformedName)) {
             return transformEntityLivingBase(basicClass);
+        }
+        if ("net.minecraft.entity.passive.EntitySquid".equals(transformedName)) {
+            return transformSquid(basicClass);
         }
         if (ENTITY_BAT_CLASS.contains(transformedName)) {
             return transformEntityBat(basicClass);
@@ -1177,6 +1316,9 @@ public final class FFDHeightTransformer implements IClassTransformer {
         if (BOAT_CLASS.contains(transformedName)) {
             return transformBoat(basicClass);
         }
+        if (RENDER_BOAT_CLASS.contains(transformedName)) {
+            return transformRenderBoat(basicClass);
+        }
         if (MINECART_CLASS.contains(transformedName)) {
             return transformMinecart(basicClass);
         }
@@ -1188,6 +1330,9 @@ public final class FFDHeightTransformer implements IClassTransformer {
         }
         if (JUKEBOX_CLASS.contains(transformedName)) {
             return transformJukebox(basicClass);
+        }
+        if (BEACON_TILE_ENTITY_CLASS.contains(transformedName)) {
+            return transformBeaconTileEntity(basicClass);
         }
         if (PLAYER_MP_CLASS.contains(transformedName)) {
             return transformPlayerMP(basicClass);
@@ -1648,6 +1793,87 @@ public final class FFDHeightTransformer implements IClassTransformer {
                 "Expected one TAIGA descending-ore return, patched " + returns);
         LOGGER.info("Patched TAIGA zero-ore generation for extended world height");
         return write(node);
+    }
+
+    private static byte[] transformHbmBedrockOre(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode spawning = findMethodByName(node, "checkSpawningConditions");
+        int originY = patchHbmOriginY(spawning);
+        require(originY == 1, "Expected one HBM bedrock-ore origin Y, patched " + originY);
+
+        MethodNode generation = findMethodByName(node, "executeOriginalLogic");
+        int positions = patchHbmMutableSetPosY(generation, 1);
+        require(positions == 2, "Expected two HBM bedrock-ore Y positions, patched " + positions);
+        LOGGER.info("Patched HBM bedrock ore generation for extended world height");
+        return write(node);
+    }
+
+    private static byte[] transformHbmBedrockOilDeposit(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode generation = findMethodByName(node, "postGenerate");
+        int positions = patchHbmMutableSetPosY(generation, 1);
+        require(positions == 1, "Expected one HBM bedrock-oil Y position, patched " + positions);
+        LOGGER.info("Patched HBM bedrock oil generation for extended world height");
+        return write(node);
+    }
+
+    private static int patchHbmOriginY(MethodNode method) {
+        int patched = 0;
+        for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (call.getOpcode() != Opcodes.INVOKESTATIC
+                    || !"com/hbm/lib/Library".equals(call.owner)
+                    || !"getBlockPosY".equals(call.name)
+                    || !"(J)I".equals(call.desc)) {
+                continue;
+            }
+            method.instructions.insert(call, list(
+                    new VarInsnNode(Opcodes.ALOAD, 1),
+                    new InsnNode(Opcodes.SWAP),
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "hbmBedrockY",
+                            "(Lnet/minecraft/world/World;I)I", false)));
+            patched++;
+        }
+        return patched;
+    }
+
+    private static int patchHbmMutableSetPosY(MethodNode method, int worldLocal) {
+        int patched = 0;
+        for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (!isHbmMutableSetPos(call)) {
+                continue;
+            }
+            AbstractInsnNode z = previousReal(call);
+            AbstractInsnNode y = previousReal(z);
+            if (y == null) {
+                continue;
+            }
+            method.instructions.insertBefore(y, new VarInsnNode(Opcodes.ALOAD, worldLocal));
+            method.instructions.insert(y, new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS,
+                    "hbmBedrockY", "(Lnet/minecraft/world/World;I)I", false));
+            patched++;
+        }
+        return patched;
+    }
+
+    private static boolean isHbmMutableSetPos(MethodInsnNode call) {
+        boolean deobfuscatedOwner = "net/minecraft/util/math/BlockPos$MutableBlockPos".equals(call.owner)
+                && ("(III)Lnet/minecraft/util/math/BlockPos$MutableBlockPos;".equals(call.desc)
+                        || "(III)Lnet/minecraft/util/math/BlockPos;".equals(call.desc));
+        boolean obfuscatedOwner = "et".equals(call.owner) && "(III)Let;".equals(call.desc);
+        return call.getOpcode() == Opcodes.INVOKEVIRTUAL
+                && (deobfuscatedOwner || obfuscatedOwner)
+                && ("setPos".equals(call.name) || "func_181079_c".equals(call.name)
+                        || "a".equals(call.name));
     }
 
     private static byte[] transformLycanitesBlockSpawnLocation(byte[] basicClass) {
@@ -2338,6 +2564,33 @@ public final class FFDHeightTransformer implements IClassTransformer {
         require(patched == 1, "Expected one boat water-level sentinel, patched " + patched);
         LOGGER.info("Patched boat water-level detection for negative heights");
         return write(node);
+    }
+
+    private static byte[] transformRenderBoat(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode method = findMethod(node, "setupRotation", "func_188311_a",
+                "(Lnet/minecraft/entity/item/EntityBoat;FF)V");
+        int patched = 0;
+        for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (instruction instanceof MethodInsnNode) {
+                MethodInsnNode call = (MethodInsnNode) instruction;
+                if ("net/minecraft/client/renderer/GlStateManager".equals(call.owner)
+                        && "(FFF)V".equals(call.desc)
+                        && ("scale".equals(call.name) || "func_179152_a".equals(call.name))) {
+                    method.instructions.insertBefore(call, list(
+                            new VarInsnNode(Opcodes.ALOAD, 1),
+                            new VarInsnNode(Opcodes.FLOAD, 3),
+                            new MethodInsnNode(Opcodes.INVOKESTATIC,
+                                    CLIENT_BUBBLE_COLUMN_HOOKS, "applyBoatRotation",
+                                    "(Lnet/minecraft/entity/item/EntityBoat;F)V", false)));
+                    patched++;
+                }
+            }
+        }
+        require(patched == 1, "Expected one boat render scale call, patched " + patched);
+        LOGGER.info("Patched boat bubble-column rocking render");
+        return writeWithFrames(node);
     }
 
     private static byte[] transformOptimizedWorldRenderer(byte[] basicClass) {
@@ -4291,8 +4544,237 @@ public final class FFDHeightTransformer implements IClassTransformer {
         return write(node);
     }
 
+    private static byte[] transformBeaconTileEntity(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        java.util.List<String> booleanFields = findFields(node, "Z");
+        require(booleanFields.size() == 1,
+                "Expected one existing beacon boolean field, found " + booleanFields.size());
+        String activeField = booleanFields.get(0);
+        String previousField = "ffdPreviousActive";
+        require(node.fields.stream().noneMatch(field -> previousField.equals(field.name)),
+                "Duplicate beacon activity field");
+        node.fields.add(new FieldNode(Opcodes.ACC_PRIVATE | Opcodes.ACC_SYNTHETIC,
+                previousField, "Z", null, null));
+
+        MethodNode update = findMethod(node, "update", "func_73660_a", "()V");
+        int updateHooks = insertBeforeReturns(update, list(
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new org.objectweb.asm.tree.FieldInsnNode(Opcodes.GETFIELD, node.name,
+                        activeField, "Z"),
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new org.objectweb.asm.tree.FieldInsnNode(Opcodes.GETFIELD, node.name,
+                        previousField, "Z"),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                        "updateBeaconSounds",
+                        "(Lnet/minecraft/tileentity/TileEntityBeacon;ZZ)Z", false),
+                new org.objectweb.asm.tree.FieldInsnNode(Opcodes.PUTFIELD, node.name,
+                        previousField, "Z")));
+        require(updateHooks == 1, "Expected one beacon update return, patched " + updateHooks);
+
+        MethodNode setField = findMethod(node, "setField", "func_174885_b", "(II)V");
+        int fieldHooks = insertBeforeReturns(setField, list(
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new VarInsnNode(Opcodes.ILOAD, 1),
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new org.objectweb.asm.tree.FieldInsnNode(Opcodes.GETFIELD, node.name,
+                        activeField, "Z"),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                        "handleBeaconFieldUpdate",
+                        "(Lnet/minecraft/tileentity/TileEntityBeacon;IZ)V", false)));
+        require(fieldHooks == 1,
+                "Expected one beacon field-update return, patched " + fieldHooks);
+        return write(node);
+    }
+
+    private static byte[] transformBlockFence(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode connect = findMethod(node, "canConnectTo", "func_176524_e",
+                "(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;"
+                        + "Lnet/minecraft/util/EnumFacing;)Z");
+        int materials = 0;
+        for (AbstractInsnNode instruction = connect.instructions.getFirst();
+                instruction != null; instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if ("net/minecraft/block/state/IBlockState".equals(call.owner)
+                    && ("getMaterial".equals(call.name) || "func_185904_a".equals(call.name))
+                    && "()Lnet/minecraft/block/material/Material;".equals(call.desc)) {
+                call.setOpcode(Opcodes.INVOKESTATIC);
+                call.owner = GAMEPLAY_HOOKS;
+                call.name = "blockReplacementMaterial";
+                call.desc = "(Lnet/minecraft/block/state/IBlockState;)"
+                        + "Lnet/minecraft/block/material/Material;";
+                call.itf = false;
+                materials++;
+            }
+        }
+        require(materials == 1, "Expected one fence connection material, patched " + materials);
+        LOGGER.info("Preserved fence connections across waterlogged states");
+        return write(node);
+    }
+
     private static byte[] transformBlock(byte[] basicClass) {
         ClassNode node = read(basicClass);
+        MethodNode metadata = findMethod(node, "getMetaFromState", "func_176201_c",
+                "(Lnet/minecraft/block/state/IBlockState;)I");
+        LabelNode originalMetadata = new LabelNode();
+        metadata.instructions.insert(list(
+                new VarInsnNode(Opcodes.ALOAD, 1),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                        "hasOnlyUniversalWaterloggedProperty",
+                        "(Lnet/minecraft/block/state/IBlockState;)Z", false),
+                new JumpInsnNode(Opcodes.IFEQ, originalMetadata),
+                new InsnNode(Opcodes.ICONST_0),
+                new InsnNode(Opcodes.IRETURN),
+                originalMetadata,
+                new FrameNode(Opcodes.F_SAME, 0, null, 0, null)));
+        MethodNode replaceable = findMethod(node, "isReplaceable", "func_176200_f",
+                "(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;)Z");
+        int replacementMaterials = 0;
+        for (AbstractInsnNode instruction = replaceable.instructions.getFirst();
+                instruction != null; instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (("getMaterial".equals(call.name) || "func_185904_a".equals(call.name))
+                    && "()Lnet/minecraft/block/material/Material;".equals(call.desc)) {
+                call.setOpcode(Opcodes.INVOKESTATIC);
+                call.owner = GAMEPLAY_HOOKS;
+                call.name = "blockReplacementMaterial";
+                call.desc = "(Lnet/minecraft/block/state/IBlockState;)"
+                        + "Lnet/minecraft/block/material/Material;";
+                call.itf = false;
+                replacementMaterials++;
+            }
+        }
+        require(replacementMaterials == 1,
+                "Expected one block replacement material, patched " + replacementMaterials);
+        MethodNode getStateId = findMethod(node, "getStateId", "func_176210_f",
+                "(Lnet/minecraft/block/state/IBlockState;)I");
+        int stateIds = 0;
+        for (AbstractInsnNode instruction = getStateId.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (instruction.getOpcode() == Opcodes.IRETURN) {
+                getStateId.instructions.insertBefore(instruction, list(
+                        new VarInsnNode(Opcodes.ALOAD, 0),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                                "encodeUniversalWaterloggedStateId",
+                                "(ILnet/minecraft/block/state/IBlockState;)I", false)));
+                stateIds++;
+            }
+        }
+        require(stateIds == 1, "Expected one Block state-id return, patched " + stateIds);
+        MethodNode getStateById = findMethod(node, "getStateById", "func_176220_d",
+                "(I)Lnet/minecraft/block/state/IBlockState;");
+        int decodedStateIds = 0;
+        for (AbstractInsnNode instruction = getStateById.instructions.getFirst();
+                instruction != null; instruction = instruction.getNext()) {
+            if (instruction.getOpcode() == Opcodes.ARETURN) {
+                getStateById.instructions.insertBefore(instruction, list(
+                        new VarInsnNode(Opcodes.ILOAD, 0),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                                "decodeUniversalWaterloggedStateId",
+                                "(Lnet/minecraft/block/state/IBlockState;I)"
+                                        + "Lnet/minecraft/block/state/IBlockState;", false)));
+                decodedStateIds++;
+            }
+        }
+        require(decodedStateIds == 1,
+                "Expected one Block state-id decode return, patched " + decodedStateIds);
+        LabelNode vanillaStateId = new LabelNode();
+        getStateById.instructions.insert(list(
+                new InsnNode(Opcodes.ACONST_NULL),
+                new VarInsnNode(Opcodes.ILOAD, 0),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                        "decodeUniversalWaterloggedStateId",
+                        "(Lnet/minecraft/block/state/IBlockState;I)"
+                                + "Lnet/minecraft/block/state/IBlockState;", false),
+                new InsnNode(Opcodes.DUP),
+                new JumpInsnNode(Opcodes.IFNULL, vanillaStateId),
+                new InsnNode(Opcodes.ARETURN),
+                vanillaStateId,
+                new FrameNode(Opcodes.F_SAME1, 0, null, 1,
+                        new Object[] {"net/minecraft/block/state/IBlockState"}),
+                new InsnNode(Opcodes.POP)));
+        MethodNode renderLayer = findMethod(node, "canRenderInLayer", "canRenderInLayer",
+                "(Lnet/minecraft/block/state/IBlockState;"
+                        + "Lnet/minecraft/util/BlockRenderLayer;)Z");
+        int renderLayers = 0;
+        for (AbstractInsnNode instruction = renderLayer.instructions.getFirst();
+                instruction != null; instruction = instruction.getNext()) {
+            if (instruction.getOpcode() == Opcodes.IRETURN) {
+                renderLayer.instructions.insertBefore(instruction, list(
+                        new VarInsnNode(Opcodes.ALOAD, 1),
+                        new VarInsnNode(Opcodes.ALOAD, 2),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, CLIENT_HOOKS,
+                                "canRenderWaterloggedLayer",
+                                "(ZLnet/minecraft/block/state/IBlockState;"
+                                        + "Lnet/minecraft/util/BlockRenderLayer;)Z", false)));
+                renderLayers++;
+            }
+        }
+        require(renderLayers == 1,
+                "Expected one Block render-layer return, patched " + renderLayers);
+        MethodNode removedByPlayer = findMethod(node, "removedByPlayer", "removedByPlayer",
+                "(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/world/World;"
+                        + "Lnet/minecraft/util/math/BlockPos;"
+                        + "Lnet/minecraft/entity/player/EntityPlayer;Z)Z");
+        int removals = 0;
+        for (AbstractInsnNode instruction = removedByPlayer.instructions.getFirst();
+                instruction != null; instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if ("net/minecraft/world/World".equals(call.owner)
+                    && ("setBlockState".equals(call.name) || "func_180501_a".equals(call.name))
+                    && "(Lnet/minecraft/util/math/BlockPos;"
+                            .concat("Lnet/minecraft/block/state/IBlockState;I)Z")
+                            .equals(call.desc)) {
+                removedByPlayer.instructions.insertBefore(call,
+                        new VarInsnNode(Opcodes.ALOAD, 1));
+                call.setOpcode(Opcodes.INVOKESTATIC);
+                call.owner = GAMEPLAY_HOOKS;
+                call.name = "setBlockStateAfterRemoval";
+                call.desc = "(Lnet/minecraft/world/World;"
+                        + "Lnet/minecraft/util/math/BlockPos;"
+                        + "Lnet/minecraft/block/state/IBlockState;I"
+                        + "Lnet/minecraft/block/state/IBlockState;)Z";
+                call.itf = false;
+                removals++;
+            }
+        }
+        require(removals == 1,
+                "Expected one Block removal state change, patched " + removals);
+        MethodNode exploded = findMethod(node, "onBlockExploded", "onBlockExploded",
+                "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;"
+                        + "Lnet/minecraft/world/Explosion;)V");
+        int explosions = 0;
+        for (AbstractInsnNode instruction = exploded.instructions.getFirst();
+                instruction != null; instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if ("net/minecraft/world/World".equals(call.owner)
+                    && ("setBlockToAir".equals(call.name) || "func_175698_g".equals(call.name))
+                    && "(Lnet/minecraft/util/math/BlockPos;)Z".equals(call.desc)) {
+                call.setOpcode(Opcodes.INVOKESTATIC);
+                call.owner = GAMEPLAY_HOOKS;
+                call.name = "setBlockToAirAfterExplosion";
+                call.desc = "(Lnet/minecraft/world/World;"
+                        + "Lnet/minecraft/util/math/BlockPos;)Z";
+                call.itf = false;
+                explosions++;
+            }
+        }
+        require(explosions == 1,
+                "Expected one Block explosion state change, patched " + explosions);
         MethodNode method = findMethod(node, "getPlayerRelativeBlockHardness", "func_180647_a",
                 "(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/entity/player/EntityPlayer;"
                         + "Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)F");
@@ -4317,7 +4799,104 @@ public final class FFDHeightTransformer implements IClassTransformer {
             patched++;
         }
         require(patched == 1, "Expected one Block break-progress return, patched " + patched);
-        LOGGER.info("Patched infested-block break progress");
+        LOGGER.info("Patched universal waterlogged state ids, rendering, removal, and break progress");
+        return write(node);
+    }
+
+    private static byte[] transformItemShears(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode method = findMethod(node, "onBlockStartBreak", "onBlockStartBreak",
+                "(Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/math/BlockPos;"
+                        + "Lnet/minecraft/entity/player/EntityPlayer;)Z");
+        int patched = 0;
+        for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) continue;
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if ("net/minecraft/world/World".equals(call.owner)
+                    && ("setBlockState".equals(call.name) || "func_180501_a".equals(call.name))
+                    && "(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;I)Z"
+                            .equals(call.desc)) {
+                call.setOpcode(Opcodes.INVOKESTATIC);
+                call.owner = GAMEPLAY_HOOKS;
+                call.name = "setBlockStateAfterShearing";
+                call.desc = "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;"
+                        + "Lnet/minecraft/block/state/IBlockState;I)Z";
+                call.itf = false;
+                patched++;
+            }
+        }
+        require(patched == 1, "Expected one shears removal hook, patched " + patched);
+        return write(node);
+    }
+
+    private static byte[] transformItemBlock(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode method = findMethod(node, "onItemUse", "func_180614_a",
+                "(Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/world/World;"
+                        + "Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/EnumHand;"
+                        + "Lnet/minecraft/util/EnumFacing;FFF)Lnet/minecraft/util/EnumActionResult;");
+        String placementDescriptor = "(Lnet/minecraft/world/World;"
+                + "Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/EnumFacing;"
+                + "FFFILnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/util/EnumHand;)"
+                + "Lnet/minecraft/block/state/IBlockState;";
+        int patched = 0;
+        for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;
+             instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (!"net/minecraft/block/Block".equals(call.owner)
+                    || !("getStateForPlacement".equals(call.name)
+                    || "func_180642_a".equals(call.name))
+                    || !placementDescriptor.equals(call.desc)) {
+                continue;
+            }
+            method.instructions.insert(instruction, list(
+                    new VarInsnNode(Opcodes.ALOAD, 2),
+                    new VarInsnNode(Opcodes.ALOAD, 3),
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                            "waterlogPlacedBlockState",
+                            "(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/world/World;"
+                                    + "Lnet/minecraft/util/math/BlockPos;)"
+                                    + "Lnet/minecraft/block/state/IBlockState;", false)));
+            patched++;
+        }
+        require(patched == 1, "Expected one ItemBlock placement-state hook, patched " + patched);
+        LOGGER.info("Patched block placement into water sources for universal waterlogging");
+        return write(node);
+    }
+
+    private static byte[] transformBlockStateContainer(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode constructor = findMethod(node, "<init>", "<init>",
+                "(Lnet/minecraft/block/Block;[Lnet/minecraft/block/properties/IProperty;"
+                        + "Lcom/google/common/collect/ImmutableMap;)V");
+        constructor.instructions.insert(list(
+                new VarInsnNode(Opcodes.ALOAD, 1),
+                new VarInsnNode(Opcodes.ALOAD, 2),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                        "appendUniversalWaterloggedProperty",
+                        "(Lnet/minecraft/block/Block;"
+                                + "[Lnet/minecraft/block/properties/IProperty;)"
+                                + "[Lnet/minecraft/block/properties/IProperty;", false),
+                new VarInsnNode(Opcodes.ASTORE, 2)));
+        LOGGER.info("Patched compatible block state containers for universal waterlogging");
+        return write(node);
+    }
+
+    private static byte[] transformStateMapperBase(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode method = findMethod(node, "getPropertyString", "func_178131_a",
+                "(Ljava/util/Map;)Ljava/lang/String;");
+        method.instructions.insert(list(
+                new VarInsnNode(Opcodes.ALOAD, 1),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                        "withoutUniversalWaterloggedProperty",
+                        "(Ljava/util/Map;)Ljava/util/Map;", false),
+                new VarInsnNode(Opcodes.ASTORE, 1)));
+        LOGGER.info("Patched model-state lookup for universal waterlogging");
         return write(node);
     }
 
@@ -4335,17 +4914,267 @@ public final class FFDHeightTransformer implements IClassTransformer {
             method.instructions.insertBefore(instruction, list(
                     new VarInsnNode(Opcodes.ALOAD, 0),
                     new VarInsnNode(Opcodes.ALOAD, 3),
+                    new VarInsnNode(Opcodes.ALOAD, 1),
+                    new VarInsnNode(Opcodes.ALOAD, 2),
                     new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
                             "blocksFlowingWater",
                             "(Lnet/minecraft/block/Block;"
-                                    + "Lnet/minecraft/block/state/IBlockState;)Z",
+                                    + "Lnet/minecraft/block/state/IBlockState;"
+                                    + "Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)Z",
                             false),
                     new InsnNode(Opcodes.IOR)));
             patched++;
         }
         require(patched > 0, "Missing BlockDynamicLiquid isBlocked returns");
+        int levelReads = 0;
+        for (MethodNode candidate : node.methods) {
+            for (AbstractInsnNode instruction = candidate.instructions.getFirst(); instruction != null;) {
+                AbstractInsnNode next = instruction.getNext();
+                if (instruction instanceof MethodInsnNode) {
+                    MethodInsnNode call = (MethodInsnNode) instruction;
+                    if (("getValue".equals(call.name) || "func_177229_b".equals(call.name))
+                            && "(Lnet/minecraft/block/properties/IProperty;)Ljava/lang/Comparable;"
+                                    .equals(call.desc)) {
+                        candidate.instructions.set(instruction, new MethodInsnNode(
+                                Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS, "getLiquidLevelValue",
+                                "(Lnet/minecraft/block/state/IBlockState;"
+                                        + "Lnet/minecraft/block/properties/IProperty;)"
+                                        + "Ljava/lang/Comparable;",
+                                false));
+                        levelReads++;
+                    }
+                }
+                instruction = next;
+            }
+        }
+        require(levelReads > 0, "Missing BlockDynamicLiquid fluid-level reads");
+        MethodNode adjacent = findMethod(node, "checkAdjacentBlock", "func_176371_a",
+                "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;I)I");
+        int adjacentDepthReads = 0;
+        for (AbstractInsnNode instruction = adjacent.instructions.getFirst();
+                instruction != null; instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (("getDepth".equals(call.name) || "func_189542_i".equals(call.name))
+                    && "(Lnet/minecraft/block/state/IBlockState;)I".equals(call.desc)) {
+                adjacent.instructions.insert(call, list(
+                        new VarInsnNode(Opcodes.ALOAD, 0),
+                        new VarInsnNode(Opcodes.ALOAD, 1),
+                        new VarInsnNode(Opcodes.ALOAD, 2),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                                "waterloggedLiquidDepth",
+                                "(ILnet/minecraft/block/Block;"
+                                        + "Lnet/minecraft/world/IBlockAccess;"
+                                        + "Lnet/minecraft/util/math/BlockPos;)I", false)));
+                adjacentDepthReads++;
+            }
+        }
+        require(adjacentDepthReads == 1,
+                "Expected one adjacent liquid-depth sample, found " + adjacentDepthReads);
+        String adjacentDescriptor = "(Lnet/minecraft/world/World;"
+                + "Lnet/minecraft/util/math/BlockPos;ILnet/minecraft/util/math/BlockPos;)I";
+        MethodNode shapedAdjacent = new MethodNode(Opcodes.ACC_PUBLIC,
+                "ffd$checkWaterloggedAdjacent", adjacentDescriptor, null, null);
+        LabelNode open = new LabelNode();
+        shapedAdjacent.instructions.add(list(
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new VarInsnNode(Opcodes.ALOAD, 1),
+                new VarInsnNode(Opcodes.ALOAD, 4),
+                new VarInsnNode(Opcodes.ALOAD, 2),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                        "isWaterloggedFlowOccluded",
+                        "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;"
+                                + "Lnet/minecraft/util/math/BlockPos;"
+                                + "Lnet/minecraft/util/math/BlockPos;)Z", false),
+                new JumpInsnNode(Opcodes.IFEQ, open),
+                new VarInsnNode(Opcodes.ILOAD, 3),
+                new InsnNode(Opcodes.IRETURN),
+                open,
+                new FrameNode(Opcodes.F_SAME, 0, null, 0, null),
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new VarInsnNode(Opcodes.ALOAD, 1),
+                new VarInsnNode(Opcodes.ALOAD, 2),
+                new VarInsnNode(Opcodes.ILOAD, 3),
+                new MethodInsnNode(Opcodes.INVOKEVIRTUAL, node.name,
+                        adjacent.name, adjacent.desc, false),
+                new InsnNode(Opcodes.IRETURN)));
+        node.methods.add(shapedAdjacent);
+        MethodNode tick = findMethod(node, "updateTick", "func_180650_b",
+                "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;"
+                        + "Lnet/minecraft/block/state/IBlockState;Ljava/util/Random;)V");
+        int neighborReads = 0;
+        int aboveReads = 0;
+        for (AbstractInsnNode instruction = tick.instructions.getFirst();
+                instruction != null; instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (call.name.equals(adjacent.name) && call.desc.equals(adjacent.desc)) {
+                tick.instructions.insertBefore(call, new VarInsnNode(Opcodes.ALOAD, 2));
+                call.name = shapedAdjacent.name;
+                call.desc = adjacentDescriptor;
+                neighborReads++;
+            } else if (("getDepth".equals(call.name) || "func_189542_i".equals(call.name))
+                    && "(Lnet/minecraft/block/state/IBlockState;)I".equals(call.desc)) {
+                tick.instructions.insert(call, list(
+                        new VarInsnNode(Opcodes.ALOAD, 0),
+                        new VarInsnNode(Opcodes.ALOAD, 1),
+                        new VarInsnNode(Opcodes.ALOAD, 2),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                                "waterloggedDepthAbove",
+                                "(ILnet/minecraft/block/Block;Lnet/minecraft/world/World;"
+                                        + "Lnet/minecraft/util/math/BlockPos;)I", false)));
+                aboveReads++;
+            }
+        }
+        require(neighborReads == 1 && aboveReads == 1,
+                "Expected liquid neighbor and above samples, found "
+                        + neighborReads + "/" + aboveReads);
         LOGGER.info("Patched flowing-water interaction with waterloggable blocks at {} returns",
                 patched);
+        LOGGER.info("Patched {} BlockDynamicLiquid fluid-level reads for universal waterlogging",
+                levelReads);
+        return write(node);
+    }
+
+    private static byte[] transformLiquid(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode method = findMethod(node, "getDepth", "func_189542_i",
+                "(Lnet/minecraft/block/state/IBlockState;)I");
+        LabelNode vanilla = new LabelNode();
+        method.instructions.insert(list(
+                new VarInsnNode(Opcodes.ALOAD, 1),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                        "isWaterloggedStateForLiquid",
+                        "(Lnet/minecraft/block/state/IBlockState;)Z", false),
+                new JumpInsnNode(Opcodes.IFEQ, vanilla),
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                        "waterloggedLiquidDepth", "(Lnet/minecraft/block/Block;)I", false),
+                new InsnNode(Opcodes.IRETURN),
+                vanilla,
+                new FrameNode(Opcodes.F_SAME, 0, null, 0, null)));
+        MethodNode side = findMethodOptional(node, "shouldSideBeRendered", "func_176225_a",
+                "(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/world/IBlockAccess;"
+                        + "Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/EnumFacing;)Z");
+        if (side != null) {
+            for (AbstractInsnNode instruction = side.instructions.getFirst();
+                    instruction != null; instruction = instruction.getNext()) {
+                if (instruction.getOpcode() == Opcodes.IRETURN) {
+                    side.instructions.insertBefore(instruction, list(
+                            new VarInsnNode(Opcodes.ALOAD, 1),
+                            new VarInsnNode(Opcodes.ALOAD, 2),
+                            new VarInsnNode(Opcodes.ALOAD, 3),
+                            new VarInsnNode(Opcodes.ALOAD, 4),
+                            new MethodInsnNode(Opcodes.INVOKESTATIC, CLIENT_HOOKS,
+                                    "fluidSideVisible",
+                                    "(ZLnet/minecraft/block/state/IBlockState;"
+                                            + "Lnet/minecraft/world/IBlockAccess;"
+                                            + "Lnet/minecraft/util/math/BlockPos;"
+                                            + "Lnet/minecraft/util/EnumFacing;)Z", false)));
+                }
+            }
+        }
+        LOGGER.info("Patched liquid depth and internal fluidlogged faces");
+        return write(node);
+    }
+
+    private static byte[] transformForgeBlockFluidBase(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode displace = findMethod(node, "canDisplace", "canDisplace",
+                "(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;)Z");
+        LabelNode regularDisplace = new LabelNode();
+        displace.instructions.insert(list(
+                new VarInsnNode(Opcodes.ALOAD, 1),
+                new VarInsnNode(Opcodes.ALOAD, 2),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS, "protectContainedHost",
+                        "(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;)Z", false),
+                new JumpInsnNode(Opcodes.IFEQ, regularDisplace),
+                new InsnNode(Opcodes.ICONST_0),
+                new InsnNode(Opcodes.IRETURN),
+                regularDisplace,
+                new FrameNode(Opcodes.F_SAME, 0, null, 0, null)));
+        MethodNode effective = findMethod(node, "getEffectiveQuanta", "getEffectiveQuanta",
+                "(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;)I");
+        LabelNode normal = new LabelNode();
+        effective.instructions.insert(list(
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new VarInsnNode(Opcodes.ALOAD, 1),
+                new VarInsnNode(Opcodes.ALOAD, 2),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                        "isContainedFluidSource",
+                        "(Lnet/minecraft/block/Block;Lnet/minecraft/world/IBlockAccess;"
+                                + "Lnet/minecraft/util/math/BlockPos;)Z", false),
+                new JumpInsnNode(Opcodes.IFEQ, normal),
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new FieldInsnNode(Opcodes.GETFIELD, node.name, "quantaPerBlock", "I"),
+                new InsnNode(Opcodes.IRETURN),
+                normal,
+                new FrameNode(Opcodes.F_SAME, 0, null, 0, null)));
+        MethodNode vertical = findMethod(node, "hasVerticalFlow", "hasVerticalFlow",
+                "(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;)Z");
+        int verticalReturns = 0;
+        for (AbstractInsnNode instruction = vertical.instructions.getFirst();
+                instruction != null; instruction = instruction.getNext()) {
+            if (instruction.getOpcode() == Opcodes.IRETURN) {
+                vertical.instructions.insertBefore(instruction, list(
+                        new VarInsnNode(Opcodes.ALOAD, 0),
+                        new VarInsnNode(Opcodes.ALOAD, 1),
+                        new VarInsnNode(Opcodes.ALOAD, 2),
+                        new VarInsnNode(Opcodes.ALOAD, 0),
+                        new FieldInsnNode(Opcodes.GETFIELD, node.name, "densityDir", "I"),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                                "hasContainedFluidAlongDensity",
+                                "(Lnet/minecraft/block/Block;Lnet/minecraft/world/IBlockAccess;"
+                                        + "Lnet/minecraft/util/math/BlockPos;I)Z", false),
+                        new InsnNode(Opcodes.IOR)));
+                verticalReturns++;
+            }
+        }
+        require(verticalReturns == 1,
+                "Expected one Forge vertical-fluid return, found " + verticalReturns);
+        LOGGER.info("Patched Forge fluid quanta and vertical source lookup for fluidlogged blocks");
+        return write(node);
+    }
+
+    private static byte[] transformForgeBlockFluidClassic(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode quanta = findMethod(node, "getQuantaValue", "getQuantaValue",
+                "(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;)I");
+        for (AbstractInsnNode instruction = quanta.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (instruction.getOpcode() == Opcodes.IRETURN) {
+                quanta.instructions.insertBefore(instruction, list(
+                        new VarInsnNode(Opcodes.ALOAD, 0),
+                        new VarInsnNode(Opcodes.ALOAD, 1),
+                        new VarInsnNode(Opcodes.ALOAD, 2),
+                        new VarInsnNode(Opcodes.ALOAD, 0),
+                        new FieldInsnNode(Opcodes.GETFIELD, node.name, "quantaPerBlock", "I"),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS, "containedFluidQuanta",
+                                "(ILnet/minecraft/block/Block;Lnet/minecraft/world/IBlockAccess;"
+                                        + "Lnet/minecraft/util/math/BlockPos;I)I", false)));
+            }
+        }
+        MethodNode source = findMethod(node, "isSourceBlock", "isSourceBlock",
+                "(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;)Z");
+        LabelNode normal = new LabelNode();
+        source.instructions.insert(list(
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new VarInsnNode(Opcodes.ALOAD, 1),
+                new VarInsnNode(Opcodes.ALOAD, 2),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                        "isContainedFluidSource",
+                        "(Lnet/minecraft/block/Block;Lnet/minecraft/world/IBlockAccess;"
+                                + "Lnet/minecraft/util/math/BlockPos;)Z", false),
+                new JumpInsnNode(Opcodes.IFEQ, normal),
+                new InsnNode(Opcodes.ICONST_1),
+                new InsnNode(Opcodes.IRETURN),
+                normal,
+                new FrameNode(Opcodes.F_SAME, 0, null, 0, null)));
+        LOGGER.info("Patched Forge classic-fluid source lookup for fluidlogged blocks");
         return write(node);
     }
 
@@ -4573,7 +5402,42 @@ public final class FFDHeightTransformer implements IClassTransformer {
         int[] patched = patchDynamicWorldBounds(method, 1);
         require(patched[0] == 1 && patched[1] == 1,
                 "Expected grass min/max bounds, patched " + patched[0] + "/" + patched[1]);
-        LOGGER.info("Patched grass spread build-height bounds");
+        int loadedChecks = 0;
+        int stateWrites = 0;
+        for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (call.getOpcode() != Opcodes.INVOKEVIRTUAL
+                    || !"net/minecraft/world/World".equals(call.owner)) {
+                continue;
+            }
+            if (("isAreaLoaded".equals(call.name) || "func_175697_a".equals(call.name))
+                    && "(Lnet/minecraft/util/math/BlockPos;I)Z".equals(call.desc)) {
+                method.instructions.insert(call, list(
+                        new VarInsnNode(Opcodes.ALOAD, 1),
+                        new VarInsnNode(Opcodes.ALOAD, 2),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS, "canTickGrass",
+                                "(ZLnet/minecraft/world/World;"
+                                        + "Lnet/minecraft/util/math/BlockPos;)Z", false)));
+                loadedChecks++;
+            } else if (("setBlockState".equals(call.name) || "func_175656_a".equals(call.name))
+                    && "(Lnet/minecraft/util/math/BlockPos;"
+                            .concat("Lnet/minecraft/block/state/IBlockState;)Z").equals(call.desc)) {
+                call.setOpcode(Opcodes.INVOKESTATIC);
+                call.owner = GAMEPLAY_HOOKS;
+                call.name = "setGrassTickState";
+                call.desc = "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;"
+                        + "Lnet/minecraft/block/state/IBlockState;)Z";
+                call.itf = false;
+                stateWrites++;
+            }
+        }
+        require(loadedChecks == 1 && stateWrites == 2,
+                "Expected grass loaded check/state writes, patched " + loadedChecks + "/" + stateWrites);
+        LOGGER.info("Patched grass spread build-height bounds and fluid survival");
         return write(node);
     }
 
@@ -4781,6 +5645,166 @@ public final class FFDHeightTransformer implements IClassTransformer {
         return write(node);
     }
 
+    private static byte[] transformSquid(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode update = findMethod(node, "onLivingUpdate", "func_70636_d", "()V");
+        boolean mcp = "onLivingUpdate".equals(update.name);
+        String squid = "Lnet/minecraft/entity/passive/EntitySquid;";
+        String skipTravelField = "ffdSkipInterpolatedTravel";
+        node.fields.add(new FieldNode(Opcodes.ACC_PRIVATE | Opcodes.ACC_SYNTHETIC,
+                skipTravelField, "Z", null, null));
+        MethodNode clinit = findMethodOptional(node, "<clinit>", "<clinit>", "()V");
+        if (clinit == null) {
+            clinit = new MethodNode(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null);
+            clinit.instructions.add(new InsnNode(Opcodes.RETURN));
+            node.methods.add(clinit);
+        }
+        insertBeforeReturns(clinit, list(new MethodInsnNode(Opcodes.INVOKESTATIC,
+                SQUID_AGE_HOOKS, "initialize", "()V", false)));
+        String[] mcpNames = {"entityInit", "writeEntityToNBT", "readEntityFromNBT",
+                "notifyDataManagerChange", "onInitialSpawn", "processInteract", "isChild"};
+        String[] srgNames = {"func_70088_a", "func_70014_b", "func_70037_a",
+                "func_184206_a", "func_180482_a", "func_184645_a", "func_70631_g_"};
+        String[] descriptors = {"()V", "(Lnet/minecraft/nbt/NBTTagCompound;)V",
+                "(Lnet/minecraft/nbt/NBTTagCompound;)V",
+                "(Lnet/minecraft/network/datasync/DataParameter;)V",
+                "(Lnet/minecraft/world/DifficultyInstance;Lnet/minecraft/entity/IEntityLivingData;)"
+                        + "Lnet/minecraft/entity/IEntityLivingData;",
+                "(Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/EnumHand;)Z", "()Z"};
+        for (int i = 0; i < mcpNames.length; i++) {
+            require(findMethodOptional(node, mcpNames[i], srgNames[i], descriptors[i]) == null,
+                    "Unexpected squid age override " + mcpNames[i]);
+            String name = mcp ? mcpNames[i] : srgNames[i];
+            MethodNode method = new MethodNode(i == 0 ? Opcodes.ACC_PROTECTED : Opcodes.ACC_PUBLIC,
+                    name, descriptors[i], null, null);
+            node.methods.add(method);
+            method.instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
+            if (i <= 4) {
+                if (i > 0) {
+                    method.instructions.add(new VarInsnNode(Opcodes.ALOAD, 1));
+                }
+                if (i == 4) {
+                    method.instructions.add(new VarInsnNode(Opcodes.ALOAD, 2));
+                }
+                method.instructions.add(new MethodInsnNode(Opcodes.INVOKESPECIAL,
+                        node.superName, name, descriptors[i], false));
+                method.instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
+            }
+            if (i == 0) {
+                method.instructions.add(new MethodInsnNode(Opcodes.INVOKESTATIC,
+                        SQUID_AGE_HOOKS, "register", "(" + squid + ")V", false));
+            } else if (i == 1 || i == 2) {
+                method.instructions.add(new VarInsnNode(Opcodes.ALOAD, 1));
+                method.instructions.add(new MethodInsnNode(Opcodes.INVOKESTATIC,
+                        SQUID_AGE_HOOKS, i == 1 ? "write" : "read",
+                        "(" + squid + "Lnet/minecraft/nbt/NBTTagCompound;)V", false));
+            } else if (i == 3) {
+                LabelNode done = new LabelNode();
+                method.instructions.add(list(
+                        new VarInsnNode(Opcodes.ALOAD, 1),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, SQUID_AGE_HOOKS, "ageChanged",
+                                "(" + squid + "Lnet/minecraft/network/datasync/DataParameter;)Z", false),
+                        new JumpInsnNode(Opcodes.IFEQ, done),
+                        new VarInsnNode(Opcodes.ALOAD, 0),
+                        new VarInsnNode(Opcodes.ALOAD, 0),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, SQUID_AGE_HOOKS,
+                                "size", "(" + squid + ")F", false),
+                        new InsnNode(Opcodes.DUP),
+                        new MethodInsnNode(Opcodes.INVOKEVIRTUAL, node.name,
+                                mcp ? "setSize" : "func_70105_a", "(FF)V", false),
+                        done, new FrameNode(Opcodes.F_SAME, 0, null, 0, null)));
+            } else if (i == 4) {
+                method.instructions.add(new MethodInsnNode(Opcodes.INVOKESTATIC, SQUID_AGE_HOOKS,
+                        "spawn", "(Lnet/minecraft/entity/IEntityLivingData;" + squid
+                                + ")Lnet/minecraft/entity/IEntityLivingData;", false));
+            } else if (i == 5) {
+                method.instructions.add(list(new VarInsnNode(Opcodes.ALOAD, 1),
+                        new VarInsnNode(Opcodes.ALOAD, 2),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, SQUID_AGE_HOOKS, "interact",
+                                "(" + squid + "Lnet/minecraft/entity/player/EntityPlayer;"
+                                        + "Lnet/minecraft/util/EnumHand;)Z", false)));
+            } else {
+                method.instructions.add(new MethodInsnNode(Opcodes.INVOKESTATIC,
+                        SQUID_AGE_HOOKS, "isChild", "(" + squid + ")Z", false));
+            }
+            method.instructions.add(new InsnNode(i < 4 ? Opcodes.RETURN
+                    : i == 4 ? Opcodes.ARETURN : Opcodes.IRETURN));
+        }
+        int ageUpdates = 0;
+        for (AbstractInsnNode instruction : update.instructions.toArray()) {
+            if (instruction instanceof MethodInsnNode
+                    && instruction.getOpcode() == Opcodes.INVOKESPECIAL
+                    && update.name.equals(((MethodInsnNode) instruction).name)
+                    && "()V".equals(((MethodInsnNode) instruction).desc)) {
+                update.instructions.insertBefore(instruction, list(new VarInsnNode(Opcodes.ALOAD, 0),
+                        new VarInsnNode(Opcodes.ALOAD, 0),
+                        new VarInsnNode(Opcodes.ALOAD, 0),
+                        new FieldInsnNode(Opcodes.GETFIELD, "net/minecraft/entity/EntityLivingBase",
+                                mcp ? "newPosRotationIncrements" : "field_70716_bi", "I"),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, SQUID_BEHAVIOR_HOOKS,
+                                "shouldSkipInterpolatedTravel", "(" + squid + "I)Z", false),
+                        new FieldInsnNode(Opcodes.PUTFIELD, node.name, skipTravelField, "Z")));
+                update.instructions.insert(instruction, list(new VarInsnNode(Opcodes.ALOAD, 0),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, SQUID_AGE_HOOKS,
+                                "tick", "(" + squid + ")V", false)));
+                ageUpdates++;
+            }
+        }
+        require(ageUpdates == 1, "Expected one squid parent update, patched " + ageUpdates);
+        MethodNode travel = findMethod(node, "travel", "func_191986_a", "(FFF)V");
+        LabelNode normalTravel = new LabelNode();
+        travel.instructions.insert(list(new VarInsnNode(Opcodes.ALOAD, 0),
+                new FieldInsnNode(Opcodes.GETFIELD, node.name, skipTravelField, "Z"),
+                new JumpInsnNode(Opcodes.IFEQ, normalTravel),
+                new VarInsnNode(Opcodes.ALOAD, 0), new InsnNode(Opcodes.ICONST_0),
+                new FieldInsnNode(Opcodes.PUTFIELD, node.name, skipTravelField, "Z"),
+                new InsnNode(Opcodes.RETURN), normalTravel,
+                new FrameNode(Opcodes.F_SAME, 0, null, 0, null)));
+        MethodNode eye = findMethod(node, "getEyeHeight", "func_70047_e", "()F");
+        for (AbstractInsnNode instruction : eye.instructions.toArray()) {
+            if (instruction.getOpcode() == Opcodes.FRETURN) {
+                eye.instructions.insertBefore(instruction, list(new VarInsnNode(Opcodes.ALOAD, 0),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, SQUID_AGE_HOOKS,
+                                "eyeHeight", "(F" + squid + ")F", false)));
+            }
+        }
+        MethodNode goals = findMethod(node, "initEntityAI", "func_184651_r", "()V");
+        require(insertBeforeReturns(goals, list(new VarInsnNode(Opcodes.ALOAD, 0),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, SQUID_BEHAVIOR_HOOKS,
+                        "register", "(" + squid + ")V", false))) == 1,
+                "Expected one squid goal setup exit");
+        MethodNode canSpawn = findMethod(node, "getCanSpawnHere", "func_70601_bi", "()Z");
+        replace(canSpawn, list(new VarInsnNode(Opcodes.ALOAD, 0),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, SQUID_BEHAVIOR_HOOKS,
+                        "canSpawn", "(" + squid + ")Z", false),
+                new InsnNode(Opcodes.IRETURN)));
+        String attackName = mcp ? "attackEntityFrom" : "func_70097_a";
+        String attackDesc = "(Lnet/minecraft/util/DamageSource;F)Z";
+        require(findMethodOptional(node, "attackEntityFrom", "func_70097_a", attackDesc) == null,
+                "Unexpected squid damage override");
+        MethodNode attack = new MethodNode(Opcodes.ACC_PUBLIC, attackName, attackDesc, null, null);
+        node.methods.add(attack);
+        attack.instructions.add(list(new VarInsnNode(Opcodes.ALOAD, 0),
+                new VarInsnNode(Opcodes.ALOAD, 1), new VarInsnNode(Opcodes.FLOAD, 2),
+                new MethodInsnNode(Opcodes.INVOKESPECIAL, node.superName, attackName,
+                        attackDesc, false), new VarInsnNode(Opcodes.ALOAD, 0),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, SQUID_BEHAVIOR_HOOKS, "hurt",
+                        "(Z" + squid + ")Z", false),
+                new InsnNode(Opcodes.IRETURN)));
+        MethodNode status = findMethodOptional(node, "handleStatusUpdate", "func_70103_a", "(B)V");
+        if (status != null) {
+            LabelNode original = new LabelNode();
+            status.instructions.insert(list(new VarInsnNode(Opcodes.ALOAD, 0),
+                    new VarInsnNode(Opcodes.ILOAD, 1),
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, SQUID_BEHAVIOR_HOOKS,
+                            "handleInk", "(" + squid + "B)Z", false),
+                    new JumpInsnNode(Opcodes.IFEQ, original), new InsnNode(Opcodes.RETURN),
+                    original, new FrameNode(Opcodes.F_SAME, 0, null, 0, null)));
+        }
+        LOGGER.info("Patched squid age, spawning, metadata, NBT, goals, ink and client motion");
+        return write(node);
+    }
+
     private static byte[] transformEntityLivingBase(byte[] basicClass) {
         ClassNode node = read(basicClass);
         MethodNode method = findMethod(node, "attemptTeleport", "func_184595_k",
@@ -4788,8 +5812,642 @@ public final class FFDHeightTransformer implements IClassTransformer {
         int patched = patchDynamicLowerBounds(method, 15, 8, 1);
         require(patched == 1, "Expected one entity-teleport lower build-height bound, patched " + patched);
         patchPowderSnowJump(node);
-        LOGGER.info("Patched entity teleport lower build-height bound and powder-snow jump");
+        patchConduitPowerBreathing(node);
+        patchDolphinsGraceWaterDrag(node);
+        patchJumpClimbing(node);
+        patchWaterSinking(node);
+        patchSweetBerryHurtStatus(node);
+        LOGGER.info("Patched entity teleport lower build-height bound, powder-snow jump, conduit breathing and dolphins-grace water drag");
         return write(node);
+    }
+
+    private static void patchWaterSinking(ClassNode node) {
+        MethodNode jump = findMethod(node, "handleJumpWater", "func_70629_bd", "()V");
+        int impulses = 0;
+        for (AbstractInsnNode instruction : jump.instructions.toArray()) {
+            if (instruction instanceof LdcInsnNode
+                    && Double.valueOf(0.03999999910593033D).equals(((LdcInsnNode) instruction).cst)) {
+                jump.instructions.insert(instruction, list(new VarInsnNode(Opcodes.ALOAD, 0),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS, "waterJumpImpulse",
+                                "(DLnet/minecraft/entity/EntityLivingBase;)D", false)));
+                impulses++;
+            }
+        }
+        require(impulses == 1, "Expected one water jump impulse, patched " + impulses);
+        MethodNode travel = findMethod(node, "travel", "func_191986_a", "(FFF)V");
+        LdcInsnNode waterGravity = null;
+        for (AbstractInsnNode instruction : travel.instructions.toArray()) {
+            if (instruction instanceof LdcInsnNode
+                    && Double.valueOf(0.02D).equals(((LdcInsnNode) instruction).cst)) {
+                waterGravity = (LdcInsnNode) instruction;
+            }
+        }
+        require(waterGravity != null, "Missing water gravity");
+        travel.instructions.insert(waterGravity, list(new VarInsnNode(Opcodes.ALOAD, 0),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS, "waterSinkingGravity",
+                        "(DLnet/minecraft/entity/EntityLivingBase;)D", false)));
+    }
+
+    private static byte[] transformItemBuoyancy(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode update = findMethod(node, "onUpdate", "func_70071_h_", "()V");
+        int patched = 0;
+        for (AbstractInsnNode instruction : update.instructions.toArray()) {
+            if (instruction instanceof MethodInsnNode) {
+                MethodInsnNode call = (MethodInsnNode) instruction;
+                if (("hasNoGravity".equals(call.name) || "func_189652_ae".equals(call.name))
+                        && "()Z".equals(call.desc)) {
+                    update.instructions.insert(call, list(new VarInsnNode(Opcodes.ALOAD, 0),
+                            new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                                    "itemWaterBuoyancy", "(ZLnet/minecraft/entity/item/EntityItem;)Z", false)));
+                    patched++;
+                }
+            }
+        }
+        require(patched == 1, "Expected one item gravity check, patched " + patched);
+        return write(node);
+    }
+
+    private static byte[] transformUncarvedPumpkin(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        int patched = 0;
+        for (MethodNode method : node.methods) {
+            boolean stem = "getActualState".equals(method.name) || "func_176221_a".equals(method.name)
+                    || "updateTick".equals(method.name) || "func_180650_b".equals(method.name);
+            for (AbstractInsnNode instruction : method.instructions.toArray()) {
+                if (stem && instruction instanceof FieldInsnNode) {
+                    FieldInsnNode field = (FieldInsnNode) instruction;
+                    if (field.getOpcode() == Opcodes.GETFIELD && node.name.equals(field.owner)
+                            && "Lnet/minecraft/block/Block;".equals(field.desc)) {
+                        method.instructions.insert(field, new MethodInsnNode(Opcodes.INVOKESTATIC,
+                                GAMEPLAY_HOOKS, "pumpkinStemFruit",
+                                "(Lnet/minecraft/block/Block;)Lnet/minecraft/block/Block;", false));
+                        patched++;
+                    }
+                }
+                if (node.name.endsWith("/WorldGenPumpkin") && instruction instanceof MethodInsnNode) {
+                    MethodInsnNode call = (MethodInsnNode) instruction;
+                    if (("setBlockState".equals(call.name) || "func_180501_a".equals(call.name))
+                            && "(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;I)Z"
+                                    .equals(call.desc)) {
+                        method.instructions.set(call, new MethodInsnNode(Opcodes.INVOKESTATIC,
+                                GAMEPLAY_HOOKS, "generateUncarvedPumpkin",
+                                "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;"
+                                        + "Lnet/minecraft/block/state/IBlockState;I)Z", false));
+                        patched++;
+                    }
+                }
+            }
+        }
+        require(patched == (node.name.endsWith("/BlockStem") ? 3 : 1),
+                "Unexpected pumpkin growth patch count " + patched);
+        return write(node);
+    }
+
+    private static void patchSweetBerryHurtStatus(ClassNode node) {
+        MethodNode attack = findMethod(node, "attackEntityFrom", "func_70097_a",
+                "(Lnet/minecraft/util/DamageSource;F)Z");
+        int packets = 0;
+        for (AbstractInsnNode instruction : attack.instructions.toArray()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (("setEntityState".equals(call.name) || "func_72960_a".equals(call.name))
+                    && "(Lnet/minecraft/entity/Entity;B)V".equals(call.desc)) {
+                attack.instructions.insertBefore(call, list(
+                        new VarInsnNode(Opcodes.ALOAD, 0),
+                        new VarInsnNode(Opcodes.ALOAD, 1),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                                "sweetBerryHurtStatus",
+                                "(BLnet/minecraft/entity/EntityLivingBase;"
+                                        + "Lnet/minecraft/util/DamageSource;)B", false)));
+                packets++;
+            }
+        }
+        require(packets == 3, "Expected three living hurt-status packets, patched " + packets);
+        MethodNode status = findMethodOptional(node, "handleStatusUpdate", "func_70103_a", "(B)V");
+        if (status == null) {
+            return;
+        }
+        int branches = 0;
+        int sounds = 0;
+        for (AbstractInsnNode instruction : status.instructions.toArray()) {
+            if (instruction.getOpcode() == Opcodes.ICONST_2) {
+                AbstractInsnNode previous = previousReal(instruction);
+                if (previous instanceof VarInsnNode && previous.getOpcode() == Opcodes.ILOAD
+                        && ((VarInsnNode) previous).var == 1) {
+                    status.instructions.insert(previous, new MethodInsnNode(
+                            Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                            "normalizeSweetBerryHurtStatus", "(B)B", false));
+                    branches++;
+                }
+            }
+            if (instruction instanceof MethodInsnNode) {
+                MethodInsnNode call = (MethodInsnNode) instruction;
+                if (("getHurtSound".equals(call.name) || "func_184601_bQ".equals(call.name))
+                        && "(Lnet/minecraft/util/DamageSource;)Lnet/minecraft/util/SoundEvent;"
+                                .equals(call.desc)) {
+                    status.instructions.insertBefore(call, list(
+                            new VarInsnNode(Opcodes.ILOAD, 1),
+                            new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                                    "sweetBerryHurtSource",
+                                    "(Lnet/minecraft/util/DamageSource;B)"
+                                            + "Lnet/minecraft/util/DamageSource;", false)));
+                    sounds++;
+                }
+            }
+        }
+        require(branches == 1 && sounds == 1,
+                "Expected one berry hurt-status branch and sound, patched " + branches + "/" + sounds);
+    }
+
+    private static void patchJumpClimbing(ClassNode node) {
+        MethodNode method = findMethod(node, "travel", "func_191986_a", "(FFF)V");
+        String jumpingField = null;
+        for (FieldNode field : node.fields) {
+            if ("Z".equals(field.desc)
+                    && ("isJumping".equals(field.name)
+                            || "field_70703_bu".equals(field.name))) {
+                jumpingField = field.name;
+                break;
+            }
+        }
+        require(jumpingField != null, "Missing EntityLivingBase jumping field");
+        method.instructions.insertBefore(method.instructions.getFirst(), list(
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new VarInsnNode(Opcodes.FLOAD, 2),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                        "waterSinkingVertical",
+                        "(Lnet/minecraft/entity/EntityLivingBase;F)F", false),
+                new VarInsnNode(Opcodes.FSTORE, 2)));
+        int patched = 0;
+        for (AbstractInsnNode instruction = method.instructions.getFirst();
+                instruction != null; instruction = instruction.getNext()) {
+            if (!(instruction instanceof FieldInsnNode)) {
+                continue;
+            }
+            FieldInsnNode collision = (FieldInsnNode) instruction;
+            if (collision.getOpcode() != Opcodes.GETFIELD
+                    || !"Z".equals(collision.desc)
+                    || !("collidedHorizontally".equals(collision.name)
+                            || "field_70123_F".equals(collision.name))) {
+                continue;
+            }
+            AbstractInsnNode branch = nextReal(collision);
+            boolean alreadyJumping = false;
+            if (branch instanceof JumpInsnNode && branch.getOpcode() == Opcodes.IFNE) {
+                AbstractInsnNode load = nextReal(branch);
+                AbstractInsnNode jumping = nextReal(load);
+                AbstractInsnNode jumpBranch = nextReal(jumping);
+                if (!(load instanceof VarInsnNode) || load.getOpcode() != Opcodes.ALOAD
+                        || ((VarInsnNode) load).var != 0
+                        || !(jumping instanceof FieldInsnNode) || jumping.getOpcode() != Opcodes.GETFIELD
+                        || !node.name.equals(((FieldInsnNode) jumping).owner)
+                        || !jumpingField.equals(((FieldInsnNode) jumping).name)
+                        || !"Z".equals(((FieldInsnNode) jumping).desc)
+                        || !(jumpBranch instanceof JumpInsnNode)
+                        || jumpBranch.getOpcode() != Opcodes.IFEQ
+                        || nextReal(((JumpInsnNode) branch).label) != nextReal(jumpBranch)) {
+                    continue;
+                }
+                branch = jumpBranch;
+                alreadyJumping = true;
+            }
+            if (!(branch instanceof JumpInsnNode) || branch.getOpcode() != Opcodes.IFEQ) {
+                continue;
+            }
+            boolean followedByClimbable = false;
+            int lookahead = 0;
+            for (AbstractInsnNode i = branch.getNext();
+                    i != null && lookahead++ < 8; i = i.getNext()) {
+                if (i instanceof MethodInsnNode
+                        && i.getOpcode() == Opcodes.INVOKEVIRTUAL
+                        && ("isOnLadder".equals(((MethodInsnNode) i).name)
+                                || "func_70617_f_".equals(((MethodInsnNode) i).name))
+                        && "()Z".equals(((MethodInsnNode) i).desc)) {
+                    AbstractInsnNode ladderBranch = nextReal(i);
+                    followedByClimbable = !alreadyJumping
+                            || (ladderBranch instanceof JumpInsnNode
+                                    && ladderBranch.getOpcode() == Opcodes.IFEQ
+                                    && ((JumpInsnNode) ladderBranch).label == ((JumpInsnNode) branch).label);
+                    break;
+                }
+                if (i instanceof JumpInsnNode || i.getOpcode() == Opcodes.IRETURN) {
+                    break;
+                }
+            }
+            if (!followedByClimbable) {
+                continue;
+            }
+            if (!alreadyJumping) {
+                method.instructions.insert(collision, list(
+                        new VarInsnNode(Opcodes.ALOAD, 0),
+                        new FieldInsnNode(Opcodes.GETFIELD, node.name, jumpingField, "Z"),
+                        new InsnNode(Opcodes.IOR)));
+            }
+            patched++;
+        }
+        require(patched == 1, "Expected one ladder jump condition, patched " + patched);
+    }
+
+    private static void patchConduitPowerBreathing(ClassNode node) {
+        MethodNode method = findMethod(node, "onEntityUpdate", "func_70030_z", "()V");
+        int patched = 0;
+        for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (call.getOpcode() != Opcodes.INVOKEVIRTUAL
+                    || !("isPotionActive".equals(call.name)
+                            || "func_70644_a".equals(call.name))
+                    || !"(Lnet/minecraft/potion/Potion;)Z".equals(call.desc)) {
+                continue;
+            }
+            AbstractInsnNode previous = previousReal(instruction);
+            if (!(previous instanceof FieldInsnNode)
+                    || previous.getOpcode() != Opcodes.GETSTATIC) {
+                continue;
+            }
+            FieldInsnNode field = (FieldInsnNode) previous;
+            if (!("WATER_BREATHING".equals(field.name)
+                    || "field_76427_o".equals(field.name))) {
+                continue;
+            }
+            call.setOpcode(Opcodes.INVOKESTATIC);
+            call.owner = GAMEPLAY_HOOKS;
+            call.name = "hasWaterBreathingOrConduit";
+            call.desc = "(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/potion/Potion;)Z";
+            call.itf = false;
+            patched++;
+        }
+        require(patched == 1,
+                "Expected one conduit breathing branch, patched " + patched);
+    }
+
+    private static void patchDolphinsGraceWaterDrag(ClassNode node) {
+        MethodNode method = findMethod(node, "travel", "func_191986_a", "(FFF)V");
+        int dragLocal = -1;
+        MethodInsnNode waterMoveRelative = null;
+        for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (call.getOpcode() == Opcodes.INVOKEVIRTUAL
+                    && node.name.equals(call.owner)
+                    && ("getWaterSlowDown".equals(call.name)
+                            || "func_189749_co".equals(call.name))
+                    && "()F".equals(call.desc)) {
+                AbstractInsnNode store = nextReal(call);
+                require(store instanceof VarInsnNode && store.getOpcode() == Opcodes.FSTORE,
+                        "Missing water drag local");
+                dragLocal = ((VarInsnNode) store).var;
+                continue;
+            }
+            if (dragLocal >= 0 && call.getOpcode() == Opcodes.INVOKEVIRTUAL
+                    && node.name.equals(call.owner)
+                    && ("moveRelative".equals(call.name)
+                            || "func_191958_b".equals(call.name))
+                    && "(FFFF)V".equals(call.desc)) {
+                waterMoveRelative = call;
+                break;
+            }
+        }
+        require(dragLocal >= 0 && waterMoveRelative != null,
+                "Missing water movement drag branch");
+        AbstractInsnNode receiver = waterMoveRelative;
+        for (int i = 0; i < 5; i++) {
+            receiver = previousReal(receiver);
+        }
+        require(receiver instanceof VarInsnNode && receiver.getOpcode() == Opcodes.ALOAD
+                        && ((VarInsnNode) receiver).var == 0,
+                "Unexpected water moveRelative receiver");
+        method.instructions.insertBefore(receiver, list(
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new VarInsnNode(Opcodes.FLOAD, dragLocal),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                        "dolphinsGraceWaterDrag",
+                        "(Lnet/minecraft/entity/EntityLivingBase;F)F", false),
+                new VarInsnNode(Opcodes.FSTORE, dragLocal)));
+    }
+
+    private static byte[] transformEntityPlayer(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode updateSize = findMethod(node, "updateSize", "func_184808_cD", "()V");
+        updateSize.instructions.insertBefore(updateSize.instructions.getFirst(), list(
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                        "updateSwimmingState",
+                        "(Lnet/minecraft/entity/player/EntityPlayer;)V", false)));
+
+        int sizePatched = 0;
+        for (AbstractInsnNode instruction = updateSize.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (call.getOpcode() != Opcodes.INVOKEVIRTUAL
+                    || !node.name.equals(call.owner)
+                    || !("isElytraFlying".equals(call.name)
+                            || "func_184613_cA".equals(call.name))
+                    || !"()Z".equals(call.desc)) {
+                continue;
+            }
+            updateSize.instructions.insert(instruction, list(
+                    new VarInsnNode(Opcodes.ALOAD, 0),
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                            "useSwimmingSize",
+                            "(Lnet/minecraft/entity/player/EntityPlayer;)Z", false),
+                    new InsnNode(Opcodes.IOR)));
+            sizePatched++;
+        }
+        require(sizePatched == 1,
+                "Expected one player swimming-size branch, patched " + sizePatched);
+
+        MethodNode travel = findMethod(node, "travel", "func_191986_a", "(FFF)V");
+        LabelNode vanillaTravel = new LabelNode();
+        travel.instructions.insertBefore(travel.instructions.getFirst(), list(
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new VarInsnNode(Opcodes.FLOAD, 1),
+                new VarInsnNode(Opcodes.FLOAD, 2),
+                new VarInsnNode(Opcodes.FLOAD, 3),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                        "handleSwimmingTravel",
+                        "(Lnet/minecraft/entity/player/EntityPlayer;FFF)Z", false),
+                new JumpInsnNode(Opcodes.IFEQ, vanillaTravel),
+                new InsnNode(Opcodes.RETURN),
+                vanillaTravel,
+                new FrameNode(Opcodes.F_SAME, 0, null, 0, null)));
+        MethodNode hurtSound = findMethod(node, "getHurtSound", "func_184601_bQ",
+                "(Lnet/minecraft/util/DamageSource;)Lnet/minecraft/util/SoundEvent;");
+        for (AbstractInsnNode instruction : hurtSound.instructions.toArray()) {
+            if (instruction.getOpcode() == Opcodes.ARETURN) {
+                hurtSound.instructions.insertBefore(instruction, list(
+                        new VarInsnNode(Opcodes.ALOAD, 1),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                                "playerHurtSound",
+                                "(Lnet/minecraft/util/SoundEvent;Lnet/minecraft/util/DamageSource;)"
+                                        + "Lnet/minecraft/util/SoundEvent;", false)));
+            }
+        }
+        LOGGER.info("Patched player swimming state, size and travel");
+        return write(node);
+    }
+
+    private static byte[] transformEntityPlayerSP(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode method = findMethod(node, "onLivingUpdate", "func_70636_d", "()V");
+        int patched = insertBeforeReturns(method, list(
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, CLIENT_SWIMMING_HOOKS,
+                        "updateLocalPlayer",
+                        "(Lnet/minecraft/client/entity/EntityPlayerSP;)V", false)));
+        require(patched > 0, "Missing EntityPlayerSP onLivingUpdate return");
+        LOGGER.info("Patched local swimming input and sprint state");
+        return write(node);
+    }
+
+    private static byte[] transformEntityRendererSwimmingCamera(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode method = findMethod(node, "orientCamera", "func_78467_g", "(F)V");
+        int patched = 0;
+        for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (!("getEyeHeight".equals(call.name) || "func_70047_e".equals(call.name))
+                    || !"()F".equals(call.desc)) {
+                continue;
+            }
+            AbstractInsnNode entityLoad = previousReal(call);
+            AbstractInsnNode eyeHeightStore = nextReal(call);
+            if (!(entityLoad instanceof VarInsnNode) || entityLoad.getOpcode() != Opcodes.ALOAD
+                    || !(eyeHeightStore instanceof VarInsnNode)
+                    || eyeHeightStore.getOpcode() != Opcodes.FSTORE) {
+                continue;
+            }
+            int entityLocal = ((VarInsnNode) entityLoad).var;
+            int eyeHeightLocal = ((VarInsnNode) eyeHeightStore).var;
+            method.instructions.insert(eyeHeightStore, list(
+                    new VarInsnNode(Opcodes.ALOAD, entityLocal),
+                    new VarInsnNode(Opcodes.FLOAD, eyeHeightLocal),
+                    new VarInsnNode(Opcodes.FLOAD, 1),
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, CLIENT_SWIMMING_HOOKS,
+                            "smoothCameraEyeHeight",
+                            "(Lnet/minecraft/entity/Entity;FF)F", false),
+                    new VarInsnNode(Opcodes.FSTORE, eyeHeightLocal)));
+            patched++;
+        }
+        require(patched == 1, "Expected one camera eye-height lookup, patched " + patched);
+        MethodNode worldPass = findMethod(node, "renderWorldPass", "func_175068_a", "(IFJ)V");
+        int outlineChecks = 0;
+        for (AbstractInsnNode instruction = worldPass.instructions.getFirst();
+                instruction != null; instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (("isInsideOfMaterial".equals(call.name) || "func_70055_a".equals(call.name))
+                    && "(Lnet/minecraft/block/material/Material;)Z".equals(call.desc)) {
+                call.setOpcode(Opcodes.INVOKESTATIC);
+                call.owner = CLIENT_HOOKS;
+                call.name = "hideBlockOutlineInMaterial";
+                call.desc = "(Lnet/minecraft/entity/Entity;"
+                        + "Lnet/minecraft/block/material/Material;)Z";
+                call.itf = false;
+                outlineChecks++;
+            }
+        }
+        require(outlineChecks == 1 || (outlineChecks == 0 && hasFutureMcBlockOutline(worldPass)),
+                "Expected one underwater block-outline check, patched " + outlineChecks);
+        MethodNode fov = findMethod(node, "getFOVModifier", "func_78481_a", "(FZ)F");
+        int fovReturns = 0;
+        for (AbstractInsnNode instruction = fov.instructions.getFirst();
+                instruction != null; instruction = instruction.getNext()) {
+            if (instruction.getOpcode() == Opcodes.FRETURN) {
+                fov.instructions.insertBefore(instruction, list(
+                        new VarInsnNode(Opcodes.ILOAD, 2),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, CLIENT_HOOKS,
+                                "refreshTerrainFov", "(FZ)F", false)));
+                fovReturns++;
+            }
+        }
+        require(fovReturns > 0, "Missing camera FOV return");
+        patchConduitLightmap(node);
+        LOGGER.info("Patched first-person swimming camera transition");
+        return writeWithFrames(node);
+    }
+
+    private static void patchConduitLightmap(ClassNode node) {
+        String waterRenderer = "xy177/farmersfuturedelight/client/ModernWaterRendering";
+        MethodNode lightmap = findMethod(node, "updateLightmap", "func_78472_g", "(F)V");
+        int patched = 0;
+        for (AbstractInsnNode instruction = lightmap.instructions.getFirst();
+                instruction != null; instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            AbstractInsnNode potion = previousReal(call);
+            if (("isPotionActive".equals(call.name) || "func_70644_a".equals(call.name))
+                    && "(Lnet/minecraft/potion/Potion;)Z".equals(call.desc)
+                    && potion instanceof FieldInsnNode
+                    && ("NIGHT_VISION".equals(((FieldInsnNode) potion).name)
+                    || "field_76439_r".equals(((FieldInsnNode) potion).name))) {
+                call.setOpcode(Opcodes.INVOKESTATIC);
+                call.owner = waterRenderer;
+                call.name = "hasLightmapVision";
+                call.desc = "(Lnet/minecraft/entity/EntityLivingBase;"
+                        + "Lnet/minecraft/potion/Potion;)Z";
+                call.itf = false;
+                patched++;
+            }
+        }
+        require(patched > 0, "Missing lightmap night-vision check");
+        MethodNode brightness = findMethod(node, "getNightVisionBrightness", "func_180438_a",
+                "(Lnet/minecraft/entity/EntityLivingBase;F)F");
+        boolean named = "getNightVisionBrightness".equals(brightness.name);
+        LabelNode vanilla = new LabelNode();
+        brightness.instructions.insert(list(
+                new VarInsnNode(Opcodes.ALOAD, 1),
+                new FieldInsnNode(Opcodes.GETSTATIC, "net/minecraft/init/MobEffects",
+                        named ? "NIGHT_VISION" : "field_76439_r",
+                        "Lnet/minecraft/potion/Potion;"),
+                new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraft/entity/EntityLivingBase",
+                        named ? "isPotionActive" : "func_70644_a",
+                        "(Lnet/minecraft/potion/Potion;)Z", false),
+                new JumpInsnNode(Opcodes.IFNE, vanilla),
+                new VarInsnNode(Opcodes.ALOAD, 1),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, waterRenderer, "conduitLightmapVision",
+                        "(Lnet/minecraft/entity/EntityLivingBase;)F", false),
+                new InsnNode(Opcodes.FRETURN),
+                vanilla));
+        LOGGER.info("Patched conduit-power lightmap vision");
+    }
+
+    private static byte[] transformModelBiped(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode method = findMethod(node, "setRotationAngles", "func_78087_a",
+                "(FFFFFFLnet/minecraft/entity/Entity;)V");
+        int limbSwingLocal = method.maxLocals;
+        int limbSwingAmountLocal = limbSwingLocal + 1;
+        int ageInTicksLocal = limbSwingLocal + 2;
+        int entityLocal = limbSwingLocal + 3;
+        method.maxLocals += 4;
+        InsnList savedArguments = list(
+                new VarInsnNode(Opcodes.FLOAD, 1),
+                new VarInsnNode(Opcodes.FSTORE, limbSwingLocal),
+                new VarInsnNode(Opcodes.FLOAD, 2),
+                new VarInsnNode(Opcodes.FSTORE, limbSwingAmountLocal),
+                new VarInsnNode(Opcodes.FLOAD, 3),
+                new VarInsnNode(Opcodes.FSTORE, ageInTicksLocal),
+                new VarInsnNode(Opcodes.ALOAD, 7),
+                new VarInsnNode(Opcodes.ASTORE, entityLocal));
+        AbstractInsnNode insertionPoint = method.instructions.getFirst();
+        while (insertionPoint instanceof LabelNode
+                || insertionPoint instanceof org.objectweb.asm.tree.LineNumberNode
+                || insertionPoint instanceof FrameNode) {
+            insertionPoint = insertionPoint.getNext();
+        }
+        if (insertionPoint == null) {
+            method.instructions.add(savedArguments);
+        } else {
+            method.instructions.insertBefore(insertionPoint, savedArguments);
+        }
+        int patched = insertBeforeReturns(method, list(
+                 new VarInsnNode(Opcodes.ALOAD, 0),
+                 new VarInsnNode(Opcodes.FLOAD, limbSwingLocal),
+                 new VarInsnNode(Opcodes.FLOAD, limbSwingAmountLocal),
+                 new VarInsnNode(Opcodes.FLOAD, ageInTicksLocal),
+                 new VarInsnNode(Opcodes.ALOAD, entityLocal),
+                 new MethodInsnNode(Opcodes.INVOKESTATIC, CLIENT_SWIMMING_HOOKS,
+                         "applyModelPose",
+                         "(Lnet/minecraft/client/model/ModelBiped;FFFLnet/minecraft/entity/Entity;)V",
+                         false)));
+        require(patched > 0, "Missing ModelBiped setRotationAngles return");
+        LOGGER.info("Patched player swimming model animation");
+        return writeWithFrames(node);
+    }
+
+    private static byte[] transformRenderPlayerSwimming(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode rotations = findMethod(node, "applyRotations", "func_77043_a",
+                "(Lnet/minecraft/client/entity/AbstractClientPlayer;FFF)V");
+        int rotationPatched = insertBeforeReturns(rotations, list(
+                new VarInsnNode(Opcodes.ALOAD, 1),
+                new VarInsnNode(Opcodes.FLOAD, 4),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, CLIENT_SWIMMING_HOOKS,
+                        "applyPlayerRotations",
+                        "(Lnet/minecraft/client/entity/AbstractClientPlayer;F)V", false)));
+        require(rotationPatched > 0, "Missing RenderPlayer applyRotations return");
+
+        int armMethods = 0;
+        String[] names = {"renderRightArm", "renderLeftArm"};
+        String[] srgNames = {"func_177138_b", "func_177139_c"};
+        for (int index = 0; index < names.length; index++) {
+            MethodNode arm = findMethod(node, names[index], srgNames[index],
+                    "(Lnet/minecraft/client/entity/AbstractClientPlayer;)V");
+            arm.instructions.insertBefore(arm.instructions.getFirst(), list(
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, CLIENT_SWIMMING_HOOKS,
+                            "beginFirstPersonArm", "()V", false)));
+            int returns = insertBeforeReturns(arm, list(
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, CLIENT_SWIMMING_HOOKS,
+                            "endFirstPersonArm", "()V", false)));
+            require(returns > 0, "Missing RenderPlayer arm-render return");
+            armMethods++;
+        }
+        require(armMethods == 2, "Expected two RenderPlayer arm methods");
+        LOGGER.info("Patched player swimming body rotation and first-person arms");
+        return write(node);
+    }
+
+    private static boolean hasFutureMcBlockOutline(MethodNode method) {
+        if (net.minecraft.launchwrapper.Launch.classLoader
+                .getResource("thedarkcolour/futuremc/asm/CoreTransformer.class") == null) {
+            return false;
+        }
+        for (AbstractInsnNode instruction = method.instructions.getFirst();
+                instruction != null; instruction = instruction.getNext()) {
+            if (!(instruction instanceof JumpInsnNode) || instruction.getOpcode() != Opcodes.IFNULL) {
+                continue;
+            }
+            AbstractInsnNode hit = previousReal(instruction);
+            AbstractInsnNode entity = nextReal(instruction);
+            AbstractInsnNode cast = nextReal(entity);
+            if (!(hit instanceof FieldInsnNode) || hit.getOpcode() != Opcodes.GETFIELD
+                    || !"Lnet/minecraft/util/math/RayTraceResult;".equals(((FieldInsnNode) hit).desc)
+                    || !("objectMouseOver".equals(((FieldInsnNode) hit).name)
+                            || "field_71476_x".equals(((FieldInsnNode) hit).name))
+                    || !(entity instanceof VarInsnNode) || entity.getOpcode() != Opcodes.ALOAD
+                    || !(cast instanceof org.objectweb.asm.tree.TypeInsnNode)
+                    || cast.getOpcode() != Opcodes.CHECKCAST
+                    || !"net/minecraft/entity/player/EntityPlayer"
+                            .equals(((org.objectweb.asm.tree.TypeInsnNode) cast).desc)) {
+                continue;
+            }
+            for (AbstractInsnNode cursor = cast.getNext();
+                    cursor != null && cursor != ((JumpInsnNode) instruction).label;
+                    cursor = cursor.getNext()) {
+                if (cursor instanceof MethodInsnNode) {
+                    MethodInsnNode call = (MethodInsnNode) cursor;
+                    if (call.getOpcode() == Opcodes.INVOKEVIRTUAL
+                            && "net/minecraft/client/renderer/RenderGlobal".equals(call.owner)
+                            && ("drawSelectionBox".equals(call.name) || "func_72731_b".equals(call.name))
+                            && "(Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/math/RayTraceResult;IF)V"
+                                    .equals(call.desc)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     private static byte[] transformEntityBat(byte[] basicClass) {
@@ -4867,6 +6525,32 @@ public final class FFDHeightTransformer implements IClassTransformer {
                 new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
                         "handlePowderSnowJump",
                         "(Lnet/minecraft/entity/EntityLivingBase;)V", false)));
+    }
+
+    private static byte[] transformEntityArrow(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode method = findMethod(node, "onUpdate", "func_70071_h_", "()V");
+        int patched = 0;
+        for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;
+             instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (call.getOpcode() == Opcodes.INVOKEVIRTUAL && node.name.equals(call.owner)
+                    && "(Lnet/minecraft/util/math/RayTraceResult;)V".equals(call.desc)
+                    && ("onHit".equals(call.name) || "func_184549_a".equals(call.name))) {
+                method.instructions.insertBefore(call, list(
+                        new InsnNode(Opcodes.DUP2),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                                "onArrowImpact", "(Lnet/minecraft/entity/projectile/EntityArrow;"
+                                        + "Lnet/minecraft/util/math/RayTraceResult;)V", false)));
+                patched++;
+            }
+        }
+        require(patched == 1, "Expected one accepted arrow-impact hook, patched " + patched);
+        LOGGER.info("Patched candle ignition after arrow-impact event cancellation");
+        return write(node);
     }
 
     private static byte[] transformShulker(byte[] basicClass) {
@@ -5046,8 +6730,53 @@ public final class FFDHeightTransformer implements IClassTransformer {
 
     private static byte[] transformWorld(byte[] basicClass) {
         ClassNode node = read(basicClass);
+        MethodNode mayPlace = findMethod(node, "mayPlace", "func_190527_a",
+                "(Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;Z"
+                        + "Lnet/minecraft/util/EnumFacing;Lnet/minecraft/entity/Entity;)Z");
+        int replacementChecks = 0;
+        for (AbstractInsnNode instruction = mayPlace.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (instruction.getOpcode() == Opcodes.IRETURN) {
+                mayPlace.instructions.insertBefore(instruction, list(
+                        new VarInsnNode(Opcodes.ALOAD, 0),
+                        new VarInsnNode(Opcodes.ALOAD, 2),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                                "canReplaceFluidloggedBlock",
+                                "(ZLnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)Z",
+                                false)));
+                replacementChecks++;
+            }
+        }
+        require(replacementChecks > 0, "Expected World block replacement checks");
         MethodNode checkLightFor = findMethod(node, "checkLightFor", "func_180500_c",
                 "(Lnet/minecraft/world/EnumSkyBlock;Lnet/minecraft/util/math/BlockPos;)Z");
+        MethodNode rawLight = findMethod(node, "getRawLight", "func_175638_a",
+                "(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/world/EnumSkyBlock;)I");
+        int fluidloggedLightValues = 0;
+        for (AbstractInsnNode instruction = rawLight.instructions.getFirst();
+                instruction != null; instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if ("net/minecraft/block/Block".equals(call.owner)
+                    && "getLightValue".equals(call.name)
+                    && ("(Lnet/minecraft/block/state/IBlockState;"
+                            + "Lnet/minecraft/world/IBlockAccess;"
+                            + "Lnet/minecraft/util/math/BlockPos;)I").equals(call.desc)) {
+                call.setOpcode(Opcodes.INVOKESTATIC);
+                call.owner = GAMEPLAY_HOOKS;
+                call.name = "getFluidloggedLightValue";
+                call.desc = "(Lnet/minecraft/block/Block;"
+                        + "Lnet/minecraft/block/state/IBlockState;"
+                        + "Lnet/minecraft/world/IBlockAccess;"
+                        + "Lnet/minecraft/util/math/BlockPos;)I";
+                call.itf = false;
+                fluidloggedLightValues++;
+            }
+        }
+        require(fluidloggedLightValues == 1,
+                "Expected one World fluidlogged light value, patched " + fluidloggedLightValues);
         MethodNode method = findMethod(node, "isOutsideBuildHeight", "func_189509_E",
                 "(Lnet/minecraft/util/math/BlockPos;)Z");
         replace(method, list(
@@ -5149,6 +6878,131 @@ public final class FFDHeightTransformer implements IClassTransformer {
                 new MethodInsnNode(Opcodes.INVOKESTATIC, HOOKS, "maxYExclusive",
                         "(Lnet/minecraft/world/World;)I", false),
                 new InsnNode(Opcodes.IRETURN)));
+        MethodNode materialAcceleration = findMethod(node, "handleMaterialAcceleration",
+                "func_72918_a", "(Lnet/minecraft/util/math/AxisAlignedBB;"
+                        + "Lnet/minecraft/block/material/Material;"
+                        + "Lnet/minecraft/entity/Entity;)Z");
+        int insideMaterialPatched = 0;
+        int accelerationPatched = 0;
+        for (AbstractInsnNode instruction = materialAcceleration.instructions.getFirst();
+                instruction != null;) {
+            AbstractInsnNode next = instruction.getNext();
+            if (instruction instanceof MethodInsnNode) {
+                MethodInsnNode call = (MethodInsnNode) instruction;
+                if ("net/minecraft/block/Block".equals(call.owner)
+                        && "isEntityInsideMaterial".equals(call.name)
+                        && ("(Lnet/minecraft/world/IBlockAccess;"
+                                + "Lnet/minecraft/util/math/BlockPos;"
+                                + "Lnet/minecraft/block/state/IBlockState;"
+                                + "Lnet/minecraft/entity/Entity;D"
+                                + "Lnet/minecraft/block/material/Material;Z)"
+                                + "Ljava/lang/Boolean;").equals(call.desc)) {
+                    materialAcceleration.instructions.insert(instruction, list(
+                            new VarInsnNode(Opcodes.ALOAD, 16),
+                            new VarInsnNode(Opcodes.ALOAD, 0),
+                            new VarInsnNode(Opcodes.ALOAD, 12),
+                            new VarInsnNode(Opcodes.ALOAD, 2),
+                            new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                                    "isEntityInsideWaterloggedMaterial",
+                                    "(Ljava/lang/Boolean;"
+                                            + "Lnet/minecraft/block/state/IBlockState;"
+                                            + "Lnet/minecraft/world/World;"
+                                            + "Lnet/minecraft/util/math/BlockPos;"
+                                            + "Lnet/minecraft/block/material/Material;)"
+                                            + "Ljava/lang/Boolean;", false)));
+                    insideMaterialPatched++;
+                } else if ("net/minecraft/block/Block".equals(call.owner)
+                        && ("modifyAcceleration".equals(call.name)
+                                || "func_176197_a".equals(call.name))
+                        && ("(Lnet/minecraft/world/World;"
+                                + "Lnet/minecraft/util/math/BlockPos;"
+                                + "Lnet/minecraft/entity/Entity;"
+                                + "Lnet/minecraft/util/math/Vec3d;)"
+                                + "Lnet/minecraft/util/math/Vec3d;").equals(call.desc)) {
+                    materialAcceleration.instructions.insertBefore(instruction,
+                            new VarInsnNode(Opcodes.ALOAD, 2));
+                    call.setOpcode(Opcodes.INVOKESTATIC);
+                    call.owner = GAMEPLAY_HOOKS;
+                    call.name = "modifyWaterloggedAcceleration";
+                    call.desc = "(Lnet/minecraft/block/Block;"
+                            + "Lnet/minecraft/world/World;"
+                            + "Lnet/minecraft/util/math/BlockPos;"
+                            + "Lnet/minecraft/entity/Entity;"
+                            + "Lnet/minecraft/util/math/Vec3d;"
+                            + "Lnet/minecraft/block/material/Material;)"
+                            + "Lnet/minecraft/util/math/Vec3d;";
+                    call.itf = false;
+                    accelerationPatched++;
+                }
+            }
+            instruction = next;
+        }
+        require(insideMaterialPatched == 1,
+                "Expected one World material-inside hook, patched " + insideMaterialPatched);
+        require(accelerationPatched == 2,
+                "Expected two World material-acceleration hooks, patched " + accelerationPatched);
+        MethodNode materialInBox = findMethod(node, "isMaterialInBB", "func_72875_a",
+                "(Lnet/minecraft/util/math/AxisAlignedBB;"
+                        + "Lnet/minecraft/block/material/Material;)Z");
+        int materialInBoxPatched = 0;
+        for (AbstractInsnNode instruction = materialInBox.instructions.getFirst();
+                instruction != null; instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (!"net/minecraft/block/Block".equals(call.owner)
+                    || !"isAABBInsideMaterial".equals(call.name)
+                    || !("(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;"
+                            + "Lnet/minecraft/util/math/AxisAlignedBB;"
+                            + "Lnet/minecraft/block/material/Material;)Ljava/lang/Boolean;")
+                            .equals(call.desc)) {
+                continue;
+            }
+            materialInBox.instructions.insert(instruction, list(
+                    new VarInsnNode(Opcodes.ALOAD, 13),
+                    new VarInsnNode(Opcodes.ALOAD, 0),
+                    new VarInsnNode(Opcodes.ALOAD, 9),
+                    new VarInsnNode(Opcodes.ALOAD, 2),
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                            "isAABBInsideFluidloggedMaterial",
+                            "(Ljava/lang/Boolean;Lnet/minecraft/block/state/IBlockState;"
+                                    + "Lnet/minecraft/world/World;"
+                                    + "Lnet/minecraft/util/math/BlockPos;"
+                                    + "Lnet/minecraft/block/material/Material;)"
+                                    + "Ljava/lang/Boolean;", false)));
+            materialInBoxPatched++;
+        }
+        require(materialInBoxPatched == 1,
+                "Expected one World material-box hook, patched " + materialInBoxPatched);
+        MethodNode neighborChanged = findMethod(node, "neighborChanged", "func_190524_a",
+                "(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;"
+                        + "Lnet/minecraft/util/math/BlockPos;)V");
+        int waterloggedNeighborChanges = 0;
+        for (AbstractInsnNode instruction = neighborChanged.instructions.getFirst();
+                instruction != null; instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (("neighborChanged".equals(call.name) || "func_189546_a".equals(call.name))
+                    && "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;"
+                            .concat("Lnet/minecraft/block/Block;"
+                                    + "Lnet/minecraft/util/math/BlockPos;)V")
+                            .equals(call.desc)) {
+                neighborChanged.instructions.insert(call, list(
+                        new VarInsnNode(Opcodes.ALOAD, 0),
+                        new VarInsnNode(Opcodes.ALOAD, 1),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                                "handleUniversalWaterloggedNeighborChanged",
+                                "(Lnet/minecraft/world/World;"
+                                        + "Lnet/minecraft/util/math/BlockPos;)V", false)));
+                waterloggedNeighborChanges++;
+            }
+        }
+        require(waterloggedNeighborChanges == 1,
+                "Expected one World waterlogged-neighbor hook, patched "
+                        + waterloggedNeighborChanges);
         addPublicBridgeCopy(node, checkLightFor, "ffd$checkLightFor");
         LOGGER.info("Patched World build-height and light bounds");
         return write(node);
@@ -5370,6 +7224,33 @@ public final class FFDHeightTransformer implements IClassTransformer {
                          false),
                 new InsnNode(Opcodes.ARETURN)));
         patchLightningRodSkeletonTrap(findMethod(node, "updateBlocks", "func_147456_g", "()V"));
+        int waterloggedTicks = 0;
+        for (MethodNode method : node.methods) {
+            for (AbstractInsnNode instruction = method.instructions.getFirst();
+                    instruction != null; instruction = instruction.getNext()) {
+                if (!(instruction instanceof MethodInsnNode)) {
+                    continue;
+                }
+                MethodInsnNode call = (MethodInsnNode) instruction;
+                if ("net/minecraft/block/Block".equals(call.owner)
+                        && ("updateTick".equals(call.name) || "func_180650_b".equals(call.name))
+                        && "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;"
+                                .concat("Lnet/minecraft/block/state/IBlockState;"
+                                        + "Ljava/util/Random;)V")
+                                .equals(call.desc)) {
+                    call.setOpcode(Opcodes.INVOKESTATIC);
+                    call.owner = GAMEPLAY_HOOKS;
+                    call.name = "updateBlockTickWithWaterlogging";
+                    call.desc = "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;"
+                            + "Lnet/minecraft/util/math/BlockPos;"
+                            + "Lnet/minecraft/block/state/IBlockState;Ljava/util/Random;)V";
+                    call.itf = false;
+                    waterloggedTicks++;
+                }
+            }
+        }
+        require(waterloggedTicks == 2,
+                "Expected two WorldServer waterlogged tick calls, patched " + waterloggedTicks);
     }
 
     private static void patchLightningRodSkeletonTrap(MethodNode method) {
@@ -5420,6 +7301,40 @@ public final class FFDHeightTransformer implements IClassTransformer {
                         "isLightningRodStrikeTarget",
                         "(Lnet/minecraft/world/WorldServer;Lnet/minecraft/util/math/BlockPos;)Z", false),
                 new org.objectweb.asm.tree.JumpInsnNode(Opcodes.IFNE, normalLightningLabel)));
+    }
+
+    private static byte[] transformBiomeCreatureTypeSwitch(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode method = findMethod(node, "getSpawnableList", "func_76747_a",
+                "(Lnet/minecraft/entity/EnumCreatureType;)Ljava/util/List;");
+        AbstractInsnNode arrayRead = null;
+        for (AbstractInsnNode instruction = method.instructions.getFirst();
+                instruction != null; instruction = instruction.getNext()) {
+            if (instruction.getOpcode() != Opcodes.IALOAD) {
+                continue;
+            }
+            AbstractInsnNode ordinal = previousReal(instruction);
+            AbstractInsnNode branch = nextReal(instruction);
+            if (!(ordinal instanceof MethodInsnNode)
+                    || !"net/minecraft/entity/EnumCreatureType".equals(
+                            ((MethodInsnNode) ordinal).owner)
+                    || !"ordinal".equals(((MethodInsnNode) ordinal).name)
+                    || !"()I".equals(((MethodInsnNode) ordinal).desc)
+                    || !(branch instanceof org.objectweb.asm.tree.TableSwitchInsnNode)) {
+                continue;
+            }
+            org.objectweb.asm.tree.TableSwitchInsnNode cases =
+                    (org.objectweb.asm.tree.TableSwitchInsnNode) branch;
+            require(cases.min > 0 || cases.max < 0,
+                    "Biome creature-type switch must reserve zero for the default branch");
+            require(arrayRead == null, "Multiple biome creature-type switch array reads");
+            arrayRead = instruction;
+        }
+        require(arrayRead != null, "Missing biome creature-type switch array read");
+        method.instructions.set(arrayRead, new MethodInsnNode(Opcodes.INVOKESTATIC,
+                GAMEPLAY_HOOKS, "biomeCreatureTypeSwitch", "([II)I", false));
+        LOGGER.info("Patched biome spawn lists for late-added creature types");
+        return write(node);
     }
 
     private static byte[] transformWorldEntitySpawner(byte[] basicClass) {
@@ -5501,6 +7416,74 @@ public final class FFDHeightTransformer implements IClassTransformer {
     private static void patchPowderSnowMovement(ClassNode node) {
         MethodNode move = findMethod(node, "move", "func_70091_d",
                 "(Lnet/minecraft/entity/MoverType;DDD)V");
+        int climbingSteps = 0;
+        for (AbstractInsnNode instruction : move.instructions.toArray()) {
+            if (instruction instanceof FieldInsnNode && instruction.getOpcode() == Opcodes.GETSTATIC) {
+                FieldInsnNode field = (FieldInsnNode) instruction;
+                if ("net/minecraft/init/Blocks".equals(field.owner)
+                        && ("LADDER".equals(field.name) || "field_150468_ap".equals(field.name))) {
+                    AbstractInsnNode branch = nextReal(field);
+                    require(branch instanceof JumpInsnNode && branch.getOpcode() == Opcodes.IF_ACMPEQ,
+                            "Unexpected climb step comparison");
+                    move.instructions.insert(field, list(new VarInsnNode(Opcodes.ALOAD, 0),
+                            new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS, "isClimbableStep",
+                                    "(Lnet/minecraft/block/Block;Lnet/minecraft/block/Block;"
+                                            + "Lnet/minecraft/entity/Entity;)Z", false)));
+                    ((JumpInsnNode) branch).setOpcode(Opcodes.IFNE);
+                    climbingSteps++;
+                }
+            }
+        }
+        require(climbingSteps == 1, "Expected one climb step comparison, patched " + climbingSteps);
+        MethodNode step = findMethod(node, "playStepSound", "func_180429_a",
+                "(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/Block;)V");
+        for (AbstractInsnNode instruction : step.instructions.toArray()) {
+            if (instruction instanceof MethodInsnNode) {
+                MethodInsnNode call = (MethodInsnNode) instruction;
+                if ("getStepSound".equals(call.name) || "func_185844_d".equals(call.name)) {
+                    step.instructions.insert(call, list(new VarInsnNode(Opcodes.ALOAD, 2),
+                            new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS, "climbingStepSound",
+                                    "(Lnet/minecraft/util/SoundEvent;Lnet/minecraft/block/Block;)"
+                                            + "Lnet/minecraft/util/SoundEvent;", false)));
+                }
+            }
+        }
+        int berryMultiplier = Math.max(move.maxLocals, 8);
+        move.maxLocals = berryMultiplier + 2;
+        int berryMovement = 0;
+        for (AbstractInsnNode instruction : move.instructions.toArray()) {
+            if (!(instruction instanceof FieldInsnNode)) {
+                continue;
+            }
+            FieldInsnNode field = (FieldInsnNode) instruction;
+            if (field.getOpcode() != Opcodes.GETFIELD
+                    || !("isInWeb".equals(field.name) || "field_70134_J".equals(field.name))) {
+                continue;
+            }
+            move.instructions.insertBefore(previousReal(field), list(
+                    new VarInsnNode(Opcodes.ALOAD, 0),
+                    new VarInsnNode(Opcodes.ALOAD, 1),
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                            "consumeSweetBerrySlowdown",
+                            "(Lnet/minecraft/entity/Entity;Lnet/minecraft/entity/MoverType;)D", false),
+                    new VarInsnNode(Opcodes.DSTORE, berryMultiplier),
+                    new VarInsnNode(Opcodes.DLOAD, 2),
+                    new VarInsnNode(Opcodes.DLOAD, berryMultiplier),
+                    new InsnNode(Opcodes.DMUL),
+                    new VarInsnNode(Opcodes.DSTORE, 2),
+                    new VarInsnNode(Opcodes.DLOAD, 4),
+                    new VarInsnNode(Opcodes.DLOAD, berryMultiplier),
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, GAMEPLAY_HOOKS,
+                            "sweetBerryVerticalMultiplier", "(D)D", false),
+                    new InsnNode(Opcodes.DMUL),
+                    new VarInsnNode(Opcodes.DSTORE, 4),
+                    new VarInsnNode(Opcodes.DLOAD, 6),
+                    new VarInsnNode(Opcodes.DLOAD, berryMultiplier),
+                    new InsnNode(Opcodes.DMUL),
+                    new VarInsnNode(Opcodes.DSTORE, 6)));
+            berryMovement++;
+        }
+        require(berryMovement == 1, "Expected one berry movement entry, patched " + berryMovement);
         int multiplierLocal = Math.max(move.maxLocals, 8);
         move.maxLocals = multiplierLocal + 2;
         move.instructions.insertBefore(move.instructions.getFirst(), list(
@@ -6217,6 +8200,24 @@ public final class FFDHeightTransformer implements IClassTransformer {
 
     private static byte[] transformChunk(byte[] basicClass) {
         ClassNode node = read(basicClass);
+        MethodNode setState = findMethod(node, "setBlockState", "func_177436_a",
+                "(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;)"
+                        + "Lnet/minecraft/block/state/IBlockState;");
+        for (AbstractInsnNode instruction = setState.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (instruction.getOpcode() == Opcodes.ARETURN) {
+                setState.instructions.insertBefore(instruction, list(
+                        new VarInsnNode(Opcodes.ALOAD, 0),
+                        new VarInsnNode(Opcodes.ALOAD, 1),
+                        new VarInsnNode(Opcodes.ALOAD, 2),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC,
+                                "xy177/farmersfuturedelight/common/fluid/FFDStoredFluidStates",
+                                "changed", "(Lnet/minecraft/block/state/IBlockState;"
+                                        + "Lnet/minecraft/world/chunk/Chunk;Lnet/minecraft/util/math/BlockPos;"
+                                        + "Lnet/minecraft/block/state/IBlockState;)"
+                                        + "Lnet/minecraft/block/state/IBlockState;", false)));
+            }
+        }
         patchChunkConstructor(node);
         MethodNode precipitationHeight = findMethod(node, "getPrecipitationHeight", "func_177440_h",
                 "(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/util/math/BlockPos;");
@@ -6473,7 +8474,53 @@ public final class FFDHeightTransformer implements IClassTransformer {
         patchRenderGlobalEntityHeightBounds(renderEntities, node.name, worldField);
         patchRenderGlobalFallbackLayers(node, worldField);
         patchWorldBorderHeight(node, worldField);
-        LOGGER.info("Patched RenderGlobal entity sections, vertical traversal, chunk invalidation and world border height");
+        MethodNode playEvent = findMethod(node, "playEvent", "func_180439_a",
+                "(Lnet/minecraft/entity/player/EntityPlayer;I"
+                        + "Lnet/minecraft/util/math/BlockPos;I)V");
+        int decodedDestroyStates = 0;
+        int destroyParticles = 0;
+        for (AbstractInsnNode instruction = playEvent.instructions.getFirst();
+                instruction != null; instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if ("net/minecraft/block/Block".equals(call.owner)
+                    && ("getStateFromMeta".equals(call.name)
+                            || "func_176203_a".equals(call.name))
+                    && "(I)Lnet/minecraft/block/state/IBlockState;".equals(call.desc)) {
+                playEvent.instructions.insertBefore(call, new VarInsnNode(Opcodes.ILOAD, 4));
+                call.setOpcode(Opcodes.INVOKESTATIC);
+                call.owner = CLIENT_HOOKS;
+                call.name = "waterloggedDestroyParticleState";
+                call.desc = "(Lnet/minecraft/block/Block;II)"
+                        + "Lnet/minecraft/block/state/IBlockState;";
+                call.itf = false;
+                decodedDestroyStates++;
+                continue;
+            }
+            if ("net/minecraft/client/particle/ParticleManager".equals(call.owner)
+                    && ("addBlockDestroyEffects".equals(call.name)
+                            || "func_180533_a".equals(call.name))
+                    && "(Lnet/minecraft/util/math/BlockPos;"
+                            .concat("Lnet/minecraft/block/state/IBlockState;)V")
+                            .equals(call.desc)) {
+                playEvent.instructions.insertBefore(call, list(
+                        new VarInsnNode(Opcodes.ILOAD, 4),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, CLIENT_HOOKS,
+                                "waterloggedDestroyParticleState",
+                                "(Lnet/minecraft/block/state/IBlockState;I)"
+                                        + "Lnet/minecraft/block/state/IBlockState;", false)));
+                destroyParticles++;
+            }
+        }
+        require(decodedDestroyStates == 1,
+                "Expected one RenderGlobal destroy-particle decode, patched "
+                        + decodedDestroyStates);
+        require(destroyParticles == 1,
+                "Expected one RenderGlobal destroy-particle state, patched " + destroyParticles);
+        LOGGER.info("Patched RenderGlobal entity sections, traversal, invalidation, borders, "
+                + "and waterlogged particles");
         return write(node);
     }
 
@@ -6575,6 +8622,214 @@ public final class FFDHeightTransformer implements IClassTransformer {
         }
         require(returns > 0, "Missing Minecraft integrated-world load return");
         LOGGER.info("Scoped loading renderer to integrated-world loading");
+        return write(node);
+    }
+
+    private static byte[] transformBlockRendererDispatcher(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode render = findMethod(node, "renderBlock", "func_175018_a",
+                "(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/util/math/BlockPos;"
+                        + "Lnet/minecraft/world/IBlockAccess;"
+                        + "Lnet/minecraft/client/renderer/BufferBuilder;)Z");
+        LabelNode normal = new LabelNode();
+        render.instructions.insert(list(
+                new VarInsnNode(Opcodes.ALOAD, 1),
+                new VarInsnNode(Opcodes.ALOAD, 3),
+                new VarInsnNode(Opcodes.ALOAD, 2),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, CLIENT_HOOKS,
+                        "isWaterloggedSpecialRender", "(Lnet/minecraft/block/state/IBlockState;"
+                                + "Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;)Z",
+                        false),
+                new JumpInsnNode(Opcodes.IFEQ, normal),
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new VarInsnNode(Opcodes.ALOAD, 1),
+                new VarInsnNode(Opcodes.ALOAD, 2),
+                new VarInsnNode(Opcodes.ALOAD, 3),
+                new VarInsnNode(Opcodes.ALOAD, 4),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, CLIENT_HOOKS,
+                        "renderWaterloggedSpecial",
+                        "(Lnet/minecraft/client/renderer/BlockRendererDispatcher;"
+                                + "Lnet/minecraft/block/state/IBlockState;"
+                                + "Lnet/minecraft/util/math/BlockPos;"
+                                + "Lnet/minecraft/world/IBlockAccess;"
+                                + "Lnet/minecraft/client/renderer/BufferBuilder;)Z", false),
+                new InsnNode(Opcodes.IRETURN),
+                normal,
+                new FrameNode(Opcodes.F_SAME, 0, null, 0, null)));
+        int extended = 0;
+        for (AbstractInsnNode instruction = render.instructions.getFirst();
+                instruction != null; instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if ("getExtendedState".equals(call.name)
+                    && "(Lnet/minecraft/block/state/IBlockState;"
+                            .concat("Lnet/minecraft/world/IBlockAccess;"
+                                    + "Lnet/minecraft/util/math/BlockPos;)"
+                                    + "Lnet/minecraft/block/state/IBlockState;").equals(call.desc)) {
+                render.instructions.insert(call, list(
+                        new VarInsnNode(Opcodes.ALOAD, 3),
+                        new VarInsnNode(Opcodes.ALOAD, 2),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, CLIENT_HOOKS,
+                                "extendedWaterloggedRenderState",
+                                "(Lnet/minecraft/block/state/IBlockState;"
+                                        + "Lnet/minecraft/world/IBlockAccess;"
+                                        + "Lnet/minecraft/util/math/BlockPos;)"
+                                        + "Lnet/minecraft/block/state/IBlockState;", false)));
+                extended++;
+            }
+        }
+        require(extended == 1, "Expected one dispatcher extended-state call, found " + extended);
+        return write(node);
+    }
+
+    private static byte[] transformBlockFluidRenderer(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        int fluidStateReads = 0;
+        for (MethodNode method : node.methods) {
+            for (AbstractInsnNode instruction = method.instructions.getFirst();
+                    instruction != null; instruction = instruction.getNext()) {
+                if (!(instruction instanceof MethodInsnNode)) {
+                    continue;
+                }
+                MethodInsnNode call = (MethodInsnNode) instruction;
+                if (("getBlockState".equals(call.name) || "func_180495_p".equals(call.name))
+                        && "net/minecraft/world/IBlockAccess".equals(call.owner)
+                        && "(Lnet/minecraft/util/math/BlockPos;)"
+                                .concat("Lnet/minecraft/block/state/IBlockState;")
+                                .equals(call.desc)) {
+                    call.setOpcode(Opcodes.INVOKESTATIC);
+                    call.owner = CLIENT_HOOKS;
+                    call.name = "fluidRenderState";
+                    call.desc = "(Lnet/minecraft/world/IBlockAccess;"
+                            + "Lnet/minecraft/util/math/BlockPos;)"
+                            + "Lnet/minecraft/block/state/IBlockState;";
+                    call.itf = false;
+                    fluidStateReads++;
+                } else if (("getMaterial".equals(call.name)
+                        || "func_185904_a".equals(call.name))
+                        && "()Lnet/minecraft/block/material/Material;".equals(call.desc)) {
+                    call.setOpcode(Opcodes.INVOKESTATIC);
+                    call.owner = CLIENT_HOOKS;
+                    call.name = "renderedFluidMaterial";
+                    call.desc = "(Lnet/minecraft/block/state/IBlockState;)"
+                            + "Lnet/minecraft/block/material/Material;";
+                    call.itf = false;
+                } else if (("getValue".equals(call.name) || "func_177229_b".equals(call.name))
+                        && "(Lnet/minecraft/block/properties/IProperty;)Ljava/lang/Comparable;"
+                                .equals(call.desc)) {
+                    call.setOpcode(Opcodes.INVOKESTATIC);
+                    call.owner = GAMEPLAY_HOOKS;
+                    call.name = "getLiquidLevelValue";
+                    call.desc = "(Lnet/minecraft/block/state/IBlockState;"
+                            + "Lnet/minecraft/block/properties/IProperty;)Ljava/lang/Comparable;";
+                    call.itf = false;
+                }
+            }
+        }
+        require(fluidStateReads >= 2,
+                "Expected fluid renderer block-state reads, patched " + fluidStateReads);
+        MethodNode renderFluid = findMethod(node, "renderFluid", "func_178270_a",
+                "(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/block/state/IBlockState;"
+                        + "Lnet/minecraft/util/math/BlockPos;"
+                        + "Lnet/minecraft/client/renderer/BufferBuilder;)Z");
+        int colorLocal = -1;
+        boolean optiFineFluidColor = false;
+        for (AbstractInsnNode instruction = renderFluid.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (call.getOpcode() == Opcodes.INVOKESTATIC
+                    && "net/optifine/CustomColors".equals(call.owner)
+                    && "getFluidColor".equals(call.name)
+                    && ("(Lnet/minecraft/world/IBlockAccess;"
+                            + "Lnet/minecraft/block/state/IBlockState;"
+                            + "Lnet/minecraft/util/math/BlockPos;"
+                            + "Lnet/optifine/render/RenderEnv;)I").equals(call.desc)) {
+                require(!optiFineFluidColor, "Multiple OptiFine fluid color lookups");
+                optiFineFluidColor = true;
+            }
+            if (call.getOpcode() == Opcodes.INVOKEVIRTUAL
+                    && "net/minecraft/client/renderer/color/BlockColors".equals(call.owner)
+                    && ("colorMultiplier".equals(call.name) || "func_186724_a".equals(call.name))
+                    && ("(Lnet/minecraft/block/state/IBlockState;"
+                            + "Lnet/minecraft/world/IBlockAccess;"
+                            + "Lnet/minecraft/util/math/BlockPos;I)I").equals(call.desc)) {
+                AbstractInsnNode store = nextReal(call);
+                require(store instanceof VarInsnNode && store.getOpcode() == Opcodes.ISTORE,
+                        "Missing fluid color local");
+                require(colorLocal < 0, "Multiple fluid color locals");
+                colorLocal = ((VarInsnNode) store).var;
+            }
+        }
+        if (optiFineFluidColor) {
+            require(colorLocal < 0, "Mixed vanilla and OptiFine fluid color lookups");
+            LOGGER.info("Preserved OptiFine fluid face colors with waterlogged material support");
+            return write(node);
+        }
+        require(colorLocal >= 0, "Missing fluid color multiplier");
+
+        int patched = 0;
+        for (AbstractInsnNode instruction = renderFluid.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) {
+                continue;
+            }
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (call.getOpcode() != Opcodes.INVOKEVIRTUAL
+                    || !"net/minecraft/client/renderer/BufferBuilder".equals(call.owner)
+                    || !("color".equals(call.name) || "func_181666_a".equals(call.name))
+                    || !"(FFFF)Lnet/minecraft/client/renderer/BufferBuilder;".equals(call.desc)) {
+                continue;
+            }
+            AbstractInsnNode alpha = previousReal(call);
+            AbstractInsnNode blue = previousReal(alpha);
+            AbstractInsnNode green = previousReal(blue);
+            AbstractInsnNode red = previousReal(green);
+            if (!isFloatConstant(red, 0.5F) || !isFloatConstant(green, 0.5F)
+                    || !isFloatConstant(blue, 0.5F) || !isFloatConstant(alpha, 1.0F)) {
+                continue;
+            }
+            renderFluid.instructions.insert(red, fluidBottomColorHook(colorLocal, 16));
+            renderFluid.instructions.insert(green, fluidBottomColorHook(colorLocal, 8));
+            renderFluid.instructions.insert(blue, fluidBottomColorHook(colorLocal, 0));
+            patched++;
+        }
+        require(patched == 4, "Expected four fluid bottom-face colors, patched " + patched);
+        LOGGER.info("Patched modern water color on fluid bottom faces");
+        return write(node);
+    }
+
+    private static InsnList fluidBottomColorHook(int colorLocal, int shift) {
+        return list(
+                new VarInsnNode(Opcodes.ILOAD, colorLocal),
+                new IntInsnNode(Opcodes.BIPUSH, shift),
+                new VarInsnNode(Opcodes.ALOAD, 2),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, CLIENT_HOOKS,
+                        "fluidBottomColorComponent",
+                        "(FIILnet/minecraft/block/state/IBlockState;)F", false));
+    }
+
+    private static byte[] transformOptiFineClearWater(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode update = findMethod(node, "updateWaterOpacity", "updateWaterOpacity",
+                "(Lnet/minecraft/client/settings/GameSettings;Lnet/minecraft/world/World;)V");
+        int patched = 0;
+        for (AbstractInsnNode instruction = update.instructions.getFirst(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (instruction.getOpcode() == Opcodes.ICONST_3
+                    && nextReal(instruction) instanceof VarInsnNode
+                    && nextReal(instruction).getOpcode() == Opcodes.ISTORE) {
+                update.instructions.set(instruction, new InsnNode(Opcodes.ICONST_1));
+                patched++;
+                break;
+            }
+        }
+        require(patched == 1, "Missing OptiFine legacy water opacity");
+        LOGGER.info("Preserved modern water opacity across OptiFine clear-water updates");
         return write(node);
     }
 
@@ -6711,6 +8966,27 @@ public final class FFDHeightTransformer implements IClassTransformer {
 
     private static byte[] transformRenderChunk(byte[] basicClass) {
         ClassNode node = read(basicClass);
+        for (MethodNode method : node.methods) {
+            for (AbstractInsnNode instruction = method.instructions.getFirst();
+                    instruction != null; instruction = instruction.getNext()) {
+                if (!(instruction instanceof MethodInsnNode)) {
+                    continue;
+                }
+                MethodInsnNode call = (MethodInsnNode) instruction;
+                if ("canRenderInLayer".equals(call.name)
+                        && "(Lnet/minecraft/block/state/IBlockState;"
+                                .concat("Lnet/minecraft/util/BlockRenderLayer;)Z")
+                                .equals(call.desc)) {
+                    call.setOpcode(Opcodes.INVOKESTATIC);
+                    call.owner = CLIENT_HOOKS;
+                    call.name = "canRenderWaterloggedBlockLayer";
+                    call.desc = "(Lnet/minecraft/block/Block;"
+                            + "Lnet/minecraft/block/state/IBlockState;"
+                            + "Lnet/minecraft/util/BlockRenderLayer;)Z";
+                    call.itf = false;
+                }
+            }
+        }
         MethodNode preRender = findMethodOptional(node, "preRenderBlocks", "func_178573_a",
                 "(Lnet/minecraft/client/renderer/BufferBuilder;"
                         + "Lnet/minecraft/util/math/BlockPos;)V");
@@ -6718,7 +8994,7 @@ public final class FFDHeightTransformer implements IClassTransformer {
             preRender = findMethodOptional(node, "a", "a", "(Lbuk;Let;)V");
         }
         if (preRender == null || !callsOptiFineRenderRegions(preRender)) {
-            return basicClass;
+            return write(node);
         }
 
         int alignedCoordinates = 0;
@@ -7068,16 +9344,24 @@ public final class FFDHeightTransformer implements IClassTransformer {
 
         int fullMasks = 0;
         int tileSections = 0;
-        int preservedChunkFrames = 0;
+        int chunkFrames = 0;
+        int repairedChunkFrames = 0;
         for (AbstractInsnNode instruction = constructor.instructions.getFirst(); instruction != null;) {
             AbstractInsnNode next = instruction.getNext();
             if (instruction instanceof FrameNode) {
                 FrameNode frame = (FrameNode) instruction;
                 if (frame.type == Opcodes.F_FULL && frame.local != null && frame.local.size() >= 5
-                        && node.name.equals(frame.local.get(0)) && Opcodes.TOP.equals(frame.local.get(1))
+                        && node.name.equals(frame.local.get(0))
                         && "java/util/Iterator".equals(frame.local.get(4))) {
-                    frame.local.set(1, "net/minecraft/world/chunk/Chunk");
-                    preservedChunkFrames++;
+                    Object chunkLocal = frame.local.get(1);
+                    require(Opcodes.TOP.equals(chunkLocal)
+                                    || "net/minecraft/world/chunk/Chunk".equals(chunkLocal),
+                            "Unexpected SPacketChunkData chunk-local frame " + chunkLocal);
+                    if (Opcodes.TOP.equals(chunkLocal)) {
+                        frame.local.set(1, "net/minecraft/world/chunk/Chunk");
+                        repairedChunkFrames++;
+                    }
+                    chunkFrames++;
                 }
             }
             if (instruction instanceof LdcInsnNode
@@ -7110,8 +9394,10 @@ public final class FFDHeightTransformer implements IClassTransformer {
         }
         require(fullMasks == 1, "Expected one SPacketChunkData full mask, patched " + fullMasks);
         require(tileSections == 1, "Expected one SPacketChunkData tile section, patched " + tileSections);
-        require(preservedChunkFrames == 1,
-                "Expected one SPacketChunkData chunk-local frame, patched " + preservedChunkFrames);
+        require(chunkFrames >= 1,
+                "Expected an SPacketChunkData chunk-local frame, found " + chunkFrames);
+        require(repairedChunkFrames <= 1,
+                "Expected at most one SPacketChunkData chunk-local repair, patched " + repairedChunkFrames);
         LOGGER.info("Patched full chunk packet for 24 sections");
         return write(node);
     }
@@ -7322,11 +9608,6 @@ public final class FFDHeightTransformer implements IClassTransformer {
         require(patched == 1, "Expected one ViewFrustum floor section lookup, patched " + patched);
     }
 
-    /**
-     * OptiFine may inline MathHelper.intFloorDiv(pos.getY(), 16) into a coordinate
-     * getter followed by ICONST_4 and ISHR. Keep this fallback isolated from the
-     * ordinary Forge call path so only one representation is rewritten.
-     */
     private static int patchNthInlinedFloorDiv(MethodNode method, String owner, String worldField, int ordinal) {
         int found = 0;
         int patched = 0;
@@ -7647,6 +9928,27 @@ public final class FFDHeightTransformer implements IClassTransformer {
         return false;
     }
 
+    private static boolean isFloatConstant(AbstractInsnNode instruction, float value) {
+        if (instruction == null) {
+            return false;
+        }
+        if (instruction instanceof LdcInsnNode) {
+            Object constant = ((LdcInsnNode) instruction).cst;
+            return constant instanceof Float
+                    && Float.compare(((Float) constant).floatValue(), value) == 0;
+        }
+        switch (instruction.getOpcode()) {
+            case Opcodes.FCONST_0:
+                return Float.compare(value, 0.0F) == 0;
+            case Opcodes.FCONST_1:
+                return Float.compare(value, 1.0F) == 0;
+            case Opcodes.FCONST_2:
+                return Float.compare(value, 2.0F) == 0;
+            default:
+                return false;
+        }
+    }
+
     private static AbstractInsnNode advance(AbstractInsnNode node, int count) {
         AbstractInsnNode cursor = node;
         while (cursor != null && count-- > 0) {
@@ -7702,6 +10004,19 @@ public final class FFDHeightTransformer implements IClassTransformer {
         return result;
     }
 
+    private static int insertBeforeReturns(MethodNode method, InsnList instructions) {
+        int patched = 0;
+        for (AbstractInsnNode instruction = method.instructions.getFirst(); instruction != null;) {
+            AbstractInsnNode next = instruction.getNext();
+            if (instruction.getOpcode() == Opcodes.RETURN) {
+                method.instructions.insertBefore(instruction, copy(instructions));
+                patched++;
+            }
+            instruction = next;
+        }
+        return patched;
+    }
+
     private static void setMixinAnnotationInt(MethodNode method, String desc, String key,
             int value) {
         AnnotationNode annotation = findAnnotation(method.visibleAnnotations, desc);
@@ -7755,6 +10070,13 @@ public final class FFDHeightTransformer implements IClassTransformer {
 
     private static byte[] write(ClassNode node) {
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+        node.accept(writer);
+        return writer.toByteArray();
+    }
+
+    private static byte[] writeWithFrames(ClassNode node) {
+        ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES
+                | ClassWriter.COMPUTE_MAXS);
         node.accept(writer);
         return writer.toByteArray();
     }

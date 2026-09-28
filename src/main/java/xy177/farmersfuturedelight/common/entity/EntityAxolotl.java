@@ -31,8 +31,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.init.MobEffects;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemFishFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
@@ -51,7 +49,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.registry.FFDEntities;
@@ -71,14 +68,28 @@ public class EntityAxolotl extends EntityAnimal {
     private static final int PLAY_DEAD_TICKS = 200;
     private static final int HUNTING_COOLDOWN_TICKS = 2400;
     private static final int MAX_AIR = 6000;
-    private static final ResourceLocation FUTURE_MC_TROPICAL_FISH_BUCKET =
-            new ResourceLocation("futuremc", "tropical_fish_bucket");
-
+    public static final int BABY_ANIMATION_IDLE_FLOOR = 0;
+    public static final int BABY_ANIMATION_IDLE_FLOOR_UNDERWATER = 1;
+    public static final int BABY_ANIMATION_IDLE_UNDERWATER = 2;
+    public static final int BABY_ANIMATION_SWIM = 3;
+    public static final int BABY_ANIMATION_WALK = 4;
+    public static final int BABY_ANIMATION_WALK_UNDERWATER = 5;
+    public static final int BABY_ANIMATION_PLAY_DEAD = 6;
     private final PathNavigateSwimmer waterNavigator;
     private final PathNavigateGround groundNavigator;
     private boolean usingWaterNavigator;
     private int playingDeadTicks;
     private int huntingCooldown;
+    private int previousPlayingDeadAnimationTicks;
+    private int playingDeadAnimationTicks;
+    private int previousInWaterAnimationTicks;
+    private int inWaterAnimationTicks;
+    private int previousOnGroundAnimationTicks;
+    private int onGroundAnimationTicks;
+    private int previousMovingAnimationTicks;
+    private int movingAnimationTicks;
+    private int babyAnimationState = -1;
+    private int babyAnimationStartTick;
     @Nullable
     private EntityLivingBase observedAttackTarget;
 
@@ -147,6 +158,7 @@ public class EntityAxolotl extends EntityAnimal {
     public void onLivingUpdate() {
         super.onLivingUpdate();
         if (world.isRemote) {
+            updateClientAnimationStates();
             return;
         }
 
@@ -169,6 +181,97 @@ public class EntityAxolotl extends EntityAnimal {
         }
         updateAirSupply();
         updateFinishedTarget();
+    }
+
+    private void updateClientAnimationStates() {
+        previousPlayingDeadAnimationTicks = playingDeadAnimationTicks;
+        previousInWaterAnimationTicks = inWaterAnimationTicks;
+        previousOnGroundAnimationTicks = onGroundAnimationTicks;
+        previousMovingAnimationTicks = movingAnimationTicks;
+
+        boolean playingDead = isPlayingDead();
+        boolean inWaterState = isInWater();
+        boolean inWater = !playingDead && inWaterState;
+        boolean onGroundState = !playingDead && !inWater && onGround;
+        boolean moving = Math.abs(limbSwingAmount) > 1.0E-4F
+                || rotationPitch != prevRotationPitch || rotationYaw != prevRotationYaw;
+
+        if (isChild()) {
+            updateBabyAnimationState(playingDead, inWaterState, onGround, moving);
+        } else {
+            babyAnimationState = -1;
+        }
+
+        playingDeadAnimationTicks = updateAnimationTicks(
+                playingDeadAnimationTicks, playingDead);
+        inWaterAnimationTicks = updateAnimationTicks(inWaterAnimationTicks, inWater);
+        onGroundAnimationTicks = updateAnimationTicks(onGroundAnimationTicks, onGroundState);
+        movingAnimationTicks = updateAnimationTicks(movingAnimationTicks, moving);
+    }
+
+    private void updateBabyAnimationState(boolean playingDead, boolean inWater,
+                                          boolean grounded, boolean moving) {
+        int next;
+        if (playingDead) {
+            next = BABY_ANIMATION_PLAY_DEAD;
+        } else if (moving) {
+            if (inWater && !grounded) {
+                next = BABY_ANIMATION_SWIM;
+            } else if (!inWater && grounded) {
+                next = BABY_ANIMATION_WALK;
+            } else {
+                next = BABY_ANIMATION_WALK_UNDERWATER;
+            }
+        } else if (inWater && !grounded) {
+            next = BABY_ANIMATION_IDLE_UNDERWATER;
+        } else if (inWater) {
+            next = BABY_ANIMATION_IDLE_FLOOR_UNDERWATER;
+        } else {
+            next = BABY_ANIMATION_IDLE_FLOOR;
+        }
+        if (babyAnimationState != next) {
+            babyAnimationState = next;
+            babyAnimationStartTick = ticksExisted;
+        }
+    }
+
+    private static int updateAnimationTicks(int ticks, boolean active) {
+        return active ? Math.min(10, ticks + 1) : Math.max(0, ticks - 1);
+    }
+
+    private static float getAnimationFactor(int previousTicks, int currentTicks,
+                                            float partialTicks) {
+        float linear = MathHelper.clamp((previousTicks
+                + (currentTicks - previousTicks) * partialTicks) / 10.0F, 0.0F, 1.0F);
+        return (1.0F - MathHelper.cos(linear * (float) Math.PI)) * 0.5F;
+    }
+
+    public float getPlayingDeadAnimationFactor(float partialTicks) {
+        return getAnimationFactor(previousPlayingDeadAnimationTicks,
+                playingDeadAnimationTicks, partialTicks);
+    }
+
+    public float getInWaterAnimationFactor(float partialTicks) {
+        return getAnimationFactor(previousInWaterAnimationTicks,
+                inWaterAnimationTicks, partialTicks);
+    }
+
+    public float getOnGroundAnimationFactor(float partialTicks) {
+        return getAnimationFactor(previousOnGroundAnimationTicks,
+                onGroundAnimationTicks, partialTicks);
+    }
+
+    public float getMovingAnimationFactor(float partialTicks) {
+        return getAnimationFactor(previousMovingAnimationTicks,
+                movingAnimationTicks, partialTicks);
+    }
+
+    public int getBabyAnimationState() {
+        return babyAnimationState < 0 ? BABY_ANIMATION_IDLE_FLOOR : babyAnimationState;
+    }
+
+    public float getBabyAnimationTime(float partialTicks) {
+        return Math.max(0.0F, ticksExisted + partialTicks - babyAnimationStartTick) * 0.05F;
     }
 
     @Override
@@ -362,16 +465,7 @@ public class EntityAxolotl extends EntityAnimal {
 
     @Override
     public boolean isBreedingItem(ItemStack stack) {
-        if (stack.isEmpty()) {
-            return false;
-        }
-        Item fishBucket = getTropicalFishBucket();
-        if (fishBucket != null) {
-            return stack.getItem() == fishBucket;
-        }
-        return stack.getItem() == Items.FISH
-                && ItemFishFood.FishType.byItemStack(stack)
-                        == ItemFishFood.FishType.CLOWNFISH;
+        return isTropicalFishBucket(stack);
     }
 
     @Override
@@ -396,14 +490,17 @@ public class EntityAxolotl extends EntityAnimal {
         return interacted;
     }
 
-    private boolean isTropicalFishBucket(ItemStack stack) {
-        Item fishBucket = getTropicalFishBucket();
-        return fishBucket != null && !stack.isEmpty() && stack.getItem() == fishBucket;
-    }
-
-    @Nullable
-    private static Item getTropicalFishBucket() {
-        return ForgeRegistries.ITEMS.getValue(FUTURE_MC_TROPICAL_FISH_BUCKET);
+    private static boolean isTropicalFishBucket(ItemStack stack) {
+        if (stack.isEmpty() || stack.getItem().getRegistryName() == null) {
+            return false;
+        }
+        ItemStack effective = FFDItems.effectiveStack(FFDItems.TROPICAL_FISH_BUCKET);
+        if (!effective.isEmpty() && stack.getItem() == effective.getItem()
+                && stack.getMetadata() == effective.getMetadata()) {
+            return true;
+        }
+        String path = stack.getItem().getRegistryName().getResourcePath();
+        return "tropical_fish_bucket".equals(path) || "bucket_tropical_fish".equals(path);
     }
 
     private void captureInBucket(EntityPlayer player, EnumHand hand) {
@@ -523,7 +620,7 @@ public class EntityAxolotl extends EntityAnimal {
     }
 
     private static boolean isAlwaysHostile(EntityLivingBase target) {
-        if (target instanceof EntityGuardian) {
+        if (target instanceof EntityGuardian || target instanceof EntityDrowned) {
             return true;
         }
         ResourceLocation id = entityId(target);
@@ -533,21 +630,18 @@ public class EntityAxolotl extends EntityAnimal {
     }
 
     private static boolean isHuntTarget(EntityLivingBase target) {
-        if (target instanceof EntitySquid || target instanceof EntityGlowSquid) {
+        if (target instanceof EntityAbstractFish || target instanceof EntitySquid
+                || target instanceof EntityGlowSquid) {
             return true;
         }
         ResourceLocation id = entityId(target);
         if (id == null) {
             return false;
         }
-        String namespace = id.getResourceDomain();
         String path = id.getResourcePath();
-        if ("futuremc".equals(namespace) || "oe".equals(namespace)) {
-            return "tropical_fish".equals(path) || "pufferfish".equals(path)
-                    || "salmon".equals(path) || "cod".equals(path)
-                    || "glow_squid".equals(path);
-        }
-        return FarmerFutureDelight.MODID.equals(namespace) && "glow_squid".equals(path);
+        return "tropical_fish".equals(path) || "pufferfish".equals(path)
+                || "puffer_fish".equals(path) || "salmon".equals(path)
+                || "cod".equals(path) || "glow_squid".equals(path);
     }
 
     @Nullable

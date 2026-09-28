@@ -3,7 +3,6 @@ package xy177.farmersfuturedelight.client.model;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -22,6 +21,7 @@ public class ModelAxolotlBaby extends ModelBase {
     private final ModelRenderer leftFrontLeg;
     private final ModelRenderer rightHindLeg;
     private final ModelRenderer leftHindLeg;
+    private final ModelRenderer[] animatedParts;
 
     public ModelAxolotlBaby() {
         textureWidth = 32;
@@ -56,19 +56,34 @@ public class ModelAxolotlBaby extends ModelBase {
 
         rightFrontLeg = flatLeg(20, 16, -2.0F, -1.25F, true);
         leftFrontLeg = flatLeg(20, 13, 2.0F, -1.25F, false);
-        rightHindLeg = flatLeg(20, 14, -2.0F, 1.75F, true);
         leftHindLeg = flatLeg(20, 14, 2.0F, 1.75F, false);
+
+        rightHindLeg = new ModelRenderer(this);
+        rightHindLeg.setRotationPoint(-2.0F, 0.25F, 1.75F);
+        rightHindLeg.rotateAngleY = 1.5708F;
+        rightHindLeg.rotateAngleZ = 1.5708F;
+        ModelRenderer rightHindLegCube = new ModelRenderer(this, 20, 14);
+        rightHindLegCube.rotateAngleX = -1.5708F;
+        rightHindLegCube.rotateAngleZ = 1.5708F;
+        rightHindLegCube.addBox(0.0F, 0.0F, -0.5F, 3, 0, 1, 0.0F);
+        rightHindLeg.addChild(rightHindLegCube);
+        body.addChild(rightHindLeg);
 
         tail = new ModelRenderer(this, 10, 9);
         tail.setRotationPoint(0.0F, -0.25F, 3.25F);
         tail.addBox(0.0F, -1.5F, -1.0F, 0, 3, 8, 0.0F);
         body.addChild(tail);
+
+        animatedParts = new ModelRenderer[] {
+                root, body, head, topGills, leftGills, rightGills, tail,
+                rightFrontLeg, leftFrontLeg, rightHindLeg, leftHindLeg
+        };
     }
 
     private ModelRenderer flatLeg(int u, int v, float x, float z, boolean right) {
         ModelRenderer leg = new ModelRenderer(this, u, v);
         leg.setRotationPoint(x, 0.25F, z);
-        leg.addBox(right ? -3.0F : 0.0F, 0.0F, -0.5F, 3, 0, 1, 0.01F);
+        leg.addBox(right ? -3.0F : 0.0F, 0.0F, -0.5F, 3, 0, 1, 0.0F);
         body.addChild(leg);
         return leg;
     }
@@ -85,64 +100,37 @@ public class ModelAxolotlBaby extends ModelBase {
                                   Entity entity) {
         EntityAxolotl axolotl = (EntityAxolotl) entity;
         resetPose();
-        if (axolotl.isPlayingDead()) {
-            body.rotateAngleX = -0.15F;
-            body.rotateAngleZ = 0.35F;
-            leftHindLeg.rotateAngleZ = 0.8F;
-            leftFrontLeg.rotateAngleY = 1.8F;
-            mirrorLegs();
-            return;
+        int animation = axolotl.getBabyAnimationState();
+        float time = axolotl.getBabyAnimationTime(
+                Math.max(0.0F, Math.min(1.0F, ageInTicks - axolotl.ticksExisted)));
+        float weight = 1.0F;
+        if (animation == EntityAxolotl.BABY_ANIMATION_WALK) {
+            time = limbSwing * 0.75F;
+            weight = Math.min(limbSwingAmount * 30.0F, 1.0F);
         }
-        if (axolotl.isInWater()) {
-            float time = ageInTicks * (limbSwingAmount > 0.02F ? 0.42F : 0.12F);
-            float sway = MathHelper.sin(time);
-            body.rotateAngleX = headPitch * 0.017453292F + sway * 0.12F;
-            tail.rotateAngleY = MathHelper.cos(time * 0.9F) * 0.55F;
-            topGills.rotateAngleX = -0.55F * sway - 0.7F;
-            leftGills.rotateAngleY = 0.35F * sway + 0.8F;
-            rightGills.rotateAngleY = -leftGills.rotateAngleY;
-            leftFrontLeg.rotateAngleZ = 1.2F;
-            leftHindLeg.rotateAngleZ = 1.4F;
-        } else if (axolotl.onGround) {
-            float sway = MathHelper.cos(ageInTicks * 0.18F);
-            tail.rotateAngleY = sway * 0.18F;
-            head.rotateAngleY = sway * 0.12F;
-            leftFrontLeg.rotateAngleY = 1.2F + sway * 0.5F;
-            leftHindLeg.rotateAngleY = 1.0F - sway * 0.35F;
-        }
-        head.rotateAngleY += MathHelper.clamp(netHeadYaw, -45.0F, 45.0F) * 0.017453292F;
-        mirrorLegs();
+        BabyAxolotlAnimationSet.apply(animation, time, weight, animatedParts);
     }
 
     private void resetPose() {
-        body.rotateAngleX = 0.0F;
-        body.rotateAngleY = 0.0F;
-        body.rotateAngleZ = 0.0F;
-        head.rotateAngleX = 0.0F;
-        head.rotateAngleY = 0.0F;
-        head.rotateAngleZ = 0.0F;
-        topGills.rotateAngleX = 0.0F;
-        leftGills.rotateAngleY = 0.0F;
-        rightGills.rotateAngleY = 0.0F;
-        tail.rotateAngleY = 0.0F;
-        resetLeg(leftFrontLeg);
-        resetLeg(rightFrontLeg);
-        resetLeg(leftHindLeg);
-        resetLeg(rightHindLeg);
+        resetPart(root, 0.0F, 24.0F, 0.0F, 0.0F, 0.0F, 0.0F);
+        resetPart(body, 0.0F, -1.25F, 1.75F, 0.0F, 0.0F, 0.0F);
+        resetPart(head, 0.0F, 0.25F, -2.75F, 0.0F, 0.0F, 0.0F);
+        resetPart(topGills, 0.0F, -2.0F, -2.0F, 0.0F, 0.0F, 0.0F);
+        resetPart(leftGills, 3.0F, -0.5F, -2.0F, 0.0F, 0.0F, 0.0F);
+        resetPart(rightGills, -3.0F, -0.5F, -2.0F, 0.0F, 0.0F, 0.0F);
+        resetPart(tail, 0.0F, -0.25F, 3.25F, 0.0F, 0.0F, 0.0F);
+        resetPart(rightFrontLeg, -2.0F, 0.25F, -1.25F, 0.0F, 0.0F, 0.0F);
+        resetPart(leftFrontLeg, 2.0F, 0.25F, -1.25F, 0.0F, 0.0F, 0.0F);
+        resetPart(rightHindLeg, -2.0F, 0.25F, 1.75F,
+                0.0F, 1.5708F, 1.5708F);
+        resetPart(leftHindLeg, 2.0F, 0.25F, 1.75F, 0.0F, 0.0F, 0.0F);
     }
 
-    private static void resetLeg(ModelRenderer leg) {
-        leg.rotateAngleX = 0.0F;
-        leg.rotateAngleY = 0.0F;
-        leg.rotateAngleZ = 0.0F;
-    }
-
-    private void mirrorLegs() {
-        rightFrontLeg.rotateAngleX = leftFrontLeg.rotateAngleX;
-        rightFrontLeg.rotateAngleY = -leftFrontLeg.rotateAngleY;
-        rightFrontLeg.rotateAngleZ = -leftFrontLeg.rotateAngleZ;
-        rightHindLeg.rotateAngleX = leftHindLeg.rotateAngleX;
-        rightHindLeg.rotateAngleY = -leftHindLeg.rotateAngleY;
-        rightHindLeg.rotateAngleZ = -leftHindLeg.rotateAngleZ;
+    private static void resetPart(ModelRenderer part, float x, float y, float z,
+                                  float angleX, float angleY, float angleZ) {
+        part.setRotationPoint(x, y, z);
+        part.rotateAngleX = angleX;
+        part.rotateAngleY = angleY;
+        part.rotateAngleZ = angleZ;
     }
 }

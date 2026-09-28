@@ -11,9 +11,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 
-/** Resolves the final OptiFine water colormap without making OptiFine a hard dependency. */
 final class OptiFineWaterColorCompat {
     private static final Logger LOGGER = LogManager.getLogger("FFD OptiFine Water Color");
+    private static final int BLEND_RADIUS = 1;
     private static final Accessor UNAVAILABLE = new Accessor();
     private static volatile Accessor accessor;
 
@@ -109,15 +109,16 @@ final class OptiFineWaterColorCompat {
                 int red = 0;
                 int green = 0;
                 int blue = 0;
-                for (int x = -1; x <= 1; x++) {
-                    for (int z = -1; z <= 1; z++) {
+                for (int x = -BLEND_RADIUS; x <= BLEND_RADIUS; x++) {
+                    for (int z = -BLEND_RADIUS; z <= BLEND_RADIUS; z++) {
                         int color = colorAt(world, pos.add(x, 0, z));
                         red += color >> 16 & 255;
                         green += color >> 8 & 255;
                         blue += color & 255;
                     }
                 }
-                return red / 9 << 16 | green / 9 << 8 | blue / 9;
+                int samples = (BLEND_RADIUS * 2 + 1) * (BLEND_RADIUS * 2 + 1);
+                return red / samples << 16 | green / samples << 8 | blue / samples;
             } catch (ReflectiveOperationException | RuntimeException | LinkageError exception) {
                 failed = true;
                 LOGGER.warn("OptiFine water colormap call failed; using biome water color", exception);

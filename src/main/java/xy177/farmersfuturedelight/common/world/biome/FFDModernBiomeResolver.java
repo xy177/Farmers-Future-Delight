@@ -3,6 +3,7 @@ package xy177.farmersfuturedelight.common.world.biome;
 import net.minecraft.init.Biomes;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
+import xy177.farmersfuturedelight.common.biome.BiomeModernOcean;
 import xy177.farmersfuturedelight.common.registry.FFDBiomes;
 import xy177.farmersfuturedelight.common.world.terrain.FFDModernWorldgenData;
 import xy177.farmersfuturedelight.common.world.terrain.FFDNoiseRouter;
@@ -10,10 +11,6 @@ import xy177.farmersfuturedelight.common.world.terrain.FFDNoiseRouter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * Resolves the modern surface role without changing the 26.3 density field.
- * The legacy biome provider is used only as a compatible public-biome source.
- */
 public final class FFDModernBiomeResolver {
     private static final int SAMPLE_STEP = FFDModernWorldgenData.CELL_WIDTH;
     private static final int MAX_CACHE_ENTRIES = 32768;
@@ -97,17 +94,55 @@ public final class FFDModernBiomeResolver {
         return sample(quartX * SAMPLE_STEP, quartZ * SAMPLE_STEP);
     }
 
-    /** Selects a legacy public biome only when its climate role is compatible. */
     public Biome resolveLegacy(Sample sample, Biome candidate) {
-        Biome mountain = FFDBiomes.forModernBiome(sample.biome);
-        if (mountain != null) {
+        Biome modern = FFDBiomes.forModernBiome(sample.biome);
+        if (modern instanceof BiomeModernOcean) {
+            if (candidate != null && !(candidate instanceof BiomeModernOcean)
+                    && candidate != Biomes.OCEAN && candidate != Biomes.DEEP_OCEAN
+                    && candidate != Biomes.FROZEN_OCEAN && isCompatible(sample, candidate)) {
+                return candidate;
+            }
+            return modern;
+        }
+        if (modern != null) {
             return isIceAndFireGlacier(candidate) && isCompatible(sample, candidate)
-                    ? candidate : mountain;
+                    ? candidate : modern;
         }
         if (candidate != null && isCompatible(sample, candidate)) {
-            return candidate;
+            return resolveTaigaVariant(sample, candidate);
         }
         return sample.fallbackBiome();
+    }
+
+    private static Biome resolveTaigaVariant(Sample sample, Biome candidate) {
+        boolean giant = candidate == Biomes.REDWOOD_TAIGA
+                || candidate == Biomes.REDWOOD_TAIGA_HILLS
+                || candidate == Biomes.MUTATED_REDWOOD_TAIGA
+                || candidate == Biomes.MUTATED_REDWOOD_TAIGA_HILLS;
+        boolean ordinary = candidate == Biomes.TAIGA || candidate == Biomes.TAIGA_HILLS
+                || candidate == Biomes.MUTATED_TAIGA || candidate == Biomes.COLD_TAIGA
+                || candidate == Biomes.COLD_TAIGA_HILLS || candidate == Biomes.MUTATED_TAIGA_COLD;
+        boolean oldGrowth = sample.biome == ModernBiome.OLD_GROWTH_PINE_TAIGA
+                || sample.biome == ModernBiome.OLD_GROWTH_SPRUCE_TAIGA;
+        if (!giant && !ordinary && (!oldGrowth || candidate.getRegistryName() == null
+                || !"minecraft".equals(candidate.getRegistryName().getResourceDomain()))) {
+            return candidate;
+        }
+        boolean hills = candidate == Biomes.TAIGA_HILLS || candidate == Biomes.COLD_TAIGA_HILLS
+                || candidate == Biomes.REDWOOD_TAIGA_HILLS
+                || candidate == Biomes.MUTATED_REDWOOD_TAIGA_HILLS;
+        switch (sample.biome) {
+            case OLD_GROWTH_PINE_TAIGA:
+                return hills ? Biomes.REDWOOD_TAIGA_HILLS : Biomes.REDWOOD_TAIGA;
+            case OLD_GROWTH_SPRUCE_TAIGA:
+                return hills ? Biomes.MUTATED_REDWOOD_TAIGA_HILLS : Biomes.MUTATED_REDWOOD_TAIGA;
+            case TAIGA:
+                return giant ? hills ? Biomes.TAIGA_HILLS : Biomes.TAIGA : candidate;
+            case SNOWY_TAIGA:
+                return giant ? hills ? Biomes.COLD_TAIGA_HILLS : Biomes.COLD_TAIGA : candidate;
+            default:
+                return candidate;
+        }
     }
 
     private static boolean isIceAndFireGlacier(Biome biome) {
@@ -133,7 +168,7 @@ public final class FFDModernBiomeResolver {
             return sample.biome == ModernBiome.FROZEN_RIVER;
         }
         if ("minecraft:beach".equals(normalized)) {
-            return sample.role == TerrainRole.COAST;
+            return sample.biome == ModernBiome.BEACH;
         }
         if ("minecraft:swamp".equals(normalized) || "minecraft:mangrove_swamp".equals(normalized)) {
             return sample.role == TerrainRole.SWAMP;
@@ -191,6 +226,13 @@ public final class FFDModernBiomeResolver {
                 return false;
             }
         } else if (candidateRole != TerrainRole.LAND) {
+            return false;
+        }
+
+        boolean badlands = sample.biome == ModernBiome.BADLANDS
+                || sample.biome == ModernBiome.WOODED_BADLANDS
+                || sample.biome == ModernBiome.ERODED_BADLANDS;
+        if (badlands != BiomeDictionary.hasType(candidate, BiomeDictionary.Type.MESA)) {
             return false;
         }
 
@@ -422,9 +464,9 @@ public final class FFDModernBiomeResolver {
                 case SNOWY_PLAINS:
                 case ICE_SPIKES: return Biomes.ICE_PLAINS;
                 case SNOWY_TAIGA: return Biomes.COLD_TAIGA;
-                case TAIGA:
-                case OLD_GROWTH_SPRUCE_TAIGA:
-                case OLD_GROWTH_PINE_TAIGA: return Biomes.TAIGA;
+                case TAIGA: return Biomes.TAIGA;
+                case OLD_GROWTH_SPRUCE_TAIGA: return Biomes.MUTATED_REDWOOD_TAIGA;
+                case OLD_GROWTH_PINE_TAIGA: return Biomes.REDWOOD_TAIGA;
                 case FOREST:
                 case FLOWER_FOREST:
                 case DAPPLED_FOREST:

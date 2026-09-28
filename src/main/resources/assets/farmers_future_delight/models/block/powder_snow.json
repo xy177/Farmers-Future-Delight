@@ -2,7 +2,7 @@
   "parent": "block/block",
   "textures": {
     "texture": "farmers_future_delight:block/powder_snow",
-    "particle": "#texture"
+    "particle": "farmers_future_delight:block/powder_snow"
   },
   "elements": [
     {

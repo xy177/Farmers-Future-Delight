@@ -69,10 +69,6 @@ public final class FFDVerticalBiomeSampler {
         return generated;
     }
 
-    /**
-     * Samples one modern biome cell without generating or caching a whole chunk.
-     * Coordinates use the modern four-block biome grid.
-     */
     public FFDVerticalBiome sampleNoiseBiome(int quartX, int quartY, int quartZ) {
         return sampleAtBlock(quartX * FFDVerticalBiomeData.CELL_SIZE,
                 quartY * FFDVerticalBiomeData.CELL_SIZE,

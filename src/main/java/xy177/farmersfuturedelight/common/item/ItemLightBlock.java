@@ -16,14 +16,12 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import xy177.farmersfuturedelight.common.block.BlockLight;
 
-/** Command-only item for placing and inspecting administrator light blocks. */
 public class ItemLightBlock extends ItemBlock {
     public ItemLightBlock(BlockLight block) {
         super(block);
         setHasSubtypes(true);
         setMaxDamage(0);
         setMaxStackSize(64);
-        // Modern light blocks are operator-only rather than ordinary creative items.
         setCreativeTab(null);
     }
 
@@ -34,7 +32,6 @@ public class ItemLightBlock extends ItemBlock {
 
     @Override
     public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
-        // Keep the item out of normal creative tabs; obtain it with /give, as in 1.17.
     }
 
     @SideOnly(Side.CLIENT)

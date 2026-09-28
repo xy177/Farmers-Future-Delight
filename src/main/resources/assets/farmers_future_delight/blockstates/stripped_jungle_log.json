@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "axis=y": { "model": "farmers_future_delight:stripped_jungle_log" },
+    "axis=z": { "model": "farmers_future_delight:stripped_jungle_log", "x": 90 },
+    "axis=x": { "model": "farmers_future_delight:stripped_jungle_log", "x": 90, "y": 90 }
+  }
+}

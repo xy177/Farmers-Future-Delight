@@ -37,7 +37,6 @@ import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiomeData;
 import xy177.farmersfuturedelight.common.world.noise.FFDXoroshiroRandom;
 import xy177.farmersfuturedelight.common.world.terrain.FFDModernWorldgenData;
 
-/** Decorates the already-carved 26.3 density caves without loading neighbor chunks. */
 public final class WorldGenVerticalCaveBiomes {
     private static final Logger LOGGER = LogManager.getLogger("FFD Large Dripstone Trace");
     private static final boolean TRACE_LARGE_DRIPSTONE =
@@ -947,10 +946,7 @@ public final class WorldGenVerticalCaveBiomes {
                     || !isAir(access.getState(x, y, z))) {
                 continue;
             }
-            for (EnumFacing face : DIRECTIONS) {
-                if (face == EnumFacing.DOWN) {
-                    continue;
-                }
+            for (EnumFacing face : EnumFacing.Plane.HORIZONTAL) {
                 int supportX = x + face.getDirectionVec().getX();
                 int supportY = y + face.getDirectionVec().getY();
                 int supportZ = z + face.getDirectionVec().getZ();

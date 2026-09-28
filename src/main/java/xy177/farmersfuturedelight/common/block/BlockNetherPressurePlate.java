@@ -23,12 +23,12 @@ public class BlockNetherPressurePlate extends BlockPressurePlate {
     @Override
     protected void playClickOnSound(World world, BlockPos pos) {
         world.playSound(null, pos, FFDSounds.NETHER_WOOD_PRESSURE_PLATE_CLICK_ON,
-                SoundCategory.BLOCKS, 0.3F, 0.8F);
+                SoundCategory.BLOCKS, 1.0F, 1.0F);
     }
 
     @Override
     protected void playClickOffSound(World world, BlockPos pos) {
         world.playSound(null, pos, FFDSounds.NETHER_WOOD_PRESSURE_PLATE_CLICK_OFF,
-                SoundCategory.BLOCKS, 0.3F, 0.7F);
+                SoundCategory.BLOCKS, 1.0F, 1.0F);
     }
 }

@@ -1,0 +1,20 @@
+{
+  "conditions": [
+    {"type": "farmers_future_delight:feature_enabled", "feature": "fish"}
+  ],
+  "parent": "minecraft:husbandry/root",
+  "display": {
+    "icon": {"item": "minecraft:fishing_rod"},
+    "title": {"translate": "advancements.farmers_future_delight.husbandry.fishy_business.title"},
+    "description": {"translate": "advancements.farmers_future_delight.husbandry.fishy_business.description"},
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "fishy_business": {
+      "trigger": "farmers_future_delight:fishy_business"
+    }
+  }
+}

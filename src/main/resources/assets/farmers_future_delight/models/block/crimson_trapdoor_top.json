@@ -1,5 +1,5 @@
 {
-  "parent": "block/trapdoor_top",
+  "parent": "farmers_future_delight:block/template_orientable_trapdoor_top",
   "textures": {
     "texture": "farmers_future_delight:block/crimson_trapdoor"
   }

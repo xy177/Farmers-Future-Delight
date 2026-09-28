@@ -7,16 +7,21 @@ import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Semaphore;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.LoadingScreenRenderer;
 import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.RegionRenderCacheBuilder;
 import net.minecraft.client.renderer.ViewFrustum;
 import net.minecraft.client.renderer.chunk.RenderChunk;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -24,17 +29,24 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 import net.minecraftforge.client.MinecraftForgeClient;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import xy177.farmersfuturedelight.client.AquaAcrobaticsWaterCompat;
 import xy177.farmersfuturedelight.client.FFDLoadingScreenRenderer;
+import xy177.farmersfuturedelight.client.ModernWaterRendering;
 import xy177.farmersfuturedelight.common.FFDConfig;
 import xy177.farmersfuturedelight.common.block.BlockSeaPickle;
-import xy177.farmersfuturedelight.common.block.WaterloggedPlantFluid;
+import xy177.farmersfuturedelight.api.WaterloggedBlockApi;
+import xy177.farmersfuturedelight.client.model.WaterloggedPlantBakedModel;
 
 public final class FFDClientHeightHooks {
     private static final Logger LOGGER = LogManager.getLogger("FFD Height Core");
     private static final Object SHADER_ALIAS_LOCK = new Object();
     private static LoadingScreenRenderer previousIntegratedWorldLoadingScreen;
+    private static float previousTerrainFov = Float.NaN;
     private static volatile Object shaderAliasPack;
     private static volatile boolean shaderAliasesResolved;
     private static volatile int shaderDrySeaPickleAlias = -1;
@@ -45,20 +57,138 @@ public final class FFDClientHeightHooks {
     private FFDClientHeightHooks() {
     }
 
+    public static boolean hideBlockOutlineInMaterial(net.minecraft.entity.Entity entity,
+                                                      Material material) {
+        return material != Material.WATER && entity.isInsideOfMaterial(material);
+    }
+
+    public static float refreshTerrainFov(float fov, boolean worldProjection) {
+        if (worldProjection) {
+            Minecraft minecraft = Minecraft.getMinecraft();
+            if (Float.compare(previousTerrainFov, fov) != 0 && minecraft.renderGlobal != null) {
+                minecraft.renderGlobal.setDisplayListEntitiesDirty();
+            }
+            previousTerrainFov = fov;
+        }
+        return fov;
+    }
+
     public static IBlockState shaderWaterloggedState(IBlockState state) {
         if (state != null && MinecraftForgeClient.getRenderLayer() == BlockRenderLayer.TRANSLUCENT
-                && WaterloggedPlantFluid.isWaterlogged(state)) {
-            return Blocks.WATER.getDefaultState();
+                && WaterloggedBlockApi.isWaterlogged(state)) {
+            Fluid fluid = containedFluid(state);
+            return WaterloggedBlockApi.sourceState(fluid == null ? FluidRegistry.WATER : fluid);
         }
         return state;
+    }
+
+    public static boolean canRenderWaterloggedLayer(boolean original, IBlockState state,
+                                                     BlockRenderLayer layer) {
+        return original || layer == BlockRenderLayer.TRANSLUCENT
+                && (WaterloggedBlockApi.isWaterlogged(state)
+                    || xy177.farmersfuturedelight.common.fluid.FFDStoredFluidStates.mayContain(state.getBlock()));
+    }
+
+    public static boolean canRenderWaterloggedBlockLayer(Block block, IBlockState state,
+            BlockRenderLayer layer) {
+        return canRenderWaterloggedLayer(block.canRenderInLayer(state, layer), state, layer);
+    }
+
+    public static IBlockState extendedWaterloggedRenderState(IBlockState state,
+            net.minecraft.world.IBlockAccess world, BlockPos pos) {
+        return MinecraftForgeClient.getRenderLayer() == BlockRenderLayer.TRANSLUCENT
+                ? WaterloggedBlockApi.getExtendedState(state, world, pos) : state;
+    }
+
+    public static boolean isWaterloggedSpecialRender(IBlockState state,
+            net.minecraft.world.IBlockAccess world, BlockPos pos) {
+        return MinecraftForgeClient.getRenderLayer() == BlockRenderLayer.TRANSLUCENT
+                && (state.getRenderType() != EnumBlockRenderType.MODEL
+                    || xy177.farmersfuturedelight.common.fluid.FFDStoredFluidStates.has(world, pos))
+                && WaterloggedBlockApi.isWaterlogged(world, pos);
+    }
+
+    public static boolean renderWaterloggedSpecial(BlockRendererDispatcher renderer,
+            IBlockState state, BlockPos pos, net.minecraft.world.IBlockAccess world,
+            BufferBuilder buffer) {
+        IBlockState extended = WaterloggedBlockApi.getExtendedState(state, world, pos);
+        net.minecraft.client.renderer.block.model.IBakedModel model = renderer.getModelForState(state);
+        return renderer.getBlockModelRenderer().renderModel(world,
+                model instanceof WaterloggedPlantBakedModel ? model : new WaterloggedPlantBakedModel(model),
+                extended, pos, buffer, false);
+    }
+
+    public static Material renderedFluidMaterial(IBlockState state) {
+        if (!WaterloggedBlockApi.isWaterlogged(state)) {
+            return state.getMaterial();
+        }
+        Fluid fluid = containedFluid(state);
+        IBlockState fluidState = WaterloggedBlockApi.sourceState(
+                fluid == null ? FluidRegistry.WATER : fluid);
+        return fluidState.getMaterial();
+    }
+
+    public static IBlockState fluidRenderState(net.minecraft.world.IBlockAccess world,
+            BlockPos pos) {
+        IBlockState state = world.getBlockState(pos);
+        return WaterloggedBlockApi.isWaterlogged(world, pos)
+                ? WaterloggedBlockApi.getExtendedState(state, world, pos) : state;
+    }
+
+    public static boolean fluidSideVisible(boolean original, IBlockState state,
+            net.minecraft.world.IBlockAccess world, BlockPos pos, EnumFacing side) {
+        Fluid fluid = FluidRegistry.lookupFluidForBlock(state.getBlock());
+        return original && !(fluid != null
+                && WaterloggedBlockApi.containsFluid(world, pos.offset(side), fluid));
+    }
+
+    private static Fluid containedFluid(IBlockState state) {
+        if (state instanceof IExtendedBlockState) {
+            String name = ((IExtendedBlockState) state)
+                    .getValue(xy177.farmersfuturedelight.common.block.WaterloggedPlantFluid
+                            .CONTAINED_FLUID);
+            if (name != null) {
+                return FluidRegistry.getFluid(name);
+            }
+        }
+        return null;
+    }
+
+    public static IBlockState waterloggedDestroyParticleState(Block block, int meta, int data) {
+        IBlockState decoded = WaterloggedBlockApi.decodeUniversalStateId(null, data);
+        if (decoded != null) {
+            return decoded;
+        }
+        if (block == null) {
+            return Blocks.AIR.getDefaultState();
+        }
+        try {
+            return block.getStateFromMeta(meta);
+        } catch (RuntimeException ignored) {
+            return block.getDefaultState();
+        }
+    }
+
+    public static IBlockState waterloggedDestroyParticleState(IBlockState original, int data) {
+        IBlockState decoded = WaterloggedBlockApi.decodeUniversalStateId(null, data);
+        return decoded == null ? original : decoded;
     }
 
     public static boolean hwylaTreatAsLiquid(boolean originalIsLiquid, IBlockState state) {
         boolean waterloggedPlant = state != null
                 && state.getBlock() != Blocks.WATER
                 && state.getBlock() != Blocks.FLOWING_WATER
-                && WaterloggedPlantFluid.isWaterlogged(state);
+                && WaterloggedBlockApi.isWaterlogged(state);
         return originalIsLiquid && !waterloggedPlant;
+    }
+
+    public static float fluidBottomColorComponent(float original, int color, int shift,
+            IBlockState state) {
+        if (!ModernWaterRendering.isModernEnabled() || AquaAcrobaticsWaterCompat.isEnabled()
+                || state == null || state.getMaterial() != Material.WATER) {
+            return original;
+        }
+        return original * (color >> shift & 255) / 255.0F;
     }
 
     public static int shaderBlockAlias(IBlockState state, int mappedId) {

@@ -246,7 +246,6 @@ public class EntityGoat extends EntityAnimal {
 
     @Override
     protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
-        // Modern goats have no ordinary entity loot; horns come from ramming suitable blocks.
     }
 
     @Override

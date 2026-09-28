@@ -905,7 +905,7 @@ public final class FFDRawOreCompat {
                         ? 5 : FFDConfig.rawOreDropAmount;
                 for (ItemStack ore : matchingOres(FFDRawOres.NAMES[i])) {
                     int multiplier = FFDConfig.denseRawOreDrop && isDenseOre(ore)
-                            ? denseOreMultiplier() : 1;
+                            ? FFDRawOreDropHooks.denseOreMultiplier(ore) : 1;
                     Object conditionals = java.lang.reflect.Array.newInstance(
                             conditionalClass, 0);
                     Object drop = newInstance(lootDropClass, raw, baseMin * multiplier,
@@ -1314,7 +1314,7 @@ public final class FFDRawOreCompat {
                 }
                 for (ItemStack ore : entry.sourceStacks()) {
                     int multiplier = FFDConfig.denseRawOreDrop && isDenseOre(ore)
-                            ? denseOreMultiplier() : 1;
+                            ? FFDRawOreDropHooks.denseOreMultiplier(ore) : 1;
                     Object conditionals = java.lang.reflect.Array.newInstance(conditionalClass, 0);
                     Object drop = newInstance(lootDropClass, raw,
                             FFDConfig.rawOreDropAmount * multiplier,
@@ -1399,18 +1399,6 @@ public final class FFDRawOreCompat {
             }
         }
         return false;
-    }
-
-    private static int denseOreMultiplier() {
-        if (!Loader.isModLoaded("densemetals")) {
-            return 2;
-        }
-        try {
-            Class<?> config = Class.forName("com.mcmoddev.densemetals.DenseMetalsConfig");
-            return Math.max(1, config.getField("denseOreValue").getInt(null));
-        } catch (Throwable ignored) {
-            return 2;
-        }
     }
 
     private static ItemStack refinedStack(String name) {

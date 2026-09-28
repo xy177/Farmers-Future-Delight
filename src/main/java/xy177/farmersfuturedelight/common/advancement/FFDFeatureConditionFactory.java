@@ -23,6 +23,13 @@ public final class FFDFeatureConditionFactory implements IConditionFactory {
                 return FFDItems::isGoatEnabled;
             case "powder_snow":
                 return FFDItems::isPowderSnowEnabled;
+            case "fish":
+                return () -> FFDEntities.isLocalCodEnabled()
+                        || FFDEntities.isLocalSalmonEnabled()
+                        || FFDEntities.isLocalPufferfishEnabled()
+                        || FFDEntities.isLocalTropicalFishEnabled();
+            case "trident":
+                return () -> FFDItems.isItemRegistered(FFDItems.TRIDENT);
             default:
                 throw new JsonSyntaxException("Unknown Farmer's Future Delight feature: " + feature);
         }

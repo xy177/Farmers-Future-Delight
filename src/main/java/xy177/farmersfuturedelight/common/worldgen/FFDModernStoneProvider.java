@@ -17,7 +17,6 @@ import xy177.farmersfuturedelight.common.registry.FFDItems;
 
 import javax.annotation.Nullable;
 
-/** Resolves the registered blocks used by modern underground generation. */
 public final class FFDModernStoneProvider {
     private static final Logger LOGGER = LogManager.getLogger("FFD Modern Stone Provider");
     private static final boolean TRACE = Boolean.getBoolean("ffd.worldgen.traceStoneProvider");

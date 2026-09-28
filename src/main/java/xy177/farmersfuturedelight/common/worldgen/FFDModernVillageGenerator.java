@@ -13,10 +13,6 @@ import net.minecraft.world.gen.structure.StructureStart;
 import xy177.farmersfuturedelight.common.FFDConfig;
 import xy177.farmersfuturedelight.common.registry.FFDBiomes;
 
-/**
- * Keeps the legacy village pieces and biome eligibility, but uses the 26.3
- * random-spread spacing for the extended-height world type.
- */
 public final class FFDModernVillageGenerator extends MapGenVillage {
     private static final int SEPARATION = 8;
     private static final int SALT = 10387312;

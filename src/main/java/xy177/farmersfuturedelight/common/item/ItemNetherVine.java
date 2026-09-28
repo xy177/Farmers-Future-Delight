@@ -63,6 +63,9 @@ public class ItemNetherVine extends ItemBlock {
         }
 
         EnumFacing direction = growsUpward ? EnumFacing.UP : EnumFacing.DOWN;
+        if (facing != direction) {
+            return EnumActionResult.FAIL;
+        }
         BlockPos target = start.offset(direction);
         if (FFDHeightHooks.isOutsideBuildHeight(world, target) || !world.isAirBlock(target)) {
             return EnumActionResult.FAIL;
@@ -85,7 +88,7 @@ public class ItemNetherVine extends ItemBlock {
             terminalSnapshot.restore(true, false);
             return EnumActionResult.FAIL;
         }
-        if (!world.setBlockState(start, body, 11)) {
+        if (world.getBlockState(start) != body && !world.setBlockState(start, body, 11)) {
             targetSnapshot.restore(true, false);
             terminalSnapshot.restore(true, false);
             return EnumActionResult.FAIL;

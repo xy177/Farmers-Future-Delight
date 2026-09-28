@@ -16,7 +16,6 @@ import xy177.farmersfuturedelight.common.registry.FFDSounds;
 import xy177.farmersfuturedelight.common.worldgen.FFDLushCaveBlockProvider;
 import xy177.farmersfuturedelight.common.worldgen.FFDNetherBlockProvider;
 
-/** Shared placement rules for plants rooted in Nether vegetation. */
 public class BlockNetherPlant extends BlockBush {
     private final AxisAlignedBB shape;
     private final boolean supportsMycelium;

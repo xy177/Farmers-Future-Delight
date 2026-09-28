@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.minecraft.init.Biomes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
@@ -25,11 +26,6 @@ import xy177.farmersfuturedelight.common.world.biome.FFDModernBiomeResolver.Samp
 import xy177.farmersfuturedelight.common.world.biome.FFDModernBiomeResolver.TerrainRole;
 import xy177.farmersfuturedelight.common.world.terrain.FFDModernWorldgenData;
 
-/**
- * Maps registered 1.12 biomes into the modern climate space. Coordinates are
- * never taken from a legacy GenLayer; registered biomes only provide weighted
- * candidates for the authoritative modern climate sample.
- */
 final class FFDBiomeCandidateSelector {
     private static final Logger LOGGER = LogManager.getLogger("FFD Biome Candidates");
     private static final int MAX_CELL_CACHE = 32768;
@@ -46,6 +42,11 @@ final class FFDBiomeCandidateSelector {
     private static final double LEGACY_REGION_VARIATION = 0.22D;
     private static final double WEIGHT_INFLUENCE = 0.045D;
     private static final double FALLBACK_BONUS = 0.12D;
+    private static final double VANILLA_MUTATION_CHANCE = 1.0D / 29.0D;
+    private static final double VANILLA_HILLS_CHANCE = 1.0D / 3.0D;
+    private static final int VANILLA_VARIANT_REGION_SIZE = 128;
+    private static final long VANILLA_VARIANT_SALT = 0xA4093822299F31D0L;
+    private static final long VANILLA_MUTATION_SALT = 0x082EFA98EC4E6C89L;
 
     private static final double[] TEMPERATURE_MIN = {
             -1.0D, -0.45D, -0.15D, 0.2D, 0.55D
@@ -132,8 +133,10 @@ final class FFDBiomeCandidateSelector {
 
         Biome fallback = sample.fallbackBiome();
         Family targetFamily = familyOf(sample.biome);
+        Biome selected;
         if (!biomesOPlentyLoaded) {
-            return selectLegacy(sample, blockX, blockZ, fallback, targetFamily);
+            selected = selectLegacy(sample, blockX, blockZ, fallback, targetFamily);
+            return applyVanillaSubBiomeVariant(selected, blockX, blockZ);
         }
         CandidateScratch scratch = candidateScratch.get();
         Entry[] candidates = scratch.entries;
@@ -163,7 +166,7 @@ final class FFDBiomeCandidateSelector {
             }
         }
         if (candidateCount == 0) {
-            return fallback;
+            return applyVanillaSubBiomeVariant(fallback, blockX, blockZ);
         }
 
         long region = regionSeed(blockX, blockZ, targetFamily,
@@ -177,10 +180,12 @@ final class FFDBiomeCandidateSelector {
         for (int i = 0; i < candidateCount; i++) {
             selectedWeight -= selectionWeight(candidates[i], scores[i], scores[0]);
             if (selectedWeight <= 0.0D) {
-                return candidates[i].biome;
+                selected = candidates[i].biome;
+                return applyVanillaSubBiomeVariant(selected, blockX, blockZ);
             }
         }
-        return candidates[candidateCount - 1].biome;
+        selected = candidates[candidateCount - 1].biome;
+        return applyVanillaSubBiomeVariant(selected, blockX, blockZ);
     }
 
     private Biome selectLegacy(Sample sample, int blockX, int blockZ,
@@ -240,8 +245,17 @@ final class FFDBiomeCandidateSelector {
 
     private long regionSeed(int blockX, int blockZ, Family family,
                             int temperature, int humidity) {
-        int cellX = Math.floorDiv(blockX, REGION_SIZE);
-        int cellZ = Math.floorDiv(blockZ, REGION_SIZE);
+        long climate = REGION_SELECTION_SALT
+                ^ (long) family.ordinal() * 0x9E3779B97F4A7C15L
+                ^ (long) temperature * 0xC2B2AE3D27D4EB4FL
+                ^ (long) humidity * 0x165667B19E3779F9L;
+        return regionSeed(blockX, blockZ, REGION_SIZE, REGION_SHAPE_SALT, climate);
+    }
+
+    private long regionSeed(int blockX, int blockZ, int regionSize,
+                            long shapeSalt, long selectionSalt) {
+        int cellX = Math.floorDiv(blockX, regionSize);
+        int cellZ = Math.floorDiv(blockZ, regionSize);
         int selectedX = cellX;
         int selectedZ = cellZ;
         double bestDistance = Double.MAX_VALUE;
@@ -249,12 +263,12 @@ final class FFDBiomeCandidateSelector {
             for (int offsetZ = -1; offsetZ <= 1; offsetZ++) {
                 int candidateX = cellX + offsetX;
                 int candidateZ = cellZ + offsetZ;
-                long shape = mix(seed ^ REGION_SHAPE_SALT, candidateX, candidateZ);
-                double centerX = (candidateX + 0.5D) * REGION_SIZE
-                        + (unit01(shape) - 0.5D) * REGION_SIZE * REGION_JITTER;
-                double centerZ = (candidateZ + 0.5D) * REGION_SIZE
-                        + (unit01(mix(shape ^ REGION_SHAPE_SALT, candidateZ, candidateX)) - 0.5D)
-                        * REGION_SIZE * REGION_JITTER;
+                long shape = mix(seed ^ shapeSalt, candidateX, candidateZ);
+                double centerX = (candidateX + 0.5D) * regionSize
+                        + (unit01(shape) - 0.5D) * regionSize * REGION_JITTER;
+                double centerZ = (candidateZ + 0.5D) * regionSize
+                        + (unit01(mix(shape ^ shapeSalt, candidateZ, candidateX)) - 0.5D)
+                        * regionSize * REGION_JITTER;
                 double deltaX = blockX - centerX;
                 double deltaZ = blockZ - centerZ;
                 double distance = deltaX * deltaX + deltaZ * deltaZ;
@@ -265,11 +279,7 @@ final class FFDBiomeCandidateSelector {
                 }
             }
         }
-        long climate = REGION_SELECTION_SALT
-                ^ (long) family.ordinal() * 0x9E3779B97F4A7C15L
-                ^ (long) temperature * 0xC2B2AE3D27D4EB4FL
-                ^ (long) humidity * 0x165667B19E3779F9L;
-        return mix(seed ^ climate, selectedX, selectedZ);
+        return mix(seed ^ selectionSalt, selectedX, selectedZ);
     }
 
     private static List<Entry> loadEntries() {
@@ -288,6 +298,7 @@ final class FFDBiomeCandidateSelector {
             mergeWeight(weights, entry.getKey(), entry.getValue());
         }
         loadConfiguredCandidates(weights);
+        loadVanillaSubBiomeCandidates(weights);
 
         List<Entry> loaded = new ArrayList<>();
         for (Map.Entry<Biome, Integer> entry : weights.entrySet()) {
@@ -297,6 +308,146 @@ final class FFDBiomeCandidateSelector {
         }
         Collections.sort(loaded, Comparator.comparing(Entry::registryName));
         return Collections.unmodifiableList(loaded);
+    }
+
+    private static void loadVanillaSubBiomeCandidates(Map<Biome, Integer> weights) {
+        Biome[] hills = {
+                Biomes.DESERT_HILLS,
+                Biomes.FOREST_HILLS,
+                Biomes.TAIGA_HILLS,
+                Biomes.EXTREME_HILLS_EDGE,
+                Biomes.JUNGLE_HILLS,
+                Biomes.BIRCH_FOREST_HILLS,
+                Biomes.COLD_TAIGA_HILLS,
+                Biomes.REDWOOD_TAIGA_HILLS,
+                Biomes.EXTREME_HILLS_WITH_TREES,
+                Biomes.SAVANNA_PLATEAU,
+                Biomes.ICE_MOUNTAINS
+        };
+        Biome[] mutations = {
+                Biomes.MUTATED_PLAINS,
+                Biomes.MUTATED_DESERT,
+                Biomes.MUTATED_EXTREME_HILLS,
+                Biomes.MUTATED_FOREST,
+                Biomes.MUTATED_TAIGA,
+                Biomes.MUTATED_SWAMPLAND,
+                Biomes.MUTATED_ICE_FLATS,
+                Biomes.MUTATED_JUNGLE,
+                Biomes.MUTATED_JUNGLE_EDGE,
+                Biomes.MUTATED_BIRCH_FOREST,
+                Biomes.MUTATED_BIRCH_FOREST_HILLS,
+                Biomes.MUTATED_ROOFED_FOREST,
+                Biomes.MUTATED_TAIGA_COLD,
+                Biomes.MUTATED_REDWOOD_TAIGA,
+                Biomes.MUTATED_REDWOOD_TAIGA_HILLS,
+                Biomes.MUTATED_EXTREME_HILLS_WITH_TREES,
+                Biomes.MUTATED_SAVANNA,
+                Biomes.MUTATED_SAVANNA_ROCK,
+                Biomes.MUTATED_MESA,
+                Biomes.MUTATED_MESA_ROCK,
+                Biomes.MUTATED_MESA_CLEAR_ROCK
+        };
+        for (Biome biome : hills) {
+            mergeWeight(weights, biome, DEFAULT_MODDED_WEIGHT);
+        }
+        for (Biome biome : mutations) {
+            mergeWeight(weights, biome, 1);
+        }
+    }
+
+    private Biome applyVanillaSubBiomeVariant(Biome selected, int blockX, int blockZ) {
+        if (selected == null || isVanillaSubBiome(selected)) {
+            return selected;
+        }
+        long variantSeed = regionSeed(blockX, blockZ, VANILLA_VARIANT_REGION_SIZE,
+                VANILLA_VARIANT_SALT, VANILLA_VARIANT_SALT);
+        Biome mutation = Biome.getMutationForBiome(selected);
+        if (mutation != null
+                && unit01(mix(variantSeed ^ VANILLA_MUTATION_SALT, 0, 0))
+                < VANILLA_MUTATION_CHANCE) {
+            return mutation;
+        }
+        Biome hills = vanillaHillsBiome(selected);
+        if (hills != null) {
+            double chance = selected == Biomes.PLAINS
+                    ? VANILLA_HILLS_CHANCE / 3.0D : VANILLA_HILLS_CHANCE;
+            if (unit01(variantSeed) < chance) {
+                return hills;
+            }
+        }
+        return selected;
+    }
+
+    private static Biome vanillaHillsBiome(Biome biome) {
+        if (biome == Biomes.PLAINS) {
+            return Biomes.FOREST_HILLS;
+        }
+        if (biome == Biomes.DESERT) {
+            return Biomes.DESERT_HILLS;
+        }
+        if (biome == Biomes.FOREST) {
+            return Biomes.FOREST_HILLS;
+        }
+        if (biome == Biomes.BIRCH_FOREST) {
+            return Biomes.BIRCH_FOREST_HILLS;
+        }
+        if (biome == Biomes.TAIGA) {
+            return Biomes.TAIGA_HILLS;
+        }
+        if (biome == Biomes.REDWOOD_TAIGA) {
+            return Biomes.REDWOOD_TAIGA_HILLS;
+        }
+        if (biome == Biomes.COLD_TAIGA) {
+            return Biomes.COLD_TAIGA_HILLS;
+        }
+        if (biome == Biomes.JUNGLE) {
+            return Biomes.JUNGLE_HILLS;
+        }
+        if (biome == Biomes.ICE_PLAINS) {
+            return Biomes.ICE_MOUNTAINS;
+        }
+        if (biome == Biomes.EXTREME_HILLS) {
+            return Biomes.EXTREME_HILLS_WITH_TREES;
+        }
+        if (biome == Biomes.SAVANNA) {
+            return Biomes.SAVANNA_PLATEAU;
+        }
+        return null;
+    }
+
+    private static boolean isVanillaSubBiome(Biome biome) {
+        return biome == Biomes.DESERT_HILLS
+                || biome == Biomes.FOREST_HILLS
+                || biome == Biomes.TAIGA_HILLS
+                || biome == Biomes.EXTREME_HILLS_EDGE
+                || biome == Biomes.JUNGLE_HILLS
+                || biome == Biomes.BIRCH_FOREST_HILLS
+                || biome == Biomes.COLD_TAIGA_HILLS
+                || biome == Biomes.REDWOOD_TAIGA_HILLS
+                || biome == Biomes.EXTREME_HILLS_WITH_TREES
+                || biome == Biomes.SAVANNA_PLATEAU
+                || biome == Biomes.ICE_MOUNTAINS
+                || biome == Biomes.MUTATED_PLAINS
+                || biome == Biomes.MUTATED_DESERT
+                || biome == Biomes.MUTATED_EXTREME_HILLS
+                || biome == Biomes.MUTATED_FOREST
+                || biome == Biomes.MUTATED_TAIGA
+                || biome == Biomes.MUTATED_SWAMPLAND
+                || biome == Biomes.MUTATED_ICE_FLATS
+                || biome == Biomes.MUTATED_JUNGLE
+                || biome == Biomes.MUTATED_JUNGLE_EDGE
+                || biome == Biomes.MUTATED_BIRCH_FOREST
+                || biome == Biomes.MUTATED_BIRCH_FOREST_HILLS
+                || biome == Biomes.MUTATED_ROOFED_FOREST
+                || biome == Biomes.MUTATED_TAIGA_COLD
+                || biome == Biomes.MUTATED_REDWOOD_TAIGA
+                || biome == Biomes.MUTATED_REDWOOD_TAIGA_HILLS
+                || biome == Biomes.MUTATED_EXTREME_HILLS_WITH_TREES
+                || biome == Biomes.MUTATED_SAVANNA
+                || biome == Biomes.MUTATED_SAVANNA_ROCK
+                || biome == Biomes.MUTATED_MESA
+                || biome == Biomes.MUTATED_MESA_ROCK
+                || biome == Biomes.MUTATED_MESA_CLEAR_ROCK;
     }
 
     private static void loadConfiguredCandidates(Map<Biome, Integer> weights) {

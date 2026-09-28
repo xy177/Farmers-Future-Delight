@@ -1,0 +1,20 @@
+{
+  "conditions": [
+    {"type": "farmers_future_delight:feature_enabled", "feature": "fish"}
+  ],
+  "parent": "farmers_future_delight:husbandry/fishy_business",
+  "display": {
+    "icon": {"item": "minecraft:water_bucket"},
+    "title": {"translate": "advancements.farmers_future_delight.husbandry.tactical_fishing.title"},
+    "description": {"translate": "advancements.farmers_future_delight.husbandry.tactical_fishing.description"},
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "tactical_fishing": {
+      "trigger": "farmers_future_delight:tactical_fishing"
+    }
+  }
+}

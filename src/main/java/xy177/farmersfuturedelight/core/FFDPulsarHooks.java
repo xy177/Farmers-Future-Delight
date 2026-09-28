@@ -8,7 +8,6 @@ import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-/** Keeps Pulsar's logical section range aligned with FFD's physical chunk storage. */
 public final class FFDPulsarHooks {
     private static final Logger LOGGER = LogManager.getLogger("FFD Pulsar Compat");
     private static final Map<World, Object> CONTEXTS =

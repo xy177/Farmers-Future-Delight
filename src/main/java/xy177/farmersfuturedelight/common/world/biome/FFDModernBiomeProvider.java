@@ -15,11 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-/**
- * Uses the modern climate sample as the only spatial biome source. Forge and
- * modded biomes participate as climate-profiled candidates without importing
- * their legacy GenLayer coordinates.
- */
 public final class FFDModernBiomeProvider extends BiomeProvider {
     private static final int MAX_CHUNK_CACHE = 1024;
 

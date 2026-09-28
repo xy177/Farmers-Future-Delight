@@ -99,7 +99,7 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
 
     public EntityBee(World worldIn) {
         super(worldIn);
-        moveHelper = new EntityFlyHelper(this);
+        moveHelper = new BeeMoveHelper(this);
         setNoGravity(true);
         setSize(0.7F, 0.6F);
         setPathPriority(PathNodeType.DANGER_FIRE, -1.0F);
@@ -471,6 +471,15 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
     }
 
     @Override
+    public void travel(float strafe, float vertical, float forward) {
+        boolean airMovement = !isInWater() && !isInLava() && !isElytraFlying();
+        super.travel(strafe, vertical, forward);
+        if (airMovement) {
+            motionY *= (double) 0.91F / (double) 0.98F;
+        }
+    }
+
+    @Override
     protected void updateFallState(double y, boolean onGroundIn, IBlockState state, BlockPos pos) {
     }
 
@@ -585,15 +594,20 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
         BlockPos closest = null;
         double closestDistance = Double.MAX_VALUE;
         double maxDistanceSq = radius * radius;
+        List<TileEntityBeehive> candidates = new ArrayList<>();
         for (TileEntity tile : world.loadedTileEntityList) {
-            if (!(tile instanceof TileEntityBeehive) || ((TileEntityBeehive) tile).isFullOfBees()
-                    || ((TileEntityBeehive) tile).isFireNearby()
+            if (!(tile instanceof TileEntityBeehive) || tile.isInvalid()
+                    || tile.getPos().distanceSq(origin) > maxDistanceSq
                     || excluded != null && excluded.contains(tile.getPos())) {
                 continue;
             }
-            double distance = tile.getPos().distanceSq(origin);
-            if (distance <= maxDistanceSq && distance < closestDistance) {
-                closest = tile.getPos().toImmutable();
+            candidates.add((TileEntityBeehive) tile);
+        }
+        for (TileEntityBeehive hive : candidates) {
+            double distance = hive.getPos().distanceSq(origin);
+            if (!hive.isInvalid() && distance < closestDistance && !hive.isFullOfBees()
+                    && !hive.isFireNearby()) {
+                closest = hive.getPos().toImmutable();
                 closestDistance = distance;
             }
         }
@@ -691,6 +705,43 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
     public static EntityDamageSource causeBeeDamage(EntityBee bee) {
         EntityDamageSource damage = new EntityDamageSource("bee_sting", bee);
         return damage;
+    }
+
+    private static final class BeeMoveHelper extends EntityFlyHelper {
+        private BeeMoveHelper(EntityBee bee) {
+            super(bee);
+        }
+
+        @Override
+        public void onUpdateMoveHelper() {
+            entity.setNoGravity(true);
+            if (action != Action.MOVE_TO) {
+                entity.setMoveVertical(0.0F);
+                entity.setMoveForward(0.0F);
+                return;
+            }
+            action = Action.WAIT;
+            double dx = posX - entity.posX;
+            double dy = posY - entity.posY;
+            double dz = posZ - entity.posZ;
+            if (dx * dx + dy * dy + dz * dz < 2.500000277905201E-7D) {
+                entity.setMoveVertical(0.0F);
+                entity.setMoveForward(0.0F);
+                return;
+            }
+            float yaw = (float) (MathHelper.atan2(dz, dx) * (180.0D / Math.PI)) - 90.0F;
+            entity.rotationYaw = limitAngle(entity.rotationYaw, yaw, 90.0F);
+            float movementSpeed = (float) (speed * entity.getEntityAttribute(entity.onGround
+                    ? SharedMonsterAttributes.MOVEMENT_SPEED : SharedMonsterAttributes.FLYING_SPEED)
+                    .getAttributeValue());
+            entity.setAIMoveSpeed(movementSpeed);
+            double horizontalDistance = Math.sqrt(dx * dx + dz * dz);
+            if (Math.abs(dy) > 1.0E-5D || horizontalDistance > 1.0E-5D) {
+                float pitch = (float) -(MathHelper.atan2(dy, horizontalDistance) * (180.0D / Math.PI));
+                entity.rotationPitch = limitAngle(entity.rotationPitch, pitch, 20.0F);
+                entity.setMoveVertical(dy > 0.0D ? movementSpeed : -movementSpeed);
+            }
+        }
     }
 
     private static final class BeeHurtByTarget extends EntityAIHurtByTarget {
@@ -944,21 +995,21 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
             if (hoverPos == null) {
                 hoverPos = new Vec3d(x, y, z);
             }
-            boolean reachedHoverPos = bee.getDistanceSq(hoverPos.x, hoverPos.y, hoverPos.z) <= 0.01D;
-            boolean move = true;
-            if (reachedHoverPos) {
-                if (bee.rand.nextInt(25) == 0) {
-                    hoverPos = new Vec3d(x + (bee.rand.nextFloat() * 2.0F - 1.0F) / 3.0F,
-                            y, z + (bee.rand.nextFloat() * 2.0F - 1.0F) / 3.0F);
-                    bee.getNavigator().clearPath();
-                } else {
-                    move = false;
-                }
+            bee.getNavigator().clearPath();
+            boolean arrived = bee.getDistanceSq(hoverPos.x, hoverPos.y, hoverPos.z) <= 0.01D;
+            boolean changeHover = arrived && bee.rand.nextInt(25) == 0;
+            if (changeHover) {
+                hoverPos = new Vec3d(x + (bee.rand.nextFloat() * 2.0F - 1.0F) * 0.33333334F,
+                        y, z + (bee.rand.nextFloat() * 2.0F - 1.0F) * 0.33333334F);
+            }
+            if (!arrived || changeHover) {
+                moveToHoverPos();
+            } else {
+                bee.getMoveHelper().action = net.minecraft.entity.ai.EntityMoveHelper.Action.WAIT;
+            }
+            if (arrived) {
                 bee.getLookHelper().setLookPosition(x, y, z, 10.0F,
                         bee.getVerticalFaceSpeed());
-            }
-            if (move) {
-                moveToHoverPos();
             }
             successfulPollinatingTicks++;
             if (bee.rand.nextFloat() < 0.05F

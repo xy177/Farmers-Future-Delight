@@ -1,4 +1,7 @@
 {
+    "music.caves_and_cliffs": {
+        "sounds": []
+    },
     "block.wet_grass.break":  {
                                   "sounds":  [
                                                  {
@@ -99,12 +102,19 @@
                                               ]
                                },
     "entity.glow_squid.squirt":  {
-                                     "sounds":  [
-                                                    "farmers_future_delight:mob/glow_squid/squirt1",
-                                                    "farmers_future_delight:mob/glow_squid/squirt2",
-                                                    "farmers_future_delight:mob/glow_squid/squirt3"
-                                                ]
-                                 },
+                                      "sounds":  [
+                                                     "farmers_future_delight:mob/glow_squid/squirt1",
+                                                     "farmers_future_delight:mob/glow_squid/squirt2",
+                                                     "farmers_future_delight:mob/glow_squid/squirt3"
+                                                 ]
+                                  },
+    "entity.squid.squirt":  {
+                                 "sounds":  [
+                                                "farmers_future_delight:mob/squid/squirt1",
+                                                "farmers_future_delight:mob/squid/squirt2",
+                                                "farmers_future_delight:mob/squid/squirt3"
+                                            ]
+                             },
     "entity.turtle.ambient_land":  {
                                        "sounds":  [
                                                       {
@@ -3869,6 +3879,261 @@
         ],
         "subtitle": "subtitles.item.bucket.empty"
     },
+    "item.bucket.fill_fish": {
+        "sounds": [
+            "farmers_future_delight:item/bucket/fill_fish1",
+            "farmers_future_delight:item/bucket/fill_fish2",
+            "farmers_future_delight:item/bucket/fill_fish3"
+        ],
+        "subtitle": "subtitles.item.bucket.fill_fish"
+    },
+    "item.bucket.empty_fish": {
+        "sounds": [
+            "farmers_future_delight:item/bucket/empty_fish1",
+            "farmers_future_delight:item/bucket/empty_fish2",
+            "farmers_future_delight:item/bucket/empty_fish3"
+        ],
+        "subtitle": "subtitles.item.bucket.empty"
+    },
+    "entity.cod.ambient": {
+        "sounds": []
+    },
+    "entity.cod.death": {
+        "sounds": [
+            "farmers_future_delight:entity/fish/hurt1",
+            "farmers_future_delight:entity/fish/hurt2",
+            "farmers_future_delight:entity/fish/hurt3",
+            "farmers_future_delight:entity/fish/hurt4"
+        ],
+        "subtitle": "subtitles.entity.cod.death"
+    },
+    "entity.cod.flop": {
+        "sounds": [
+            {"name": "farmers_future_delight:entity/fish/flop1", "volume": 0.3},
+            {"name": "farmers_future_delight:entity/fish/flop2", "volume": 0.3},
+            {"name": "farmers_future_delight:entity/fish/flop3", "volume": 0.3},
+            {"name": "farmers_future_delight:entity/fish/flop4", "volume": 0.3}
+        ],
+        "subtitle": "subtitles.entity.cod.flop"
+    },
+    "entity.cod.hurt": {
+        "sounds": [
+            "farmers_future_delight:entity/fish/hurt1",
+            "farmers_future_delight:entity/fish/hurt2",
+            "farmers_future_delight:entity/fish/hurt3",
+            "farmers_future_delight:entity/fish/hurt4"
+        ],
+        "subtitle": "subtitles.entity.cod.hurt"
+    },
+    "entity.salmon.ambient": {
+        "sounds": []
+    },
+    "entity.salmon.death": {
+        "sounds": [
+            {"name": "farmers_future_delight:entity/fish/hurt1", "pitch": 0.8},
+            {"name": "farmers_future_delight:entity/fish/hurt2", "pitch": 0.8},
+            {"name": "farmers_future_delight:entity/fish/hurt3", "pitch": 0.8},
+            {"name": "farmers_future_delight:entity/fish/hurt4", "pitch": 0.8}
+        ],
+        "subtitle": "subtitles.entity.salmon.death"
+    },
+    "entity.salmon.flop": {
+        "sounds": [
+            {"name": "farmers_future_delight:entity/fish/flop1", "pitch": 0.8, "volume": 0.3},
+            {"name": "farmers_future_delight:entity/fish/flop2", "pitch": 0.8, "volume": 0.3},
+            {"name": "farmers_future_delight:entity/fish/flop3", "pitch": 0.8, "volume": 0.3},
+            {"name": "farmers_future_delight:entity/fish/flop4", "pitch": 0.8, "volume": 0.3}
+        ],
+        "subtitle": "subtitles.entity.salmon.flop"
+    },
+    "entity.salmon.hurt": {
+        "sounds": [
+            {"name": "farmers_future_delight:entity/fish/hurt1", "pitch": 0.8},
+            {"name": "farmers_future_delight:entity/fish/hurt2", "pitch": 0.8},
+            {"name": "farmers_future_delight:entity/fish/hurt3", "pitch": 0.8},
+            {"name": "farmers_future_delight:entity/fish/hurt4", "pitch": 0.8}
+        ],
+        "subtitle": "subtitles.entity.salmon.hurt"
+    },
+    "entity.puffer_fish.ambient": {
+        "sounds": []
+    },
+    "entity.puffer_fish.blow_out": {
+        "sounds": [
+            {"name": "farmers_future_delight:entity/pufferfish/blow_out1", "volume": 0.7},
+            {"name": "farmers_future_delight:entity/pufferfish/blow_out2", "volume": 0.7}
+        ],
+        "subtitle": "subtitles.entity.puffer_fish.blow_out"
+    },
+    "entity.puffer_fish.blow_up": {
+        "sounds": [
+            {"name": "farmers_future_delight:entity/pufferfish/blow_up1", "volume": 0.45},
+            {"name": "farmers_future_delight:entity/pufferfish/blow_up2", "volume": 0.45}
+        ],
+        "subtitle": "subtitles.entity.puffer_fish.blow_up"
+    },
+    "entity.puffer_fish.death": {
+        "sounds": [
+            "farmers_future_delight:entity/pufferfish/death1",
+            "farmers_future_delight:entity/pufferfish/death2"
+        ],
+        "subtitle": "subtitles.entity.puffer_fish.death"
+    },
+    "entity.puffer_fish.flop": {
+        "sounds": [
+            {"name": "farmers_future_delight:entity/pufferfish/flop1", "volume": 0.3},
+            {"name": "farmers_future_delight:entity/pufferfish/flop2", "volume": 0.3},
+            {"name": "farmers_future_delight:entity/pufferfish/flop3", "volume": 0.3},
+            {"name": "farmers_future_delight:entity/pufferfish/flop4", "volume": 0.3}
+        ],
+        "subtitle": "subtitles.entity.puffer_fish.flop"
+    },
+    "entity.puffer_fish.hurt": {
+        "sounds": [
+            "farmers_future_delight:entity/pufferfish/hurt1",
+            "farmers_future_delight:entity/pufferfish/hurt2"
+        ],
+        "subtitle": "subtitles.entity.puffer_fish.hurt"
+    },
+    "entity.puffer_fish.sting": {
+        "sounds": [
+            "farmers_future_delight:entity/pufferfish/sting1",
+            "farmers_future_delight:entity/pufferfish/sting2"
+        ],
+        "subtitle": "subtitles.entity.puffer_fish.sting"
+    },
+    "entity.tropical_fish.ambient": {
+        "sounds": []
+    },
+    "entity.tropical_fish.death": {
+        "sounds": [
+            {"name": "farmers_future_delight:entity/fish/hurt1", "pitch": 0.8},
+            {"name": "farmers_future_delight:entity/fish/hurt2", "pitch": 0.8},
+            {"name": "farmers_future_delight:entity/fish/hurt3", "pitch": 0.8},
+            {"name": "farmers_future_delight:entity/fish/hurt4", "pitch": 0.8}
+        ]
+    },
+    "entity.tropical_fish.flop": {
+        "sounds": [
+            {"name": "farmers_future_delight:entity/fish/flop1", "volume": 0.3},
+            {"name": "farmers_future_delight:entity/fish/flop2", "volume": 0.3},
+            {"name": "farmers_future_delight:entity/fish/flop3", "volume": 0.3},
+            {"name": "farmers_future_delight:entity/fish/flop4", "volume": 0.3}
+        ]
+    },
+    "entity.tropical_fish.hurt": {
+        "sounds": [
+            "farmers_future_delight:entity/fish/hurt1",
+            "farmers_future_delight:entity/fish/hurt2",
+            "farmers_future_delight:entity/fish/hurt3",
+            "farmers_future_delight:entity/fish/hurt4"
+        ]
+    },
+    "entity.fish.swim": {
+        "sounds": [
+            "farmers_future_delight:entity/fish/swim1",
+            "farmers_future_delight:entity/fish/swim2",
+            "farmers_future_delight:entity/fish/swim3",
+            "farmers_future_delight:entity/fish/swim4",
+            "farmers_future_delight:entity/fish/swim5",
+            "farmers_future_delight:entity/fish/swim6",
+            "farmers_future_delight:entity/fish/swim7"
+        ]
+    },
+    "entity.dolphin.ambient": {
+        "sounds": [
+            "farmers_future_delight:mob/dolphin/idle1",
+            "farmers_future_delight:mob/dolphin/idle2",
+            "farmers_future_delight:mob/dolphin/idle3",
+            "farmers_future_delight:mob/dolphin/idle4",
+            "farmers_future_delight:mob/dolphin/idle5",
+            "farmers_future_delight:mob/dolphin/idle6",
+            "farmers_future_delight:mob/dolphin/blowhole1",
+            "farmers_future_delight:mob/dolphin/blowhole2"
+        ],
+        "subtitle": "subtitles.entity.dolphin.ambient"
+    },
+    "entity.dolphin.ambient_water": {
+        "sounds": [
+            {"name": "farmers_future_delight:mob/dolphin/idle_water1", "volume": 0.8},
+            "farmers_future_delight:mob/dolphin/idle_water2",
+            "farmers_future_delight:mob/dolphin/idle_water3",
+            "farmers_future_delight:mob/dolphin/idle_water4",
+            "farmers_future_delight:mob/dolphin/idle_water5",
+            "farmers_future_delight:mob/dolphin/idle_water6",
+            {"name": "farmers_future_delight:mob/dolphin/idle_water7", "volume": 0.75},
+            {"name": "farmers_future_delight:mob/dolphin/idle_water8", "volume": 0.75},
+            "farmers_future_delight:mob/dolphin/idle_water9",
+            {"name": "farmers_future_delight:mob/dolphin/idle_water10", "volume": 0.8}
+        ],
+        "subtitle": "subtitles.entity.dolphin.ambient_water"
+    },
+    "entity.dolphin.attack": {
+        "sounds": [
+            "farmers_future_delight:mob/dolphin/attack1",
+            "farmers_future_delight:mob/dolphin/attack2",
+            "farmers_future_delight:mob/dolphin/attack3"
+        ],
+        "subtitle": "subtitles.entity.dolphin.attack"
+    },
+    "entity.dolphin.death": {
+        "sounds": [
+            "farmers_future_delight:mob/dolphin/death1",
+            "farmers_future_delight:mob/dolphin/death2"
+        ],
+        "subtitle": "subtitles.entity.dolphin.death"
+    },
+    "entity.dolphin.eat": {
+        "sounds": [
+            {"name": "farmers_future_delight:mob/dolphin/eat1", "volume": 0.75},
+            {"name": "farmers_future_delight:mob/dolphin/eat2", "volume": 0.75},
+            {"name": "farmers_future_delight:mob/dolphin/eat3", "volume": 0.75}
+        ],
+        "subtitle": "subtitles.entity.dolphin.eat"
+    },
+    "entity.dolphin.hurt": {
+        "sounds": [
+            "farmers_future_delight:mob/dolphin/hurt1",
+            "farmers_future_delight:mob/dolphin/hurt2",
+            "farmers_future_delight:mob/dolphin/hurt3"
+        ],
+        "subtitle": "subtitles.entity.dolphin.hurt"
+    },
+    "entity.dolphin.jump": {
+        "sounds": [
+            {"name": "farmers_future_delight:mob/dolphin/jump1", "volume": 0.75},
+            {"name": "farmers_future_delight:mob/dolphin/jump2", "volume": 0.75},
+            {"name": "farmers_future_delight:mob/dolphin/jump3", "volume": 0.75}
+        ],
+        "subtitle": "subtitles.entity.dolphin.jump"
+    },
+    "entity.dolphin.play": {
+        "sounds": [
+            "farmers_future_delight:mob/dolphin/play1",
+            "farmers_future_delight:mob/dolphin/play2"
+        ],
+        "subtitle": "subtitles.entity.dolphin.play"
+    },
+    "entity.dolphin.splash": {
+        "sounds": [
+            "farmers_future_delight:mob/dolphin/splash1",
+            "farmers_future_delight:mob/dolphin/splash2",
+            "farmers_future_delight:mob/dolphin/splash3"
+        ],
+        "subtitle": "subtitles.entity.dolphin.splash"
+    },
+    "entity.dolphin.swim": {
+        "sounds": [
+            "farmers_future_delight:mob/dolphin/swim1",
+            "farmers_future_delight:mob/dolphin/swim2",
+            "farmers_future_delight:mob/dolphin/swim3",
+            "farmers_future_delight:mob/dolphin/swim4",
+            "farmers_future_delight:entity/fish/swim5",
+            "farmers_future_delight:entity/fish/swim6",
+            "farmers_future_delight:entity/fish/swim7"
+        ],
+        "subtitle": "subtitles.entity.dolphin.swim"
+    },
     "entity.goat.ambient": {
         "sounds": [
             {"name": "farmers_future_delight:mob/goat/idle1", "volume": 0.82},
@@ -4088,9 +4353,316 @@
         ],
         "subtitle": "subtitles.entity.player.freeze_hurt"
     },
+    "entity.player.hurt_sweet_berry_bush": {
+        "sounds": [
+            "farmers_future_delight:entity/player/hurt/berrybush_hurt1",
+            "farmers_future_delight:entity/player/hurt/berrybush_hurt2"
+        ],
+        "subtitle": "subtitles.entity.player.hurt_sweet_berry_bush"
+    },
     "music_disc.otherside": {
         "sounds": [
             {"name": "farmers_future_delight:records/otherside", "stream": true}
         ]
+    },
+    "block.beacon.activate": {
+        "sounds": ["farmers_future_delight:block/beacon/activate"],
+        "subtitle": "subtitles.block.beacon.activate"
+    },
+    "block.beacon.ambient": {
+        "sounds": [
+            {
+                "attenuation_distance": 7,
+                "name": "farmers_future_delight:block/beacon/ambient",
+                "volume": 0.9
+            }
+        ],
+        "subtitle": "subtitles.block.beacon.ambient"
+    },
+    "block.beacon.deactivate": {
+        "sounds": ["farmers_future_delight:block/beacon/deactivate"],
+        "subtitle": "subtitles.block.beacon.deactivate"
+    },
+    "block.beacon.power_select": {
+        "sounds": [
+            "farmers_future_delight:block/beacon/power1",
+            "farmers_future_delight:block/beacon/power2",
+            "farmers_future_delight:block/beacon/power3"
+        ],
+        "subtitle": "subtitles.block.beacon.power_select"
+    },
+    "block.conduit.activate": {
+        "sounds": ["farmers_future_delight:block/conduit/activate"],
+        "subtitle": "subtitles.block.conduit.activate"
+    },
+    "block.conduit.ambient": {
+        "sounds": ["farmers_future_delight:block/conduit/ambient"],
+        "subtitle": "subtitles.block.conduit.ambient"
+    },
+    "block.conduit.ambient_short": {
+        "sounds": [
+            "farmers_future_delight:block/conduit/short1",
+            "farmers_future_delight:block/conduit/short2",
+            "farmers_future_delight:block/conduit/short3",
+            "farmers_future_delight:block/conduit/short4",
+            "farmers_future_delight:block/conduit/short5",
+            "farmers_future_delight:block/conduit/short6",
+            "farmers_future_delight:block/conduit/short7",
+            "farmers_future_delight:block/conduit/short8",
+            "farmers_future_delight:block/conduit/short9"
+        ],
+        "subtitle": "subtitles.block.conduit.ambient_short"
+    },
+    "block.conduit.attack_target": {
+        "sounds": [
+            "farmers_future_delight:block/conduit/attack1",
+            "farmers_future_delight:block/conduit/attack2",
+            "farmers_future_delight:block/conduit/attack3"
+        ],
+        "subtitle": "subtitles.block.conduit.attack_target"
+    },
+    "block.conduit.deactivate": {
+        "sounds": ["farmers_future_delight:block/conduit/deactivate"],
+        "subtitle": "subtitles.block.conduit.deactivate"
+    },
+    "block.bubble_column.upwards_inside": {
+        "sounds": [{"name": "farmers_future_delight:block/bubble_column/upwards_inside", "volume": 0.7}],
+        "subtitle": "subtitles.block.bubble_column.upwards_inside"
+    },
+    "block.bubble_column.whirlpool_inside": {
+        "sounds": [{"name": "farmers_future_delight:block/bubble_column/whirlpool_inside", "volume": 0.7}],
+        "subtitle": "subtitles.block.bubble_column.whirlpool_inside"
+    },
+    "block.vine.step": {
+        "sounds": [
+            "farmers_future_delight:block/vine/climb1",
+            "farmers_future_delight:block/vine/climb2",
+            "farmers_future_delight:block/vine/climb3",
+            "farmers_future_delight:block/vine/climb4",
+            "farmers_future_delight:block/vine/climb5"
+        ],
+        "subtitle": "subtitles.block.generic.footsteps"
+    },
+    "block.pumpkin.carve": {
+        "sounds": ["farmers_future_delight:block/pumpkin/carve1", "farmers_future_delight:block/pumpkin/carve2"],
+        "subtitle": "subtitles.block.pumpkin.carve"
+    },
+    "block.bubble_column.upwards_ambient": {
+        "sounds": [
+            "farmers_future_delight:block/bubble_column/upwards_ambient1",
+            "farmers_future_delight:block/bubble_column/upwards_ambient2",
+            "farmers_future_delight:block/bubble_column/upwards_ambient3",
+            "farmers_future_delight:block/bubble_column/upwards_ambient4",
+            "farmers_future_delight:block/bubble_column/upwards_ambient5"
+        ],
+        "subtitle": "subtitles.block.bubble_column.upwards_ambient"
+    },
+    "block.bubble_column.whirlpool_ambient": {
+        "sounds": [
+            "farmers_future_delight:block/bubble_column/whirlpool_ambient1",
+            "farmers_future_delight:block/bubble_column/whirlpool_ambient2",
+            "farmers_future_delight:block/bubble_column/whirlpool_ambient3",
+            "farmers_future_delight:block/bubble_column/whirlpool_ambient4",
+            "farmers_future_delight:block/bubble_column/whirlpool_ambient5"
+        ],
+        "subtitle": "subtitles.block.bubble_column.whirlpool_ambient"
+    },
+    "entity.drowned.ambient": {
+        "sounds": [
+            {
+                "name": "farmers_future_delight:entity/drowned/idle1",
+                "volume": 0.9
+            },
+            {
+                "name": "farmers_future_delight:entity/drowned/idle2",
+                "volume": 0.9
+            },
+            {
+                "name": "farmers_future_delight:entity/drowned/idle3",
+                "volume": 0.9
+            },
+            {
+                "name": "farmers_future_delight:entity/drowned/idle4",
+                "volume": 0.9
+            },
+            {
+                "name": "farmers_future_delight:entity/drowned/idle5",
+                "volume": 0.9
+            }
+        ],
+        "subtitle": "subtitles.entity.drowned.ambient"
+    },
+    "entity.drowned.ambient_water": {
+        "sounds": [
+            {
+                "name": "farmers_future_delight:entity/drowned/water/idle1",
+                "volume": 0.9
+            },
+            {
+                "name": "farmers_future_delight:entity/drowned/water/idle2",
+                "volume": 0.9
+            },
+            {
+                "name": "farmers_future_delight:entity/drowned/water/idle3",
+                "volume": 0.9
+            },
+            {
+                "name": "farmers_future_delight:entity/drowned/water/idle4",
+                "volume": 0.9
+            }
+        ],
+        "subtitle": "subtitles.entity.drowned.ambient_water"
+    },
+    "entity.drowned.death": {
+        "sounds": [
+            {
+                "name": "farmers_future_delight:entity/drowned/death1",
+                "volume": 0.9
+            },
+            {
+                "name": "farmers_future_delight:entity/drowned/death2",
+                "volume": 0.9
+            }
+        ],
+        "subtitle": "subtitles.entity.drowned.death"
+    },
+    "entity.drowned.death_water": {
+        "sounds": [
+            {
+                "name": "farmers_future_delight:entity/drowned/water/death1",
+                "volume": 0.9
+            },
+            {
+                "name": "farmers_future_delight:entity/drowned/water/death2",
+                "volume": 0.9
+            }
+        ],
+        "subtitle": "subtitles.entity.drowned.death"
+    },
+    "entity.drowned.hurt": {
+        "sounds": [
+            {
+                "name": "farmers_future_delight:entity/drowned/hurt1",
+                "volume": 0.9
+            },
+            {
+                "name": "farmers_future_delight:entity/drowned/hurt2",
+                "volume": 0.9
+            },
+            {
+                "name": "farmers_future_delight:entity/drowned/hurt3",
+                "volume": 0.9
+            }
+        ],
+        "subtitle": "subtitles.entity.drowned.hurt"
+    },
+    "entity.drowned.hurt_water": {
+        "sounds": [
+            {
+                "name": "farmers_future_delight:entity/drowned/water/hurt1",
+                "volume": 0.9
+            },
+            {
+                "name": "farmers_future_delight:entity/drowned/water/hurt2",
+                "volume": 0.9
+            },
+            {
+                "name": "farmers_future_delight:entity/drowned/water/hurt3",
+                "volume": 0.9
+            }
+        ],
+        "subtitle": "subtitles.entity.drowned.hurt"
+    },
+    "entity.drowned.shoot": {
+        "sounds": [
+            "farmers_future_delight:item/trident/throw1",
+            "farmers_future_delight:item/trident/throw2"
+        ],
+        "subtitle": "subtitles.entity.drowned.shoot"
+    },
+    "entity.drowned.step": {
+        "sounds": [
+            "farmers_future_delight:entity/drowned/step1",
+            "farmers_future_delight:entity/drowned/step2",
+            "farmers_future_delight:entity/drowned/step3",
+            "farmers_future_delight:entity/drowned/step4",
+            "farmers_future_delight:entity/drowned/step5"
+        ],
+        "subtitle": "subtitles.block.generic.footsteps"
+    },
+    "entity.drowned.swim": {
+        "sounds": [
+            "farmers_future_delight:entity/drowned/swim1",
+            "farmers_future_delight:entity/drowned/swim2",
+            "farmers_future_delight:entity/drowned/swim3",
+            "farmers_future_delight:entity/drowned/swim4",
+            "farmers_future_delight:entity/drowned/swim5"
+        ],
+        "subtitle": "subtitles.entity.drowned.swim"
+    },
+    "entity.zombie.converted_to_drowned": {
+        "sounds": [
+            "farmers_future_delight:entity/zombie/convert1",
+            "farmers_future_delight:entity/zombie/convert2",
+            "farmers_future_delight:entity/zombie/convert3"
+        ],
+        "subtitle": "subtitles.entity.zombie.converted_to_drowned"
+    },
+    "item.trident.throw": {
+        "sounds": [
+            "farmers_future_delight:item/trident/throw1",
+            "farmers_future_delight:item/trident/throw2"
+        ],
+        "subtitle": "subtitles.item.trident.throw"
+    },
+    "item.trident.hit": {
+        "sounds": [
+            "farmers_future_delight:item/trident/pierce1",
+            "farmers_future_delight:item/trident/pierce2",
+            "farmers_future_delight:item/trident/pierce3"
+        ],
+        "subtitle": "subtitles.item.trident.hit"
+    },
+    "item.trident.hit_ground": {
+        "sounds": [
+            "farmers_future_delight:item/trident/impact1",
+            "farmers_future_delight:item/trident/impact2",
+            "farmers_future_delight:item/trident/impact3",
+            "farmers_future_delight:item/trident/impact4"
+        ],
+        "subtitle": "subtitles.item.trident.hit_ground"
+    },
+    "item.trident.return": {
+        "sounds": [
+            "farmers_future_delight:item/trident/return1",
+            "farmers_future_delight:item/trident/return2",
+            "farmers_future_delight:item/trident/return3"
+        ],
+        "subtitle": "subtitles.item.trident.return"
+    },
+    "item.trident.riptide_1": {
+        "sounds": [
+            "farmers_future_delight:item/trident/riptide1"
+        ],
+        "subtitle": "subtitles.item.trident.riptide"
+    },
+    "item.trident.riptide_2": {
+        "sounds": [
+            "farmers_future_delight:item/trident/riptide2"
+        ],
+        "subtitle": "subtitles.item.trident.riptide"
+    },
+    "item.trident.riptide_3": {
+        "sounds": [
+            "farmers_future_delight:item/trident/riptide3"
+        ],
+        "subtitle": "subtitles.item.trident.riptide"
+    },
+    "item.trident.thunder": {
+        "sounds": [
+            "farmers_future_delight:item/trident/thunder1",
+            "farmers_future_delight:item/trident/thunder2"
+        ],
+        "subtitle": "subtitles.item.trident.thunder"
     }
 }

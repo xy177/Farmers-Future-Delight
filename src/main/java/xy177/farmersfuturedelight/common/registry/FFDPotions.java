@@ -18,6 +18,8 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.FFDConfig;
 import xy177.farmersfuturedelight.common.potion.PotionSlowFalling;
+import xy177.farmersfuturedelight.common.potion.PotionConduitPower;
+import xy177.farmersfuturedelight.common.potion.PotionDolphinsGrace;
 
 @Mod.EventBusSubscriber(modid = FarmerFutureDelight.MODID)
 public final class FFDPotions {
@@ -29,8 +31,16 @@ public final class FFDPotions {
             new ResourceLocation("oe", "turtle_master_strong");
     private static final ResourceLocation PHANTOMS_SLOW_FALLING =
             new ResourceLocation("phantoms", "slow_falling");
+    private static final ResourceLocation OE_DOLPHINS_GRACE =
+            new ResourceLocation("oe", "dolphins_grace");
+    private static final ResourceLocation OE_CONDUIT_POWER =
+            new ResourceLocation("oe", "conduit_power");
     public static final Potion SLOW_FALLING = new PotionSlowFalling()
             .setRegistryName(FarmerFutureDelight.MODID, "slow_falling");
+    public static final Potion CONDUIT_POWER = new PotionConduitPower()
+            .setRegistryName(FarmerFutureDelight.MODID, "conduit_power");
+    public static final Potion DOLPHINS_GRACE = new PotionDolphinsGrace()
+            .setRegistryName(FarmerFutureDelight.MODID, "dolphins_grace");
     public static final PotionType SLOW_FALLING_TYPE = slowFalling("slow_falling", 90 * 20);
     public static final PotionType LONG_SLOW_FALLING = slowFalling("long_slow_falling", 240 * 20);
     public static final PotionType TURTLE_MASTER = turtleMaster("turtle_master", 20 * 20, 3, 2);
@@ -45,6 +55,14 @@ public final class FFDPotions {
         if (shouldRegisterLocalSlowFalling(
                 event.getRegistry().containsKey(PHANTOMS_SLOW_FALLING))) {
             event.getRegistry().register(SLOW_FALLING);
+        }
+        if (shouldRegisterLocalConduitPower(
+                event.getRegistry().containsKey(OE_CONDUIT_POWER))) {
+            event.getRegistry().register(CONDUIT_POWER);
+        }
+        if (shouldRegisterLocalDolphinsGrace(
+                event.getRegistry().containsKey(OE_DOLPHINS_GRACE))) {
+            event.getRegistry().register(DOLPHINS_GRACE);
         }
     }
 
@@ -102,6 +120,69 @@ public final class FFDPotions {
         }
         return !externalRegistered || !FFDConfig.isAutoCompatibilityEnabled(
                 "slow_falling", "phantoms");
+    }
+
+    private static boolean shouldRegisterLocalDolphinsGrace(boolean externalRegistered) {
+        if (FFDConfig.dolphinMode == FFDConfig.FeatureMode.ENABLED) {
+            return true;
+        }
+        if (FFDConfig.dolphinMode == FFDConfig.FeatureMode.DISABLED) {
+            return false;
+        }
+        return !externalRegistered || !FFDConfig.isAutoCompatibilityEnabled(
+                "dolphins_grace", "oe");
+    }
+
+    private static boolean shouldRegisterLocalConduitPower(boolean externalRegistered) {
+        if (FFDConfig.conduitMode == FFDConfig.FeatureMode.ENABLED) {
+            return true;
+        }
+        if (FFDConfig.conduitMode == FFDConfig.FeatureMode.DISABLED) {
+            return false;
+        }
+        return FFDItems.isBlockRegistered(FFDBlocks.CONDUIT) || !externalRegistered
+                || !FFDConfig.isAutoCompatibilityEnabled("conduit_power", "oe");
+    }
+
+    public static Potion effectiveDolphinsGrace() {
+        Potion external = ForgeRegistries.POTIONS.getValue(OE_DOLPHINS_GRACE);
+        if (FFDConfig.dolphinMode == FFDConfig.FeatureMode.AUTO && external != null
+                && FFDConfig.isAutoCompatibilityEnabled("dolphins_grace", "oe")) {
+            return external;
+        }
+        Potion local = ForgeRegistries.POTIONS.getValue(DOLPHINS_GRACE.getRegistryName());
+        return local == null ? external : local;
+    }
+
+    public static boolean hasDolphinsGrace(net.minecraft.entity.EntityLivingBase entity) {
+        if (entity == null) {
+            return false;
+        }
+        Potion local = ForgeRegistries.POTIONS.getValue(DOLPHINS_GRACE.getRegistryName());
+        Potion external = ForgeRegistries.POTIONS.getValue(OE_DOLPHINS_GRACE);
+        return local != null && entity.isPotionActive(local)
+                || external != null && entity.isPotionActive(external);
+    }
+
+    public static boolean hasConduitPower(net.minecraft.entity.EntityLivingBase entity) {
+        return conduitPowerAmplifier(entity) >= 0;
+    }
+
+    public static int conduitPowerAmplifier(net.minecraft.entity.EntityLivingBase entity) {
+        if (entity == null) {
+            return -1;
+        }
+        Potion local = ForgeRegistries.POTIONS.getValue(CONDUIT_POWER.getRegistryName());
+        Potion external = ForgeRegistries.POTIONS.getValue(OE_CONDUIT_POWER);
+        int amplifier = -1;
+        if (local != null && entity.isPotionActive(local)) {
+            amplifier = entity.getActivePotionEffect(local).getAmplifier();
+        }
+        if (external != null && entity.isPotionActive(external)) {
+            amplifier = Math.max(amplifier,
+                    entity.getActivePotionEffect(external).getAmplifier());
+        }
+        return amplifier;
     }
 
     private static PotionType slowFalling(String registryName, int duration) {

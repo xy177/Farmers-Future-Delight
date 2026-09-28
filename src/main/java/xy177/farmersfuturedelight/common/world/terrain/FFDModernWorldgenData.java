@@ -91,10 +91,6 @@ public final class FFDModernWorldgenData {
         return positionalRandom.fromHashOf(normalizeId(id));
     }
 
-    /**
-     * Samples one of the bundled 26.3 surface/material noises without exposing
-     * the mutable noise cache to the generator.
-     */
     public double sampleNoise(String id, int x, int y, int z) {
         return noise(id).sample(x, y, z);
     }
@@ -115,12 +111,6 @@ public final class FFDModernWorldgenData {
         return (int) Math.floor(router.preliminarySurfaceLevel.sample(x, 0, z));
     }
 
-    /**
-     * Estimates the unshifted surface of the same final density field that the
-     * extended chunk generator interpolates into blocks. The preliminary
-     * surface router is useful for aquifer hints, but it can intentionally
-     * differ from the final terrain boundary around rivers and coastlines.
-     */
     public int finalDensitySurfaceLevel(int x, int z) {
         int cacheX = Math.floorDiv(x, CELL_WIDTH) * CELL_WIDTH;
         int cacheZ = Math.floorDiv(z, CELL_WIDTH) * CELL_WIDTH;
@@ -143,8 +133,6 @@ public final class FFDModernWorldgenData {
             return MIN_Y - 1;
         }
 
-        // The generator interpolates the same vertical cells, so keep this
-        // estimate on the cell grid instead of rescanning every block.
         finalSurfaceCache.put(key, sampled);
         return sampled;
     }

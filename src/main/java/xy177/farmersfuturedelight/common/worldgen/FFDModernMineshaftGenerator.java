@@ -11,10 +11,6 @@ import net.minecraft.world.gen.structure.StructureMineshaftStart;
 import net.minecraft.world.gen.structure.StructureStart;
 import xy177.farmersfuturedelight.common.world.ChunkGeneratorExtended;
 
-/**
- * Reuses the 1.12 mineshaft pieces and rarity while applying the 26.3 height
- * placement after the pieces have been assembled.
- */
 public final class FFDModernMineshaftGenerator extends MapGenMineshaft {
     private final ChunkGeneratorExtended extendedGenerator;
 

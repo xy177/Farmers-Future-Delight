@@ -13,7 +13,6 @@ import org.apache.logging.log4j.Logger;
 import xy177.farmersfuturedelight.common.world.ChunkGeneratorExtended;
 import xy177.farmersfuturedelight.core.FFDHeightHooks;
 
-/** Installs the extended-world structure placement while preserving 1.12 data. */
 public final class FFDStructureHooks {
     private static final Logger LOGGER = LogManager.getLogger("FFD Structure Hooks");
 

@@ -23,11 +23,14 @@ import xy177.farmersfuturedelight.common.item.ItemAxolotlBucket;
 import xy177.farmersfuturedelight.common.item.ItemBigDripleaf;
 import xy177.farmersfuturedelight.common.item.ItemCandle;
 import xy177.farmersfuturedelight.common.item.ItemBlockDriedKelp;
+import xy177.farmersfuturedelight.common.item.ItemCoralFan;
 import xy177.farmersfuturedelight.common.item.ItemDriedKelp;
+import xy177.farmersfuturedelight.common.item.ItemFishBucket;
 import xy177.farmersfuturedelight.common.item.ItemGlowBerries;
 import xy177.farmersfuturedelight.common.item.ItemGlowInkSac;
 import xy177.farmersfuturedelight.common.item.ItemGlowItemFrame;
 import xy177.farmersfuturedelight.common.item.ItemGoatHorn;
+import xy177.farmersfuturedelight.common.item.ItemHeartOfTheSea;
 import xy177.farmersfuturedelight.common.item.ItemHoneyBottle;
 import xy177.farmersfuturedelight.common.item.ItemHoneycomb;
 import xy177.farmersfuturedelight.common.item.ItemHangingRoots;
@@ -44,6 +47,7 @@ import xy177.farmersfuturedelight.common.item.ItemSweetBerries;
 import xy177.farmersfuturedelight.common.item.ItemSpyglass;
 import xy177.farmersfuturedelight.common.item.ItemTurtleEgg;
 import xy177.farmersfuturedelight.common.item.ItemTurtleHelmet;
+import xy177.farmersfuturedelight.common.item.ItemTrident;
 
 public final class FFDItems {
     private static final Map<Item, Block> LOCAL_ITEM_BLOCKS = new IdentityHashMap<>();
@@ -262,6 +266,44 @@ public final class FFDItems {
             .setRegistryName(FarmerFutureDelight.MODID, "sea_pickle")
             .setUnlocalizedName(FarmerFutureDelight.MODID + ".sea_pickle")
             .setCreativeTab(FFDCreativeTab.INSTANCE);
+    public static final Item[] CORAL_BLOCK_ITEMS = blockItems(FFDBlocks.CORAL_BLOCKS);
+    public static final Item[] DEAD_CORAL_BLOCK_ITEMS = blockItems(FFDBlocks.DEAD_CORAL_BLOCKS);
+    public static final Item[] CORAL_ITEMS = blockItems(FFDBlocks.CORALS);
+    public static final Item[] DEAD_CORAL_ITEMS = blockItems(FFDBlocks.DEAD_CORALS);
+    public static final Item[] CORAL_FAN_ITEMS = coralFanItems(
+            FFDBlocks.CORAL_FANS, FFDBlocks.CORAL_WALL_FANS);
+    public static final Item[] DEAD_CORAL_FAN_ITEMS = coralFanItems(
+            FFDBlocks.DEAD_CORAL_FANS, FFDBlocks.DEAD_CORAL_WALL_FANS);
+    public static final Item BLUE_ICE = blockItem(FFDBlocks.BLUE_ICE);
+    public static final Item[] STRIPPED_LOG_ITEMS = blockItems(FFDBlocks.STRIPPED_LOGS);
+    public static final Item[] STRIPPED_WOOD_ITEMS = blockItems(FFDBlocks.STRIPPED_WOODS);
+    public static final Item[] OVERWORLD_TRAPDOOR_ITEMS =
+            blockItems(FFDBlocks.OVERWORLD_TRAPDOORS);
+    public static final Item[] OVERWORLD_BUTTON_ITEMS =
+            blockItems(FFDBlocks.OVERWORLD_BUTTONS);
+    public static final Item[] OVERWORLD_PRESSURE_PLATE_ITEMS =
+            blockItems(FFDBlocks.OVERWORLD_PRESSURE_PLATES);
+    public static final Item PUMPKIN = blockItem(FFDBlocks.PUMPKIN);
+    public static final Item[] PRISMARINE_STAIR_ITEMS = blockItems(FFDBlocks.PRISMARINE_STAIRS);
+    public static final Item[] PRISMARINE_SLAB_ITEMS = slabItems(
+            FFDBlocks.PRISMARINE_SLABS, FFDBlocks.PRISMARINE_DOUBLE_SLABS);
+    public static final Item NAUTILUS_SHELL = simpleItem("nautilus_shell");
+    public static final Item HEART_OF_THE_SEA = new ItemHeartOfTheSea()
+            .setRegistryName(FarmerFutureDelight.MODID, "heart_of_the_sea")
+            .setUnlocalizedName(FarmerFutureDelight.MODID + ".heart_of_the_sea")
+            .setCreativeTab(FFDCreativeTab.INSTANCE);
+    public static final Item TRIDENT = new ItemTrident()
+            .setRegistryName(FarmerFutureDelight.MODID, "trident")
+            .setUnlocalizedName(FarmerFutureDelight.MODID + ".trident")
+            .setCreativeTab(FFDCreativeTab.INSTANCE);
+    public static final Item CONDUIT = blockItem(FFDBlocks.CONDUIT);
+    public static final Item COD_BUCKET = fishBucket("cod");
+    public static final Item SALMON_BUCKET = fishBucket("salmon");
+    public static final Item PUFFERFISH_BUCKET = fishBucket("pufferfish");
+    public static final Item TROPICAL_FISH_BUCKET = fishBucket("tropical_fish");
+    public static final Item[] FISH_BUCKETS = {
+            COD_BUCKET, SALMON_BUCKET, PUFFERFISH_BUCKET, TROPICAL_FISH_BUCKET
+    };
     public static final Item TURTLE_EGG = new ItemTurtleEgg(FFDBlocks.TURTLE_EGG)
             .setRegistryName(FFDBlocks.TURTLE_EGG.getRegistryName())
             .setUnlocalizedName(FarmerFutureDelight.MODID + ".turtle_egg")
@@ -430,6 +472,62 @@ public final class FFDItems {
 
     public static boolean isSeaPickleEnabled() {
         return FFDCompat.isEnabled(FFDConfig.seaPickleMode, FFDCompat.Feature.SEA_PICKLE);
+    }
+
+    public static boolean isCoralEnabled() {
+        return FFDCompat.isEnabled(FFDConfig.coralMode, FFDCompat.Feature.CORAL);
+    }
+
+    public static boolean isBlueIceEnabled() {
+        return FFDCompat.isEnabled(FFDConfig.blueIceMode, FFDCompat.Feature.AQUATIC_DECOR);
+    }
+
+    public static boolean isStrippedWoodEnabled() {
+        return FFDCompat.isEnabled(FFDConfig.strippedWoodMode,
+                FFDCompat.Feature.AQUATIC_DECOR);
+    }
+
+    public static boolean isPumpkinEnabled() {
+        return FFDCompat.isEnabled(FFDConfig.pumpkinMode,
+                FFDCompat.Feature.AQUATIC_DECOR);
+    }
+
+    public static boolean isPrismarineDecorEnabled() {
+        return FFDCompat.isEnabled(FFDConfig.prismarineDecorMode,
+                FFDCompat.Feature.AQUATIC_DECOR);
+    }
+
+    public static boolean isConduitEnabled() {
+        return FFDCompat.isEnabled(FFDConfig.conduitMode, FFDCompat.Feature.AQUATIC_DECOR);
+    }
+
+    public static boolean isBubbleColumnEnabled() {
+        return FFDCompat.isEnabled(FFDConfig.bubbleColumnMode, FFDCompat.Feature.AQUATIC_DECOR);
+    }
+
+    public static boolean isFishEnabled() {
+        return FFDCompat.isEnabled(FFDConfig.fishMode, FFDCompat.Feature.FISH);
+    }
+
+    public static boolean isTridentEnabled() {
+        return FFDCompat.isEnabled(FFDConfig.tridentMode, FFDCompat.Feature.TRIDENT);
+    }
+
+    public static boolean isTridentStack(ItemStack stack) {
+        if (stack.isEmpty() || stack.getItem().getRegistryName() == null) {
+            return false;
+        }
+        return isTridentItem(stack.getItem());
+    }
+
+    public static boolean isTridentItem(Item item) {
+        if (item == null || item.getRegistryName() == null) {
+            return false;
+        }
+        net.minecraft.util.ResourceLocation id = item.getRegistryName();
+        return item == TRIDENT
+                || ("futuremc".equals(id.getResourceDomain()) && "trident".equals(id.getResourcePath()))
+                || ("oe".equals(id.getResourceDomain()) && "trident".equals(id.getResourcePath()));
     }
 
     public static boolean isTurtleEnabled() {
@@ -690,6 +788,41 @@ public final class FFDItems {
         if (block == FFDBlocks.SEA_PICKLE) {
             return binding(FFDConfig.seaPickleMode, FFDCompat.Feature.SEA_PICKLE);
         }
+        if (arrayContains(block, FFDBlocks.CORAL_BLOCKS)
+                || arrayContains(block, FFDBlocks.DEAD_CORAL_BLOCKS)
+                || arrayContains(block, FFDBlocks.CORALS)
+                || arrayContains(block, FFDBlocks.DEAD_CORALS)
+                || arrayContains(block, FFDBlocks.CORAL_FANS)
+                || arrayContains(block, FFDBlocks.DEAD_CORAL_FANS)
+                || arrayContains(block, FFDBlocks.CORAL_WALL_FANS)
+                || arrayContains(block, FFDBlocks.DEAD_CORAL_WALL_FANS)) {
+            return binding(FFDConfig.coralMode, FFDCompat.Feature.CORAL);
+        }
+        if (block == FFDBlocks.BLUE_ICE) {
+            return binding(FFDConfig.blueIceMode, FFDCompat.Feature.AQUATIC_DECOR);
+        }
+        if (block == FFDBlocks.CONDUIT) {
+            return binding(FFDConfig.conduitMode, FFDCompat.Feature.AQUATIC_DECOR);
+        }
+        if (block == FFDBlocks.BUBBLE_COLUMN) {
+            return binding(FFDConfig.bubbleColumnMode, FFDCompat.Feature.AQUATIC_DECOR);
+        }
+        if (arrayContains(block, FFDBlocks.STRIPPED_LOGS)
+                || arrayContains(block, FFDBlocks.STRIPPED_WOODS)
+                || arrayContains(block, FFDBlocks.OVERWORLD_TRAPDOORS)
+                || arrayContains(block, FFDBlocks.OVERWORLD_TRAPDOORS_WATERLOGGED)
+                || arrayContains(block, FFDBlocks.OVERWORLD_BUTTONS)
+                || arrayContains(block, FFDBlocks.OVERWORLD_PRESSURE_PLATES)) {
+            return binding(FFDConfig.strippedWoodMode, FFDCompat.Feature.AQUATIC_DECOR);
+        }
+        if (block == FFDBlocks.PUMPKIN) {
+            return binding(FFDConfig.pumpkinMode, FFDCompat.Feature.AQUATIC_DECOR);
+        }
+        if (arrayContains(block, FFDBlocks.PRISMARINE_STAIRS)
+                || arrayContains(block, FFDBlocks.PRISMARINE_SLABS)
+                || arrayContains(block, FFDBlocks.PRISMARINE_DOUBLE_SLABS)) {
+            return binding(FFDConfig.prismarineDecorMode, FFDCompat.Feature.AQUATIC_DECOR);
+        }
         if (block == FFDBlocks.TURTLE_EGG) {
             return binding(FFDConfig.turtleMode, FFDCompat.Feature.TURTLE);
         }
@@ -753,6 +886,15 @@ public final class FFDItems {
         }
         if (item == SEA_PICKLE) {
             return binding(FFDConfig.seaPickleMode, FFDCompat.Feature.SEA_PICKLE);
+        }
+        if (item == NAUTILUS_SHELL || item == HEART_OF_THE_SEA) {
+            return binding(FFDConfig.conduitMode, FFDCompat.Feature.AQUATIC_DECOR);
+        }
+        if (item == TRIDENT) {
+            return binding(FFDConfig.tridentMode, FFDCompat.Feature.TRIDENT);
+        }
+        if (arrayContains(item, FISH_BUCKETS)) {
+            return binding(FFDConfig.fishMode, FFDCompat.Feature.FISH);
         }
         if (item == TURTLE_SCUTE || item == TURTLE_HELMET) {
             return binding(FFDConfig.turtleMode, FFDCompat.Feature.TURTLE);
@@ -962,10 +1104,33 @@ public final class FFDItems {
                 .setCreativeTab(FFDCreativeTab.INSTANCE);
     }
 
+    private static Item fishBucket(String entityPath) {
+        String name = entityPath + "_bucket";
+        return new ItemFishBucket(entityPath)
+                .setRegistryName(FarmerFutureDelight.MODID, name)
+                .setUnlocalizedName(FarmerFutureDelight.MODID + "." + name)
+                .setCreativeTab(FFDCreativeTab.INSTANCE);
+    }
+
     private static Item[] blockItems(Block[] blocks) {
         Item[] items = new Item[blocks.length];
         for (int i = 0; i < blocks.length; i++) {
             items[i] = blockItem(blocks[i]);
+        }
+        return items;
+    }
+
+    private static Item[] coralFanItems(
+            xy177.farmersfuturedelight.common.block.BlockCoralPlant[] floorFans,
+            xy177.farmersfuturedelight.common.block.BlockCoralWallFan[] wallFans) {
+        Item[] items = new Item[floorFans.length];
+        for (int i = 0; i < items.length; i++) {
+            ItemCoralFan item = new ItemCoralFan(floorFans[i], wallFans[i]);
+            item.setRegistryName(floorFans[i].getRegistryName());
+            item.setUnlocalizedName(FarmerFutureDelight.MODID + "."
+                    + floorFans[i].getRegistryName().getResourcePath());
+            item.setCreativeTab(FFDCreativeTab.INSTANCE);
+            items[i] = rememberBlockItem(item, floorFans[i]);
         }
         return items;
     }

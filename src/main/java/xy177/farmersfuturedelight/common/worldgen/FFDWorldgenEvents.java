@@ -7,10 +7,13 @@ import net.minecraft.world.biome.BiomeDecorator;
 import net.minecraft.world.biome.BiomeHills;
 import net.minecraft.world.gen.feature.WorldGenerator;
 import net.minecraft.world.gen.NoiseGeneratorPerlin;
+import net.minecraft.world.WorldType;
+import net.minecraft.world.gen.layer.GenLayer;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
 import net.minecraftforge.event.terraingen.InitMapGenEvent;
 import net.minecraftforge.event.terraingen.OreGenEvent;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
+import net.minecraftforge.event.terraingen.WorldTypeEvent;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.Event;
@@ -21,7 +24,9 @@ import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.world.biome.FFDModernBiomeProvider;
 import xy177.farmersfuturedelight.common.world.biome.FFDModernBiomeResolver;
+import xy177.farmersfuturedelight.common.world.biome.GenLayerModernOcean;
 import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiomeManager;
+import xy177.farmersfuturedelight.common.world.FFDWorldTypes;
 import xy177.farmersfuturedelight.core.FFDHeightHooks;
 
 import java.util.Random;
@@ -36,6 +41,32 @@ public final class FFDWorldgenEvents {
             new NoiseGeneratorPerlin(new Random(1234L), 1);
 
     private FFDWorldgenEvents() {
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void addModernOceanTemperatures(WorldTypeEvent.InitBiomeGens event) {
+        WorldType type = event.getWorldType();
+        if (type == FFDWorldTypes.EXTENDED || type != WorldType.DEFAULT
+                && type != WorldType.DEFAULT_1_1 && type != WorldType.LARGE_BIOMES
+                && type != WorldType.AMPLIFIED && type != WorldType.CUSTOMIZED) {
+            return;
+        }
+        GenLayer[] layers = event.getNewBiomeGens();
+        if (layers == null || layers.length < 2) {
+            return;
+        }
+        GenLayer generation = new GenLayerModernOcean(4071L, event.getSeed(), layers[0], 4);
+        GenLayer index = new GenLayerModernOcean(4072L, event.getSeed(), layers[1], 1);
+        generation.initWorldGenSeed(event.getSeed());
+        index.initWorldGenSeed(event.getSeed());
+        layers[0] = generation;
+        layers[1] = index;
+        if (layers.length > 2) {
+            GenLayer riverMix = new GenLayerModernOcean(4073L, event.getSeed(), layers[2], 4);
+            riverMix.initWorldGenSeed(event.getSeed());
+            layers[2] = riverMix;
+        }
+        event.setNewBiomeGens(layers);
     }
 
     @SubscribeEvent
@@ -60,11 +91,6 @@ public final class FFDWorldgenEvents {
         event.setResult(Event.Result.DENY);
     }
 
-    /**
-     * The extended generator supplies the modern vanilla ore pass itself. Only
-     * the original 1.12 generators are denied here; external Forge ore events
-     * (including standard event types) remain available in the Y=0..255 band.
-     */
     private static boolean isVanillaOverworldOre(OreGenEvent.GenerateMinable event) {
         WorldGenerator generator = event.getGenerator();
         if (generator == null) {

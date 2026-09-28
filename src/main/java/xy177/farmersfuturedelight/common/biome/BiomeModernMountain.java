@@ -7,7 +7,7 @@ import net.minecraft.entity.passive.EntityWolf;
 import net.minecraft.world.biome.Biome;
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 
-public final class BiomeModernMountain extends Biome {
+public final class BiomeModernMountain extends Biome implements ModernWaterBiome {
     private final int skyColor;
     private final int modernWaterColor;
 
@@ -36,6 +36,11 @@ public final class BiomeModernMountain extends Biome {
 
     public int getModernWaterColor() {
         return modernWaterColor;
+    }
+
+    @Override
+    public int getModernWaterFogColor() {
+        return 0x050533;
     }
 
     private void configureCreatureSpawns(SpawnProfile profile) {

@@ -23,7 +23,6 @@ import net.minecraft.world.gen.structure.template.TemplateManager;
 import xy177.farmersfuturedelight.common.FFDConfig;
 import xy177.farmersfuturedelight.core.FFDHeightHooks;
 
-/** Places the 26.3 lower fossil feature without adding a new structure type. */
 public final class WorldGenModernFossils {
     private static final long FEATURE_SALT = 0x6F7A5B2D11L;
     private static final ResourceLocation[] FOSSILS = fossils("");

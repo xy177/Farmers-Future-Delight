@@ -24,7 +24,6 @@ import net.minecraft.world.storage.MapData;
 
 import xy177.farmersfuturedelight.common.entity.EntityGlowItemFrame;
 
-/** Item-frame renderer using the dedicated 26.3 glow frame model and full-bright pass. */
 public class RenderGlowItemFrame extends Render<EntityGlowItemFrame> {
     private static final ResourceLocation MAP_BACKGROUND_TEXTURES =
             new ResourceLocation("textures/map/map_background.png");

@@ -10,7 +10,6 @@ import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -24,6 +23,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
 
 import xy177.farmersfuturedelight.FarmerFutureDelight;
+import xy177.farmersfuturedelight.api.WaterloggedBlockApi;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 
@@ -43,7 +43,7 @@ public class BlockTallSeagrass extends BlockUnderwaterPlant {
     protected BlockStateContainer createBlockState() {
         return new ExtendedBlockState(this,
                 new net.minecraft.block.properties.IProperty<?>[] {BlockLiquid.LEVEL, HALF},
-                WaterloggedPlantFluid.extendedProperties());
+                WaterloggedBlockApi.extendedProperties());
     }
 
     @Override
@@ -104,10 +104,10 @@ public class BlockTallSeagrass extends BlockUnderwaterPlant {
         BlockPos lower = state.getValue(HALF) == BlockDoublePlant.EnumBlockHalf.UPPER ? pos.down() : pos;
         BlockPos upper = lower.up();
         if (world.getBlockState(lower).getBlock() == this) {
-            world.setBlockState(lower, Blocks.WATER.getDefaultState(), 2);
+            WaterloggedBlockApi.restoreFluid(world, lower, world.getBlockState(lower), 2);
         }
         if (world.getBlockState(upper).getBlock() == this) {
-            world.setBlockState(upper, Blocks.WATER.getDefaultState(), 3);
+            WaterloggedBlockApi.restoreFluid(world, upper, world.getBlockState(upper), 3);
         }
     }
 
@@ -122,6 +122,16 @@ public class BlockTallSeagrass extends BlockUnderwaterPlant {
     @Override
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
         return TALL_SEAGRASS_AABB;
+    }
+
+    @Override
+    public boolean isReplaceable(IBlockAccess world, BlockPos pos) {
+        return true;
+    }
+
+    @Override
+    public EnumOffsetType getOffsetType() {
+        return EnumOffsetType.XZ;
     }
 
     @Override

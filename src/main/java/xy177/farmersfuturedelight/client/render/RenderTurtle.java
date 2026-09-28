@@ -40,7 +40,7 @@ public class RenderTurtle extends RenderLiving<EntityTurtle> {
     @Override
     protected void preRenderCallback(EntityTurtle turtle, float partialTickTime) {
         if (turtle.isChild()) {
-            shadowSize = 0.7F * 0.83F;
+            shadowSize = 0.7F * 0.3F * 0.83F;
         } else {
             shadowSize = 0.7F;
         }

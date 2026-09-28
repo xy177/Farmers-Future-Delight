@@ -35,11 +35,13 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
 
 import xy177.farmersfuturedelight.FarmerFutureDelight;
+import xy177.farmersfuturedelight.api.IWaterloggableBlock;
+import xy177.farmersfuturedelight.api.WaterloggedBlockApi;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
 
-public class BlockBigDripleaf extends Block implements IGrowable {
+public class BlockBigDripleaf extends Block implements IGrowable, IWaterloggableBlock {
     public static final PropertyDirection FACING = BlockHorizontal.FACING;
     public static final PropertyEnum<DripleafTilt> TILT = PropertyEnum.create("tilt", DripleafTilt.class);
     private static final int UNSTABLE_DELAY = 10;
@@ -79,12 +81,12 @@ public class BlockBigDripleaf extends Block implements IGrowable {
     protected BlockStateContainer createBlockState() {
         return new ExtendedBlockState(this,
                 new net.minecraft.block.properties.IProperty<?>[] {BlockLiquid.LEVEL, FACING, TILT},
-                WaterloggedPlantFluid.extendedProperties());
+                WaterloggedBlockApi.extendedProperties());
     }
 
     @Override
     public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
-        return WaterloggedPlantFluid.getExtendedState(state, world, pos);
+        return WaterloggedBlockApi.getExtendedState(state, world, pos);
     }
 
     @Override
@@ -111,6 +113,20 @@ public class BlockBigDripleaf extends Block implements IGrowable {
     }
 
     @Override
+    public boolean isWaterloggedState(IBlockState state) {
+        return isWaterlogged(state);
+    }
+
+    @Override
+    public IBlockState setWaterloggedState(IBlockState state, boolean waterlogged) {
+        BlockBigDripleaf target = waterlogged ? FFDBlocks.BIG_DRIPLEAF_WATERLOGGED
+                : FFDBlocks.BIG_DRIPLEAF;
+        return target.getDefaultState()
+                .withProperty(FACING, state.getValue(FACING))
+                .withProperty(TILT, state.getValue(TILT));
+    }
+
+    @Override
     public boolean canPlaceBlockAt(World world, BlockPos pos) {
         return FFDItems.isDripleafEnabled() && DripleafPlacement.canPlaceHead(world, pos);
     }
@@ -124,7 +140,7 @@ public class BlockBigDripleaf extends Block implements IGrowable {
     @Override
     public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
         super.onBlockAdded(world, pos, state);
-        WaterloggedPlantFluid.onBlockAdded(world, pos, this);
+        WaterloggedBlockApi.onBlockAdded(world, pos, this);
     }
 
     @Override
@@ -140,13 +156,13 @@ public class BlockBigDripleaf extends Block implements IGrowable {
         }
         if (!canStay(world, pos)) {
             dropBlockAsItem(world, pos, state, 0);
-            world.setBlockState(pos, replacementState(), 3);
+            WaterloggedBlockApi.restoreFluid(world, pos, state, 3);
             return;
         }
         if (world.isBlockPowered(pos) && state.getValue(TILT) != DripleafTilt.NONE) {
             resetTilt(world, pos, state);
         }
-        WaterloggedPlantFluid.onNeighborChanged(world, pos, this);
+        WaterloggedBlockApi.onNeighborChanged(world, pos, this);
     }
 
     @Override
@@ -165,10 +181,10 @@ public class BlockBigDripleaf extends Block implements IGrowable {
         }
         if (!canStay(world, pos)) {
             dropBlockAsItem(world, pos, state, 0);
-            world.setBlockState(pos, replacementState(), 3);
+            WaterloggedBlockApi.restoreFluid(world, pos, state, 3);
             return;
         }
-        WaterloggedPlantFluid.updateTick(world, pos, state);
+        WaterloggedBlockApi.updateTick(world, pos, state);
         if (world.isBlockPowered(pos)) {
             if (state.getValue(TILT) != DripleafTilt.NONE) {
                 resetTilt(world, pos, state);
@@ -256,26 +272,23 @@ public class BlockBigDripleaf extends Block implements IGrowable {
         return FFDItems.effectiveStack(FFDItems.BIG_DRIPLEAF);
     }
 
-    private IBlockState replacementState() {
-        return waterlogged ? Blocks.WATER.getDefaultState() : Blocks.AIR.getDefaultState();
-    }
-
     @Override
     public boolean removedByPlayer(IBlockState state, World world, BlockPos pos,
                                    EntityPlayer player, boolean willHarvest) {
         onBlockHarvested(world, pos, state, player);
-        return world.setBlockState(pos, replacementState(), world.isRemote ? 11 : 3);
+        return WaterloggedBlockApi.restoreFluid(world, pos, state, world.isRemote ? 11 : 3);
     }
 
     @Override
     public void onBlockExploded(World world, BlockPos pos, net.minecraft.world.Explosion explosion) {
-        world.setBlockState(pos, replacementState(), 3);
+        IBlockState state = world.getBlockState(pos);
+        WaterloggedBlockApi.restoreFluid(world, pos, state, 3);
         onBlockDestroyedByExplosion(world, pos, explosion);
     }
 
     @Override
     public Vec3d modifyAcceleration(World world, BlockPos pos, Entity entity, Vec3d motion) {
-        return waterlogged ? Blocks.WATER.modifyAcceleration(world, pos, entity, motion) : motion;
+        return WaterloggedBlockApi.modifyAcceleration(world, pos, entity, motion);
     }
 
     @Override

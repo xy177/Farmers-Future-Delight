@@ -1,0 +1,6 @@
+{
+    "parent": "block/cross",
+    "textures": {
+        "cross": "farmers_future_delight:block/horn_coral"
+    }
+}

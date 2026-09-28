@@ -21,15 +21,22 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import xy177.farmersfuturedelight.common.FFDCreativeTab;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
+import xy177.farmersfuturedelight.api.IWaterloggableBlock;
+import xy177.farmersfuturedelight.api.WaterloggedBlockApi;
 
-/** Common water-material behavior for backported aquatic blocks. */
-public abstract class BlockUnderwaterPlant extends BlockBush {
+public abstract class BlockUnderwaterPlant extends BlockBush implements IWaterloggableBlock {
     protected BlockUnderwaterPlant() {
         super(Material.WATER);
+        setCreativeTab(FFDCreativeTab.INSTANCE);
         setHardness(0.0F);
         setSoundType(FFDSounds.WET_GRASS);
-        setLightOpacity(Blocks.WATER.getLightOpacity(Blocks.WATER.getDefaultState()));
+    }
+
+    @Override
+    public int getLightOpacity(IBlockState state) {
+        return Blocks.WATER.getDefaultState().getLightOpacity();
     }
 
     protected abstract boolean isFeatureEnabled();
@@ -39,15 +46,25 @@ public abstract class BlockUnderwaterPlant extends BlockBush {
     protected abstract boolean canPlaceInto(World world, BlockPos pos);
 
     @Override
+    public boolean isWaterloggedState(IBlockState state) {
+        return true;
+    }
+
+    @Override
+    public IBlockState setWaterloggedState(IBlockState state, boolean waterlogged) {
+        return waterlogged ? state : null;
+    }
+
+    @Override
     protected BlockStateContainer createBlockState() {
         return new ExtendedBlockState(this,
                 new net.minecraft.block.properties.IProperty<?>[] {BlockLiquid.LEVEL},
-                WaterloggedPlantFluid.extendedProperties());
+                WaterloggedBlockApi.extendedProperties());
     }
 
     @Override
     public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
-        return WaterloggedPlantFluid.getExtendedState(state, world, pos);
+        return WaterloggedBlockApi.getExtendedState(state, world, pos);
     }
 
     @Override
@@ -61,7 +78,7 @@ public abstract class BlockUnderwaterPlant extends BlockBush {
     }
 
     protected static boolean isSourceWater(IBlockAccess world, BlockPos pos) {
-        return WaterloggedPlantFluid.isSourceWater(world, pos);
+        return WaterloggedBlockApi.isWaterSource(world, pos);
     }
 
     protected static boolean isVanillaWaterBlock(IBlockAccess world, BlockPos pos) {
@@ -88,7 +105,7 @@ public abstract class BlockUnderwaterPlant extends BlockBush {
             if (isFeatureEnabled()) {
                 dropBlockAsItem(world, pos, state, 0);
             }
-            world.setBlockState(pos, Blocks.WATER.getDefaultState(), 3);
+            WaterloggedBlockApi.restoreFluid(world, pos, state, 3);
         }
     }
 
@@ -101,12 +118,12 @@ public abstract class BlockUnderwaterPlant extends BlockBush {
     public boolean removedByPlayer(IBlockState state, World world, BlockPos pos,
                                    EntityPlayer player, boolean willHarvest) {
         onBlockHarvested(world, pos, state, player);
-        return world.setBlockState(pos, Blocks.WATER.getDefaultState(), world.isRemote ? 11 : 3);
+        return WaterloggedBlockApi.restoreFluid(world, pos, state, world.isRemote ? 11 : 3);
     }
 
     @Override
     public void onBlockExploded(World world, BlockPos pos, net.minecraft.world.Explosion explosion) {
-        world.setBlockState(pos, Blocks.WATER.getDefaultState(), 3);
+        WaterloggedBlockApi.restoreFluid(world, pos, world.getBlockState(pos), 3);
         onBlockDestroyedByExplosion(world, pos, explosion);
     }
 
@@ -165,7 +182,7 @@ public abstract class BlockUnderwaterPlant extends BlockBush {
     @Override
     public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
         super.onBlockAdded(world, pos, state);
-        WaterloggedPlantFluid.onBlockAdded(world, pos, this);
+        WaterloggedBlockApi.onBlockAdded(world, pos, this);
     }
 
     @Override
@@ -173,7 +190,7 @@ public abstract class BlockUnderwaterPlant extends BlockBush {
                                 Block blockIn, BlockPos fromPos) {
         super.neighborChanged(state, world, pos, blockIn, fromPos);
         if (world.getBlockState(pos).getBlock() == this) {
-            WaterloggedPlantFluid.onNeighborChanged(world, pos, this);
+            WaterloggedBlockApi.onNeighborChanged(world, pos, this);
         }
     }
 
@@ -181,14 +198,12 @@ public abstract class BlockUnderwaterPlant extends BlockBush {
     public void updateTick(World world, BlockPos pos, IBlockState state, java.util.Random random) {
         super.updateTick(world, pos, state, random);
         if (world.getBlockState(pos).getBlock() == this) {
-            WaterloggedPlantFluid.updateTick(world, pos, state);
+            WaterloggedBlockApi.updateTick(world, pos, state);
         }
     }
 
     @Override
     public Vec3d modifyAcceleration(World world, BlockPos pos, Entity entity, Vec3d motion) {
-        return WaterloggedPlantFluid.isSourceWater(world, pos)
-                ? Blocks.WATER.modifyAcceleration(world, pos, entity, motion)
-                : motion;
+        return WaterloggedBlockApi.modifyAcceleration(world, pos, entity, motion);
     }
 }

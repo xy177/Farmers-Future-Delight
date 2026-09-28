@@ -17,7 +17,6 @@ import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 
-/** Item frame variant that keeps the vanilla 1.12 frame interaction contract. */
 public class EntityGlowItemFrame extends EntityItemFrame implements IEntityAdditionalSpawnData {
     public EntityGlowItemFrame(World world) {
         super(world);

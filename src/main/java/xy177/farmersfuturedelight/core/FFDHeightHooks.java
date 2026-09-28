@@ -7,7 +7,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Iterator;
 import java.util.Random;
+import java.util.Set;
+import java.util.WeakHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.BlockPistonBase;
@@ -22,6 +26,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.play.server.SPacketChunkData;
+import net.minecraft.server.management.PlayerChunkMapEntry;
 import net.minecraft.util.ClassInheritanceMultiMap;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -44,6 +50,7 @@ import net.minecraft.world.NextTickListEntry;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import xy177.farmersfuturedelight.api.WaterloggedBlockApi;
 
 public final class FFDHeightHooks {
     public static final String WORLD_TYPE_NAME = "ffd_cac";
@@ -59,6 +66,11 @@ public final class FFDHeightHooks {
     private static final ThreadLocal<ArrayDeque<Integer>> COMPAT_WORLDGEN_HEIGHT_SCOPES =
             new ThreadLocal<>();
     private static volatile World voxelMapWorld;
+    private static final String WATER_LIGHTING_TAG = "FFDWaterLightingVersion";
+    private static final int WATER_LIGHTING_VERSION = 2;
+    private static final Set<Chunk> PENDING_WATER_RELIGHT = Collections.synchronizedSet(
+            Collections.newSetFromMap(new WeakHashMap<Chunk, Boolean>()));
+    private static final Map<Chunk, Integer> PENDING_WATER_LIGHT_SYNC = new WeakHashMap<>();
 
     private FFDHeightHooks() {
     }
@@ -133,8 +145,10 @@ public final class FFDHeightHooks {
                 "com.deeperdepths.common.world.chambers.WorldGenTrialChambers$Start")
                 || className.equals(
                 "com.deeperdepths.common.world.ancient_cities.WorldGenAncientCities$Start");
-        boolean extended = isExtended(world) && (yungMineshaft || deeperDepths);
-        if (extended && box.minY > MIN_Y) {
+        boolean villageNames = className.equals(
+                "astrotibs.villagenames.village.MapGenVillageVN$Start");
+        boolean extended = isExtended(world) && (yungMineshaft || deeperDepths || villageNames);
+        if (extended && (yungMineshaft || deeperDepths) && box.minY > MIN_Y) {
             box.minY = MIN_Y;
         }
         beginCompatExtendedWorldgen(extended);
@@ -239,6 +253,10 @@ public final class FFDHeightHooks {
                 ? 128 : world.getActualHeight();
     }
 
+    public static int hbmBedrockY(World world, int relativeY) {
+        return isExtended(world) ? MIN_Y + relativeY : relativeY;
+    }
+
     public static int portalSearchHeight(World world) {
         if (world != null && world.provider != null && world.provider.getDimension() == -1
                 && hasExtendedWorldType(world)) {
@@ -310,11 +328,6 @@ public final class FFDHeightHooks {
         return maxYExclusive(entity.world);
     }
 
-    /**
-     * Vanilla piston boundary checks use a literal zero for the build-height floor.
-     * Keep the complete vanilla decision here and only widen that floor for the
-     * extended-height world type.
-     */
     public static boolean canPush(IBlockState blockState, World world, BlockPos pos,
             EnumFacing facing, boolean destroyBlocks, EnumFacing pistonFacing) {
         if (blockState == null || world == null || pos == null || facing == null
@@ -431,9 +444,6 @@ public final class FFDHeightHooks {
         return true;
     }
 
-    /**
-     * Keeps vanilla Y=0..255 in slots 0..15 for legacy generators that inspect the array directly.
-     */
     public static int storageIndex(int y, World world) {
         if (FFDCoreCompat.isCaveBiomesApiPresent()) {
             return y >= MIN_Y && y < MAX_Y_EXCLUSIVE ? (y - MIN_Y) >> 4 : -1;
@@ -766,12 +776,10 @@ public final class FFDHeightHooks {
         return new int[] {seafloorHeight, underwaterTransparentHeight};
     }
 
-    /** Supplies the world context used by VoxelMap's world-less persistent data object. */
     public static void setVoxelMapWorld(World world) {
         voxelMapWorld = world;
     }
 
-    /** Encodes an extended-world height into VoxelMap's unsigned byte cache format. */
     public static int encodeVoxelMapHeight(int height) {
         World world = voxelMapWorld;
         if (!isExtended(world)) {
@@ -783,7 +791,6 @@ public final class FFDHeightHooks {
         return MathHelper.clamp(height - minY(world) + 1, 1, 255);
     }
 
-    /** Decodes an extended-world height from VoxelMap's unsigned byte cache format. */
     public static int decodeVoxelMapHeight(int encoded) {
         World world = voxelMapWorld;
         if (!isExtended(world) || encoded == 0) {
@@ -1167,11 +1174,61 @@ public final class FFDHeightHooks {
             chunk.generateSkylightMap();
         }
         if (type == EnumSkyBlock.SKY) {
+            int previous = section.getSkyLight(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15);
             section.setSkyLight(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15, value);
+            if (previous != value) {
+                queueWaterLightSync(chunk, pos, index);
+            }
         } else if (type == EnumSkyBlock.BLOCK) {
+            int previous = section.getBlockLight(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15);
             section.setBlockLight(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15, value);
+            if (previous != value) {
+                queueWaterLightSync(chunk, pos, index);
+            }
         }
         chunk.markDirty();
+    }
+
+    private static void queueWaterLightSync(Chunk chunk, BlockPos pos, int section) {
+        World world = chunk.getWorld();
+        if (!(world instanceof WorldServer) || PENDING_WATER_RELIGHT.contains(chunk)) {
+            return;
+        }
+        PlayerChunkMapEntry entry = ((WorldServer) world).getPlayerChunkMap().getEntry(chunk.x, chunk.z);
+        if (entry == null || !entry.isSentToPlayers() || entry.getWatchingPlayers().isEmpty()) {
+            return;
+        }
+        IBlockState state = chunk.getBlockState(pos);
+        if (state.getMaterial() != Material.WATER && !WaterloggedBlockApi.isWaterlogged(state)) {
+            return;
+        }
+        synchronized (PENDING_WATER_LIGHT_SYNC) {
+            Integer pending = PENDING_WATER_LIGHT_SYNC.get(chunk);
+            PENDING_WATER_LIGHT_SYNC.put(chunk, (pending == null ? 0 : pending) | 1 << section);
+        }
+    }
+
+    public static void syncWaterLighting(World world) {
+        if (!(world instanceof WorldServer)) {
+            return;
+        }
+        synchronized (PENDING_WATER_LIGHT_SYNC) {
+            Iterator<Map.Entry<Chunk, Integer>> iterator = PENDING_WATER_LIGHT_SYNC.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<Chunk, Integer> pending = iterator.next();
+                Chunk chunk = pending.getKey();
+                if (chunk.getWorld() != world) {
+                    continue;
+                }
+                int sections = pending.getValue();
+                iterator.remove();
+                PlayerChunkMapEntry entry = ((WorldServer) world).getPlayerChunkMap().getEntry(chunk.x, chunk.z);
+                if (entry != null && entry.getChunk() == chunk && entry.isSentToPlayers()
+                        && !entry.getWatchingPlayers().isEmpty() && !PENDING_WATER_RELIGHT.contains(chunk)) {
+                    entry.sendPacket(new SPacketChunkData(chunk, sections));
+                }
+            }
+        }
     }
 
     public static int getLightSubtracted(Chunk chunk, BlockPos pos, int amount) {
@@ -1374,10 +1431,30 @@ public final class FFDHeightHooks {
         return sectionCount(world) * 16 * 16;
     }
 
+    public static void loadWaterLighting(Chunk chunk, NBTTagCompound data) {
+        if (!chunk.getWorld().isRemote && data.getInteger(WATER_LIGHTING_TAG) < WATER_LIGHTING_VERSION) {
+            PENDING_WATER_RELIGHT.add(chunk);
+            synchronized (PENDING_WATER_LIGHT_SYNC) {
+                PENDING_WATER_LIGHT_SYNC.remove(chunk);
+            }
+            chunk.resetRelightChecks();
+        }
+    }
+
+    public static void saveWaterLighting(Chunk chunk, NBTTagCompound data) {
+        if (!chunk.getWorld().isRemote && !PENDING_WATER_RELIGHT.contains(chunk)) {
+            data.setInteger(WATER_LIGHTING_TAG, WATER_LIGHTING_VERSION);
+        }
+    }
+
     public static int enqueueRelightChecks(Chunk chunk, int queuedLightChecks) {
         World world = chunk.getWorld();
         int sectionCount = sectionCount(world);
         int totalChecks = totalRelightChecks(world);
+        if (queuedLightChecks >= totalChecks) {
+            return queuedLightChecks;
+        }
+        boolean updatingWater = PENDING_WATER_RELIGHT.contains(chunk);
         ExtendedBlockStorage[] storage = chunk.getBlockStorageArray();
         for (int batch = 0; batch < 8 && queuedLightChecks < totalChecks; batch++, queuedLightChecks++) {
             int sectionIndex = queuedLightChecks % sectionCount;
@@ -1393,7 +1470,12 @@ public final class FFDHeightHooks {
                 IBlockState state = section == Chunk.NULL_BLOCK_STORAGE
                         ? Blocks.AIR.getDefaultState() : section.get(localX, localY, localZ);
                 if (section == Chunk.NULL_BLOCK_STORAGE && edge
-                        || section != Chunk.NULL_BLOCK_STORAGE && state.getBlock().isAir(state, world, pos)) {
+                        || section != Chunk.NULL_BLOCK_STORAGE
+                        && (state.getBlock().isAir(state, world, pos) || state.getMaterial() == Material.WATER)) {
+                    if (updatingWater && state.getMaterial() == Material.WATER
+                            && !world.isAreaLoaded(pos, 17, false)) {
+                        return queuedLightChecks;
+                    }
                     for (EnumFacing facing : EnumFacing.values()) {
                         BlockPos neighbor = pos.offset(facing);
                         if (world.getBlockState(neighbor).getLightValue(world, neighbor) > 0) {
@@ -1401,6 +1483,17 @@ public final class FFDHeightHooks {
                         }
                     }
                     world.checkLight(pos);
+                }
+            }
+        }
+        if (queuedLightChecks >= totalChecks && PENDING_WATER_RELIGHT.remove(chunk)) {
+            chunk.markDirty();
+            if (world instanceof WorldServer) {
+                net.minecraft.server.management.PlayerChunkMapEntry entry =
+                        ((WorldServer) world).getPlayerChunkMap().getEntry(chunk.x, chunk.z);
+                if (entry != null && !entry.getWatchingPlayers().isEmpty()) {
+                    entry.sendPacket(new net.minecraft.network.play.server.SPacketChunkData(
+                            chunk, fullSectionMask(chunk)));
                 }
             }
         }
@@ -1423,15 +1516,24 @@ public final class FFDHeightHooks {
             }
             if (!foundOpaque && opacity > 0) {
                 foundOpaque = true;
-            } else if (foundOpaque && opacity == 0 && !world.checkLight(cursor)) {
-                return false;
+            } else if (foundOpaque) {
+                IBlockState state = chunk.getBlockState(cursor);
+                if ((opacity == 0 || state.getMaterial() == Material.WATER
+                        || WaterloggedBlockApi.isWaterlogged(state)
+                        || chunk.getLightFor(EnumSkyBlock.BLOCK, cursor) > 0
+                        || chunk.getLightFor(EnumSkyBlock.SKY, cursor) > 0) && !world.checkLight(cursor)) {
+                    return false;
+                }
             }
         }
         for (int y = cursor.getY(); y > minY; y--) {
             cursor.setY(y);
             IBlockState state = chunk.getBlockState(cursor);
-            if (state.getLightValue(world, cursor) > 0) {
-                world.checkLight(cursor);
+            if ((state.getLightValue(world, cursor) > 0 || state.getMaterial() == Material.WATER
+                    || WaterloggedBlockApi.isWaterlogged(state)
+                    || chunk.getLightFor(EnumSkyBlock.BLOCK, cursor) > 0
+                    || chunk.getLightFor(EnumSkyBlock.SKY, cursor) > 0) && !world.checkLight(cursor)) {
+                return false;
             }
         }
         return true;

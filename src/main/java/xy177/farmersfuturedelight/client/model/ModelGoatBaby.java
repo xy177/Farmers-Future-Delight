@@ -100,10 +100,9 @@ public class ModelGoatBaby extends ModelBase {
                                   float netHeadYaw, float headPitch, float scale,
                                   Entity entity) {
         EntityGoat goat = (EntityGoat) entity;
-        head.rotateAngleY = MathHelper.clamp(MathHelper.wrapDegrees(netHeadYaw),
-                -15.0F, 15.0F) * 0.017453292F;
+        head.rotateAngleY = netHeadYaw * 0.017453292F;
         float rammingRotation = goat.getRammingXHeadRot();
-        head.rotateAngleX = rammingRotation == 0.0F ? 0.4363F : rammingRotation;
+        head.rotateAngleX = rammingRotation == 0.0F ? 0.3926991F : rammingRotation;
         rightHindLeg.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F)
                 * 1.4F * limbSwingAmount;
         leftHindLeg.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + (float) Math.PI)

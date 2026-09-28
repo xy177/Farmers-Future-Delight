@@ -3,6 +3,7 @@ package xy177.farmersfuturedelight.common.registry;
 import java.util.Random;
 
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.oredict.OreDictionary;
 import xy177.farmersfuturedelight.common.FFDConfig;
@@ -26,7 +27,7 @@ public final class FFDRawOreDropHooks {
                 if (!raw.isEmpty()) {
                     int amount = FFDConfig.rawOreDropAmount;
                     if (FFDConfig.denseRawOreDrop && isDenseOre(drop)) {
-                        amount *= denseOreMultiplier();
+                        amount *= denseOreMultiplier(drop);
                     }
                     if (fortune > 0) {
                         int multiplier = RANDOM.nextInt(fortune + 2) - 1;
@@ -54,7 +55,7 @@ public final class FFDRawOreDropHooks {
             int amount = FFDRawOres.isCopper(FFDRawOres.NAMES[index])
                     ? 2 + RANDOM.nextInt(4) : FFDConfig.rawOreDropAmount;
             if (FFDConfig.denseRawOreDrop && isDenseOre(drop)) {
-                amount *= denseOreMultiplier();
+                amount *= denseOreMultiplier(drop);
             }
             if (fortune > 0) {
                 int multiplier = RANDOM.nextInt(fortune + 2) - 1;
@@ -97,6 +98,13 @@ public final class FFDRawOreDropHooks {
         return false;
     }
 
+    public static int denseOreMultiplier(ItemStack stack) {
+        if (isOsvDenseOre(stack)) {
+            return Math.max(1, FFDConfig.osvDenseRawOreMultiplier);
+        }
+        return denseOreMultiplier();
+    }
+
     private static int denseOreMultiplier() {
         if (!net.minecraftforge.fml.common.Loader.isModLoaded("densemetals")) {
             return 2;
@@ -107,5 +115,13 @@ public final class FFDRawOreDropHooks {
         } catch (Throwable ignored) {
             return 2;
         }
+    }
+
+    private static boolean isOsvDenseOre(ItemStack stack) {
+        if (stack == null || stack.isEmpty() || !isDenseOre(stack)) {
+            return false;
+        }
+        ResourceLocation registryName = stack.getItem().getRegistryName();
+        return registryName != null && "osv".equals(registryName.getResourceDomain());
     }
 }

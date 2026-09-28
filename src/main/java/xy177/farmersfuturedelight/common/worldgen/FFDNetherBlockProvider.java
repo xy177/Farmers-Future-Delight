@@ -10,7 +10,6 @@ import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 
 import javax.annotation.Nullable;
 
-/** Resolves independently provided blocks used by Nether forest generation. */
 public final class FFDNetherBlockProvider {
     private final IBlockState crimsonNylium;
     private final IBlockState crimsonFungus;
