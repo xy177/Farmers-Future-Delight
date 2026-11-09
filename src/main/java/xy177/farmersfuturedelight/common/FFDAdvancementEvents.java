@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import net.minecraft.block.BlockJukebox;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.item.EntityBoat;
@@ -87,6 +88,12 @@ public final class FFDAdvancementEvents {
         String childPath = entityPath(event.getChild());
         if ("bee".equals(childPath)) {
             FFDAdvancements.BRED_BEE.trigger(player);
+        } else if ("cat".equals(childPath)) {
+            FFDAdvancements.BRED_CAT.trigger(player);
+        } else if ("fox".equals(childPath)) {
+            FFDAdvancements.BRED_FOX.trigger(player);
+        } else if ("panda".equals(childPath)) {
+            FFDAdvancements.BRED_PANDA.trigger(player);
         } else if ("turtle".equals(childPath)) {
             FFDAdvancements.BRED_TURTLE.trigger(player);
         } else if ("goat".equals(childPath)) {
@@ -99,8 +106,17 @@ public final class FFDAdvancementEvents {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onLivingDeath(LivingDeathEvent event) {
         Entity source = event.getSource().getTrueSource();
-        if (source instanceof EntityPlayerMP && "phantom".equals(entityPath(event.getEntityLiving()))) {
-            FFDAdvancements.KILL_PHANTOM.trigger((EntityPlayerMP) source);
+        if (!(source instanceof EntityPlayerMP)) {
+            return;
+        }
+        EntityPlayerMP player = (EntityPlayerMP) source;
+        String path = entityPath(event.getEntityLiving());
+        if ("phantom".equals(path)) {
+            FFDAdvancements.KILL_PHANTOM.trigger(player);
+        } else if ("pillager".equals(path)) {
+            FFDAdvancements.KILL_PILLAGER.trigger(player);
+        } else if ("ravager".equals(path)) {
+            FFDAdvancements.KILL_RAVAGER.trigger(player);
         }
     }
 
@@ -210,6 +226,10 @@ public final class FFDAdvancementEvents {
     }
 
     private static void satisfyDisabledCompatibilityCriteria(EntityPlayerMP player) {
+        if (FFDConfig.catMode == FFDConfig.FeatureMode.DISABLED) {
+            FFDAdvancements.BRED_CAT.trigger(player);
+            FFDAdvancements.completeCatCatalogue(player);
+        }
         if (FFDConfig.sweetBerryMode == FFDConfig.FeatureMode.DISABLED) {
             FFDAdvancements.CONSUME_SWEET_BERRIES.trigger(player);
         }
@@ -226,6 +246,18 @@ public final class FFDAdvancementEvents {
         if (FFDConfig.turtleMode == FFDConfig.FeatureMode.DISABLED) {
             FFDAdvancements.BRED_TURTLE.trigger(player);
         }
+        if (FFDConfig.foxMode == FFDConfig.FeatureMode.DISABLED) {
+            FFDAdvancements.BRED_FOX.trigger(player);
+        }
+        if (FFDConfig.pandaMode == FFDConfig.FeatureMode.DISABLED) {
+            FFDAdvancements.BRED_PANDA.trigger(player);
+        }
+        if (FFDConfig.pillagerMode == FFDConfig.FeatureMode.DISABLED) {
+            grantDisabledMobCriterion(player, "pillager");
+        }
+        if (FFDConfig.ravagerMode == FFDConfig.FeatureMode.DISABLED) {
+            grantDisabledMobCriterion(player, "ravager");
+        }
         if (FFDConfig.goatMode == FFDConfig.FeatureMode.DISABLED) {
             FFDAdvancements.BRED_GOAT.trigger(player);
         }
@@ -234,6 +266,14 @@ public final class FFDAdvancementEvents {
         }
         if (FFDConfig.phantomMode == FFDConfig.FeatureMode.DISABLED) {
             FFDAdvancements.KILL_PHANTOM.trigger(player);
+        }
+    }
+
+    private static void grantDisabledMobCriterion(EntityPlayerMP player, String criterion) {
+        Advancement advancement = player.getServer().getAdvancementManager().getAdvancement(
+                new ResourceLocation("minecraft", "adventure/kill_all_mobs"));
+        if (advancement != null) {
+            player.getAdvancements().grantCriterion(advancement, criterion);
         }
     }
 

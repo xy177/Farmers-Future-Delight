@@ -1,0 +1,20 @@
+{
+  "conditions": [
+    {"type": "farmers_future_delight:feature_enabled", "feature": "honey"}
+  ],
+  "parent": "minecraft:husbandry/root",
+  "display": {
+    "icon": {"item": "farmers_future_delight:honey_block"},
+    "title": {"translate": "advancements.farmers_future_delight.husbandry.sticky_situation.title"},
+    "description": {"translate": "advancements.farmers_future_delight.husbandry.sticky_situation.description"},
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "sticky_situation": {
+      "trigger": "farmers_future_delight:sticky_situation"
+    }
+  }
+}

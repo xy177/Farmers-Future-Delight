@@ -1,0 +1,20 @@
+{
+  "pools": [
+    {
+      "name": "bowl",
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "item",
+          "name": "minecraft:bowl"
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "farmers_future_delight:damage_source",
+          "damage_type": "lightningBolt"
+        }
+      ]
+    }
+  ]
+}

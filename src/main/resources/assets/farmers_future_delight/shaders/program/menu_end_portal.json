@@ -1,0 +1,10 @@
+{
+  "blend": { "func": "add", "srcrgb": "one", "dstrgb": "zero" },
+  "vertex": "farmers_future_delight:menu_end_portal",
+  "fragment": "farmers_future_delight:menu_end_portal",
+  "samplers": [{"name": "Sky"}, {"name": "Portal"}],
+  "uniforms": [
+    {"name": "Size", "type": "float", "count": 2, "values": [1, 1]},
+    {"name": "GameTime", "type": "float", "count": 1, "values": [0]}
+  ]
+}

@@ -204,6 +204,7 @@ public class EntityDolphin extends EntityAgeable implements IAnimals {
     public boolean processInteract(EntityPlayer player, EnumHand hand) {
         ItemStack held = player.getHeldItem(hand);
         if (isFish(held)) {
+            if (isChild() && FFDAgeLock.isLocked(this)) return false;
             playSound(FFDSounds.DOLPHIN_EAT, 1.0F, 1.0F);
             if (isChild()) {
                 ageUp((int) ((float) (-getGrowingAge() / 20) * 0.1F), true);
@@ -254,12 +255,8 @@ public class EntityDolphin extends EntityAgeable implements IAnimals {
     }
 
     @Override
-    protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
-        int amount = rand.nextInt(2) + rand.nextInt(lootingModifier + 1);
-        if (amount > 0) {
-            entityDropItem(new ItemStack(isBurning() ? Items.COOKED_FISH : Items.FISH,
-                    amount, 0), 0.0F);
-        }
+    protected net.minecraft.util.ResourceLocation getLootTable() {
+        return xy177.farmersfuturedelight.common.FFDEntityLootTables.DOLPHIN;
     }
 
     @Override

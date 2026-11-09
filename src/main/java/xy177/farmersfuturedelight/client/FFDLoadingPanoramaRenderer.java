@@ -20,17 +20,11 @@ import xy177.farmersfuturedelight.FarmerFutureDelight;
 
 final class FFDLoadingPanoramaRenderer {
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final ResourceLocation[] PANORAMA_TEXTURES = new ResourceLocation[6];
     private static final ResourceLocation PANORAMA_OVERLAY = id(
             "textures/gui/title/background/panorama_overlay.png");
     private static final ResourceLocation BLUR_SHADER = id("shaders/post/loading_blur.json");
-
-    static {
-        for (int index = 0; index < PANORAMA_TEXTURES.length; index++) {
-            PANORAMA_TEXTURES[index] = id(
-                    "textures/gui/title/background/panorama_" + index + ".png");
-        }
-    }
+    private static final java.lang.reflect.Field SHADER_PASSES = net.minecraftforge.fml.common.ObfuscationReflectionHelper
+            .findField(ShaderGroup.class, "field_148031_d");
 
     private ShaderGroup blurShader;
     private Framebuffer blurTarget;
@@ -41,6 +35,14 @@ final class FFDLoadingPanoramaRenderer {
     private static float rotation;
 
     void render(Minecraft minecraft, int width, int height, Framebuffer target) {
+        render(minecraft, width, height, target, true);
+    }
+
+    void render(Minecraft minecraft, int width, int height, Framebuffer target, boolean darken) {
+        render(minecraft, width, height, target, darken, true);
+    }
+
+    void render(Minecraft minecraft, int width, int height, Framebuffer target, boolean darken, boolean blur) {
         advanceRotation();
         GlStateManager.enableTexture2D();
         GlStateManager.disableLighting();
@@ -50,9 +52,9 @@ final class FFDLoadingPanoramaRenderer {
         drawCube(minecraft, target.framebufferWidth, target.framebufferHeight);
         setupGuiProjection(width, height);
         drawPanoramaOverlay(minecraft, width, height);
-        applyBlur(minecraft, target);
+        if (blur) applyBlur(minecraft, target);
         setupGuiProjection(width, height);
-        Gui.drawRect(0, 0, width, height, 0x40000000);
+        if (darken) Gui.drawRect(0, 0, width, height, 0x40000000);
         GlStateManager.enableAlpha();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
     }
@@ -65,6 +67,13 @@ final class FFDLoadingPanoramaRenderer {
         blurTarget = null;
         blurWidth = -1;
         blurHeight = -1;
+        blurUnavailable = false;
+    }
+
+    void renderWorld(Minecraft minecraft, int width, int height, Framebuffer target) {
+        applyBlur(minecraft, target);
+        setupGuiProjection(width, height);
+        GlStateManager.color(1, 1, 1, 1);
     }
 
     private void advanceRotation() {
@@ -109,8 +118,8 @@ final class FFDLoadingPanoramaRenderer {
             GlStateManager.rotate(10.0F, 1.0F, 0.0F, 0.0F);
             GlStateManager.rotate(-rotation, 0.0F, 1.0F, 0.0F);
             int alpha = Math.round(255.0F) / (sample + 1);
-            for (int face = 0; face < PANORAMA_TEXTURES.length; face++) {
-                minecraft.getTextureManager().bindTexture(PANORAMA_TEXTURES[face]);
+            for (int face = 0; face < 6; face++) {
+                minecraft.getTextureManager().bindTexture(FFDMenuPanoramas.face(face));
                 buffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
                 addFace(buffer, face, alpha);
                 tessellator.draw();
@@ -186,6 +195,8 @@ final class FFDLoadingPanoramaRenderer {
     }
 
     private void applyBlur(Minecraft minecraft, Framebuffer target) {
+        int radius = FFDClientOptions.menuBackgroundBlur();
+        if (radius == 0) return;
         if (blurUnavailable || !OpenGlHelper.isFramebufferEnabled()
                 || !OpenGlHelper.areShadersSupported()) {
             return;
@@ -214,11 +225,18 @@ final class FFDLoadingPanoramaRenderer {
                 configureBlurFramebuffer(blurShader.getFramebufferRaw("swap"));
             }
             configureBlurFramebuffer(target);
+            @SuppressWarnings("unchecked")
+            java.util.List<net.minecraft.client.shader.Shader> passes = (java.util.List<net.minecraft.client.shader.Shader>)
+                    SHADER_PASSES.get(blurShader);
+            for (net.minecraft.client.shader.Shader shader : passes) {
+                net.minecraft.client.shader.ShaderUniform uniform = shader.getShaderManager().getShaderUniform("Radius");
+                if (uniform != null) uniform.set((float) radius);
+            }
             blurShader.render(0.0F);
-        } catch (IOException | RuntimeException exception) {
-            blurUnavailable = true;
+        } catch (IOException | IllegalAccessException | RuntimeException exception) {
             LOGGER.warn("Unable to initialize the modern loading-screen blur", exception);
             close();
+            blurUnavailable = true;
         } finally {
             target.setFramebufferFilter(previousFilter);
             GlStateManager.bindTexture(target.framebufferTexture);
@@ -241,10 +259,10 @@ final class FFDLoadingPanoramaRenderer {
     private static void setupGuiProjection(int width, int height) {
         GlStateManager.matrixMode(5889);
         GlStateManager.loadIdentity();
-        GlStateManager.ortho(0.0D, width, height, 0.0D, 100.0D, 300.0D);
+        GlStateManager.ortho(0.0D, width, height, 0.0D, 1000.0D, 3000.0D);
         GlStateManager.matrixMode(5888);
         GlStateManager.loadIdentity();
-        GlStateManager.translate(0.0F, 0.0F, -200.0F);
+        GlStateManager.translate(0.0F, 0.0F, -2000.0F);
     }
 
     private static ResourceLocation id(String path) {

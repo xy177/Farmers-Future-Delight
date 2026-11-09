@@ -1,6 +1,13 @@
 package xy177.farmersfuturedelight.common.registry;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
+import xy177.farmersfuturedelight.common.block.BlockBlackstone;
+import xy177.farmersfuturedelight.common.block.BlockCryingObsidian;
+import xy177.farmersfuturedelight.common.block.BlockFutureFlower;
+import xy177.farmersfuturedelight.common.block.BlockScaffolding;
+import xy177.farmersfuturedelight.common.block.BlockWoodStandingSign;
+import xy177.farmersfuturedelight.common.block.BlockWoodWallSign;
 import net.minecraft.block.material.MapColor;
 
 import xy177.farmersfuturedelight.api.WaterloggedBlockApi;
@@ -40,6 +47,15 @@ import xy177.farmersfuturedelight.common.block.BlockHangingRoots;
 import xy177.farmersfuturedelight.common.block.BlockHoneycomb;
 import xy177.farmersfuturedelight.common.block.BlockInfestedDeepslate;
 import xy177.farmersfuturedelight.common.block.BlockIronChain;
+import xy177.farmersfuturedelight.common.block.BlockLantern;
+import xy177.farmersfuturedelight.common.block.BlockLoom;
+import xy177.farmersfuturedelight.common.block.BlockLectern;
+import xy177.farmersfuturedelight.common.block.BlockFletchingTable;
+import xy177.farmersfuturedelight.common.block.BlockSmithingTable;
+import xy177.farmersfuturedelight.common.block.BlockBell;
+import xy177.farmersfuturedelight.common.block.BlockAncientDebris;
+import xy177.farmersfuturedelight.common.block.BlockBamboo;
+import xy177.farmersfuturedelight.common.block.BlockBambooSapling;
 import xy177.farmersfuturedelight.common.block.BlockKelp;
 import xy177.farmersfuturedelight.common.block.BlockKelpPlant;
 import xy177.farmersfuturedelight.common.block.BlockKelpYoung;
@@ -84,6 +100,35 @@ import xy177.farmersfuturedelight.common.block.BlockWeatheringCopperStairs;
 import xy177.farmersfuturedelight.common.block.CopperWeathering;
 
 public final class FFDBlocks {
+    public static final xy177.farmersfuturedelight.common.block.BlockCampfire CAMPFIRE =
+            new xy177.farmersfuturedelight.common.block.BlockCampfire();
+    public static final xy177.farmersfuturedelight.common.block.BlockCookingFurnace SMOKER =
+            new xy177.farmersfuturedelight.common.block.BlockCookingFurnace(true);
+    public static final xy177.farmersfuturedelight.common.block.BlockCookingFurnace BLAST_FURNACE =
+            new xy177.farmersfuturedelight.common.block.BlockCookingFurnace(false);
+    public static final xy177.farmersfuturedelight.common.block.BlockBarrel BARREL =
+            new xy177.farmersfuturedelight.common.block.BlockBarrel();
+    public static final xy177.farmersfuturedelight.common.block.BlockComposter COMPOSTER =
+            new xy177.farmersfuturedelight.common.block.BlockComposter();
+    public static final xy177.farmersfuturedelight.common.block.BlockStonecutter STONECUTTER =
+            new xy177.farmersfuturedelight.common.block.BlockStonecutter();
+    public static final xy177.farmersfuturedelight.common.block.BlockGrindstone GRINDSTONE =
+            new xy177.farmersfuturedelight.common.block.BlockGrindstone();
+    public static final xy177.farmersfuturedelight.common.block.BlockCartographyTable CARTOGRAPHY_TABLE =
+            new xy177.farmersfuturedelight.common.block.BlockCartographyTable();
+    public static final BlockLoom LOOM = new BlockLoom();
+    public static final BlockLectern LECTERN = new BlockLectern();
+    public static final BlockFletchingTable FLETCHING_TABLE = new BlockFletchingTable();
+    public static final BlockSmithingTable SMITHING_TABLE = new BlockSmithingTable();
+    public static final BlockAncientDebris ANCIENT_DEBRIS = new BlockAncientDebris();
+    public static final xy177.farmersfuturedelight.common.block.BlockNetheriteBlock NETHERITE_BLOCK =
+            new xy177.farmersfuturedelight.common.block.BlockNetheriteBlock();
+    public static final BlockFutureStone QUARTZ_BRICKS = new BlockFutureStone(
+            "quartz_bricks", 0.8F, 4.0F, SoundType.STONE).setMapColor(MapColor.QUARTZ);
+    public static final BlockCryingObsidian CRYING_OBSIDIAN = new BlockCryingObsidian();
+    public static final BlockBell BELL = new BlockBell();
+    public static final xy177.farmersfuturedelight.common.block.BlockJigsaw JIGSAW =
+            new xy177.farmersfuturedelight.common.block.BlockJigsaw();
     public static final String[] CANDLE_NAMES = {
             "candle", "white_candle", "orange_candle", "magenta_candle",
             "light_blue_candle", "yellow_candle", "lime_candle", "pink_candle",
@@ -93,6 +138,11 @@ public final class FFDBlocks {
     public static final String[] OVERWORLD_WOOD_NAMES = {
             "oak", "spruce", "birch", "jungle", "acacia", "dark_oak"
     };
+    public static final String[] WOOD_SIGN_NAMES = {
+            "spruce", "birch", "jungle", "acacia", "dark_oak"
+    };
+    public static final BlockWoodStandingSign[] WOOD_STANDING_SIGNS = standingWoodSigns();
+    public static final BlockWoodWallSign[] WOOD_WALL_SIGNS = wallWoodSigns();
     private static final MapColor[] STRIPPED_WOOD_MAP_COLORS = {
             MapColor.WOOD, MapColor.OBSIDIAN, MapColor.SAND,
             MapColor.DIRT, MapColor.ADOBE, MapColor.BROWN
@@ -157,6 +207,24 @@ public final class FFDBlocks {
             new BlockFutureStone("dripstone_block", 1.5F, 1.0F, FFDSounds.DRIPSTONE_BLOCK);
     public static final BlockPointedDripstone POINTED_DRIPSTONE = new BlockPointedDripstone();
     public static final BlockIronChain IRON_CHAIN = new BlockIronChain();
+    public static final BlockLantern LANTERN = new BlockLantern();
+    public static final BlockFutureFlower CORNFLOWER = new BlockFutureFlower("cornflower", false);
+    public static final BlockFutureFlower LILY_OF_THE_VALLEY = new BlockFutureFlower("lily_of_the_valley", false);
+    public static final BlockFutureFlower WITHER_ROSE = new BlockFutureFlower("wither_rose", true);
+    public static final BlockFutureFlower GOLDEN_DANDELION = new BlockFutureFlower("golden_dandelion", false);
+    public static final BlockPottedNetherPlant POTTED_GOLDEN_DANDELION = flowerPot("potted_golden_dandelion", GOLDEN_DANDELION);
+    public static final BlockPottedNetherPlant POTTED_CORNFLOWER = flowerPot("potted_cornflower", CORNFLOWER);
+    public static final BlockPottedNetherPlant POTTED_LILY_OF_THE_VALLEY = flowerPot("potted_lily_of_the_valley", LILY_OF_THE_VALLEY);
+    public static final BlockPottedNetherPlant POTTED_WITHER_ROSE = flowerPot("potted_wither_rose", WITHER_ROSE);
+    public static final BlockBamboo BAMBOO = new BlockBamboo();
+    public static final BlockScaffolding SCAFFOLDING = new BlockScaffolding();
+    public static final BlockBambooSapling BAMBOO_SAPLING = new BlockBambooSapling();
+    public static final BlockPottedNetherPlant POTTED_BAMBOO = new BlockPottedNetherPlant("potted_bamboo", BAMBOO) {
+        @Override
+        protected net.minecraft.item.ItemStack plantStack() {
+            return FFDItems.effectiveStack(FFDItems.BAMBOO);
+        }
+    };
     public static final BlockLight LIGHT = new BlockLight();
     public static final BlockCandle[] CANDLES = candles();
     public static final BlockCandleCake[] CANDLE_CAKES = candleCakes(CANDLES);
@@ -167,6 +235,45 @@ public final class FFDBlocks {
             "lava_cauldron", BlockFutureCauldron.Content.LAVA);
     public static final BlockFutureCauldron POWDER_SNOW_CAULDRON = new BlockFutureCauldron(
             "powder_snow_cauldron", BlockFutureCauldron.Content.POWDER_SNOW);
+    public static final BlockBlackstone BLACKSTONE =
+            new BlockBlackstone("blackstone", 1.5F, SoundType.STONE);
+    public static final BlockBlackstone POLISHED_BLACKSTONE =
+            new BlockBlackstone("polished_blackstone", 2.0F, SoundType.STONE);
+    public static final BlockBlackstone POLISHED_BLACKSTONE_BRICKS =
+            new BlockBlackstone("polished_blackstone_bricks", 1.5F, SoundType.STONE);
+    public static final BlockBlackstone CRACKED_POLISHED_BLACKSTONE_BRICKS =
+            new BlockBlackstone("cracked_polished_blackstone_bricks", 1.5F, SoundType.STONE);
+    public static final BlockBlackstone CHISELED_POLISHED_BLACKSTONE =
+            new BlockBlackstone("chiseled_polished_blackstone", 1.5F, SoundType.STONE);
+    public static final BlockBlackstone.Gilded GILDED_BLACKSTONE =
+            new BlockBlackstone.Gilded(FFDSounds.GILDED_BLACKSTONE);
+    public static final BlockFutureStairs BLACKSTONE_STAIRS = blackstoneProperties(
+            new BlockFutureStairs("blackstone_stairs", BLACKSTONE.getDefaultState(), SoundType.STONE), 1.5F);
+    public static final BlockFutureSlab.Half BLACKSTONE_SLAB = blackstoneProperties(
+            new BlockFutureSlab.Half("blackstone_slab", SoundType.STONE), 2.0F);
+    public static final BlockFutureSlab.Double BLACKSTONE_DOUBLE_SLAB = blackstoneProperties(
+            new BlockFutureSlab.Double("blackstone_double_slab", SoundType.STONE, BLACKSTONE_SLAB), 2.0F);
+    public static final xy177.farmersfuturedelight.common.block.BlockModernWall BLACKSTONE_WALL =
+            new xy177.farmersfuturedelight.common.block.BlockModernWall("blackstone_wall", BLACKSTONE.getDefaultState(), 1.5F, 6.0F);
+    public static final BlockFutureStairs POLISHED_BLACKSTONE_STAIRS = blackstoneProperties(
+            new BlockFutureStairs("polished_blackstone_stairs", POLISHED_BLACKSTONE.getDefaultState(), SoundType.STONE), 2.0F);
+    public static final BlockFutureSlab.Half POLISHED_BLACKSTONE_SLAB = blackstoneProperties(
+            new BlockFutureSlab.Half("polished_blackstone_slab", SoundType.STONE), 2.0F);
+    public static final BlockFutureSlab.Double POLISHED_BLACKSTONE_DOUBLE_SLAB = blackstoneProperties(
+            new BlockFutureSlab.Double("polished_blackstone_double_slab", SoundType.STONE, POLISHED_BLACKSTONE_SLAB), 2.0F);
+    public static final xy177.farmersfuturedelight.common.block.BlockModernWall POLISHED_BLACKSTONE_WALL =
+            new xy177.farmersfuturedelight.common.block.BlockModernWall("polished_blackstone_wall", POLISHED_BLACKSTONE.getDefaultState(), 2.0F, 6.0F);
+    public static final BlockFutureStairs POLISHED_BLACKSTONE_BRICK_STAIRS = blackstoneProperties(
+            new BlockFutureStairs("polished_blackstone_brick_stairs", POLISHED_BLACKSTONE_BRICKS.getDefaultState(), SoundType.STONE), 1.5F);
+    public static final BlockFutureSlab.Half POLISHED_BLACKSTONE_BRICK_SLAB = blackstoneProperties(
+            new BlockFutureSlab.Half("polished_blackstone_brick_slab", SoundType.STONE), 2.0F);
+    public static final BlockFutureSlab.Double POLISHED_BLACKSTONE_BRICK_DOUBLE_SLAB = blackstoneProperties(
+            new BlockFutureSlab.Double("polished_blackstone_brick_double_slab", SoundType.STONE, POLISHED_BLACKSTONE_BRICK_SLAB), 2.0F);
+    public static final xy177.farmersfuturedelight.common.block.BlockModernWall POLISHED_BLACKSTONE_BRICK_WALL =
+            new xy177.farmersfuturedelight.common.block.BlockModernWall("polished_blackstone_brick_wall", POLISHED_BLACKSTONE_BRICKS.getDefaultState(), 1.5F, 6.0F);
+    public static final BlockBlackstone.Button POLISHED_BLACKSTONE_BUTTON = new BlockBlackstone.Button();
+    public static final BlockBlackstone.PressurePlate POLISHED_BLACKSTONE_PRESSURE_PLATE = new BlockBlackstone.PressurePlate();
+
     public static final BlockDeepslate DEEPSLATE = new BlockDeepslate();
     public static final BlockFutureStone COBBLED_DEEPSLATE =
             new BlockFutureStone("cobbled_deepslate", 3.5F, 6.0F, FFDSounds.DEEPSLATE);
@@ -413,6 +520,7 @@ public final class FFDBlocks {
     public static final BlockNetherPressurePlate WARPED_PRESSURE_PLATE = new BlockNetherPressurePlate("warped_pressure_plate");
 
     static {
+        registerWaterloggedRendering(FFDStoneDecor.blocks().toArray(new Block[0]));
         SHROOMLIGHT.setLightLevel(1.0F);
         registerCopperFamily(COPPER_BLOCKS, WAXED_COPPER_BLOCKS);
         registerCopperFamily(CUT_COPPER_BLOCKS, WAXED_CUT_COPPER_BLOCKS);
@@ -427,7 +535,12 @@ public final class FFDBlocks {
                 TALL_SEAGRASS, SEA_PICKLE, SMALL_DRIPLEAF, BIG_DRIPLEAF_STEM,
                 BIG_DRIPLEAF, BIG_DRIPLEAF_WATERLOGGED, HANGING_ROOTS,
                 SMALL_AMETHYST_BUD, MEDIUM_AMETHYST_BUD, LARGE_AMETHYST_BUD,
-                AMETHYST_CLUSTER, IRON_CHAIN);
+                AMETHYST_CLUSTER, IRON_CHAIN, LANTERN);
+        registerWaterloggedRendering(BLACKSTONE_STAIRS, POLISHED_BLACKSTONE_STAIRS,
+                POLISHED_BLACKSTONE_BRICK_STAIRS, BLACKSTONE_SLAB, BLACKSTONE_DOUBLE_SLAB,
+                POLISHED_BLACKSTONE_SLAB, POLISHED_BLACKSTONE_DOUBLE_SLAB,
+                POLISHED_BLACKSTONE_BRICK_SLAB, POLISHED_BLACKSTONE_BRICK_DOUBLE_SLAB,
+                BLACKSTONE_WALL, POLISHED_BLACKSTONE_WALL, POLISHED_BLACKSTONE_BRICK_WALL);
         registerWaterloggedRendering(COBBLED_DEEPSLATE_WALL, POLISHED_DEEPSLATE_WALL,
                 DEEPSLATE_BRICK_WALL, DEEPSLATE_TILE_WALL);
         registerWaterloggedRendering(CANDLES);
@@ -461,6 +574,17 @@ public final class FFDBlocks {
         registerWaterloggedRenderingArrays(OVERWORLD_TRAPDOORS, OVERWORLD_TRAPDOORS_WATERLOGGED);
     }
 
+    private static BlockPottedNetherPlant flowerPot(String name, Block flower) {
+        return new BlockPottedNetherPlant(name, flower) {
+            @Override
+            protected net.minecraft.item.ItemStack plantStack() {
+                Block effective = FFDItems.effectiveBlock(flower);
+                return effective == null ? net.minecraft.item.ItemStack.EMPTY
+                        : new net.minecraft.item.ItemStack(net.minecraft.item.Item.getItemFromBlock(effective));
+            }
+        };
+    }
+
     private static BlockCoralBlock[] coralBlocks(BlockCoralBlock[] deadVariants) {
         BlockCoralBlock[] blocks = new BlockCoralBlock[CORAL_NAMES.length];
         for (int i = 0; i < blocks.length; i++) {
@@ -480,6 +604,13 @@ public final class FFDBlocks {
                     deadVariants == null ? null : deadVariants[i]);
         }
         return blocks;
+    }
+
+    private static <T extends Block> T blackstoneProperties(T block, float hardness) {
+        block.setHardness(hardness);
+        block.setResistance(6.0F / 3.0F);
+        if (block instanceof BlockFutureSlab) ((BlockFutureSlab) block).setMapColor(MapColor.BLACK);
+        return block;
     }
 
     private static BlockCoralWallFan[] coralWallFans(BlockCoralWallFan[] deadVariants) {
@@ -541,6 +672,22 @@ public final class FFDBlocks {
                     OVERWORLD_WOOD_NAMES[i] + "_pressure_plate");
         }
         return blocks;
+    }
+
+    private static BlockWoodStandingSign[] standingWoodSigns() {
+        BlockWoodStandingSign[] signs = new BlockWoodStandingSign[WOOD_SIGN_NAMES.length];
+        for (int i = 0; i < signs.length; i++) {
+            signs[i] = new BlockWoodStandingSign(WOOD_SIGN_NAMES[i]);
+        }
+        return signs;
+    }
+
+    private static BlockWoodWallSign[] wallWoodSigns() {
+        BlockWoodWallSign[] signs = new BlockWoodWallSign[WOOD_SIGN_NAMES.length];
+        for (int i = 0; i < signs.length; i++) {
+            signs[i] = new BlockWoodWallSign(WOOD_SIGN_NAMES[i]);
+        }
+        return signs;
     }
 
     private static BlockFutureStairs[] prismarineStairs() {

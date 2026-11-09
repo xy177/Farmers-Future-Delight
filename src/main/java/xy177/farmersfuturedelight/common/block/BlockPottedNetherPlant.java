@@ -112,7 +112,7 @@ public class BlockPottedNetherPlant extends Block {
         return Items.FLOWER_POT;
     }
 
-    private ItemStack plantStack() {
+    protected ItemStack plantStack() {
         return FFDItems.effectiveStack(Item.getItemFromBlock(plant));
     }
 

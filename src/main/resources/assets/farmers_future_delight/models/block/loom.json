@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "particle": "farmers_future_delight:blocks/loom_side",
+    "down": "farmers_future_delight:blocks/loom_bottom",
+    "up": "farmers_future_delight:blocks/loom_top",
+    "north": "farmers_future_delight:blocks/loom_front",
+    "south": "farmers_future_delight:blocks/loom_side",
+    "east": "farmers_future_delight:blocks/loom_side",
+    "west": "farmers_future_delight:blocks/loom_side"
+  }
+}

@@ -61,7 +61,9 @@ public final class FFDClientHeightHooks {
 
     public static boolean hideBlockOutlineInMaterial(net.minecraft.entity.Entity entity,
                                                       Material material) {
-        return material != Material.WATER && entity.isInsideOfMaterial(material);
+        return material == Material.WATER
+                ? ModernWaterRendering.isCameraInMaterial(entity, material)
+                : entity.isInsideOfMaterial(material);
     }
 
     public static float refreshTerrainFov(float fov, boolean worldProjection) {
@@ -107,9 +109,6 @@ public final class FFDClientHeightHooks {
     public static boolean isWaterloggedSpecialRender(IBlockState state,
             net.minecraft.world.IBlockAccess world, BlockPos pos) {
         return MinecraftForgeClient.getRenderLayer() == BlockRenderLayer.TRANSLUCENT
-                && (state.getRenderType() != EnumBlockRenderType.MODEL
-                    || xy177.farmersfuturedelight.common.fluid.FFDStoredFluidStates.has(world, pos)
-                    || Loader.isModLoaded("fluidlogged_api"))
                 && WaterloggedBlockApi.getFluidForBlock(state.getBlock()) == null
                 && WaterloggedBlockApi.isWaterlogged(world, pos);
     }
@@ -117,26 +116,19 @@ public final class FFDClientHeightHooks {
     public static boolean renderWaterloggedSpecial(BlockRendererDispatcher renderer,
             IBlockState state, BlockPos pos, net.minecraft.world.IBlockAccess world,
             BufferBuilder buffer) {
-        if (Loader.isModLoaded("fluidlogged_api")) {
-            boolean rendered = false;
-            if (state.getRenderType() == EnumBlockRenderType.MODEL
-                    && state.getBlock().getBlockLayer() == BlockRenderLayer.TRANSLUCENT) {
-                IBlockState actual = state.getActualState(world, pos);
-                net.minecraft.client.renderer.block.model.IBakedModel model = renderer.getModelForState(actual);
-                if (model instanceof WaterloggedPlantBakedModel) {
-                    model = ((WaterloggedPlantBakedModel) model).getPlantModel();
-                }
-                rendered = renderer.getBlockModelRenderer().renderModel(world, model,
-                        actual.getBlock().getExtendedState(actual, world, pos), pos, buffer, true);
+        boolean rendered = false;
+        if (state.getRenderType() == EnumBlockRenderType.MODEL
+                && state.getBlock().getBlockLayer() == BlockRenderLayer.TRANSLUCENT) {
+            IBlockState actual = state.getActualState(world, pos);
+            net.minecraft.client.renderer.block.model.IBakedModel model = renderer.getModelForState(actual);
+            if (model instanceof WaterloggedPlantBakedModel) {
+                model = ((WaterloggedPlantBakedModel) model).getPlantModel();
             }
-            IBlockState fluid = WaterloggedBlockApi.getFluidState(world, pos);
-            return renderer.renderBlock(fluid, pos, world, buffer) || rendered;
+            rendered = renderer.getBlockModelRenderer().renderModel(world, model,
+                    actual.getBlock().getExtendedState(actual, world, pos), pos, buffer, true);
         }
-        IBlockState extended = WaterloggedBlockApi.getExtendedState(state, world, pos);
-        net.minecraft.client.renderer.block.model.IBakedModel model = renderer.getModelForState(state);
-        return renderer.getBlockModelRenderer().renderModel(world,
-                model instanceof WaterloggedPlantBakedModel ? model : new WaterloggedPlantBakedModel(model),
-                extended, pos, buffer, false);
+        IBlockState fluid = WaterloggedBlockApi.getFluidState(world, pos);
+        return renderer.renderBlock(fluid, pos, world, buffer) || rendered;
     }
 
     public static Material renderedFluidMaterial(IBlockState state) {

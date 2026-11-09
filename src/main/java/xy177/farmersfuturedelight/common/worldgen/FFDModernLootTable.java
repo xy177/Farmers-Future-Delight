@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.lang.reflect.Field;
 
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -12,13 +13,20 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.storage.loot.LootContext;
 import net.minecraft.world.storage.loot.LootPool;
 import net.minecraft.world.storage.loot.LootTable;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public final class FFDModernLootTable extends LootTable {
+    private static final Field POOLS = ObfuscationReflectionHelper.findField(LootTable.class, "field_186466_c");
     private final LootTable delegate;
 
     public FFDModernLootTable(LootTable delegate) {
         super(new LootPool[0]);
         this.delegate = delegate;
+        try {
+            POOLS.set(this, POOLS.get(delegate));
+        } catch (IllegalAccessException exception) {
+            throw new IllegalStateException(exception);
+        }
     }
 
     @Override

@@ -219,7 +219,7 @@ public class ModelDrowned extends ModelBiped {
     }
 
     private void restorePivots(EntityDrowned drowned) {
-        boolean child = drowned.isChild();
+        boolean child = this instanceof ModelBabyDrowned;
         float ageScale = child ? 0.5F : 1.0F;
         float headY = child ? 15.25F : 0.0F;
         float bodyY = child ? 17.5F : 0.0F;

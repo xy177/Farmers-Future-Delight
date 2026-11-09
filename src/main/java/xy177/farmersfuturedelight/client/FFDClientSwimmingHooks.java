@@ -13,12 +13,14 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.MobEffects;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumHandSide;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.event.InputUpdateEvent;
 
 import xy177.farmersfuturedelight.common.FFDRiptide;
+import xy177.farmersfuturedelight.common.item.ItemCrossbow;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.core.FFDGameplayHooks;
 
@@ -41,6 +43,11 @@ public final class FFDClientSwimmingHooks {
         if (FFDGameplayHooks.isSwimming(player) && event.getMovementInput().sneak) {
             event.getMovementInput().moveStrafe /= 0.3F;
             event.getMovementInput().moveForward /= 0.3F;
+        } else if (!event.getMovementInput().sneak && !player.capabilities.isFlying
+                && (player.height == 1.5F || FFDGameplayHooks.hasSwimmingPose(player)
+                && !player.isInWater())) {
+            event.getMovementInput().moveStrafe *= 0.3F;
+            event.getMovementInput().moveForward *= 0.3F;
         }
     }
 
@@ -71,7 +78,7 @@ public final class FFDClientSwimmingHooks {
             }
         }
         if (canSwim && canSprint && movingForward
-                && Minecraft.getMinecraft().gameSettings.keyBindSprint.isKeyDown()) {
+                && FFDClientOptions.effectiveKeyState(Minecraft.getMinecraft().gameSettings.keyBindSprint)) {
             state.swimSprinting = true;
         }
         if (canSwim && player.isSprinting() && movingForward) {
@@ -147,7 +154,64 @@ public final class FFDClientSwimmingHooks {
                 ModelBiped.copyModelAngles(model.bipedHead, model.bipedHeadwear);
             }
         }
+        applyCrossbowPose(model, player);
         applySpyglassPose(model, player);
+    }
+
+    private static void applyCrossbowPose(ModelBiped model, EntityPlayer player) {
+        ItemStack activeStack = player.isHandActive() ? player.getActiveItemStack() : ItemStack.EMPTY;
+        if (!activeStack.isEmpty() && activeStack.getItem() == FFDItems.CROSSBOW) {
+            boolean holdingRight = activeHandSide(player) == EnumHandSide.RIGHT;
+            if (ItemCrossbow.isCharged(activeStack)) {
+                applyCrossbowHold(model, holdingRight);
+            } else {
+                applyCrossbowCharge(model, holdingRight,
+                        ItemCrossbow.getChargeDuration(activeStack),
+                        FFDItems.CROSSBOW.getMaxItemUseDuration(activeStack)
+                                - player.getItemInUseCount());
+            }
+            return;
+        }
+        ItemStack mainHand = player.getHeldItem(EnumHand.MAIN_HAND);
+        if (!mainHand.isEmpty() && mainHand.getItem() == FFDItems.CROSSBOW
+                && ItemCrossbow.isCharged(mainHand)) {
+            applyCrossbowHold(model, player.getPrimaryHand() == EnumHandSide.RIGHT);
+            return;
+        }
+        ItemStack offHand = player.getHeldItem(EnumHand.OFF_HAND);
+        if (!offHand.isEmpty() && offHand.getItem() == FFDItems.CROSSBOW
+                && ItemCrossbow.isCharged(offHand)) {
+            applyCrossbowHold(model, player.getPrimaryHand() != EnumHandSide.RIGHT);
+        }
+    }
+
+    private static void applyCrossbowHold(ModelBiped model, boolean holdingRight) {
+        ModelRenderer holdingArm = holdingRight ? model.bipedRightArm : model.bipedLeftArm;
+        ModelRenderer shootingArm = holdingRight ? model.bipedLeftArm : model.bipedRightArm;
+        holdingArm.rotateAngleY = (holdingRight ? -0.3F : 0.3F) + model.bipedHead.rotateAngleY;
+        shootingArm.rotateAngleY = (holdingRight ? 0.6F : -0.6F)
+                + model.bipedHead.rotateAngleY;
+        holdingArm.rotateAngleX = -(float) Math.PI / 2.0F
+                + model.bipedHead.rotateAngleX + 0.1F;
+        shootingArm.rotateAngleX = -1.5F + model.bipedHead.rotateAngleX;
+    }
+
+    private static void applyCrossbowCharge(ModelBiped model, boolean holdingRight,
+                                            int chargeDuration, int elapsed) {
+        ModelRenderer holdingArm = holdingRight ? model.bipedRightArm : model.bipedLeftArm;
+        ModelRenderer pullingArm = holdingRight ? model.bipedLeftArm : model.bipedRightArm;
+        holdingArm.rotateAngleY = holdingRight ? -0.8F : 0.8F;
+        pullingArm.rotateAngleX = -0.97079635F;
+        holdingArm.rotateAngleX = -0.97079635F;
+        float progress = MathHelper.clamp((float) elapsed / chargeDuration, 0.0F, 1.0F);
+        pullingArm.rotateAngleY = MathHelper.clamp(0.4F + 0.45F * progress, 0.4F, 0.85F)
+                * (holdingRight ? 1.0F : -1.0F);
+        pullingArm.rotateAngleX += (-1.5707964F - pullingArm.rotateAngleX) * progress;
+    }
+
+    private static EnumHandSide activeHandSide(EntityPlayer player) {
+        return player.getActiveHand() == EnumHand.MAIN_HAND
+                ? player.getPrimaryHand() : player.getPrimaryHand().opposite();
     }
 
     private static void applySpyglassPose(ModelBiped model, EntityPlayer player) {
@@ -273,7 +337,7 @@ public final class FFDClientSwimmingHooks {
                 key -> new AnimationState(player.ticksExisted));
         int elapsed = Math.max(0, player.ticksExisted - state.lastTick);
         if (elapsed > 0) {
-            boolean swimming = FFDGameplayHooks.isSwimming(player);
+            boolean swimming = FFDGameplayHooks.hasSwimmingPose(player);
             for (int tick = 0; tick < Math.min(elapsed, 20); tick++) {
                 state.previous = state.current;
                 state.current = swimming ? Math.min(1.0F, state.current + 0.09F)

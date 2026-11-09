@@ -10,6 +10,9 @@ import net.minecraft.block.BlockCake;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.BlockRotatedPillar;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityAgeable;
 import net.minecraft.entity.EntityList;
@@ -20,6 +23,9 @@ import net.minecraft.entity.monster.EntityGuardian;
 import net.minecraft.entity.monster.EntityPigZombie;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityVillager;
+import net.minecraft.entity.passive.EntitySheep;
+import net.minecraft.entity.monster.EntityIronGolem;
+import net.minecraft.entity.passive.EntityWolf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityPotion;
 import net.minecraft.block.state.IBlockState;
@@ -36,6 +42,7 @@ import net.minecraft.init.PotionTypes;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.inventory.ContainerRepair;
 import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySign;
@@ -63,11 +70,15 @@ import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent;
 import net.minecraftforge.event.entity.player.FillBucketEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.event.world.ChunkDataEvent;
@@ -90,6 +101,7 @@ import xy177.farmersfuturedelight.common.block.BlockCoralPlant;
 import xy177.farmersfuturedelight.common.block.BlockCoralWallFan;
 import xy177.farmersfuturedelight.common.block.CopperWeathering;
 import xy177.farmersfuturedelight.common.block.BlockGlowLichen;
+import xy177.farmersfuturedelight.common.registry.FFDSounds;
 import xy177.farmersfuturedelight.common.block.BlockKelpHead;
 import xy177.farmersfuturedelight.common.block.BlockNetherVine;
 import xy177.farmersfuturedelight.common.block.BlockSeaPickle;
@@ -107,6 +119,8 @@ import xy177.farmersfuturedelight.common.registry.FFDCustomStrippedWoods;
 import xy177.farmersfuturedelight.common.registry.FFDEntities;
 import xy177.farmersfuturedelight.common.registry.FFDCustomRawOres;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
+import xy177.farmersfuturedelight.common.registry.FFDStats;
+import xy177.farmersfuturedelight.common.item.INetheriteItem;
 import xy177.farmersfuturedelight.common.registry.FFDPotions;
 import xy177.farmersfuturedelight.common.registry.FFDRawOres;
 import xy177.farmersfuturedelight.common.registry.FFDRawOreDropHooks;
@@ -118,6 +132,27 @@ import xy177.farmersfuturedelight.core.FFDHeightHooks;
 
 @Mod.EventBusSubscriber(modid = FarmerFutureDelight.MODID)
 public final class FFDGameplayEvents {
+    @SubscribeEvent
+    public static void onAnvilContainerOpen(PlayerContainerEvent.Open event) {
+        if (!event.getEntityPlayer().world.isRemote
+                && event.getContainer() instanceof ContainerRepair
+                && ((ContainerRepair) event.getContainer()).canInteractWith(event.getEntityPlayer())) {
+            event.getEntityPlayer().addStat(FFDStats.ANVIL_INTERACTION);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onNetheriteItemEntityJoin(EntityJoinWorldEvent event) {
+        if (!(event.getEntity() instanceof EntityItem)) {
+            return;
+        }
+        ItemStack stack = ((EntityItem) event.getEntity()).getItem();
+        if (!stack.isEmpty() && stack.getItem() instanceof INetheriteItem) {
+            ObfuscationReflectionHelper.setPrivateValue(net.minecraft.entity.Entity.class,
+                    event.getEntity(), true, "field_70178_ae", "isImmuneToFire");
+        }
+    }
+
     private static final ResourceLocation DEEPER_DEPTHS_COPPER_ORE =
             new ResourceLocation("deeperdepths", "copper_ore");
 
@@ -160,6 +195,13 @@ public final class FFDGameplayEvents {
         }
         GameRules rules = event.getWorld().getGameRules();
         FFDGameplayHooks.ensureSleepingPercentageRule(rules);
+        FFDGameplayHooks.ensurePortingGameRules(rules);
+        FFDPortingGameRules.ensure(rules);
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onCreeperDropRecord(net.minecraftforge.event.entity.living.LivingDropsEvent event) {
+        FFDGameplayHooks.dropCreeperDiscs(event);
     }
 
     @SubscribeEvent
@@ -232,7 +274,8 @@ public final class FFDGameplayEvents {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onVanillaOreHarvested(HarvestDropsEvent event) {
-        if (!FFDConfig.oresDropRawMaterials || event.isSilkTouching()) {
+        if (!FFDConfig.oresDropRawMaterials || event.isSilkTouching()
+                || FFDBlockLootTables.hasLootTable(event.getWorld(), event.getState())) {
             return;
         }
         ItemStack ore = blockStack(event.getState());
@@ -373,6 +416,28 @@ public final class FFDGameplayEvents {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void preventUnusableCampfireIgnition(PlayerInteractEvent.RightClickBlock event) {
+        Item item = event.getItemStack().getItem();
+        if (event.getFace() == null || item != Items.FLINT_AND_STEEL && item != Items.FIRE_CHARGE) {
+            return;
+        }
+        IBlockState state = event.getWorld().getBlockState(event.getPos());
+        if (!(state.getBlock() instanceof xy177.farmersfuturedelight.common.block.BlockCampfire)
+                || !state.getValue(xy177.farmersfuturedelight.common.block.BlockCampfire.LIT)
+                && !xy177.farmersfuturedelight.common.block.BlockCampfire.hasContainedFluid(
+                        event.getWorld(), event.getPos())) {
+            return;
+        }
+        BlockPos adjacent = event.getPos().offset(event.getFace());
+        if (event.getWorld().isAirBlock(adjacent)
+                && Blocks.FIRE.canPlaceBlockAt(event.getWorld(), adjacent)) {
+            return;
+        }
+        event.setCancellationResult(EnumActionResult.FAIL);
+        event.setCanceled(true);
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onShovelCreatesDirtPath(PlayerInteractEvent.RightClickBlock event) {
         if (!FFDConfig.shovelCreatesDirtPath
                 || !(event.getItemStack().getItem() instanceof ItemSpade)
@@ -397,6 +462,33 @@ public final class FFDGameplayEvents {
             if (!event.getEntityPlayer().capabilities.isCreativeMode) {
                 event.getItemStack().damageItem(1, event.getEntityPlayer());
             }
+        }
+        event.setCanceled(true);
+        event.setCancellationResult(EnumActionResult.SUCCESS);
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onExternalBambooPotted(PlayerInteractEvent.RightClickBlock event) {
+        if (!FFDItems.isBlockRegistered(FFDBlocks.POTTED_BAMBOO)
+                || event.getItemStack().isEmpty() || event.getItemStack().getItem() == FFDItems.BAMBOO
+                || event.getUseBlock() == Event.Result.DENY || event.getUseItem() == Event.Result.DENY
+                || event.getWorld().getBlockState(event.getPos()).getBlock() != Blocks.FLOWER_POT) {
+            return;
+        }
+        ItemStack bamboo = FFDItems.effectiveStack(FFDItems.BAMBOO);
+        if (bamboo.isEmpty() || !ItemStack.areItemsEqual(bamboo, event.getItemStack())) {
+            return;
+        }
+        TileEntity tile = event.getWorld().getTileEntity(event.getPos());
+        EnumFacing face = event.getFace() == null ? EnumFacing.UP : event.getFace();
+        if (!(tile instanceof net.minecraft.tileentity.TileEntityFlowerPot)
+                || !((net.minecraft.tileentity.TileEntityFlowerPot) tile).getFlowerItemStack().isEmpty()
+                || !event.getEntityPlayer().canPlayerEdit(event.getPos(), face, event.getItemStack())) {
+            return;
+        }
+        if (!event.getWorld().isRemote) {
+            FFDItems.BAMBOO.onItemUse(event.getEntityPlayer(), event.getWorld(), event.getPos(),
+                    event.getHand(), face, 0.5F, 0.5F, 0.5F);
         }
         event.setCanceled(true);
         event.setCancellationResult(EnumActionResult.SUCCESS);
@@ -469,14 +561,15 @@ public final class FFDGameplayEvents {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onSignTextDyeOrGlow(PlayerInteractEvent.RightClickBlock event) {
-        if (!FFDItems.isSignTextEnabled()) {
-            return;
-        }
         ItemStack held = event.getItemStack();
         boolean glowInk = FFDCompat.isCompatibleGlowInkSac(held);
-        boolean dye = held.getItem() == Items.DYE && held.getMetadata() >= 0
-                && held.getMetadata() < EnumDyeColor.values().length;
-        if (!glowInk && !dye) {
+        EnumDyeColor dyeColor = signDyeColor(held);
+        boolean dye = dyeColor != null;
+        boolean honeycomb = held.getItem() == FFDItems.HONEYCOMB;
+        if ((!FFDItems.isSignTextEnabled() && !honeycomb)) {
+            return;
+        }
+        if (!glowInk && !dye && !honeycomb) {
             return;
         }
         TileEntity tile = event.getWorld().getTileEntity(event.getPos());
@@ -492,18 +585,26 @@ public final class FFDGameplayEvents {
         event.setCancellationResult(EnumActionResult.SUCCESS);
 
         TileEntitySign sign = (TileEntitySign) tile;
+        if (FFDSignText.isWaxed(sign)) {
+            return;
+        }
         boolean changed;
         SoundEvent sound;
-        if (glowInk) {
-            changed = FFDSignText.setGlowing(sign, true);
+        boolean back = FFDSignText.isBackSide(sign, event.getEntityPlayer());
+        if (honeycomb) {
+            changed = FFDSignText.setWaxed(sign, true);
+            sound = FFDSounds.HONEYCOMB_WAX_ON;
+        } else if (glowInk) {
+            changed = FFDSignText.setGlowing(sign, true, back);
             sound = FFDSounds.GLOW_INK_SAC_USE;
-        } else if (held.getMetadata() == EnumDyeColor.BLACK.getDyeDamage()
-                && FFDSignText.isGlowing(sign)) {
-            changed = FFDSignText.setGlowing(sign, false);
+        } else if (held.getItem() == Items.DYE
+                && held.getMetadata() == EnumDyeColor.BLACK.getDyeDamage()
+                && FFDSignText.isGlowing(sign, back)) {
+            changed = FFDSignText.setGlowing(sign, false, back);
             sound = FFDSounds.INK_SAC_USE;
         } else {
             changed = FFDSignText.applyDye(sign,
-                    EnumDyeColor.byDyeDamage(held.getMetadata()));
+                    dyeColor, back);
             sound = FFDSounds.DYE_USE;
         }
         if (!changed) {
@@ -517,6 +618,46 @@ public final class FFDGameplayEvents {
                 sound, SoundCategory.BLOCKS, 1.0F, 1.0F);
         if (!event.getEntityPlayer().capabilities.isCreativeMode) {
             held.shrink(1);
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void preventEditingWaxedSign(PlayerInteractEvent.RightClickBlock event) {
+        TileEntity tile = event.getWorld().getTileEntity(event.getPos());
+        if (tile instanceof TileEntitySign && FFDSignText.isWaxed((TileEntitySign) tile)) {
+            event.setUseBlock(Event.Result.DENY);
+        }
+    }
+
+    private static EnumDyeColor signDyeColor(ItemStack stack) {
+        if (stack.getItem() == FFDItems.WHITE_DYE) return EnumDyeColor.WHITE;
+        if (stack.getItem() == FFDItems.BLACK_DYE) return EnumDyeColor.BLACK;
+        if (stack.getItem() == FFDItems.BLUE_DYE) return EnumDyeColor.BLUE;
+        if (stack.getItem() == FFDItems.BROWN_DYE) return EnumDyeColor.BROWN;
+        if (stack.getItem() == Items.DYE
+                && stack.getMetadata() >= 0
+                && stack.getMetadata() < EnumDyeColor.values().length) {
+            EnumDyeColor color = EnumDyeColor.byDyeDamage(stack.getMetadata());
+            if (FFDConfig.legacyDyeCompatibility
+                    || color != EnumDyeColor.WHITE && color != EnumDyeColor.BLACK
+                    && color != EnumDyeColor.BLUE && color != EnumDyeColor.BROWN) {
+                return color;
+            }
+        }
+        return null;
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void onLegacySeparatedDyeSheepInteraction(EntityInteract event) {
+        ItemStack held = event.getItemStack();
+        if (!FFDConfig.legacyDyeCompatibility && held.getItem() == Items.DYE
+                && (held.getMetadata() == EnumDyeColor.WHITE.getDyeDamage()
+                || held.getMetadata() == EnumDyeColor.BLACK.getDyeDamage()
+                || held.getMetadata() == EnumDyeColor.BLUE.getDyeDamage()
+                || held.getMetadata() == EnumDyeColor.BROWN.getDyeDamage())
+                && (event.getTarget() instanceof EntitySheep
+                || event.getTarget() instanceof EntityWolf)) {
+            event.setCanceled(true);
         }
     }
 
@@ -614,6 +755,17 @@ public final class FFDGameplayEvents {
 
     @SubscribeEvent
     public static void onAnvilUpdate(AnvilUpdateEvent event) {
+        if (FFDItems.isBlackstoneEnabled()
+                && event.getRight().getItem() == FFDItems.BLACKSTONE
+                && isStoneTool(event.getLeft().getItem())) {
+            ItemStack output = event.getLeft().copy();
+            int repair = Math.max(1, output.getMaxDamage() / 4);
+            output.setItemDamage(Math.max(0, output.getItemDamage() - repair));
+            event.setOutput(output);
+            event.setMaterialCost(1);
+            event.setCost(1);
+            return;
+        }
         ItemStack membrane = FFDItems.effectiveStack(FFDItems.PHANTOM_MEMBRANE);
         if (!FFDItems.isPhantomEnabled() || event.getLeft().getItem() != Items.ELYTRA
                 || membrane.isEmpty()
@@ -651,6 +803,12 @@ public final class FFDGameplayEvents {
         event.setMaterialCost(membranesUsed);
         event.setCost(event.getCost() + workCost);
         event.setOutput(output);
+    }
+
+    private static boolean isStoneTool(net.minecraft.item.Item item) {
+        return item == Items.STONE_SWORD || item == Items.STONE_PICKAXE
+                || item == Items.STONE_AXE || item == Items.STONE_SHOVEL
+                || item == Items.STONE_HOE;
     }
 
     @SubscribeEvent
@@ -919,6 +1077,40 @@ public final class FFDGameplayEvents {
         }
     }
 
+    @SubscribeEvent
+    public static void onModernFuel(net.minecraftforge.event.furnace.FurnaceFuelBurnTimeEvent event) {
+        if (event.getBurnTime() >= 0) {
+            return;
+        }
+        Item item = event.getItemStack().getItem();
+        if (item == Items.BOAT || item == Items.SPRUCE_BOAT || item == Items.BIRCH_BOAT
+                || item == Items.JUNGLE_BOAT || item == Items.ACACIA_BOAT
+                || item == Items.DARK_OAK_BOAT) {
+            event.setBurnTime(1200);
+        } else if (item == Item.getItemFromBlock(Blocks.DEADBUSH)) {
+            event.setBurnTime(100);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onVanillaLeavesHarvested(HarvestDropsEvent event) {
+        Block block = event.getState().getBlock();
+        if (event.getWorld().isRemote || (block != Blocks.LEAVES && block != Blocks.LEAVES2)
+                || event.isSilkTouching()
+                || FFDBlockLootTables.hasLootTable(event.getWorld(), event.getState())) {
+            return;
+        }
+        EntityPlayer player = event.getHarvester();
+        if (player != null && player.getHeldItemMainhand().getItem() instanceof ItemShears) {
+            return;
+        }
+        float[] chances = {0.02F, 0.022222223F, 0.025F, 0.033333335F, 0.1F};
+        int fortune = Math.max(0, Math.min(event.getFortuneLevel(), chances.length - 1));
+        if (event.getWorld().rand.nextFloat() < chances[fortune]) {
+            event.getDrops().add(new ItemStack(Items.STICK, 1 + event.getWorld().rand.nextInt(2)));
+        }
+    }
+
     private static boolean tryExtraFluidBucket(PlayerInteractEvent.RightClickBlock event,
             BlockPos pos, FluidStack fluid, EnumFacing side) {
         IBlockState state = event.getWorld().getBlockState(pos);
@@ -986,9 +1178,16 @@ public final class FFDGameplayEvents {
                 ? null : result;
     }
 
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onChorusFlowerProjectileImpact(ProjectileImpactEvent event) {
+        if (!event.isCanceled()) {
+            FFDGameplayHooks.breakChorusFlowerOnProjectile(event.getEntity(), event.getRayTraceResult());
+        }
+    }
+
     @SubscribeEvent
     public static void onProjectileImpact(ProjectileImpactEvent event) {
-        if (event.getEntity().world.isRemote) {
+        if (event.isCanceled() || event.getEntity().world.isRemote) {
             return;
         }
         if (FFDItems.isAxolotlEnabled() && event.getEntity() instanceof EntityPotion) {
@@ -1010,6 +1209,33 @@ public final class FFDGameplayEvents {
             return;
         }
         IBlockState state = event.getEntity().world.getBlockState(hit.getBlockPos());
+        if (state.getBlock() instanceof xy177.farmersfuturedelight.common.block.BlockCampfire
+                && event.getEntity().isBurning()
+                && !state.getValue(xy177.farmersfuturedelight.common.block.BlockCampfire.LIT)
+                && !xy177.farmersfuturedelight.common.block.BlockCampfire.hasContainedFluid(
+                        event.getEntity().world, hit.getBlockPos())) {
+            Entity projectile = event.getEntity();
+            Entity owner = projectile instanceof net.minecraft.entity.projectile.EntityArrow
+                    ? ((net.minecraft.entity.projectile.EntityArrow) projectile).shootingEntity
+                    : projectile instanceof net.minecraft.entity.projectile.EntityThrowable
+                    ? ((net.minecraft.entity.projectile.EntityThrowable) projectile).getThrower()
+                    : projectile instanceof net.minecraft.entity.projectile.EntityFireball
+                    ? ((net.minecraft.entity.projectile.EntityFireball) projectile).shootingEntity : null;
+            boolean mayInteract = owner instanceof EntityPlayer
+                    ? ((EntityPlayer) owner).capabilities.allowEdit
+                    && projectile.world.isBlockModifiable((EntityPlayer) owner, hit.getBlockPos())
+                    : owner == null || net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(
+                            projectile.world, owner);
+            if (mayInteract) {
+                projectile.world.setBlockState(hit.getBlockPos(), state.withProperty(
+                        xy177.farmersfuturedelight.common.block.BlockCampfire.LIT, true), 11);
+            }
+        }
+        if (state.getBlock() instanceof xy177.farmersfuturedelight.common.block.BlockBell) {
+            ((xy177.farmersfuturedelight.common.block.BlockBell) state.getBlock()).onHit(
+                    event.getEntity().world, hit.getBlockPos(), state, hit.sideHit,
+                    hit.hitVec.y - hit.getBlockPos().getY());
+        }
         if (BlockBigDripleaf.isBigDripleaf(state)) {
             BlockBigDripleaf.tiltFully(event.getEntity().world, hit.getBlockPos(), state);
         }
@@ -1155,6 +1381,53 @@ public final class FFDGameplayEvents {
             return;
         }
 
+        if (xy177.farmersfuturedelight.common.registry.FFDEntities.isLocalCatEnabled()
+                && event.getEntity().getClass()
+                == net.minecraft.entity.passive.EntityOcelot.class
+                && ((net.minecraft.entity.passive.EntityOcelot) event.getEntity()).isTamed()) {
+            net.minecraft.nbt.NBTTagCompound legacyData = new net.minecraft.nbt.NBTTagCompound();
+            event.getEntity().writeToNBT(legacyData);
+            xy177.farmersfuturedelight.common.entity.EntityCat cat =
+                    new xy177.farmersfuturedelight.common.entity.EntityCat(event.getWorld());
+            cat.readFromNBT(legacyData);
+            event.setCanceled(true);
+            event.getWorld().spawnEntity(cat);
+            return;
+        }
+
+        if (xy177.farmersfuturedelight.common.registry.FFDEntities.isLocalCatEnabled()
+                && event.getEntity().getClass()
+                == net.minecraft.entity.passive.EntityOcelot.class) {
+            net.minecraft.entity.passive.EntityOcelot ocelot =
+                    (net.minecraft.entity.passive.EntityOcelot) event.getEntity();
+            java.util.List<net.minecraft.entity.ai.EntityAIBase> vanillaAvoidTasks =
+                    new java.util.ArrayList<>();
+            for (net.minecraft.entity.ai.EntityAITasks.EntityAITaskEntry task
+                    : ocelot.tasks.taskEntries) {
+                if (task.priority == 4
+                        && task.action.getClass()
+                        == net.minecraft.entity.ai.EntityAIAvoidEntity.class) {
+                    vanillaAvoidTasks.add(task.action);
+                }
+            }
+            for (net.minecraft.entity.ai.EntityAIBase task : vanillaAvoidTasks) {
+                ocelot.tasks.removeTask(task);
+            }
+            boolean hasTrustAvoidTask = false;
+            for (net.minecraft.entity.ai.EntityAITasks.EntityAITaskEntry task
+                    : ocelot.tasks.taskEntries) {
+                if (task.action instanceof xy177.farmersfuturedelight.common.entity.ai
+                        .EntityAIOcelotAvoidUntrustedPlayer) {
+                    hasTrustAvoidTask = true;
+                    break;
+                }
+            }
+            if (!hasTrustAvoidTask) {
+                ocelot.tasks.addTask(4, new xy177.farmersfuturedelight.common.entity.ai
+                        .EntityAIOcelotAvoidUntrustedPlayer(ocelot));
+            }
+        }
+
         if (FFDItems.isTurtleEnabled() && event.getEntity() instanceof EntityCreature
                 && !(event.getEntity() instanceof EntityPigZombie)
                 && (FFDConfig.isConfiguredEntity(FFDConfig.turtleEggDestroyingMobs,
@@ -1167,6 +1440,166 @@ public final class FFDGameplayEvents {
                 && event.getEntity() instanceof EntityGuardian) {
             addAxolotlTargeting((EntityGuardian) event.getEntity());
         }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void onOcelotTrustInteraction(EntityInteract event) {
+        if (event.isCanceled()
+                || !xy177.farmersfuturedelight.common.registry.FFDEntities.isLocalCatEnabled()
+                || event.getTarget().getClass()
+                != net.minecraft.entity.passive.EntityOcelot.class
+                || event.getItemStack().getItem() != Items.FISH
+                || event.getEntityPlayer().getDistanceSq(event.getTarget()) > 9.0D) {
+            return;
+        }
+        net.minecraft.entity.passive.EntityOcelot ocelot =
+                (net.minecraft.entity.passive.EntityOcelot) event.getTarget();
+        boolean temptTaskRunning = false;
+        for (net.minecraft.entity.ai.EntityAITasks.EntityAITaskEntry task
+                : ocelot.tasks.taskEntries) {
+            if (task.action instanceof net.minecraft.entity.ai.EntityAITempt
+                    && ((net.minecraft.entity.ai.EntityAITempt) task.action).isRunning()) {
+                temptTaskRunning = true;
+                break;
+            }
+        }
+        if (!temptTaskRunning) {
+            return;
+        }
+        ItemStack fish = event.getItemStack();
+        boolean rawCodOrSalmon = fish.getMetadata() == 0 || fish.getMetadata() == 1;
+        event.setCanceled(true);
+        event.setCancellationResult(rawCodOrSalmon
+                ? EnumActionResult.SUCCESS : EnumActionResult.FAIL);
+        if (event.getWorld().isRemote || !rawCodOrSalmon
+                || xy177.farmersfuturedelight.common.entity.FFDOcelotTrust
+                .isTrusting(ocelot)) {
+            return;
+        }
+        EntityPlayer player = event.getEntityPlayer();
+        if (!player.capabilities.isCreativeMode) {
+            fish.shrink(1);
+        }
+        boolean trusted = ocelot.getRNG().nextInt(3) == 0
+                ;
+        if (trusted) {
+            xy177.farmersfuturedelight.common.entity.FFDOcelotTrust.setTrusting(ocelot, true);
+        }
+        event.getWorld().setEntityState(ocelot, (byte) (trusted ? 7 : 6));
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void onIronGolemRepair(EntityInteract event) {
+        if (event.isCanceled()
+                || !(event.getTarget() instanceof EntityIronGolem)
+                || event.getItemStack().getItem() != Items.IRON_INGOT) {
+            return;
+        }
+        EntityIronGolem golem = (EntityIronGolem) event.getTarget();
+        if (golem.getHealth() >= golem.getMaxHealth()) return;
+        event.setCanceled(true);
+        event.setCancellationResult(EnumActionResult.SUCCESS);
+        event.getEntityPlayer().swingArm(event.getHand());
+        if (event.getWorld().isRemote) return;
+        golem.heal(25.0F);
+        golem.playSound(FFDSounds.IRON_GOLEM_REPAIR, 1.0F,
+                1.0F + (golem.getRNG().nextFloat() - golem.getRNG().nextFloat()) * 0.2F);
+        if (!event.getEntityPlayer().capabilities.isCreativeMode) {
+            event.getItemStack().shrink(1);
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onIronGolemDamage(net.minecraftforge.event.entity.living.LivingDamageEvent event) {
+        if (event.isCanceled() || event.getEntityLiving().world.isRemote
+                || !(event.getEntityLiving() instanceof EntityIronGolem) || event.getAmount() <= 0.0F) return;
+        EntityIronGolem golem = (EntityIronGolem) event.getEntityLiving();
+        if (golemCrackStage(golem.getHealth(), golem.getMaxHealth())
+                != golemCrackStage(Math.max(0.0F, golem.getHealth() - event.getAmount()),
+                        golem.getMaxHealth())) {
+            golem.playSound(FFDSounds.IRON_GOLEM_DAMAGE, 1.0F, 1.0F);
+        }
+    }
+
+    private static int golemCrackStage(float health, float maximum) {
+        float ratio = health / maximum;
+        return ratio < 0.25F ? 3 : ratio < 0.5F ? 2 : ratio < 0.75F ? 1 : 0;
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void onVillagerTradeListCreate(EntityInteract event) {
+        if (!FFDConfig.modernVillagerSystem || event.isCanceled() || event.getWorld().isRemote
+                || event.getEntityPlayer().isSneaking()
+                || !(event.getTarget() instanceof EntityVillager)) {
+            return;
+        }
+        EntityVillager villager = (EntityVillager) event.getTarget();
+        ItemStack interactionItem = event.getEntityPlayer().getHeldItem(event.getHand());
+        if (!villager.isEntityAlive() || villager.isTrading()
+                || xy177.farmersfuturedelight.common.registry.FFDVillagerHomes.isSleeping(villager)
+                || interactionItem.getItem() == Items.SPAWN_EGG || interactionItem.getItem() == Items.NAME_TAG) return;
+        if (villager.isChild()) {
+            xy177.farmersfuturedelight.common.registry.FFDVillagerTypes.refuseTrade(villager);
+            event.setCancellationResult(net.minecraft.util.EnumActionResult.SUCCESS);
+            event.setCanceled(true);
+            return;
+        }
+        xy177.farmersfuturedelight.common.registry.FFDWorkstationLifecycle.validateWorkstation(villager);
+        xy177.farmersfuturedelight.common.registry.FFDModernVillagerTrades.refreshUntradedProfile(villager);
+        if (xy177.farmersfuturedelight.common.registry.FFDProfessionWorkstations.isProfessionUnassigned(villager)) {
+            if (event.getHand() == net.minecraft.util.EnumHand.MAIN_HAND) {
+                xy177.farmersfuturedelight.common.registry.FFDVillagerTypes.refuseTrade(villager);
+            }
+            event.setCancellationResult(net.minecraft.util.EnumActionResult.SUCCESS);
+            event.setCanceled(true);
+            return;
+        }
+        if (villager.getEntityData().getBoolean("farmers_future_delight:has_traded")) return;
+        String appliedTag = xy177.farmersfuturedelight.common.registry.FFDTradeConfiguration.getAppliedTag();
+        if (villager.getEntityData().getBoolean(appliedTag)
+                || !xy177.farmersfuturedelight.common.registry.FFDTradeConfiguration.hasProfile(villager)) {
+            return;
+        }
+        Object currentTrades = ObfuscationReflectionHelper.getPrivateValue(EntityVillager.class, villager,
+                "field_70963_i");
+        boolean newTrades = currentTrades == null;
+        if (!newTrades && villager.getEntityData().getBoolean(
+                "farmers_future_delight:legacy_trade_history_unknown")) return;
+        if (!newTrades
+                && !xy177.farmersfuturedelight.common.registry.FFDTradeConfiguration
+                .shouldUpdateExistingUntradedVillagers()) {
+            return;
+        }
+        net.minecraft.village.MerchantRecipeList recipes = villager.getRecipes(event.getEntityPlayer());
+        if (recipes == null) return;
+        if (villager.getEntityData().getBoolean(appliedTag)) return;
+        if (!newTrades) {
+            for (net.minecraft.village.MerchantRecipe recipe : recipes) {
+                if (recipe.getToolUses() > 0) return;
+            }
+        }
+        if (xy177.farmersfuturedelight.common.registry.FFDTradeConfiguration.apply(villager, recipes)) {
+            villager.getEntityData().setBoolean(appliedTag, true);
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onVillagerEmptyTradeList(EntityInteract event) {
+        if (!FFDConfig.modernVillagerSystem || event.isCanceled() || event.getWorld().isRemote
+                || event.getEntityPlayer().isSneaking()
+                || event.getTarget().getClass() != EntityVillager.class) return;
+        EntityVillager villager = (EntityVillager) event.getTarget();
+        ItemStack held = event.getEntityPlayer().getHeldItem(event.getHand());
+        if (!villager.isEntityAlive() || villager.isTrading()
+                || xy177.farmersfuturedelight.common.registry.FFDVillagerHomes.isSleeping(villager)
+                || held.getItem() == Items.SPAWN_EGG || held.getItem() == Items.NAME_TAG) return;
+        net.minecraft.village.MerchantRecipeList offers = villager.getRecipes(event.getEntityPlayer());
+        if (offers == null || !offers.isEmpty()) return;
+        if (event.getHand() == net.minecraft.util.EnumHand.MAIN_HAND) {
+            xy177.farmersfuturedelight.common.registry.FFDVillagerTypes.refuseTrade(villager);
+        }
+        event.setCancellationResult(net.minecraft.util.EnumActionResult.SUCCESS);
+        event.setCanceled(true);
     }
 
     private static void addTurtleTargeting(EntityCreature creature) {

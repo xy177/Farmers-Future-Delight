@@ -52,6 +52,7 @@ public class EntityTrident extends EntityArrow implements IThrowableEntity {
         super(world, shooter);
         tridentStack = stack.copy();
         tridentStack.setCount(1);
+        xy177.farmersfuturedelight.core.FFDGameplayHooks.captureProjectileCanDestroy(this, stack);
         dataManager.set(LOYALTY, loyaltyByte(stack));
         setThrower(shooter);
         setDamage(8.0D);

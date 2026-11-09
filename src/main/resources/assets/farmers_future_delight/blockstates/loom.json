@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "farmers_future_delight:loom" },
+    "facing=east": { "model": "farmers_future_delight:loom", "y": 90 },
+    "facing=south": { "model": "farmers_future_delight:loom", "y": 180 },
+    "facing=west": { "model": "farmers_future_delight:loom", "y": 270 }
+  }
+}

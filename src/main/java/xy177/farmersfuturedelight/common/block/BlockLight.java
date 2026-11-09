@@ -89,14 +89,14 @@ public class BlockLight extends Block {
 
     @Override
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-        return FarmerFutureDelight.proxy.getLightSelectionBox(source, pos);
+        return FULL_BLOCK_AABB;
     }
 
     @Override
     @Nullable
     public RayTraceResult collisionRayTrace(IBlockState state, World world, BlockPos pos,
                                             Vec3d start, Vec3d end) {
-        AxisAlignedBB selectionBox = getBoundingBox(state, world, pos);
+        AxisAlignedBB selectionBox = FarmerFutureDelight.proxy.getLightSelectionBox(world, pos);
         return selectionBox == NULL_AABB ? null : rayTrace(pos, start, end, selectionBox);
     }
 

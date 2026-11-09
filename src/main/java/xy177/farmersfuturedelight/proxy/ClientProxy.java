@@ -33,9 +33,11 @@ import xy177.farmersfuturedelight.client.particle.ParticleGlowSquid;
 import xy177.farmersfuturedelight.client.model.CustomRawOreModelLoader;
 import xy177.farmersfuturedelight.client.model.CustomDeepslateOreModelLoader;
 import xy177.farmersfuturedelight.client.particle.ParticleDripstone;
+import xy177.farmersfuturedelight.client.particle.ParticleCryingObsidian;
 import xy177.farmersfuturedelight.client.particle.ParticleFallingNectar;
 import xy177.farmersfuturedelight.client.particle.ParticleHoneyDrip;
 import xy177.farmersfuturedelight.client.particle.ParticleSmallFlame;
+import xy177.farmersfuturedelight.client.particle.ParticleCampfireSmoke;
 import xy177.farmersfuturedelight.client.particle.ParticleConduit;
 import xy177.farmersfuturedelight.client.particle.ParticleBubbleColumnUp;
 import xy177.farmersfuturedelight.client.particle.ParticleCurrentDown;
@@ -47,6 +49,11 @@ import xy177.farmersfuturedelight.client.render.RenderGlowSquid;
 import xy177.farmersfuturedelight.client.render.RenderAgeableSquid;
 import xy177.farmersfuturedelight.client.render.RenderGlowItemFrame;
 import xy177.farmersfuturedelight.client.render.RenderGoat;
+import xy177.farmersfuturedelight.client.render.RenderCat;
+import xy177.farmersfuturedelight.client.render.RenderFox;
+import xy177.farmersfuturedelight.client.render.RenderPanda;
+import xy177.farmersfuturedelight.client.render.RenderPillager;
+import xy177.farmersfuturedelight.client.render.RenderRavager;
 import xy177.farmersfuturedelight.client.render.RenderPhantom;
 import xy177.farmersfuturedelight.client.render.RenderTurtle;
 import xy177.farmersfuturedelight.client.render.RenderSign;
@@ -66,6 +73,11 @@ import xy177.farmersfuturedelight.common.entity.EntityAxolotl;
 import xy177.farmersfuturedelight.common.entity.EntityGlowSquid;
 import xy177.farmersfuturedelight.common.entity.EntityGlowItemFrame;
 import xy177.farmersfuturedelight.common.entity.EntityGoat;
+import xy177.farmersfuturedelight.common.entity.EntityCat;
+import xy177.farmersfuturedelight.common.entity.EntityFox;
+import xy177.farmersfuturedelight.common.entity.EntityPanda;
+import xy177.farmersfuturedelight.common.entity.EntityPillager;
+import xy177.farmersfuturedelight.common.entity.EntityRavager;
 import xy177.farmersfuturedelight.common.entity.EntityPhantom;
 import xy177.farmersfuturedelight.common.entity.EntityTurtle;
 import xy177.farmersfuturedelight.common.entity.EntityCod;
@@ -75,6 +87,7 @@ import xy177.farmersfuturedelight.common.entity.EntityTropicalFish;
 import xy177.farmersfuturedelight.common.entity.EntityDolphin;
 import xy177.farmersfuturedelight.common.entity.EntityDrowned;
 import xy177.farmersfuturedelight.common.entity.EntityTrident;
+import xy177.farmersfuturedelight.common.entity.EntityCrossbowArrow;
 import net.minecraft.tileentity.TileEntitySign;
 import xy177.farmersfuturedelight.common.tile.TileEntityConduit;
 import xy177.farmersfuturedelight.common.block.BlockKelp;
@@ -89,6 +102,7 @@ import xy177.farmersfuturedelight.common.block.BlockHangingRoots;
 import xy177.farmersfuturedelight.common.block.BlockFutureStairs;
 import xy177.farmersfuturedelight.common.block.BlockFutureSlab;
 import xy177.farmersfuturedelight.common.block.BlockFutureWall;
+import xy177.farmersfuturedelight.common.block.BlockModernWall;
 import xy177.farmersfuturedelight.common.block.BlockIronChain;
 import xy177.farmersfuturedelight.common.block.BlockCandle;
 import xy177.farmersfuturedelight.common.block.BlockNetherFence;
@@ -109,6 +123,73 @@ import xy177.farmersfuturedelight.common.fluid.FFDFluidloggedData;
 
 @Mod.EventBusSubscriber(modid = FarmerFutureDelight.MODID, value = Side.CLIENT)
 public class ClientProxy extends CommonProxy {
+    @Override
+    public void handleCookingBook(net.minecraft.nbt.NBTTagCompound data) {
+        Minecraft.getMinecraft().addScheduledTask(() ->
+                xy177.farmersfuturedelight.client.GuiCookingFurnace.receiveBook(data));
+    }
+
+    @Override
+    public void openJigsaw(xy177.farmersfuturedelight.common.tile.TileEntityJigsaw tile) {
+        Minecraft.getMinecraft().displayGuiScreen(new xy177.farmersfuturedelight.client.GuiJigsawEditor(tile));
+    }
+
+    @Override
+    public void handleMerchantState(xy177.farmersfuturedelight.common.network.PacketMerchantState state) {
+        Minecraft.getMinecraft().addScheduledTask(() ->
+                xy177.farmersfuturedelight.client.GuiModernMerchant.receive(state));
+    }
+
+    @Override
+    public Object getWorkstationGui(int id, net.minecraft.entity.player.EntityPlayer player,
+                                    net.minecraft.world.World world, net.minecraft.util.math.BlockPos pos) {
+        if (id == xy177.farmersfuturedelight.common.network.FFDGuiHandler.SMITHING_TABLE) {
+            return new xy177.farmersfuturedelight.client.GuiSmithingTable(
+                    player.inventory, world, pos);
+        }
+        net.minecraft.tileentity.TileEntity tile = world.getTileEntity(pos);
+        if (id == xy177.farmersfuturedelight.common.network.FFDGuiHandler.COOKING_FURNACE
+                && tile instanceof xy177.farmersfuturedelight.common.tile.TileEntityCookingFurnace) {
+            return new xy177.farmersfuturedelight.client.GuiCookingFurnace(player.inventory,
+                    (xy177.farmersfuturedelight.common.tile.TileEntityCookingFurnace) tile);
+        }
+        if (id == xy177.farmersfuturedelight.common.network.FFDGuiHandler.STONECUTTER
+                && tile instanceof xy177.farmersfuturedelight.common.tile.TileEntityStonecutter) {
+            return new xy177.farmersfuturedelight.client.GuiStonecutter(player.inventory,
+                    (xy177.farmersfuturedelight.common.tile.TileEntityStonecutter) tile);
+        }
+        if (id == xy177.farmersfuturedelight.common.network.FFDGuiHandler.GRINDSTONE
+                && tile instanceof xy177.farmersfuturedelight.common.tile.TileEntityGrindstone) {
+            return new xy177.farmersfuturedelight.client.GuiGrindstone(player.inventory,
+                    (xy177.farmersfuturedelight.common.tile.TileEntityGrindstone) tile);
+        }
+        if (id == xy177.farmersfuturedelight.common.network.FFDGuiHandler.CARTOGRAPHY_TABLE
+                && tile instanceof xy177.farmersfuturedelight.common.tile.TileEntityCartographyTable) {
+            return new xy177.farmersfuturedelight.client.GuiCartographyTable(player.inventory,
+                    (xy177.farmersfuturedelight.common.tile.TileEntityCartographyTable) tile);
+        }
+        if (id == xy177.farmersfuturedelight.common.network.FFDGuiHandler.LOOM) {
+            return new xy177.farmersfuturedelight.client.GuiLoom(
+                    new xy177.farmersfuturedelight.common.inventory.ContainerLoom(
+                            player.inventory, world, pos));
+        }
+        if (id == xy177.farmersfuturedelight.common.network.FFDGuiHandler.LECTERN
+                && tile instanceof xy177.farmersfuturedelight.common.tile.TileEntityLectern) {
+            xy177.farmersfuturedelight.common.tile.TileEntityLectern lectern =
+                    (xy177.farmersfuturedelight.common.tile.TileEntityLectern) tile;
+            return new xy177.farmersfuturedelight.client.GuiLecternBook(player,
+                    new xy177.farmersfuturedelight.common.inventory.ContainerLectern(lectern));
+        }
+        return null;
+    }
+
+    @Override
+    public boolean isHoldingScaffolding() {
+        EntityPlayer player = Minecraft.getMinecraft().player;
+        return player != null && (player.getHeldItemMainhand().getItem() == FFDItems.SCAFFOLDING
+                || player.getHeldItemOffhand().getItem() == FFDItems.SCAFFOLDING);
+    }
+
     @Override
     public AxisAlignedBB getLightSelectionBox(net.minecraft.world.IBlockAccess world, BlockPos pos) {
         Minecraft minecraft = Minecraft.getMinecraft();
@@ -134,6 +215,53 @@ public class ClientProxy extends CommonProxy {
             }
         }
         registerModel(FFDItems.SWEET_BERRIES, "sweet_berries");
+        registerModel(FFDItems.SUSPICIOUS_STEW, "suspicious_stew");
+        registerModel(FFDItems.LEATHER_HORSE_ARMOR, "leather_horse_armor");
+        registerModel(FFDItems.LANTERN, "lantern");
+        registerModel(FFDItems.BARREL, "barrel");
+        registerModel(FFDItems.CAMPFIRE, "campfire");
+        registerStateMapper(FFDBlocks.CAMPFIRE, new StateMap.Builder()
+                .ignore(xy177.farmersfuturedelight.common.block.BlockCampfire.SIGNAL_FIRE,
+                        xy177.farmersfuturedelight.common.block.BlockCampfire.WATERLOGGED).build());
+        registerModel(FFDItems.SMOKER, "smoker");
+        registerModel(FFDItems.BLAST_FURNACE, "blast_furnace");
+        registerModel(FFDItems.COMPOSTER, "composter");
+        registerModel(FFDItems.STONECUTTER, "stonecutter");
+        registerModel(FFDItems.GRINDSTONE, "grindstone");
+        registerModel(FFDItems.CARTOGRAPHY_TABLE, "cartography_table");
+        registerModel(FFDItems.LOOM, "loom");
+        registerModel(FFDItems.LECTERN, "lectern");
+        registerStateMapper(FFDBlocks.LECTERN, new StateMap.Builder()
+                .ignore(xy177.farmersfuturedelight.common.block.BlockLectern.POWERED).build());
+        registerModel(FFDItems.FLETCHING_TABLE, "fletching_table");
+        registerModel(FFDItems.SMITHING_TABLE, "smithing_table");
+        if (FFDItems.isNetheriteEnabled()) {
+            registerModels(FFDItems.NETHERITE_ITEMS);
+        }
+        registerModel(FFDItems.BELL, "bell");
+        registerModel(FFDItems.JIGSAW, "jigsaw");
+        registerStateMapper(FFDBlocks.BELL, new StateMap.Builder()
+                .ignore(xy177.farmersfuturedelight.common.block.BlockBell.POWERED).build());
+        registerModel(FFDItems.FLOWER_BANNER_PATTERN, "flower_banner_pattern");
+        registerModel(FFDItems.CREEPER_BANNER_PATTERN, "creeper_banner_pattern");
+        registerModel(FFDItems.SKULL_BANNER_PATTERN, "skull_banner_pattern");
+        registerModel(FFDItems.MOJANG_BANNER_PATTERN, "mojang_banner_pattern");
+        registerModel(FFDItems.GLOBE_BANNER_PATTERN, "globe_banner_pattern");
+        registerModel(FFDItems.FIELD_MASONED_BANNER_PATTERN, "field_masoned_banner_pattern");
+        registerModel(FFDItems.BORDURE_INDENTED_BANNER_PATTERN, "bordure_indented_banner_pattern");
+        registerModel(FFDItems.CORNFLOWER, "cornflower");
+        registerModel(FFDItems.LILY_OF_THE_VALLEY, "lily_of_the_valley");
+        registerModel(FFDItems.WITHER_ROSE, "wither_rose");
+        registerModel(FFDItems.GOLDEN_DANDELION, "golden_dandelion");
+        registerModel(FFDItems.WHITE_DYE, "white_dye");
+        registerModel(FFDItems.BLACK_DYE, "black_dye");
+        registerModel(FFDItems.BLUE_DYE, "blue_dye");
+        registerModel(FFDItems.BROWN_DYE, "brown_dye");
+        registerModel(FFDItems.BAMBOO, "bamboo");
+        registerModel(FFDItems.SCAFFOLDING, "scaffolding");
+        registerStateMapper(FFDBlocks.SCAFFOLDING, new StateMap.Builder()
+                .ignore(xy177.farmersfuturedelight.common.block.BlockScaffolding.DISTANCE,
+                        xy177.farmersfuturedelight.common.block.BlockScaffolding.WATERLOGGED).build());
         registerModel(FFDItems.MOSS_BLOCK, "moss_block");
         registerModel(FFDItems.MOSS_CARPET, "moss_carpet");
         registerModel(FFDItems.GLOW_BERRIES, "glow_berries");
@@ -241,6 +369,15 @@ public class ClientProxy extends CommonProxy {
                     new ResourceLocation(FarmerFutureDelight.MODID, "trident_in_hand"),
                     new ResourceLocation(FarmerFutureDelight.MODID, "trident_throwing"));
         }
+        if (FFDItems.isLocalCrossbowEnabled()) {
+            registerModel(FFDItems.CROSSBOW, "crossbow");
+            ModelBakery.registerItemVariants(FFDItems.CROSSBOW,
+                    new ResourceLocation(FarmerFutureDelight.MODID, "crossbow_pulling_0"),
+                    new ResourceLocation(FarmerFutureDelight.MODID, "crossbow_pulling_1"),
+                    new ResourceLocation(FarmerFutureDelight.MODID, "crossbow_pulling_2"),
+                    new ResourceLocation(FarmerFutureDelight.MODID, "crossbow_arrow"),
+                    new ResourceLocation(FarmerFutureDelight.MODID, "crossbow_firework"));
+        }
         if (FFDItems.isBlockRegistered(FFDBlocks.BUBBLE_COLUMN)) {
             registerStateMapper(FFDBlocks.BUBBLE_COLUMN,
                     new StateMap.Builder().ignore(
@@ -322,6 +459,32 @@ public class ClientProxy extends CommonProxy {
             registerModel(FFDItems.POWDER_SNOW, "powder_snow");
             registerModel(FFDItems.POWDER_SNOW_BUCKET, "powder_snow_bucket");
         }
+        if (FFDItems.isBlackstoneEnabled()) {
+            registerModel(FFDItems.BLACKSTONE, "blackstone");
+            registerModel(FFDItems.POLISHED_BLACKSTONE, "polished_blackstone");
+            registerModel(FFDItems.POLISHED_BLACKSTONE_BRICKS, "polished_blackstone_bricks");
+            registerModel(FFDItems.CRACKED_POLISHED_BLACKSTONE_BRICKS, "cracked_polished_blackstone_bricks");
+            registerModel(FFDItems.CHISELED_POLISHED_BLACKSTONE, "chiseled_polished_blackstone");
+            registerModel(FFDItems.GILDED_BLACKSTONE, "gilded_blackstone");
+            registerModel(FFDItems.BLACKSTONE_STAIRS, "blackstone_stairs");
+            registerModel(FFDItems.POLISHED_BLACKSTONE_STAIRS, "polished_blackstone_stairs");
+            registerModel(FFDItems.POLISHED_BLACKSTONE_BRICK_STAIRS, "polished_blackstone_brick_stairs");
+            registerModel(FFDItems.BLACKSTONE_WALL, "blackstone_wall");
+            registerModel(FFDItems.POLISHED_BLACKSTONE_WALL, "polished_blackstone_wall");
+            registerModel(FFDItems.POLISHED_BLACKSTONE_BRICK_WALL, "polished_blackstone_brick_wall");
+            registerModel(FFDItems.POLISHED_BLACKSTONE_BUTTON, "polished_blackstone_button");
+            registerModel(FFDItems.POLISHED_BLACKSTONE_PRESSURE_PLATE, "polished_blackstone_pressure_plate");
+            registerModel(FFDItems.BLACKSTONE_SLAB, "blackstone_slab");
+            registerModel(FFDItems.POLISHED_BLACKSTONE_SLAB, "polished_blackstone_slab");
+            registerModel(FFDItems.POLISHED_BLACKSTONE_BRICK_SLAB, "polished_blackstone_brick_slab");
+        }
+        if (FFDItems.isQuartzBricksEnabled()) {
+            registerModel(FFDItems.QUARTZ_BRICKS, "quartz_bricks");
+        }
+        if (FFDItems.isCryingObsidianEnabled()) {
+            registerModel(FFDItems.CRYING_OBSIDIAN, "crying_obsidian");
+        }
+        registerWaterloggedShapeMappers(FFDBlocks.BLACKSTONE_STAIRS, FFDBlocks.POLISHED_BLACKSTONE_STAIRS, FFDBlocks.POLISHED_BLACKSTONE_BRICK_STAIRS, FFDBlocks.BLACKSTONE_WALL, FFDBlocks.POLISHED_BLACKSTONE_WALL, FFDBlocks.POLISHED_BLACKSTONE_BRICK_WALL, FFDBlocks.BLACKSTONE_SLAB, FFDBlocks.POLISHED_BLACKSTONE_SLAB, FFDBlocks.POLISHED_BLACKSTONE_BRICK_SLAB, FFDBlocks.BLACKSTONE_DOUBLE_SLAB, FFDBlocks.POLISHED_BLACKSTONE_DOUBLE_SLAB, FFDBlocks.POLISHED_BLACKSTONE_BRICK_DOUBLE_SLAB);
         if (FFDItems.isDeepslateEnabled()) {
             registerModel(FFDItems.DEEPSLATE, "deepslate");
             registerModel(FFDItems.COBBLED_DEEPSLATE, "cobbled_deepslate");
@@ -488,6 +651,9 @@ public class ClientProxy extends CommonProxy {
                 new StateMap.Builder().ignore(BlockLiquid.LEVEL).build());
         registerStateMapper(FFDBlocks.IRON_CHAIN,
                 new StateMap.Builder().ignore(BlockIronChain.WATERLOGGED).build());
+        registerStateMapper(FFDBlocks.LANTERN,
+                new StateMap.Builder().ignore(
+                        xy177.farmersfuturedelight.common.block.BlockLantern.WATERLOGGED).build());
         registerStateMapper(FFDBlocks.COBBLED_DEEPSLATE_WALL,
                 new StateMap.Builder().ignore(BlockFutureWall.WATERLOGGED).build());
         registerStateMapper(FFDBlocks.POLISHED_DEEPSLATE_WALL,
@@ -526,6 +692,10 @@ public class ClientProxy extends CommonProxy {
                 FFDBlocks.CRIMSON_DOUBLE_SLAB, FFDBlocks.WARPED_SLAB,
                 FFDBlocks.WARPED_DOUBLE_SLAB);
         registerCustomRawOreModels();
+        registerModels(xy177.farmersfuturedelight.common.registry.FFDItems.STONE_DECOR_ITEMS);
+        registerModels(FFDItems.WOOD_SIGN_ITEMS);
+        registerWaterloggedShapeMappers(xy177.farmersfuturedelight.common.registry.FFDStoneDecor
+                .blocks().toArray(new net.minecraft.block.Block[0]));
         registerCustomStrippedWoodModels();
         FFDDeepslateOreCompatClient.registerModels();
     }
@@ -674,6 +844,9 @@ public class ClientProxy extends CommonProxy {
             } else if (block instanceof BlockNetherSlab) {
                 registerStateMapper(block, new StateMap.Builder()
                         .ignore(BlockNetherSlab.WATERLOGGED).build());
+            } else if (block instanceof BlockModernWall) {
+                registerStateMapper(block, new StateMap.Builder()
+                        .ignore(BlockModernWall.WATERLOGGED).build());
             }
         }
     }
@@ -697,6 +870,17 @@ public class ClientProxy extends CommonProxy {
         RenderingRegistry.registerEntityRenderingHandler(EntityTurtle.class, RenderTurtle::new);
         RenderingRegistry.registerEntityRenderingHandler(EntityAxolotl.class, RenderAxolotl::new);
         RenderingRegistry.registerEntityRenderingHandler(EntityGoat.class, RenderGoat::new);
+        RenderingRegistry.registerEntityRenderingHandler(EntityCat.class, RenderCat::new);
+        RenderingRegistry.registerEntityRenderingHandler(EntityFox.class, RenderFox::new);
+        RenderingRegistry.registerEntityRenderingHandler(EntityPanda.class, RenderPanda::new);
+        RenderingRegistry.registerEntityRenderingHandler(EntityPillager.class, RenderPillager::new);
+        RenderingRegistry.registerEntityRenderingHandler(EntityRavager.class, RenderRavager::new);
+        RenderingRegistry.registerEntityRenderingHandler(
+                xy177.farmersfuturedelight.common.entity.EntityWanderingTrader.class,
+                xy177.farmersfuturedelight.client.render.RenderWanderingTrader::new);
+        RenderingRegistry.registerEntityRenderingHandler(
+                xy177.farmersfuturedelight.common.entity.EntityTraderLlama.class,
+                xy177.farmersfuturedelight.client.render.RenderTraderLlama::new);
         RenderingRegistry.registerEntityRenderingHandler(EntityBee.class, RenderBee::new);
         RenderingRegistry.registerEntityRenderingHandler(EntityPhantom.class, RenderPhantom::new);
         RenderingRegistry.registerEntityRenderingHandler(EntityGlowItemFrame.class,
@@ -713,6 +897,8 @@ public class ClientProxy extends CommonProxy {
                 RenderDrowned::new);
         RenderingRegistry.registerEntityRenderingHandler(EntityTrident.class,
                 RenderTrident::new);
+        RenderingRegistry.registerEntityRenderingHandler(EntityCrossbowArrow.class,
+                xy177.farmersfuturedelight.client.render.RenderCrossbowArrow::new);
         FFDItems.TRIDENT.setTileEntityItemStackRenderer(new RenderTridentItem());
         if (FFDItems.isSignTextEnabled()) {
             ClientRegistry.bindTileEntitySpecialRenderer(TileEntitySign.class, new RenderSign());
@@ -721,18 +907,52 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void init() {
+        xy177.farmersfuturedelight.client.FFDCreativeInventory.install();
+        xy177.farmersfuturedelight.client.FFDModernMenus.install();
+        xy177.farmersfuturedelight.client.friends.FFDFriendsMenu.install();
         AquaAcrobaticsWaterCompat.registerBiomeColors();
         if (FFDItems.isItemRegistered(FFDItems.CONDUIT)) {
             ClientRegistry.bindTileEntitySpecialRenderer(TileEntityConduit.class,
                     new RenderConduit());
             FFDItems.CONDUIT.setTileEntityItemStackRenderer(new RenderConduitItem());
         }
+        ClientRegistry.bindTileEntitySpecialRenderer(xy177.farmersfuturedelight.common.tile.TileEntityCampfire.class,
+                new xy177.farmersfuturedelight.client.render.RenderCampfireContents());
+        ClientRegistry.bindTileEntitySpecialRenderer(
+                xy177.farmersfuturedelight.common.tile.TileEntityBell.class,
+                new xy177.farmersfuturedelight.client.render.RenderBell());
+        ClientRegistry.bindTileEntitySpecialRenderer(
+                xy177.farmersfuturedelight.common.tile.TileEntityLectern.class,
+                new xy177.farmersfuturedelight.client.render.RenderLecternBook());
         if (FFDItems.isItemRegistered(FFDItems.TRIDENT)) {
             for (RenderPlayer renderer : Minecraft.getMinecraft()
                     .getRenderManager().getSkinMap().values()) {
                 renderer.addLayer(new LayerRiptide(renderer));
             }
         }
+    }
+
+    @Override
+    public void handleVillagerState(int dimension, int entityId, net.minecraft.nbt.NBTTagCompound state) {
+        Minecraft.getMinecraft().addScheduledTask(() -> {
+            net.minecraft.world.World world = Minecraft.getMinecraft().world;
+            if (world == null || world.provider.getDimension() != dimension) return;
+            net.minecraft.entity.Entity entity = world.getEntityByID(entityId);
+            if (entity != null && entity.getClass() == net.minecraft.entity.passive.EntityVillager.class) {
+                xy177.farmersfuturedelight.common.registry.FFDVillagerTypes.receiveClientState(
+                        (net.minecraft.entity.passive.EntityVillager) entity, state);
+            } else if (entity != null
+                    && entity.getClass() == net.minecraft.entity.monster.EntityZombieVillager.class) {
+                xy177.farmersfuturedelight.common.registry.FFDZombieVillagerState.receiveClientState(
+                        (net.minecraft.entity.monster.EntityZombieVillager) entity, state);
+            }
+        });
+    }
+
+    @Override
+    public void handleMapDecorations(String mapName, net.minecraft.nbt.NBTTagCompound decorations) {
+        Minecraft.getMinecraft().addScheduledTask(() ->
+                xy177.farmersfuturedelight.client.FFDMapDecorationRenderer.receive(mapName, decorations));
     }
 
     @Override
@@ -828,6 +1048,13 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
+    public void spawnCryingObsidianParticle(net.minecraft.world.World world, double x, double y,
+                                            double z) {
+        Minecraft.getMinecraft().effectRenderer.addEffect(
+                ParticleCryingObsidian.create(world, x, y, z));
+    }
+
+    @Override
     public void spawnSmallFlameParticle(net.minecraft.world.World world, double x, double y,
                                         double z) {
         Minecraft minecraft = Minecraft.getMinecraft();
@@ -839,6 +1066,21 @@ public class ClientProxy extends CommonProxy {
             return;
         }
         minecraft.effectRenderer.addEffect(ParticleSmallFlame.create(world, x, y, z));
+    }
+
+    @Override
+    public void spawnCampfireSmoke(net.minecraft.world.World world, double x, double y,
+                                   double z, boolean signalFire) {
+        Minecraft minecraft = Minecraft.getMinecraft();
+        int particleSetting = minecraft.gameSettings.particleSetting;
+        if (particleSetting == 2
+                || particleSetting == 1 && world.rand.nextInt(3) != 0
+                || minecraft.getRenderViewEntity() == null
+                || minecraft.getRenderViewEntity().getDistanceSq(x, y, z) > 4096.0D) {
+            return;
+        }
+        minecraft.effectRenderer.addEffect(
+                ParticleCampfireSmoke.create(world, x, y, z, signalFire));
     }
 
     @Override
@@ -894,6 +1136,26 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
+    public void handleImmediateRespawnRule(boolean enabled) {
+        Minecraft.getMinecraft().addScheduledTask(
+                () -> xy177.farmersfuturedelight.client.FFDClientGameRules
+                        .setImmediateRespawn(enabled));
+    }
+
+    @Override
+    public void handleRavagerRoar(EntityRavager ravager) {
+        Minecraft.getMinecraft().addScheduledTask(() -> {
+            Minecraft minecraft = Minecraft.getMinecraft();
+            EntityPlayer player = minecraft.player;
+            if (player != null && !player.isDead && player.world == ravager.world
+                    && ravager.getEntityBoundingBox().grow(4.0D)
+                    .intersects(player.getEntityBoundingBox())) {
+                ravager.applyClientRoarKnockback(player);
+            }
+        });
+    }
+
+    @Override
     public void handleDrownedConverting(int dimension, int entityId, boolean converting) {
         Minecraft.getMinecraft().addScheduledTask(() -> {
             net.minecraft.world.World world = Minecraft.getMinecraft().world;
@@ -907,6 +1169,40 @@ public class ClientProxy extends CommonProxy {
                         converting);
             }
         });
+    }
+
+    @Override
+    public void handleMooshroomState(int dimension, int entityId, boolean brown) {
+        Minecraft.getMinecraft().addScheduledTask(() -> {
+            net.minecraft.world.World world = Minecraft.getMinecraft().world;
+            if (world == null || world.provider.getDimension() != dimension) {
+                return;
+            }
+            net.minecraft.entity.Entity entity = world.getEntityByID(entityId);
+            if (entity instanceof net.minecraft.entity.passive.EntityMooshroom) {
+                xy177.farmersfuturedelight.common.entity.FFDMooshroomData.setBrown(
+                        (net.minecraft.entity.passive.EntityMooshroom) entity, brown);
+            }
+        });
+    }
+
+    @Override
+    public void handleAgeLockState(int dimension, int entityId, boolean locked, int timer) {
+        Minecraft.getMinecraft().addScheduledTask(() -> {
+            net.minecraft.world.World world = Minecraft.getMinecraft().world;
+            if (world == null || world.provider.getDimension() != dimension) return;
+            net.minecraft.entity.Entity entity = world.getEntityByID(entityId);
+            if (entity instanceof net.minecraft.entity.EntityLivingBase) {
+                xy177.farmersfuturedelight.common.entity.FFDAgeLock.applyState(
+                        (net.minecraft.entity.EntityLivingBase) entity, locked, timer);
+            }
+        });
+    }
+
+    @Override
+    public void spawnAgeLockParticle(net.minecraft.entity.EntityLivingBase entity, boolean locked) {
+        Minecraft.getMinecraft().effectRenderer.addEffect(
+                new xy177.farmersfuturedelight.client.particle.ParticleAgeLock(entity, locked));
     }
 
     @Override

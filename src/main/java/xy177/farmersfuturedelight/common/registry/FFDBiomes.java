@@ -5,11 +5,13 @@ import net.minecraft.world.biome.Biome;
 import xy177.farmersfuturedelight.common.biome.BiomeCrimsonForest;
 import xy177.farmersfuturedelight.common.biome.BiomeModernMountain;
 import xy177.farmersfuturedelight.common.biome.BiomeModernOcean;
+import xy177.farmersfuturedelight.common.biome.BiomeBambooJungle;
 import xy177.farmersfuturedelight.common.biome.BiomeWarpedForest;
 import xy177.farmersfuturedelight.common.world.biome.FFDModernBiomeResolver;
 import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiome;
 
 public final class FFDBiomes {
+    public static final Biome BAMBOO_JUNGLE = new BiomeBambooJungle();
     public static final Biome CRIMSON_FOREST = new BiomeCrimsonForest();
     public static final Biome WARPED_FOREST = new BiomeWarpedForest();
     public static final Biome MEADOW = new BiomeModernMountain(
@@ -65,6 +67,8 @@ public final class FFDBiomes {
 
     public static Biome forModernBiome(FFDModernBiomeResolver.ModernBiome biome) {
         switch (biome) {
+            case BAMBOO_JUNGLE:
+                return BAMBOO_JUNGLE;
             case WARM_OCEAN:
                 return WARM_OCEAN;
             case LUKEWARM_OCEAN:

@@ -1,0 +1,123 @@
+{
+  "pools": [
+    {
+      "name": "pool_0",
+      "rolls": {
+        "min": 1,
+        "max": 5
+      },
+      "entries": [
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:clay_ball"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 3
+              }
+            }
+          ],
+          "entryName": "pool_0_entry_0"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:flower_pot"
+            }
+          ],
+          "entryName": "pool_0_entry_1"
+        },
+        {
+          "type": "item",
+          "weight": 2,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:stone"
+            }
+          ],
+          "entryName": "pool_0_entry_2"
+        },
+        {
+          "type": "item",
+          "weight": 2,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:stone_bricks"
+            }
+          ],
+          "entryName": "pool_0_entry_3"
+        },
+        {
+          "type": "item",
+          "weight": 4,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:bread"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 4
+              }
+            }
+          ],
+          "entryName": "pool_0_entry_4"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:yellow_dye"
+            }
+          ],
+          "entryName": "pool_0_entry_5"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:smooth_stone"
+            }
+          ],
+          "entryName": "pool_0_entry_6"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:emerald"
+            }
+          ],
+          "entryName": "pool_0_entry_7"
+        }
+      ]
+    }
+  ]
+}

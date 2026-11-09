@@ -197,11 +197,8 @@ public class EntityPufferfish extends EntityAbstractFish {
     }
 
     @Override
-    protected void dropFewItems(boolean recentlyHit, int looting) {
-        entityDropItem(new ItemStack(Items.FISH, 1, 3), 0.0F);
-        if (rand.nextFloat() < 0.05F) {
-            entityDropItem(new ItemStack(Items.DYE, 1, 15), 0.0F);
-        }
+    protected net.minecraft.util.ResourceLocation getLootTable() {
+        return xy177.farmersfuturedelight.common.FFDEntityLootTables.PUFFERFISH;
     }
 
     @Override

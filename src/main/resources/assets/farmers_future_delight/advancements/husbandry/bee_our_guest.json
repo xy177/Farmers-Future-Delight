@@ -1,0 +1,20 @@
+{
+  "conditions": [
+    {"type": "farmers_future_delight:feature_enabled", "feature": "honey"}
+  ],
+  "parent": "minecraft:husbandry/root",
+  "display": {
+    "icon": {"item": "farmers_future_delight:honey_bottle"},
+    "title": {"translate": "advancements.farmers_future_delight.husbandry.bee_our_guest.title"},
+    "description": {"translate": "advancements.farmers_future_delight.husbandry.bee_our_guest.description"},
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "bee_our_guest": {
+      "trigger": "farmers_future_delight:bee_our_guest"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "careers": {
+    "farmer": {
+      "enabled": true,
+      "replaceDefaults": false,
+      "remove": [
+        {
+          "buy": { "id": "minecraft:wheat", "count": 20 },
+          "sell": { "id": "minecraft:emerald" }
+        }
+      ],
+      "replace": [
+        {
+          "match": {
+            "buy": { "id": "minecraft:wheat", "count": 20 },
+            "sell": { "id": "minecraft:emerald" }
+          },
+          "offer": {
+            "buy": { "id": "minecraft:wheat", "count": 18 },
+            "sell": { "id": "minecraft:emerald" },
+            "maxUses": 12,
+            "minCareerLevel": 1,
+            "maxCareerLevel": 2
+          }
+        }
+      ],
+      "addAmount": 1,
+      "add": [
+        {
+          "weight": 2,
+          "buy": { "id": "minecraft:carrot", "minCount": 20, "maxCount": 22, "meta": [0], "nbt": ["{}"] },
+          "sell": { "id": "minecraft:emerald", "count": { "min": 1, "max": 1 } },
+          "maxUses": 16,
+          "minCareerLevel": 1
+        }
+      ]
+    }
+  }
+}

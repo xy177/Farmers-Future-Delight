@@ -9,6 +9,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.color.IBlockColor;
@@ -73,6 +74,20 @@ public final class ModernWaterRendering {
 
     public static boolean usesModernWaterTextures() {
         return modernWaterTextures;
+    }
+
+    public static boolean isCameraInMaterial(Entity entity, Material material) {
+        if (entity == null || entity.world == null) {
+            return false;
+        }
+        Minecraft minecraft = Minecraft.getMinecraft();
+        if (minecraft.gameSettings.thirdPersonView == 0
+                || minecraft.getRenderViewEntity() != entity) {
+            return entity.isInsideOfMaterial(material);
+        }
+        IBlockState state = ActiveRenderInfo.getBlockStateAtEntityViewpoint(
+                entity.world, entity, minecraft.getRenderPartialTicks());
+        return state != null && state.getMaterial() == material;
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -201,7 +216,7 @@ public final class ModernWaterRendering {
             trackedPlayer = player;
             timeUnderwater = 0;
         }
-        if (player.isInsideOfMaterial(Material.WATER)) {
+        if (isCameraInMaterial(player, Material.WATER)) {
             timeUnderwater = MathHelper.clamp(timeUnderwater + (player.isSpectator() ? 10 : 1), 0, 600);
         } else {
             timeUnderwater = MathHelper.clamp(timeUnderwater - 10, 0, 600);
@@ -213,11 +228,13 @@ public final class ModernWaterRendering {
         Entity entity = event.getEntity();
         if (!isModernEnabled() || AquaAcrobaticsWaterCompat.isEnabled()
                 || event.getState().getMaterial() != Material.WATER
+                || !isCameraInMaterial(entity, Material.WATER)
                 || entity instanceof EntityPlayer
                 && ((EntityPlayer) entity).isPotionActive(MobEffects.BLINDNESS)) {
             return;
         }
-        float vision = entity instanceof EntityPlayer ? waterVision((EntityPlayer) entity) : 0.0F;
+        float vision = entity instanceof EntityPlayer
+                ? waterVision((EntityPlayer) entity, true) : 0.0F;
         float density = 0.05F - vision * vision * 0.03F;
         if (BiomeDictionary.hasType(entity.world.getBiome(entity.getPosition()), BiomeDictionary.Type.SWAMP)) {
             density += 0.005F;
@@ -233,7 +250,9 @@ public final class ModernWaterRendering {
         if (!isModernEnabled() || AquaAcrobaticsWaterCompat.isEnabled()) {
             return;
         }
-        if (event.getState().getMaterial() != Material.WATER || !(entity instanceof EntityPlayer)) {
+        if (event.getState().getMaterial() != Material.WATER
+                || !isCameraInMaterial(entity, Material.WATER)
+                || !(entity instanceof EntityPlayer)) {
             fogAdjustTime = -1L;
             return;
         }
@@ -258,7 +277,7 @@ public final class ModernWaterRendering {
         red /= 255.0F;
         green /= 255.0F;
         blue /= 255.0F;
-        float vision = waterVision(player);
+        float vision = waterVision(player, true);
         float brightness = Math.min(1.0F / Math.max(red, 0.0001F),
                 Math.min(1.0F / Math.max(green, 0.0001F),
                         1.0F / Math.max(blue, 0.0001F)));
@@ -325,11 +344,12 @@ public final class ModernWaterRendering {
 
     public static float conduitLightmapVision(EntityLivingBase entity) {
         return entity instanceof EntityPlayer && FFDPotions.hasConduitPower(entity)
-                ? waterVision((EntityPlayer) entity) : 0.0F;
+                ? waterVision((EntityPlayer) entity,
+                        isCameraInMaterial(entity, Material.WATER)) : 0.0F;
     }
 
-    private static float waterVision(EntityPlayer player) {
-        if (player != trackedPlayer || !player.isInsideOfMaterial(Material.WATER)) {
+    private static float waterVision(EntityPlayer player, boolean cameraInWater) {
+        if (player != trackedPlayer || !cameraInWater) {
             return 0.0F;
         }
         if (timeUnderwater >= 600) {

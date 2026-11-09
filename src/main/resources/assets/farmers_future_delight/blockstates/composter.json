@@ -1,0 +1,31 @@
+{
+  "variants": {
+    "level=0": {
+      "model": "farmers_future_delight:composter"
+    },
+    "level=1": {
+      "model": "farmers_future_delight:composter_level1"
+    },
+    "level=2": {
+      "model": "farmers_future_delight:composter_level2"
+    },
+    "level=3": {
+      "model": "farmers_future_delight:composter_level3"
+    },
+    "level=4": {
+      "model": "farmers_future_delight:composter_level4"
+    },
+    "level=5": {
+      "model": "farmers_future_delight:composter_level5"
+    },
+    "level=6": {
+      "model": "farmers_future_delight:composter_level6"
+    },
+    "level=7": {
+      "model": "farmers_future_delight:composter_level7"
+    },
+    "level=8": {
+      "model": "farmers_future_delight:composter_level8"
+    }
+  }
+}

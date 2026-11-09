@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "facing=east,has_book=false": { "model": "farmers_future_delight:lectern", "y": 90 },
+    "facing=east,has_book=true": { "model": "farmers_future_delight:lectern", "y": 90 },
+    "facing=north,has_book=false": { "model": "farmers_future_delight:lectern" },
+    "facing=north,has_book=true": { "model": "farmers_future_delight:lectern" },
+    "facing=south,has_book=false": { "model": "farmers_future_delight:lectern", "y": 180 },
+    "facing=south,has_book=true": { "model": "farmers_future_delight:lectern", "y": 180 },
+    "facing=west,has_book=false": { "model": "farmers_future_delight:lectern", "y": 270 },
+    "facing=west,has_book=true": { "model": "farmers_future_delight:lectern", "y": 270 }
+  }
+}

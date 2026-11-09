@@ -1,0 +1,26 @@
+{
+  "parent": "farmers_future_delight:adventure/ol_betsy",
+  "display": {
+    "icon": {
+      "item": "farmers_future_delight:crossbow"
+    },
+    "title": {
+      "translate": "advancements.adventure.two_birds_one_arrow.title"
+    },
+    "description": {
+      "translate": "advancements.adventure.two_birds_one_arrow.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "two_birds_one_arrow": {
+      "trigger": "farmers_future_delight:two_birds_one_arrow"
+    }
+  },
+  "rewards": {
+    "experience": 65
+  }
+}

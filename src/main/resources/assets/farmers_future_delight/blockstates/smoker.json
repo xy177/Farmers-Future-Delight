@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "facing=north,lit=false": { "model": "farmers_future_delight:smoker" },
+    "facing=east,lit=false": { "model": "farmers_future_delight:smoker", "y": 90 },
+    "facing=south,lit=false": { "model": "farmers_future_delight:smoker", "y": 180 },
+    "facing=west,lit=false": { "model": "farmers_future_delight:smoker", "y": 270 },
+    "facing=north,lit=true": { "model": "farmers_future_delight:smoker_on" },
+    "facing=east,lit=true": { "model": "farmers_future_delight:smoker_on", "y": 90 },
+    "facing=south,lit=true": { "model": "farmers_future_delight:smoker_on", "y": 180 },
+    "facing=west,lit=true": { "model": "farmers_future_delight:smoker_on", "y": 270 }
+  }
+}

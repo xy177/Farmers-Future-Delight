@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "particle": "farmers_future_delight:blocks/cartography_table_side3",
+    "down": "minecraft:blocks/planks_big_oak",
+    "up": "farmers_future_delight:blocks/cartography_table_top",
+    "north": "farmers_future_delight:blocks/cartography_table_side3",
+    "east": "farmers_future_delight:blocks/cartography_table_side3",
+    "south": "farmers_future_delight:blocks/cartography_table_side1",
+    "west": "farmers_future_delight:blocks/cartography_table_side2"
+  }
+}

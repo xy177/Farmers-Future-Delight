@@ -1,0 +1,319 @@
+{
+  "pools": [
+    {
+      "name": "pool_0",
+      "rolls": {
+        "min": 0,
+        "max": 1
+      },
+      "entries": [
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:crossbow"
+            }
+          ],
+          "entryName": "pool_0_entry_0"
+        }
+      ]
+    },
+    {
+      "name": "pool_1",
+      "rolls": {
+        "min": 2,
+        "max": 3
+      },
+      "entries": [
+        {
+          "type": "item",
+          "weight": 7,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:wheat"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 3,
+                "max": 5
+              }
+            }
+          ],
+          "entryName": "pool_1_entry_0"
+        },
+        {
+          "type": "item",
+          "weight": 5,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:potato"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 2,
+                "max": 5
+              }
+            }
+          ],
+          "entryName": "pool_1_entry_1"
+        },
+        {
+          "type": "item",
+          "weight": 5,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:carrot"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 3,
+                "max": 5
+              }
+            }
+          ],
+          "entryName": "pool_1_entry_2"
+        }
+      ]
+    },
+    {
+      "name": "pool_2",
+      "rolls": {
+        "min": 1,
+        "max": 3
+      },
+      "entries": [
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:dark_oak_log"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 2,
+                "max": 3
+              }
+            }
+          ],
+          "entryName": "pool_2_entry_0"
+        }
+      ]
+    },
+    {
+      "name": "pool_3",
+      "rolls": {
+        "min": 2,
+        "max": 3
+      },
+      "entries": [
+        {
+          "type": "item",
+          "weight": 7,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:experience_bottle"
+            }
+          ],
+          "entryName": "pool_3_entry_0"
+        },
+        {
+          "type": "item",
+          "weight": 4,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:string"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 6
+              }
+            }
+          ],
+          "entryName": "pool_3_entry_1"
+        },
+        {
+          "type": "item",
+          "weight": 4,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:arrow"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 2,
+                "max": 7
+              }
+            }
+          ],
+          "entryName": "pool_3_entry_2"
+        },
+        {
+          "type": "item",
+          "weight": 3,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:tripwire_hook"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 3
+              }
+            }
+          ],
+          "entryName": "pool_3_entry_3"
+        },
+        {
+          "type": "item",
+          "weight": 3,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:iron_ingot"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 3
+              }
+            }
+          ],
+          "entryName": "pool_3_entry_4"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:book"
+            },
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "enchantments": [
+                "minecraft:protection",
+                "minecraft:fire_protection",
+                "minecraft:feather_falling",
+                "minecraft:blast_protection",
+                "minecraft:projectile_protection",
+                "minecraft:respiration",
+                "minecraft:aqua_affinity",
+                "minecraft:thorns",
+                "minecraft:depth_strider",
+                "minecraft:sharpness",
+                "minecraft:smite",
+                "minecraft:bane_of_arthropods",
+                "minecraft:knockback",
+                "minecraft:fire_aspect",
+                "minecraft:looting",
+                "minecraft:sweeping_edge",
+                "minecraft:efficiency",
+                "minecraft:silk_touch",
+                "minecraft:unbreaking",
+                "minecraft:fortune",
+                "minecraft:power",
+                "minecraft:punch",
+                "minecraft:flame",
+                "minecraft:infinity",
+                "minecraft:luck_of_the_sea",
+                "minecraft:lure",
+                "minecraft:loyalty",
+                "minecraft:impaling",
+                "minecraft:riptide",
+                "minecraft:channeling",
+                "minecraft:multishot",
+                "minecraft:quick_charge",
+                "minecraft:piercing",
+                "minecraft:density",
+                "minecraft:breach",
+                "minecraft:lunge",
+                "minecraft:binding_curse",
+                "minecraft:vanishing_curse",
+                "minecraft:frost_walker",
+                "minecraft:mending"
+              ]
+            }
+          ],
+          "entryName": "pool_3_entry_5"
+        }
+      ]
+    },
+    {
+      "name": "pool_4",
+      "rolls": {
+        "min": 0,
+        "max": 1
+      },
+      "entries": [
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:goat_horn"
+            },
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "instruments": [
+                0,
+                1,
+                2,
+                3
+              ]
+            }
+          ],
+          "entryName": "pool_4_entry_0"
+        }
+      ]
+    },
+    {
+      "name": "pool_5",
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "empty",
+          "weight": 3,
+          "entryName": "pool_5_entry_0"
+        },
+        {
+          "type": "empty",
+          "weight": 1,
+          "entryName": "pool_5_entry_1"
+        }
+      ]
+    }
+  ]
+}

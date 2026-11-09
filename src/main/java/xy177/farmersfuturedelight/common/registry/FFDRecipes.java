@@ -15,6 +15,10 @@ public final class FFDRecipes {
     }
 
     public static void init() {
+        FFDStoneDecor.registerSmelting();
+        if (FFDItems.isBlackstoneEnabled()) {
+            addSmelting(FFDItems.POLISHED_BLACKSTONE_BRICKS, FFDItems.CRACKED_POLISHED_BLACKSTONE_BRICKS, 0.1F);
+        }
         FFDRawOreOreDictionaryCompat.register();
         FFDRawOreCompat.registerCraftingRecipes();
         if (FFDItems.isStrippedWoodEnabled()) {

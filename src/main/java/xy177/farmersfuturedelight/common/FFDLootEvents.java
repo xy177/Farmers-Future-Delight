@@ -26,6 +26,12 @@ public final class FFDLootEvents {
             FarmerFutureDelight.MODID + ":otherside_stronghold_corridor";
     private static final String NAUTILUS_SHELL_ENTRY =
             FarmerFutureDelight.MODID + ":nautilus_shell_fishing_treasure";
+    private static final String SUSPICIOUS_STEW_ENTRY =
+            FarmerFutureDelight.MODID + ":suspicious_stew";
+    private static final String NETHERITE_TEMPLATE_ENTRY =
+            FarmerFutureDelight.MODID + ":netherite_upgrade_template";
+    private static final net.minecraft.util.ResourceLocation NETHER_BRIDGE_LOOT =
+            new net.minecraft.util.ResourceLocation("minecraft", "chests/nether_bridge");
 
     private FFDLootEvents() {
     }
@@ -42,9 +48,16 @@ public final class FFDLootEvents {
                 && LootTableList.CHESTS_STRONGHOLD_CORRIDOR.equals(event.getName())) {
             addOtherside(event, 1, OTHERSIDE_STRONGHOLD_ENTRY);
         }
+        if (FFDItems.isNetheriteEnabled() && NETHER_BRIDGE_LOOT.equals(event.getName())) {
+            addNetheriteTemplate(event);
+        }
         if (FFDOceanStructures.isOceanLootTable(event.getName())
                 && !(event.getTable() instanceof FFDModernLootTable)) {
             event.setTable(new FFDModernLootTable(event.getTable()));
+        }
+        if (!FFDItems.effectiveStack(FFDItems.SUSPICIOUS_STEW).isEmpty()
+                && FFDOceanStructures.SHIPWRECK_SUPPLY_LOOT.equals(event.getName())) {
+            addSuspiciousStew(event);
         }
         if (LootTableList.GAMEPLAY_FISHING_TREASURE.equals(event.getName())) {
             addNautilusShell(event);
@@ -84,5 +97,34 @@ public final class FFDLootEvents {
         }
         pool.addEntry(new LootEntryItem(shell.getItem(), 1, 0,
                 new LootFunction[0], new LootCondition[0], NAUTILUS_SHELL_ENTRY));
+    }
+
+    private static void addSuspiciousStew(LootTableLoadEvent event) {
+        LootPool pool = event.getTable().getPool("supplies");
+        if (pool == null || pool.getEntry(SUSPICIOUS_STEW_ENTRY) != null) {
+            return;
+        }
+        LootFunction[] functions = {
+                new xy177.farmersfuturedelight.common.worldgen.FFDSuspiciousStewLootFunction(
+                        new LootCondition[0])
+        };
+        pool.addEntry(new LootEntryItem(FFDItems.effectiveStack(FFDItems.SUSPICIOUS_STEW).getItem(),
+                10, 0, functions,
+                new LootCondition[0], SUSPICIOUS_STEW_ENTRY));
+    }
+
+    private static void addNetheriteTemplate(LootTableLoadEvent event) {
+        LootPool pool = event.getTable().getPool("pool0");
+        if (pool == null) {
+            pool = event.getTable().getPool("main");
+        }
+        ItemStack template = FFDItems.effectiveStack(
+                FFDItems.NETHERITE_UPGRADE_SMITHING_TEMPLATE);
+        if (pool == null || template.isEmpty()
+                || pool.getEntry(NETHERITE_TEMPLATE_ENTRY) != null) {
+            return;
+        }
+        pool.addEntry(new LootEntryItem(template.getItem(), 1, 0,
+                new LootFunction[0], new LootCondition[0], NETHERITE_TEMPLATE_ENTRY));
     }
 }

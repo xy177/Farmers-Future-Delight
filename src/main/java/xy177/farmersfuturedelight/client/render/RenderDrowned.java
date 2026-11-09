@@ -20,6 +20,7 @@ import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.client.model.ModelBabyDrowned;
 import xy177.farmersfuturedelight.client.model.ModelDrowned;
 import xy177.farmersfuturedelight.common.entity.EntityDrowned;
+import xy177.farmersfuturedelight.common.FFDConfig;
 
 public class RenderDrowned extends RenderBiped<EntityDrowned> {
     private static final ResourceLocation TEXTURE = new ResourceLocation(
@@ -45,14 +46,18 @@ public class RenderDrowned extends RenderBiped<EntityDrowned> {
     @Override
     public void doRender(EntityDrowned drowned, double x, double y, double z,
                          float entityYaw, float partialTicks) {
-        mainModel = drowned.isChild() ? babyModel : adultModel;
+        mainModel = modernBaby(drowned) ? babyModel : adultModel;
         shadowSize = 0.5F;
         super.doRender(drowned, x, y, z, entityYaw, partialTicks);
     }
 
     @Override
     protected ResourceLocation getEntityTexture(EntityDrowned entity) {
-        return entity.isChild() ? BABY_TEXTURE : TEXTURE;
+        return modernBaby(entity) ? BABY_TEXTURE : TEXTURE;
+    }
+
+    private static boolean modernBaby(EntityDrowned entity) {
+        return entity.isChild() && FFDConfig.modernBabyModels;
     }
 
     @Override
@@ -63,8 +68,11 @@ public class RenderDrowned extends RenderBiped<EntityDrowned> {
         if (swimAmount > 0.0F) {
             float pitch = drowned.prevRotationPitch
                     + (drowned.rotationPitch - drowned.prevRotationPitch) * partialTicks;
+            float center = drowned.height * 0.5F;
+            GlStateManager.translate(0.0F, center, 0.0F);
             GlStateManager.rotate(swimAmount * (-10.0F - pitch),
                     1.0F, 0.0F, 0.0F);
+            GlStateManager.translate(0.0F, -center, 0.0F);
         }
     }
 
@@ -102,6 +110,10 @@ public class RenderDrowned extends RenderBiped<EntityDrowned> {
                 return;
             }
             GlStateManager.pushMatrix();
+            if (drowned.isChild() && !modernBaby(drowned)) {
+                GlStateManager.translate(0.0F, 0.75F, 0.0F);
+                GlStateManager.scale(0.5F, 0.5F, 0.5F);
+            }
             if (drowned.isSneaking()) {
                 GlStateManager.translate(0.0F, 0.2F, 0.0F);
             }
@@ -109,7 +121,7 @@ public class RenderDrowned extends RenderBiped<EntityDrowned> {
             GlStateManager.rotate(-90.0F, 1.0F, 0.0F, 0.0F);
             GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
             boolean left = hand == EnumHandSide.LEFT;
-            boolean child = drowned.isChild();
+            boolean child = modernBaby(drowned);
             GlStateManager.translate(child ? 0.0F : (left ? -1.0F : 1.0F) / 16.0F,
                     child ? 0.0625F : 0.125F, child ? -0.28125F : -0.625F);
             Minecraft.getMinecraft().getItemRenderer().renderItemSide(
@@ -155,8 +167,8 @@ public class RenderDrowned extends RenderBiped<EntityDrowned> {
                                   float limbSwingAmount, float partialTicks,
                                   float ageInTicks, float netHeadYaw, float headPitch,
                                   float scale) {
-            ModelDrowned model = drowned.isChild() ? babyModel : adultModel;
-            renderer.bindTexture(drowned.isChild() ? BABY_OUTER : OUTER);
+            ModelDrowned model = modernBaby(drowned) ? babyModel : adultModel;
+            renderer.bindTexture(modernBaby(drowned) ? BABY_OUTER : OUTER);
             model.setModelAttributes(renderer.getMainModel());
             model.setLivingAnimations(drowned, limbSwing, limbSwingAmount, partialTicks);
             model.render(drowned, limbSwing, limbSwingAmount, ageInTicks,

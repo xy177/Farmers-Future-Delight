@@ -194,14 +194,8 @@ public class EntityPhantom extends EntityMob {
     }
 
     @Override
-    protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
-        if (!wasRecentlyHit || !xy177.farmersfuturedelight.common.registry.FFDEntities.isPhantomEnabled()) {
-            return;
-        }
-        int count = rand.nextInt(2) + rand.nextInt(lootingModifier + 1);
-        if (count > 0) {
-            entityDropItem(new ItemStack(FFDItems.PHANTOM_MEMBRANE, count), 0.0F);
-        }
+    protected net.minecraft.util.ResourceLocation getLootTable() {
+        return xy177.farmersfuturedelight.common.FFDEntityLootTables.PHANTOM;
     }
 
     @Override

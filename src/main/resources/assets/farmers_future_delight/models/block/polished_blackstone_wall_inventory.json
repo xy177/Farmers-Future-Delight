@@ -1,0 +1,6 @@
+{
+  "parent": "farmers_future_delight:block/stone_decor_wall_inventory",
+  "textures": {
+    "wall": "farmers_future_delight:block/polished_blackstone"
+  }
+}

@@ -5,13 +5,22 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
+import net.minecraft.item.Item.ToolMaterial;
+import xy177.farmersfuturedelight.common.item.ItemScaffolding;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemDoor;
 import net.minecraft.item.ItemSlab;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemArmor.ArmorMaterial;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.common.util.EnumHelper;
 
@@ -22,7 +31,9 @@ import xy177.farmersfuturedelight.common.FFDCreativeTab;
 import xy177.farmersfuturedelight.common.item.ItemAxolotlBucket;
 import xy177.farmersfuturedelight.common.item.ItemBigDripleaf;
 import xy177.farmersfuturedelight.common.item.ItemCandle;
+import xy177.farmersfuturedelight.common.item.ItemCrossbow;
 import xy177.farmersfuturedelight.common.item.ItemBlockDriedKelp;
+import xy177.farmersfuturedelight.common.item.ItemWoodSign;
 import xy177.farmersfuturedelight.common.item.ItemCoralFan;
 import xy177.farmersfuturedelight.common.item.ItemDriedKelp;
 import xy177.farmersfuturedelight.common.item.ItemFishBucket;
@@ -38,6 +49,15 @@ import xy177.farmersfuturedelight.common.item.ItemKelp;
 import xy177.farmersfuturedelight.common.item.ItemLightBlock;
 import xy177.farmersfuturedelight.common.item.ItemMusicDisc;
 import xy177.farmersfuturedelight.common.item.ItemNetherPlant;
+import xy177.farmersfuturedelight.common.item.ItemNetheriteAxe;
+import xy177.farmersfuturedelight.common.item.ItemNetheriteArmor;
+import xy177.farmersfuturedelight.common.item.ItemNetheriteBlock;
+import xy177.farmersfuturedelight.common.item.ItemNetheriteComponent;
+import xy177.farmersfuturedelight.common.item.ItemNetheriteHoe;
+import xy177.farmersfuturedelight.common.item.ItemNetheriteHorseArmor;
+import xy177.farmersfuturedelight.common.item.ItemNetheritePickaxe;
+import xy177.farmersfuturedelight.common.item.ItemNetheriteShovel;
+import xy177.farmersfuturedelight.common.item.ItemNetheriteSword;
 import xy177.farmersfuturedelight.common.item.ItemNetherVine;
 import xy177.farmersfuturedelight.common.item.ItemPowderSnowBucket;
 import xy177.farmersfuturedelight.common.item.ItemSeagrass;
@@ -45,23 +65,79 @@ import xy177.farmersfuturedelight.common.item.ItemSeaPickle;
 import xy177.farmersfuturedelight.common.item.ItemSmallDripleaf;
 import xy177.farmersfuturedelight.common.item.ItemSweetBerries;
 import xy177.farmersfuturedelight.common.item.ItemSpyglass;
+import xy177.farmersfuturedelight.common.item.ItemSuspiciousStew;
+import xy177.farmersfuturedelight.common.item.ItemLeatherHorseArmor;
 import xy177.farmersfuturedelight.common.item.ItemTurtleEgg;
 import xy177.farmersfuturedelight.common.item.ItemTurtleHelmet;
 import xy177.farmersfuturedelight.common.item.ItemTrident;
+import xy177.farmersfuturedelight.common.item.ItemModernDye;
+import xy177.farmersfuturedelight.common.item.ItemBannerPattern;
+import net.minecraft.tileentity.BannerPattern;
 
 public final class FFDItems {
     private static final Map<Item, Block> LOCAL_ITEM_BLOCKS = new IdentityHashMap<>();
+    private static final Map<ResourceLocation, Block> LOCAL_BLOCKS_BY_NAME = new HashMap<>();
     private static final Map<net.minecraft.util.ResourceLocation, Item> LOCAL_BLOCK_ITEMS_BY_NAME =
             new HashMap<>();
 
     public static final ArmorMaterial TURTLE_SCUTE_ARMOR = EnumHelper.addArmorMaterial(
             "turtle_scute", FarmerFutureDelight.MODID + ":turtle_scute", 25,
             new int[] {2, 5, 6, 2}, 9, FFDSounds.TURTLE_ARMOR_EQUIP, 0.0F);
+    public static final ToolMaterial NETHERITE_TOOL_MATERIAL = EnumHelper.addToolMaterial(
+            "FFD_NETHERITE", 4, 2031, 9.0F, 4.0F, 15);
+    public static final ArmorMaterial NETHERITE_ARMOR_MATERIAL = EnumHelper.addArmorMaterial(
+            "FFD_NETHERITE", FarmerFutureDelight.MODID + ":netherite", 37,
+            new int[] {3, 6, 8, 3},
+            15, FFDSounds.NETHERITE_ARMOR_EQUIP, 3.0F);
 
     public static final Item SWEET_BERRIES = new ItemSweetBerries()
             .setRegistryName(FarmerFutureDelight.MODID, "sweet_berries")
             .setUnlocalizedName(FarmerFutureDelight.MODID + ".sweet_berries")
             .setCreativeTab(FFDCreativeTab.INSTANCE);
+    public static final Item SUSPICIOUS_STEW = new ItemSuspiciousStew()
+            .setRegistryName(FarmerFutureDelight.MODID, "suspicious_stew")
+            .setUnlocalizedName(FarmerFutureDelight.MODID + ".suspicious_stew");
+    public static final Item LEATHER_HORSE_ARMOR = new ItemLeatherHorseArmor()
+            .setRegistryName(FarmerFutureDelight.MODID, "leather_horse_armor")
+            .setUnlocalizedName(FarmerFutureDelight.MODID + ".leather_horse_armor");
+    public static final Item ANCIENT_DEBRIS = netheriteBlockItem(FFDBlocks.ANCIENT_DEBRIS);
+    public static final Item NETHERITE_BLOCK = netheriteBlockItem(FFDBlocks.NETHERITE_BLOCK);
+    public static final Item NETHERITE_SCRAP = netheriteComponent("netherite_scrap");
+    public static final Item NETHERITE_INGOT = netheriteComponent("netherite_ingot");
+    public static final Item NETHERITE_UPGRADE_SMITHING_TEMPLATE =
+            netheriteComponent("netherite_upgrade_smithing_template");
+    public static final Item NETHERITE_SWORD = netheriteGear(
+            new ItemNetheriteSword(NETHERITE_TOOL_MATERIAL), "netherite_sword");
+    public static final Item NETHERITE_PICKAXE = netheriteGear(
+            new ItemNetheritePickaxe(NETHERITE_TOOL_MATERIAL), "netherite_pickaxe");
+    public static final Item NETHERITE_AXE = netheriteGear(
+            new ItemNetheriteAxe(NETHERITE_TOOL_MATERIAL), "netherite_axe");
+    public static final Item NETHERITE_SHOVEL = netheriteGear(
+            new ItemNetheriteShovel(NETHERITE_TOOL_MATERIAL), "netherite_shovel");
+    public static final Item NETHERITE_HOE = netheriteGear(
+            new ItemNetheriteHoe(NETHERITE_TOOL_MATERIAL), "netherite_hoe");
+    public static final Item NETHERITE_HELMET = netheriteArmor(
+            net.minecraft.inventory.EntityEquipmentSlot.HEAD, "netherite_helmet");
+    public static final Item NETHERITE_CHESTPLATE = netheriteArmor(
+            net.minecraft.inventory.EntityEquipmentSlot.CHEST, "netherite_chestplate");
+    public static final Item NETHERITE_LEGGINGS = netheriteArmor(
+            net.minecraft.inventory.EntityEquipmentSlot.LEGS, "netherite_leggings");
+    public static final Item NETHERITE_BOOTS = netheriteArmor(
+            net.minecraft.inventory.EntityEquipmentSlot.FEET, "netherite_boots");
+    public static final Item NETHERITE_HORSE_ARMOR = netheriteGear(
+            new ItemNetheriteHorseArmor(), "netherite_horse_armor");
+    public static final Item[] NETHERITE_ITEMS = {
+            ANCIENT_DEBRIS, NETHERITE_BLOCK, NETHERITE_SCRAP, NETHERITE_INGOT,
+            NETHERITE_UPGRADE_SMITHING_TEMPLATE, NETHERITE_SWORD, NETHERITE_PICKAXE,
+            NETHERITE_AXE, NETHERITE_SHOVEL, NETHERITE_HOE, NETHERITE_HELMET,
+            NETHERITE_CHESTPLATE, NETHERITE_LEGGINGS, NETHERITE_BOOTS,
+            NETHERITE_HORSE_ARMOR
+    };
+
+    static {
+        NETHERITE_TOOL_MATERIAL.setRepairItem(new ItemStack(NETHERITE_INGOT));
+        NETHERITE_ARMOR_MATERIAL.setRepairItem(new ItemStack(NETHERITE_INGOT));
+    }
     public static final Item MOSS_BLOCK = new ItemBlock(FFDBlocks.MOSS_BLOCK)
             .setRegistryName(FFDBlocks.MOSS_BLOCK.getRegistryName())
             .setUnlocalizedName(FarmerFutureDelight.MODID + ".moss_block")
@@ -142,6 +218,48 @@ public final class FFDItems {
     public static final Item DRIPSTONE_BLOCK = blockItem(FFDBlocks.DRIPSTONE_BLOCK);
     public static final Item POINTED_DRIPSTONE = blockItem(FFDBlocks.POINTED_DRIPSTONE);
     public static final Item IRON_CHAIN = blockItem(FFDBlocks.IRON_CHAIN);
+    public static final Item LANTERN = blockItem(FFDBlocks.LANTERN);
+    public static final Item SMOKER = blockItem(FFDBlocks.SMOKER);
+    public static final Item BLAST_FURNACE = blockItem(FFDBlocks.BLAST_FURNACE);
+    public static final Item BARREL = blockItem(FFDBlocks.BARREL);
+    public static final Item CAMPFIRE = blockItem(FFDBlocks.CAMPFIRE);
+    public static final Item COMPOSTER = blockItem(FFDBlocks.COMPOSTER);
+    public static final Item STONECUTTER = blockItem(FFDBlocks.STONECUTTER);
+    public static final Item GRINDSTONE = blockItem(FFDBlocks.GRINDSTONE);
+    public static final Item CARTOGRAPHY_TABLE = blockItem(FFDBlocks.CARTOGRAPHY_TABLE);
+    public static final Item LOOM = blockItem(FFDBlocks.LOOM);
+    public static final Item LECTERN = blockItem(FFDBlocks.LECTERN);
+    public static final Item FLETCHING_TABLE = blockItem(FFDBlocks.FLETCHING_TABLE);
+    public static final Item SMITHING_TABLE = blockItem(FFDBlocks.SMITHING_TABLE);
+    public static final Item BELL = blockItem(FFDBlocks.BELL);
+    public static final Item JIGSAW = blockItem(FFDBlocks.JIGSAW);
+    public static final Item FLOWER_BANNER_PATTERN = bannerPatternItem("flower_banner_pattern", BannerPattern.FLOWER);
+    public static final Item CREEPER_BANNER_PATTERN = bannerPatternItem("creeper_banner_pattern", BannerPattern.CREEPER);
+    public static final Item SKULL_BANNER_PATTERN = bannerPatternItem("skull_banner_pattern", BannerPattern.SKULL);
+    public static final Item MOJANG_BANNER_PATTERN = bannerPatternItem("mojang_banner_pattern", BannerPattern.MOJANG);
+    public static final Item GLOBE_BANNER_PATTERN = bannerPatternItem("globe_banner_pattern", FFDBannerPatterns.GLOBE);
+    public static final Item FIELD_MASONED_BANNER_PATTERN = bannerPatternItem("field_masoned_banner_pattern", BannerPattern.BRICKS);
+    public static final Item BORDURE_INDENTED_BANNER_PATTERN = bannerPatternItem("bordure_indented_banner_pattern", BannerPattern.CURLY_BORDER);
+    public static final Item CORNFLOWER = flowerItem(FFDBlocks.CORNFLOWER, FFDBlocks.POTTED_CORNFLOWER);
+    public static final Item LILY_OF_THE_VALLEY = flowerItem(FFDBlocks.LILY_OF_THE_VALLEY, FFDBlocks.POTTED_LILY_OF_THE_VALLEY);
+    public static final Item WITHER_ROSE = flowerItem(FFDBlocks.WITHER_ROSE, FFDBlocks.POTTED_WITHER_ROSE);
+    public static final Item GOLDEN_DANDELION = flowerItem(FFDBlocks.GOLDEN_DANDELION, FFDBlocks.POTTED_GOLDEN_DANDELION);
+    public static final Item WHITE_DYE = dyeItem("white_dye", EnumDyeColor.WHITE);
+    public static final Item BLACK_DYE = dyeItem("black_dye", EnumDyeColor.BLACK);
+    public static final Item BLUE_DYE = dyeItem("blue_dye", EnumDyeColor.BLUE);
+    public static final Item BROWN_DYE = dyeItem("brown_dye", EnumDyeColor.BROWN);
+    public static final Item SCAFFOLDING = new ItemScaffolding(FFDBlocks.SCAFFOLDING)
+            .setRegistryName(FFDBlocks.SCAFFOLDING.getRegistryName())
+            .setUnlocalizedName(FarmerFutureDelight.MODID + ".scaffolding")
+            .setCreativeTab(FFDCreativeTab.INSTANCE);
+    public static final Item BAMBOO = new ItemNetherPlant(FFDBlocks.BAMBOO, FFDBlocks.POTTED_BAMBOO) {
+        @Override
+        public int getItemBurnTime(ItemStack stack) {
+            return 50;
+        }
+    }.setRegistryName(FFDBlocks.BAMBOO.getRegistryName())
+            .setUnlocalizedName(FarmerFutureDelight.MODID + ".bamboo")
+            .setCreativeTab(FFDCreativeTab.INSTANCE);
     public static final Item LIGHT = new ItemLightBlock(FFDBlocks.LIGHT)
             .setRegistryName(FFDBlocks.LIGHT.getRegistryName())
             .setUnlocalizedName(FarmerFutureDelight.MODID + ".light");
@@ -156,6 +274,28 @@ public final class FFDItems {
             .setRegistryName(FarmerFutureDelight.MODID, "amethyst_shard")
             .setUnlocalizedName(FarmerFutureDelight.MODID + ".amethyst_shard")
             .setCreativeTab(FFDCreativeTab.INSTANCE);
+    public static final Item BLACKSTONE = blockItem(FFDBlocks.BLACKSTONE);
+    public static final Item POLISHED_BLACKSTONE = blockItem(FFDBlocks.POLISHED_BLACKSTONE);
+    public static final Item POLISHED_BLACKSTONE_BRICKS = blockItem(FFDBlocks.POLISHED_BLACKSTONE_BRICKS);
+    public static final Item CRACKED_POLISHED_BLACKSTONE_BRICKS = blockItem(FFDBlocks.CRACKED_POLISHED_BLACKSTONE_BRICKS);
+    public static final Item CHISELED_POLISHED_BLACKSTONE = blockItem(FFDBlocks.CHISELED_POLISHED_BLACKSTONE);
+    public static final Item GILDED_BLACKSTONE = blockItem(FFDBlocks.GILDED_BLACKSTONE);
+    public static final Item BLACKSTONE_STAIRS = blockItem(FFDBlocks.BLACKSTONE_STAIRS);
+    public static final Item POLISHED_BLACKSTONE_STAIRS = blockItem(FFDBlocks.POLISHED_BLACKSTONE_STAIRS);
+    public static final Item POLISHED_BLACKSTONE_BRICK_STAIRS = blockItem(FFDBlocks.POLISHED_BLACKSTONE_BRICK_STAIRS);
+    public static final Item BLACKSTONE_WALL = blockItem(FFDBlocks.BLACKSTONE_WALL);
+    public static final Item POLISHED_BLACKSTONE_WALL = blockItem(FFDBlocks.POLISHED_BLACKSTONE_WALL);
+    public static final Item POLISHED_BLACKSTONE_BRICK_WALL = blockItem(FFDBlocks.POLISHED_BLACKSTONE_BRICK_WALL);
+    public static final Item POLISHED_BLACKSTONE_BUTTON = blockItem(FFDBlocks.POLISHED_BLACKSTONE_BUTTON);
+    public static final Item POLISHED_BLACKSTONE_PRESSURE_PLATE = blockItem(FFDBlocks.POLISHED_BLACKSTONE_PRESSURE_PLATE);
+    public static final Item BLACKSTONE_SLAB = slabItem(
+            FFDBlocks.BLACKSTONE_SLAB, FFDBlocks.BLACKSTONE_DOUBLE_SLAB);
+    public static final Item POLISHED_BLACKSTONE_SLAB = slabItem(
+            FFDBlocks.POLISHED_BLACKSTONE_SLAB, FFDBlocks.POLISHED_BLACKSTONE_DOUBLE_SLAB);
+    public static final Item POLISHED_BLACKSTONE_BRICK_SLAB = slabItem(
+            FFDBlocks.POLISHED_BLACKSTONE_BRICK_SLAB, FFDBlocks.POLISHED_BLACKSTONE_BRICK_DOUBLE_SLAB);
+    public static final Item QUARTZ_BRICKS = blockItem(FFDBlocks.QUARTZ_BRICKS);
+    public static final Item CRYING_OBSIDIAN = blockItem(FFDBlocks.CRYING_OBSIDIAN);
     public static final Item DEEPSLATE = blockItem(FFDBlocks.DEEPSLATE);
     public static final Item COBBLED_DEEPSLATE = blockItem(FFDBlocks.COBBLED_DEEPSLATE);
     public static final Item POLISHED_DEEPSLATE = blockItem(FFDBlocks.POLISHED_DEEPSLATE);
@@ -275,6 +415,7 @@ public final class FFDItems {
             blockItems(FFDBlocks.OVERWORLD_BUTTONS);
     public static final Item[] OVERWORLD_PRESSURE_PLATE_ITEMS =
             blockItems(FFDBlocks.OVERWORLD_PRESSURE_PLATES);
+    public static final Item[] WOOD_SIGN_ITEMS = woodSignItems();
     public static final Item PUMPKIN = blockItem(FFDBlocks.PUMPKIN);
     public static final Item[] PRISMARINE_STAIR_ITEMS = blockItems(FFDBlocks.PRISMARINE_STAIRS);
     public static final Item[] PRISMARINE_SLAB_ITEMS = slabItems(
@@ -287,6 +428,10 @@ public final class FFDItems {
     public static final Item TRIDENT = new ItemTrident()
             .setRegistryName(FarmerFutureDelight.MODID, "trident")
             .setUnlocalizedName(FarmerFutureDelight.MODID + ".trident")
+            .setCreativeTab(FFDCreativeTab.INSTANCE);
+    public static final Item CROSSBOW = new ItemCrossbow()
+            .setRegistryName(FarmerFutureDelight.MODID, "crossbow")
+            .setUnlocalizedName(FarmerFutureDelight.MODID + ".crossbow")
             .setCreativeTab(FFDCreativeTab.INSTANCE);
     public static final Item CONDUIT = blockItem(FFDBlocks.CONDUIT);
     public static final Item COD_BUCKET = fishBucket("cod");
@@ -505,6 +650,20 @@ public final class FFDItems {
         return FFDCompat.isEnabled(FFDConfig.tridentMode, FFDCompat.Feature.TRIDENT);
     }
 
+    public static boolean isLocalCrossbowEnabled() {
+        return FFDCompat.isLocalItemEnabled(FFDConfig.crossbowMode,
+                FFDCompat.Feature.CROSSBOW, CROSSBOW, null, "crossbow");
+    }
+
+    public static boolean isCrossbowItem(Item item) {
+        if (item == null || item.getRegistryName() == null) {
+            return false;
+        }
+        net.minecraft.util.ResourceLocation id = item.getRegistryName();
+        return item == CROSSBOW || "futuremc".equals(id.getResourceDomain())
+                && "crossbow".equals(id.getResourcePath());
+    }
+
     public static boolean isTridentStack(ItemStack stack) {
         if (stack.isEmpty() || stack.getItem().getRegistryName() == null) {
             return false;
@@ -555,6 +714,23 @@ public final class FFDItems {
         return FFDCompat.isEnabled(FFDConfig.amethystMode, FFDCompat.Feature.AMETHYST);
     }
 
+    public static boolean isNetheriteEnabled() {
+        return FFDCompat.isEnabled(FFDConfig.netheriteMode, FFDCompat.Feature.NETHERITE);
+    }
+
+    public static boolean isBlackstoneEnabled() {
+        return FFDCompat.isEnabled(FFDConfig.blackstoneMode, FFDCompat.Feature.BLACKSTONE);
+    }
+
+    public static boolean isQuartzBricksEnabled() {
+        return FFDCompat.isEnabled(FFDConfig.quartzBricksMode, FFDCompat.Feature.QUARTZ_BRICKS);
+    }
+
+    public static boolean isCryingObsidianEnabled() {
+        return FFDCompat.isEnabled(FFDConfig.cryingObsidianMode,
+                FFDCompat.Feature.CRYING_OBSIDIAN);
+    }
+
     public static boolean isDeepslateEnabled() {
         return FFDCompat.isEnabled(FFDConfig.deepslateMode, FFDCompat.Feature.DEEPSLATE);
     }
@@ -578,6 +754,31 @@ public final class FFDItems {
 
     public static boolean isIronChainEnabled() {
         return FFDCompat.isEnabled(FFDConfig.ironChainMode, FFDCompat.Feature.IRON_CHAIN);
+    }
+
+    public static boolean isLanternEnabled() {
+        return FFDCompat.isEnabled(FFDConfig.lanternMode, FFDCompat.Feature.LANTERN);
+    }
+
+    private static Item flowerItem(Block flower, Block pot) {
+        Item item = new ItemNetherPlant(flower, pot).setRegistryName(flower.getRegistryName())
+                .setUnlocalizedName(flower.getUnlocalizedName().substring(5))
+                .setCreativeTab(FFDCreativeTab.INSTANCE);
+        LOCAL_ITEM_BLOCKS.put(item, flower);
+        LOCAL_BLOCK_ITEMS_BY_NAME.put(item.getRegistryName(), item);
+        return item;
+    }
+
+    public static boolean isFlowersEnabled() {
+        return FFDCompat.isEnabled(FFDConfig.flowersMode, FFDCompat.Feature.FLOWERS);
+    }
+
+    public static boolean isBambooEnabled() {
+        return FFDCompat.isEnabled(FFDConfig.bambooMode, FFDCompat.Feature.BAMBOO);
+    }
+
+    public static boolean isScaffoldingEnabled() {
+        return FFDCompat.isEnabled(FFDConfig.scaffoldingMode, FFDCompat.Feature.SCAFFOLDING);
     }
 
     public static boolean isLightEnabled() {
@@ -623,6 +824,10 @@ public final class FFDItems {
     }
 
     public static boolean shouldRegisterBlock(Block block) {
+        if (block.getRegistryName() != null) LOCAL_BLOCKS_BY_NAME.put(block.getRegistryName(), block);
+        if (block == FFDBlocks.BAMBOO_SAPLING && !shouldRegisterBlock(FFDBlocks.BAMBOO)) {
+            return false;
+        }
         String rawOreMaterial = rawOreMaterial(block);
         if (rawOreMaterial != null && !isRawOreMaterialEnabled(rawOreMaterial)) {
             return false;
@@ -654,6 +859,9 @@ public final class FFDItems {
     }
 
     public static boolean shouldDisplayInCreativeTab(ItemStack stack) {
+        if (stack.getItem() == POWDER_SNOW) {
+            return false;
+        }
         if (stack.isEmpty() || stack.getItem().getRegistryName() == null) {
             return true;
         }
@@ -676,22 +884,44 @@ public final class FFDItems {
                         contentPaths(local));
     }
 
+    public static Item localBlockItem(ResourceLocation name) {
+        return LOCAL_BLOCK_ITEMS_BY_NAME.get(name);
+    }
+
+    public static Block localBlock(ResourceLocation name) {
+        Block block = LOCAL_BLOCKS_BY_NAME.get(name);
+        if (block != null) return block;
+        Item item = localBlockItem(name);
+        block = LOCAL_ITEM_BLOCKS.get(item);
+        if (block != null) return block;
+        for (Block candidate : FFDStoneDecor.blocks()) {
+            if (name.equals(candidate.getRegistryName())) return candidate;
+        }
+        for (Block candidate : FFDBlocks.WOOD_WALL_SIGNS) {
+            if (name.equals(candidate.getRegistryName())) return candidate;
+        }
+        return null;
+    }
+
     public static Block effectiveBlock(Block local) {
+        IBlockState state = effectiveBlockState(local);
+        return state == null ? null : state.getBlock();
+    }
+
+    public static IBlockState effectiveBlockState(Block local) {
         String rawOreMaterial = rawOreMaterial(local);
         if (rawOreMaterial != null && !FFDConfig.isRawOreMaterialEnabled(rawOreMaterial)) {
             return null;
         }
         if (isBlockRegistered(local)) {
-            return local;
+            return local.getDefaultState();
         }
         FeatureBinding binding = blockBinding(local);
         if (binding == null || binding.mode != FFDConfig.FeatureMode.AUTO
                 || local.getRegistryName() == null) {
             return null;
         }
-        net.minecraft.block.state.IBlockState external = FFDCompat.getExternalBlockState(
-                binding.feature, contentPaths(local));
-        return external == null ? null : external.getBlock();
+        return FFDCompat.getExternalBlockState(binding.feature, contentPaths(local));
     }
 
     public static Item effectiveItem(Item local) {
@@ -708,6 +938,51 @@ public final class FFDItems {
     }
 
     private static FeatureBinding blockBinding(Block block) {
+        if (block == FFDBlocks.ANCIENT_DEBRIS || block == FFDBlocks.NETHERITE_BLOCK) {
+            return binding(FFDConfig.netheriteMode, FFDCompat.Feature.NETHERITE);
+        }
+        if (block == FFDBlocks.CAMPFIRE) {
+            return binding(FFDConfig.campfireMode, FFDCompat.Feature.CAMPFIRE);
+        }
+        if (block == FFDBlocks.SMOKER) {
+            return binding(FFDConfig.smokerMode, FFDCompat.Feature.SMOKER);
+        }
+        if (block == FFDBlocks.BLAST_FURNACE) {
+            return binding(FFDConfig.blastFurnaceMode, FFDCompat.Feature.BLAST_FURNACE);
+        }
+        if (block == FFDBlocks.COMPOSTER) {
+            return binding(FFDConfig.composterMode, FFDCompat.Feature.COMPOSTER);
+        }
+        if (block == FFDBlocks.BARREL) {
+            return binding(FFDConfig.barrelMode, FFDCompat.Feature.BARREL);
+        }
+        if (block == FFDBlocks.STONECUTTER) {
+            return binding(FFDConfig.stonecutterMode, FFDCompat.Feature.STONECUTTER);
+        }
+        if (block == FFDBlocks.GRINDSTONE) {
+            return binding(FFDConfig.grindstoneMode, FFDCompat.Feature.GRINDSTONE);
+        }
+        if (block == FFDBlocks.CARTOGRAPHY_TABLE) {
+            return binding(FFDConfig.cartographyTableMode, FFDCompat.Feature.CARTOGRAPHY_TABLE);
+        }
+        if (block == FFDBlocks.LECTERN) {
+            return binding(FFDConfig.lecternMode, FFDCompat.Feature.LECTERN);
+        }
+        if (block == FFDBlocks.FLETCHING_TABLE) {
+            return binding(FFDConfig.fletchingTableMode, FFDCompat.Feature.FLETCHING_TABLE);
+        }
+        if (block == FFDBlocks.SMITHING_TABLE) {
+            return binding(FFDConfig.smithingTableMode, FFDCompat.Feature.SMITHING_TABLE);
+        }
+        if (block == FFDBlocks.BELL) {
+            return binding(FFDConfig.bellMode, FFDCompat.Feature.BELL);
+        }
+        if (block == FFDBlocks.LOOM) {
+            return binding(FFDConfig.loomMode, FFDCompat.Feature.LOOM);
+        }
+        if (FFDStoneDecor.contains(block)) {
+            return binding(FFDConfig.stoneDecorMode, FFDCompat.Feature.STONE_DECOR);
+        }
         if (block == FFDBlocks.SWEET_BERRY_BUSH) {
             return binding(FFDConfig.sweetBerryMode, FFDCompat.Feature.SWEET_BERRY);
         }
@@ -750,12 +1025,37 @@ public final class FFDItems {
         if (block == FFDBlocks.IRON_CHAIN) {
             return binding(FFDConfig.ironChainMode, FFDCompat.Feature.IRON_CHAIN);
         }
+        if (block == FFDBlocks.LANTERN) {
+            return binding(FFDConfig.lanternMode, FFDCompat.Feature.LANTERN);
+        }
+        if (oneOf(block, FFDBlocks.CORNFLOWER, FFDBlocks.LILY_OF_THE_VALLEY, FFDBlocks.WITHER_ROSE,
+                FFDBlocks.POTTED_CORNFLOWER, FFDBlocks.POTTED_LILY_OF_THE_VALLEY, FFDBlocks.POTTED_WITHER_ROSE,
+                FFDBlocks.GOLDEN_DANDELION, FFDBlocks.POTTED_GOLDEN_DANDELION)) {
+            return binding(FFDConfig.flowersMode, FFDCompat.Feature.FLOWERS);
+        }
+        if (oneOf(block, FFDBlocks.BAMBOO, FFDBlocks.BAMBOO_SAPLING, FFDBlocks.POTTED_BAMBOO)) {
+            return binding(FFDConfig.bambooMode, FFDCompat.Feature.BAMBOO);
+        }
+        if (block == FFDBlocks.SCAFFOLDING) {
+            return binding(FFDConfig.scaffoldingMode, FFDCompat.Feature.SCAFFOLDING);
+        }
         if (arrayContains(block, FFDBlocks.CANDLES)
                 || arrayContains(block, FFDBlocks.CANDLE_CAKES)) {
             return binding(FFDConfig.candleMode, FFDCompat.Feature.CANDLE);
         }
         if (block == FFDBlocks.POWDER_SNOW) {
             return binding(FFDConfig.powderSnowMode, FFDCompat.Feature.POWDER_SNOW);
+        }
+        if (block != null && block.getRegistryName() != null
+                && FarmerFutureDelight.MODID.equals(block.getRegistryName().getResourceDomain())
+                && block.getRegistryName().getResourcePath().contains("blackstone")) {
+            return binding(FFDConfig.blackstoneMode, FFDCompat.Feature.BLACKSTONE);
+        }
+        if (block == FFDBlocks.QUARTZ_BRICKS) {
+            return binding(FFDConfig.quartzBricksMode, FFDCompat.Feature.QUARTZ_BRICKS);
+        }
+        if (block == FFDBlocks.CRYING_OBSIDIAN) {
+            return binding(FFDConfig.cryingObsidianMode, FFDCompat.Feature.CRYING_OBSIDIAN);
         }
         if (isDeepslateBlock(block)) {
             return binding(FFDConfig.deepslateMode, FFDCompat.Feature.DEEPSLATE);
@@ -805,7 +1105,9 @@ public final class FFDItems {
                 || arrayContains(block, FFDBlocks.OVERWORLD_TRAPDOORS)
                 || arrayContains(block, FFDBlocks.OVERWORLD_TRAPDOORS_WATERLOGGED)
                 || arrayContains(block, FFDBlocks.OVERWORLD_BUTTONS)
-                || arrayContains(block, FFDBlocks.OVERWORLD_PRESSURE_PLATES)) {
+                || arrayContains(block, FFDBlocks.OVERWORLD_PRESSURE_PLATES)
+                || arrayContains(block, FFDBlocks.WOOD_STANDING_SIGNS)
+                || arrayContains(block, FFDBlocks.WOOD_WALL_SIGNS)) {
             return binding(FFDConfig.strippedWoodMode, FFDCompat.Feature.AQUATIC_DECOR);
         }
         if (block == FFDBlocks.PUMPKIN) {
@@ -849,6 +1151,27 @@ public final class FFDItems {
     }
 
     private static FeatureBinding itemBinding(Item item) {
+        if (arrayContains(item, NETHERITE_ITEMS)) {
+            return binding(FFDConfig.netheriteMode, FFDCompat.Feature.NETHERITE);
+        }
+        if (item == FLOWER_BANNER_PATTERN || item == CREEPER_BANNER_PATTERN
+                || item == SKULL_BANNER_PATTERN || item == MOJANG_BANNER_PATTERN
+                || item == GLOBE_BANNER_PATTERN || item == FIELD_MASONED_BANNER_PATTERN
+                || item == BORDURE_INDENTED_BANNER_PATTERN) {
+            return binding(FFDConfig.loomMode, FFDCompat.Feature.LOOM);
+        }
+        if (item == LEATHER_HORSE_ARMOR) {
+            return binding(FFDConfig.leatherHorseArmorMode, FFDCompat.Feature.LEATHER_HORSE_ARMOR);
+        }
+        if (item == SUSPICIOUS_STEW) {
+            return binding(FFDConfig.suspiciousStewMode, FFDCompat.Feature.SUSPICIOUS_STEW);
+        }
+        if (item == BAMBOO) {
+            return binding(FFDConfig.bambooMode, FFDCompat.Feature.BAMBOO);
+        }
+        if (item == SCAFFOLDING) {
+            return binding(FFDConfig.scaffoldingMode, FFDCompat.Feature.SCAFFOLDING);
+        }
         Block localBlock = LOCAL_ITEM_BLOCKS.get(item);
         if (localBlock != null) {
             FeatureBinding block = blockBinding(localBlock);
@@ -885,6 +1208,9 @@ public final class FFDItems {
         }
         if (item == TRIDENT) {
             return binding(FFDConfig.tridentMode, FFDCompat.Feature.TRIDENT);
+        }
+        if (item == CROSSBOW) {
+            return binding(FFDConfig.crossbowMode, FFDCompat.Feature.CROSSBOW);
         }
         if (arrayContains(item, FISH_BUCKETS)) {
             return binding(FFDConfig.fishMode, FFDCompat.Feature.FISH);
@@ -1077,8 +1403,19 @@ public final class FFDItems {
         }
     }
 
-    private static ItemBlock blockItem(Block block) {
+    static ItemBlock blockItem(Block block) {
         ItemBlock item = new ItemBlock(block) {
+            @Override
+            public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world,
+                                        BlockPos pos, EnumFacing side, float hitX,
+                                        float hitY, float hitZ, IBlockState state) {
+                if (block == FFDBlocks.BELL && state == null) {
+                    return false;
+                }
+                return super.placeBlockAt(stack, player, world, pos, side,
+                        hitX, hitY, hitZ, state);
+            }
+
             @Override
             public int getItemBurnTime(ItemStack stack) {
                 if (arrayContains(block, FFDBlocks.OVERWORLD_BUTTONS)) {
@@ -1089,6 +1426,12 @@ public final class FFDItems {
                         || arrayContains(block, FFDBlocks.STRIPPED_WOODS)
                         || arrayContains(block, FFDBlocks.OVERWORLD_TRAPDOORS)
                         || arrayContains(block, FFDBlocks.OVERWORLD_PRESSURE_PLATES)) {
+                    return 300;
+                }
+                if (block == FFDBlocks.BARREL || block == FFDBlocks.COMPOSTER
+                        || block == FFDBlocks.LOOM || block == FFDBlocks.LECTERN
+                        || block == FFDBlocks.CARTOGRAPHY_TABLE || block == FFDBlocks.FLETCHING_TABLE
+                        || block == FFDBlocks.SMITHING_TABLE) {
                     return 300;
                 }
                 return 0;
@@ -1102,6 +1445,44 @@ public final class FFDItems {
 
     private static Item simpleItem(String name) {
         return new Item()
+                .setRegistryName(FarmerFutureDelight.MODID, name)
+                .setUnlocalizedName(FarmerFutureDelight.MODID + "." + name)
+                .setCreativeTab(FFDCreativeTab.INSTANCE);
+    }
+
+    private static Item netheriteComponent(String name) {
+        return netheriteGear(new ItemNetheriteComponent(), name);
+    }
+
+    private static Item netheriteGear(Item item, String name) {
+        item.setRegistryName(FarmerFutureDelight.MODID, name);
+        item.setUnlocalizedName(FarmerFutureDelight.MODID + "." + name);
+        item.setCreativeTab(FFDCreativeTab.INSTANCE);
+        return item;
+    }
+
+    private static Item netheriteArmor(net.minecraft.inventory.EntityEquipmentSlot slot,
+                                       String name) {
+        return netheriteGear(new ItemNetheriteArmor(NETHERITE_ARMOR_MATERIAL, slot), name);
+    }
+
+    private static Item netheriteBlockItem(Block block) {
+        Item item = new ItemNetheriteBlock(block);
+        item.setRegistryName(block.getRegistryName());
+        item.setUnlocalizedName(FarmerFutureDelight.MODID + "."
+                + block.getRegistryName().getResourcePath());
+        return rememberBlockItem(item, block);
+    }
+
+    private static Item dyeItem(String name, EnumDyeColor color) {
+        return new ItemModernDye(color)
+                .setRegistryName(FarmerFutureDelight.MODID, name)
+                .setUnlocalizedName(FarmerFutureDelight.MODID + "." + name)
+                .setCreativeTab(FFDCreativeTab.INSTANCE);
+    }
+
+    private static Item bannerPatternItem(String name, BannerPattern pattern) {
+        return new ItemBannerPattern(pattern)
                 .setRegistryName(FarmerFutureDelight.MODID, name)
                 .setUnlocalizedName(FarmerFutureDelight.MODID + "." + name)
                 .setCreativeTab(FFDCreativeTab.INSTANCE);
@@ -1134,6 +1515,20 @@ public final class FFDItems {
                     + floorFans[i].getRegistryName().getResourcePath());
             item.setCreativeTab(FFDCreativeTab.INSTANCE);
             items[i] = rememberBlockItem(item, floorFans[i]);
+        }
+        return items;
+    }
+
+    private static Item[] woodSignItems() {
+        Item[] items = new Item[FFDBlocks.WOOD_SIGN_NAMES.length];
+        for (int i = 0; i < items.length; i++) {
+            String name = FFDBlocks.WOOD_SIGN_NAMES[i];
+            ItemWoodSign item = new ItemWoodSign(
+                    FFDBlocks.WOOD_STANDING_SIGNS[i], FFDBlocks.WOOD_WALL_SIGNS[i]);
+            item.setRegistryName(FarmerFutureDelight.MODID, name + "_sign");
+            item.setUnlocalizedName(FarmerFutureDelight.MODID + "." + name + "_sign");
+            item.setCreativeTab(FFDCreativeTab.INSTANCE);
+            items[i] = rememberBlockItem(item, FFDBlocks.WOOD_STANDING_SIGNS[i]);
         }
         return items;
     }
@@ -1201,7 +1596,7 @@ public final class FFDItems {
         return rememberBlockItem(item, block);
     }
 
-    private static ItemSlab slabItem(net.minecraft.block.BlockSlab slab, net.minecraft.block.BlockSlab doubleSlab) {
+    static ItemSlab slabItem(net.minecraft.block.BlockSlab slab, net.minecraft.block.BlockSlab doubleSlab) {
         ItemSlab item = new ItemSlab(slab, slab, doubleSlab) {
             @Override
             public int getItemBurnTime(ItemStack stack) {
@@ -1232,6 +1627,8 @@ public final class FFDItems {
         LOCAL_BLOCK_ITEMS_BY_NAME.put(item.getRegistryName(), item);
         return item;
     }
+
+    public static final Item[] STONE_DECOR_ITEMS = FFDStoneDecor.createItems();
 
     private FFDItems() {
     }

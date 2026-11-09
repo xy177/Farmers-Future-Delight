@@ -1,0 +1,120 @@
+{
+  "pools": [
+    {
+      "name": "pool_0",
+      "rolls": {
+        "min": 1,
+        "max": 5
+      },
+      "entries": [
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:emerald"
+            }
+          ],
+          "entryName": "pool_0_entry_0"
+        },
+        {
+          "type": "item",
+          "weight": 2,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:arrow"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 3
+              }
+            }
+          ],
+          "entryName": "pool_0_entry_1"
+        },
+        {
+          "type": "item",
+          "weight": 6,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:feather"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 3
+              }
+            }
+          ],
+          "entryName": "pool_0_entry_2"
+        },
+        {
+          "type": "item",
+          "weight": 2,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:egg"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 3
+              }
+            }
+          ],
+          "entryName": "pool_0_entry_3"
+        },
+        {
+          "type": "item",
+          "weight": 6,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:flint"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 3
+              }
+            }
+          ],
+          "entryName": "pool_0_entry_4"
+        },
+        {
+          "type": "item",
+          "weight": 6,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:stick"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 3
+              }
+            }
+          ],
+          "entryName": "pool_0_entry_5"
+        }
+      ]
+    }
+  ]
+}

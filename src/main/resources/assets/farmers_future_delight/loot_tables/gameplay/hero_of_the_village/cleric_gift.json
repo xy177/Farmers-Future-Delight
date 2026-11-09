@@ -1,0 +1,28 @@
+{
+  "pools": [
+    {
+      "name": "pool_0",
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "item",
+          "name": "minecraft:redstone",
+          "entryName": "minecraft:redstone",
+          "weight": 1
+        },
+        {
+          "type": "item",
+          "name": "minecraft:dye",
+          "entryName": "minecraft:lapis_lazuli",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_data",
+              "data": 4
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

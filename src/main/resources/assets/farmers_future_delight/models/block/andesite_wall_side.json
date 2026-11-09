@@ -1,0 +1,6 @@
+{
+  "parent": "farmers_future_delight:block/stone_decor_wall_side",
+  "textures": {
+    "wall": "minecraft:blocks/stone_andesite"
+  }
+}

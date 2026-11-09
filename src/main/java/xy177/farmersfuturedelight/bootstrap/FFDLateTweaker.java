@@ -23,10 +23,31 @@ public final class FFDLateTweaker implements ITweaker {
             FFDEarlyTweaker.reloadCleanMixAlfheimMixins(classLoader);
         }
         classLoader.registerTransformer(HEIGHT_TRANSFORMER);
+        registerTransformerIfMissing(classLoader,
+                "xy177.farmersfuturedelight.core.FFDCreativeInventoryTransformer");
+        registerTransformerIfMissing(classLoader,
+                "xy177.farmersfuturedelight.core.FFDMenuTransformer");
+        registerTransformerIfMissing(classLoader,
+                "xy177.farmersfuturedelight.core.FFDRabbitJumpTransformer");
+        registerTransformerIfMissing(classLoader,
+                "xy177.farmersfuturedelight.core.FFDFunctionPermissionTransformer");
+        registerTransformerIfMissing(classLoader,
+                "xy177.farmersfuturedelight.core.FFDCommandPermissionTransformer");
+        registerTransformerIfMissing(classLoader,
+                "xy177.farmersfuturedelight.core.FFDVanillaAdvancementTransformer");
         if (!Boolean.TRUE.equals(Launch.blackboard.get("ffd.cleanMixActive"))) {
             moveAfterDeobfuscation(classLoader);
             FFDEarlyTweaker.refreshMixinTransformerDelegation(classLoader);
         }
+    }
+
+    private static void registerTransformerIfMissing(LaunchClassLoader classLoader, String name) {
+        for (IClassTransformer transformer : classLoader.getTransformers()) {
+            if (name.equals(transformer.getClass().getName())) {
+                return;
+            }
+        }
+        classLoader.registerTransformer(name);
     }
 
     @Override

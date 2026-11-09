@@ -18,6 +18,7 @@ import net.minecraft.entity.item.EntityMinecartTNT;
 import net.minecraft.entity.item.EntityTNTPrimed;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityWitherSkull;
 import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
@@ -35,6 +36,7 @@ import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.FFDCreativeTab;
+import xy177.farmersfuturedelight.common.advancement.FFDAdvancements;
 import xy177.farmersfuturedelight.common.tile.TileEntityBeehive;
 
 public class BlockBeehive extends Block {
@@ -196,7 +198,11 @@ public class BlockBeehive extends Block {
                 && tile instanceof TileEntityBeehive
                 && EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
             TileEntityBeehive hive = (TileEntityBeehive) tile;
-            spawnAsEntity(world, pos, hive.createItemStack());
+            if (naturalNest && hive.getOccupantCount() == TileEntityBeehive.MAX_BEES
+                    && player instanceof EntityPlayerMP) {
+                FFDAdvancements.TOTAL_BEELOCATION.trigger((EntityPlayerMP) player);
+            }
+            spawnAsEntity(world, pos, hive.createItemStack(state));
             player.addStat(StatList.getBlockStats(this));
             player.addExhaustion(0.005F);
             return;

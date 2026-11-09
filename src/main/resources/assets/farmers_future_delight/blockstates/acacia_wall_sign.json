@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "farmers_future_delight:acacia_sign_particle"
+    },
+    "facing=south": {
+      "model": "farmers_future_delight:acacia_sign_particle"
+    },
+    "facing=east": {
+      "model": "farmers_future_delight:acacia_sign_particle"
+    },
+    "facing=west": {
+      "model": "farmers_future_delight:acacia_sign_particle"
+    }
+  }
+}

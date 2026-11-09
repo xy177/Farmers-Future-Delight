@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "facing=down,open=false": {"model": "farmers_future_delight:barrel", "x": 180},
+    "facing=down,open=true": {"model": "farmers_future_delight:barrel_open", "x": 180},
+    "facing=east,open=false": {"model": "farmers_future_delight:barrel", "x": 90, "y": 90},
+    "facing=east,open=true": {"model": "farmers_future_delight:barrel_open", "x": 90, "y": 90},
+    "facing=north,open=false": {"model": "farmers_future_delight:barrel", "x": 90},
+    "facing=north,open=true": {"model": "farmers_future_delight:barrel_open", "x": 90},
+    "facing=south,open=false": {"model": "farmers_future_delight:barrel", "x": 90, "y": 180},
+    "facing=south,open=true": {"model": "farmers_future_delight:barrel_open", "x": 90, "y": 180},
+    "facing=up,open=false": {"model": "farmers_future_delight:barrel"},
+    "facing=up,open=true": {"model": "farmers_future_delight:barrel_open"},
+    "facing=west,open=false": {"model": "farmers_future_delight:barrel", "x": 90, "y": 270},
+    "facing=west,open=true": {"model": "farmers_future_delight:barrel_open", "x": 90, "y": 270}
+  }
+}

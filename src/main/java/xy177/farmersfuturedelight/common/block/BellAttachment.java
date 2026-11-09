@@ -1,0 +1,21 @@
+package xy177.farmersfuturedelight.common.block;
+
+import net.minecraft.util.IStringSerializable;
+
+public enum BellAttachment implements IStringSerializable {
+    FLOOR("floor"),
+    CEILING("ceiling"),
+    SINGLE_WALL("single_wall"),
+    DOUBLE_WALL("double_wall");
+
+    private final String name;
+
+    BellAttachment(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+}

@@ -1,0 +1,6 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "farmers_future_delight:items/netherite_pickaxe"
+  }
+}

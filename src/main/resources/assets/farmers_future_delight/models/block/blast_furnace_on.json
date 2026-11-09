@@ -1,0 +1,4 @@
+{
+  "parent": "farmers_future_delight:block/blast_furnace",
+  "textures": { "front": "farmers_future_delight:blocks/blast_furnace_front_on" }
+}

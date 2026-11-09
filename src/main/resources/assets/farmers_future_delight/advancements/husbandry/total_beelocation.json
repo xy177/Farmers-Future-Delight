@@ -1,0 +1,20 @@
+{
+  "conditions": [
+    {"type": "farmers_future_delight:feature_enabled", "feature": "honey"}
+  ],
+  "parent": "minecraft:husbandry/root",
+  "display": {
+    "icon": {"item": "farmers_future_delight:bee_nest"},
+    "title": {"translate": "advancements.farmers_future_delight.husbandry.total_beelocation.title"},
+    "description": {"translate": "advancements.farmers_future_delight.husbandry.total_beelocation.description"},
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "total_beelocation": {
+      "trigger": "farmers_future_delight:total_beelocation"
+    }
+  }
+}

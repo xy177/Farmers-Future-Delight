@@ -1,0 +1,6019 @@
+{
+  "source": "Minecraft Java 26.3",
+  "groups": [
+    {
+      "trades": [
+        {
+          "id": "minecraft:smith/1/coal_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 15,
+              "id": "minecraft:coal"
+            },
+            "xp": 2
+          }
+        },
+        {
+          "id": "minecraft:armorer/1/emerald_iron_leggings",
+          "definition": {
+            "gives": {
+              "id": "minecraft:iron_leggings"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 7,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:armorer/1/emerald_iron_boots",
+          "definition": {
+            "gives": {
+              "id": "minecraft:iron_boots"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 4,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:armorer/1/emerald_iron_helmet",
+          "definition": {
+            "gives": {
+              "id": "minecraft:iron_helmet"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 5,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:armorer/1/emerald_iron_chestplate",
+          "definition": {
+            "gives": {
+              "id": "minecraft:iron_chestplate"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 9,
+              "id": "minecraft:emerald"
+            }
+          }
+        }
+      ],
+      "id": "armorer/level_1",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:smith/2/iron_ingot_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 4,
+              "id": "minecraft:iron_ingot"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:smith/2/emerald_bell",
+          "definition": {
+            "gives": {
+              "id": "minecraft:bell"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 36,
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:armorer/2/emerald_chainmail_boots",
+          "definition": {
+            "gives": {
+              "id": "minecraft:chainmail_boots"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:armorer/2/emerald_chainmail_leggings",
+          "definition": {
+            "gives": {
+              "id": "minecraft:chainmail_leggings"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        }
+      ],
+      "id": "armorer/level_2",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:armorer/3/lava_bucket_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:lava_bucket"
+            },
+            "xp": 20
+          }
+        },
+        {
+          "id": "minecraft:armorer/3/emerald_chainmail_helmet",
+          "definition": {
+            "gives": {
+              "id": "minecraft:chainmail_helmet"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:armorer/3/emerald_chainmail_chestplate",
+          "definition": {
+            "gives": {
+              "id": "minecraft:chainmail_chestplate"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 4,
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:armorer/3/emerald_shield",
+          "definition": {
+            "gives": {
+              "id": "minecraft:shield"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 5,
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:armorer/3/diamond_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:diamond"
+            },
+            "xp": 20
+          }
+        }
+      ],
+      "id": "armorer/level_3",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:armorer/4/emerald_enchanted_diamond_leggings",
+          "definition": {
+            "given_item_modifier": [
+              {
+                "type": "minecraft:enchant_with_levels",
+                "include_additional_cost_component": true,
+                "levels": {
+                  "type": "minecraft:uniform",
+                  "max": 19,
+                  "min": 5
+                },
+                "options": "#minecraft:on_traded_equipment"
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "items": "minecraft:diamond_leggings",
+                  "predicates": {
+                    "minecraft:enchantments": [
+                      {}
+                    ]
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:diamond_leggings"
+            },
+            "max_uses": 3,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 14,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:armorer/4/emerald_enchanted_diamond_boots",
+          "definition": {
+            "given_item_modifier": [
+              {
+                "type": "minecraft:enchant_with_levels",
+                "include_additional_cost_component": true,
+                "levels": {
+                  "type": "minecraft:uniform",
+                  "max": 19,
+                  "min": 5
+                },
+                "options": "#minecraft:on_traded_equipment"
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "items": "minecraft:diamond_boots",
+                  "predicates": {
+                    "minecraft:enchantments": [
+                      {}
+                    ]
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:diamond_boots"
+            },
+            "max_uses": 3,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 8,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        }
+      ],
+      "id": "armorer/level_4",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:armorer/5/emerald_enchanted_diamond_helmet",
+          "definition": {
+            "given_item_modifier": [
+              {
+                "type": "minecraft:enchant_with_levels",
+                "include_additional_cost_component": true,
+                "levels": {
+                  "type": "minecraft:uniform",
+                  "max": 19,
+                  "min": 5
+                },
+                "options": "#minecraft:on_traded_equipment"
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "items": "minecraft:diamond_helmet",
+                  "predicates": {
+                    "minecraft:enchantments": [
+                      {}
+                    ]
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:diamond_helmet"
+            },
+            "max_uses": 3,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 8,
+              "id": "minecraft:emerald"
+            },
+            "xp": 30
+          }
+        },
+        {
+          "id": "minecraft:armorer/5/emerald_enchanted_diamond_chestplate",
+          "definition": {
+            "given_item_modifier": [
+              {
+                "type": "minecraft:enchant_with_levels",
+                "include_additional_cost_component": true,
+                "levels": {
+                  "type": "minecraft:uniform",
+                  "max": 19,
+                  "min": 5
+                },
+                "options": "#minecraft:on_traded_equipment"
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "items": "minecraft:diamond_chestplate",
+                  "predicates": {
+                    "minecraft:enchantments": [
+                      {}
+                    ]
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:diamond_chestplate"
+            },
+            "max_uses": 3,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 16,
+              "id": "minecraft:emerald"
+            },
+            "xp": 30
+          }
+        }
+      ],
+      "id": "armorer/level_5",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:butcher/1/chicken_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 14,
+              "id": "minecraft:chicken"
+            },
+            "xp": 2
+          }
+        },
+        {
+          "id": "minecraft:butcher/1/porkchop_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 7,
+              "id": "minecraft:porkchop"
+            },
+            "xp": 2
+          }
+        },
+        {
+          "id": "minecraft:butcher/1/rabbit_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 4,
+              "id": "minecraft:rabbit"
+            },
+            "xp": 2
+          }
+        },
+        {
+          "id": "minecraft:butcher/1/emerald_rabbit_stew",
+          "definition": {
+            "gives": {
+              "id": "minecraft:rabbit_stew"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        }
+      ],
+      "id": "butcher/level_1",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:butcher/2/coal_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 15,
+              "id": "minecraft:coal"
+            },
+            "xp": 2
+          }
+        },
+        {
+          "id": "minecraft:butcher/2/emerald_cooked_porkchop",
+          "definition": {
+            "gives": {
+              "count": 5,
+              "id": "minecraft:cooked_porkchop"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:butcher/2/emerald_cooked_chicken",
+          "definition": {
+            "gives": {
+              "count": 8,
+              "id": "minecraft:cooked_chicken"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        }
+      ],
+      "id": "butcher/level_2",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:butcher/3/mutton_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 7,
+              "id": "minecraft:mutton"
+            },
+            "xp": 20
+          }
+        },
+        {
+          "id": "minecraft:butcher/3/beef_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 10,
+              "id": "minecraft:beef"
+            },
+            "xp": 20
+          }
+        }
+      ],
+      "id": "butcher/level_3",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:butcher/4/dried_kelp_block_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 10,
+              "id": "minecraft:dried_kelp_block"
+            },
+            "xp": 30
+          }
+        }
+      ],
+      "id": "butcher/level_4",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:butcher/5/sweet_berries_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 10,
+              "id": "minecraft:sweet_berries"
+            },
+            "xp": 30
+          }
+        }
+      ],
+      "id": "butcher/level_5",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:cartographer/1/paper_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 24,
+              "id": "minecraft:paper"
+            },
+            "xp": 2
+          }
+        },
+        {
+          "id": "minecraft:cartographer/1/emerald_map",
+          "definition": {
+            "gives": {
+              "id": "minecraft:map"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 7,
+              "id": "minecraft:emerald"
+            }
+          }
+        }
+      ],
+      "id": "cartographer/level_1",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:cartographer/2/glass_pane_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 11,
+              "id": "minecraft:glass_pane"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:cartographer/2/emerald_and_compass_village_taiga_map",
+          "definition": {
+            "additional_wants": {
+              "id": "minecraft:compass"
+            },
+            "given_item_modifier": [
+              {
+                "type": "minecraft:exploration_map",
+                "decoration": "minecraft:village_taiga",
+                "destination": "#minecraft:on_taiga_village_maps",
+                "search_radius": 100
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "predicates": {
+                    "minecraft:map_id": {}
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:taiga_village_map"
+            },
+            "max_uses": 12,
+            "merchant_predicate": {
+              "type": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "minecraft:predicates": {
+                  "minecraft:villager/variant": [
+                    "minecraft:swamp",
+                    "minecraft:snow",
+                    "minecraft:plains"
+                  ]
+                }
+              }
+            },
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 8,
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:cartographer/2/emerald_and_compass_explorer_swamp_map",
+          "definition": {
+            "additional_wants": {
+              "id": "minecraft:compass"
+            },
+            "given_item_modifier": [
+              {
+                "type": "minecraft:exploration_map",
+                "decoration": "minecraft:swamp_hut",
+                "destination": "#minecraft:on_swamp_hut_maps",
+                "search_radius": 100
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "predicates": {
+                    "minecraft:map_id": {}
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:swamp_hut_map"
+            },
+            "max_uses": 12,
+            "merchant_predicate": {
+              "type": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "minecraft:predicates": {
+                  "minecraft:villager/variant": [
+                    "minecraft:taiga",
+                    "minecraft:snow",
+                    "minecraft:jungle"
+                  ]
+                }
+              }
+            },
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 8,
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:cartographer/2/emerald_and_compass_village_snowy_map",
+          "definition": {
+            "additional_wants": {
+              "id": "minecraft:compass"
+            },
+            "given_item_modifier": [
+              {
+                "type": "minecraft:exploration_map",
+                "decoration": "minecraft:village_snowy",
+                "destination": "#minecraft:on_snowy_village_maps",
+                "search_radius": 100
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "predicates": {
+                    "minecraft:map_id": {}
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:snowy_village_map"
+            },
+            "max_uses": 12,
+            "merchant_predicate": {
+              "type": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "minecraft:predicates": {
+                  "minecraft:villager/variant": [
+                    "minecraft:taiga",
+                    "minecraft:swamp"
+                  ]
+                }
+              }
+            },
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 8,
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:cartographer/2/emerald_and_compass_village_savanna_map",
+          "definition": {
+            "additional_wants": {
+              "id": "minecraft:compass"
+            },
+            "given_item_modifier": [
+              {
+                "type": "minecraft:exploration_map",
+                "decoration": "minecraft:village_savanna",
+                "destination": "#minecraft:on_savanna_village_maps",
+                "search_radius": 100
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "predicates": {
+                    "minecraft:map_id": {}
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:savanna_village_map"
+            },
+            "max_uses": 12,
+            "merchant_predicate": {
+              "type": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "minecraft:predicates": {
+                  "minecraft:villager/variant": [
+                    "minecraft:plains",
+                    "minecraft:jungle",
+                    "minecraft:desert"
+                  ]
+                }
+              }
+            },
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 8,
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:cartographer/2/emerald_and_compass_village_plains_map",
+          "definition": {
+            "additional_wants": {
+              "id": "minecraft:compass"
+            },
+            "given_item_modifier": [
+              {
+                "type": "minecraft:exploration_map",
+                "decoration": "minecraft:village_plains",
+                "destination": "#minecraft:on_plains_village_maps",
+                "search_radius": 100
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "predicates": {
+                    "minecraft:map_id": {}
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:plains_village_map"
+            },
+            "max_uses": 12,
+            "merchant_predicate": {
+              "type": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "minecraft:predicates": {
+                  "minecraft:villager/variant": [
+                    "minecraft:taiga",
+                    "minecraft:snow",
+                    "minecraft:savanna",
+                    "minecraft:desert"
+                  ]
+                }
+              }
+            },
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 8,
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:cartographer/2/emerald_and_compass_explorer_jungle_map",
+          "definition": {
+            "additional_wants": {
+              "id": "minecraft:compass"
+            },
+            "given_item_modifier": [
+              {
+                "type": "minecraft:exploration_map",
+                "decoration": "minecraft:jungle_temple",
+                "destination": "#minecraft:on_jungle_pyramid_maps",
+                "search_radius": 100
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "predicates": {
+                    "minecraft:map_id": {}
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:jungle_pyramid_map"
+            },
+            "max_uses": 12,
+            "merchant_predicate": {
+              "type": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "minecraft:predicates": {
+                  "minecraft:villager/variant": [
+                    "minecraft:swamp",
+                    "minecraft:savanna",
+                    "minecraft:desert"
+                  ]
+                }
+              }
+            },
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 8,
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:cartographer/2/emerald_and_compass_village_desert_map",
+          "definition": {
+            "additional_wants": {
+              "id": "minecraft:compass"
+            },
+            "given_item_modifier": [
+              {
+                "type": "minecraft:exploration_map",
+                "decoration": "minecraft:village_desert",
+                "destination": "#minecraft:on_desert_village_maps",
+                "search_radius": 100
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "predicates": {
+                    "minecraft:map_id": {}
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:desert_village_map"
+            },
+            "max_uses": 12,
+            "merchant_predicate": {
+              "type": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "minecraft:predicates": {
+                  "minecraft:villager/variant": [
+                    "minecraft:savanna",
+                    "minecraft:jungle"
+                  ]
+                }
+              }
+            },
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 8,
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        }
+      ],
+      "id": "cartographer/level_2",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:cartographer/3/compass_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:compass"
+            },
+            "xp": 20
+          }
+        },
+        {
+          "id": "minecraft:cartographer/3/emerald_and_compass_ocean_monument_map",
+          "definition": {
+            "additional_wants": {
+              "id": "minecraft:compass"
+            },
+            "given_item_modifier": [
+              {
+                "type": "minecraft:exploration_map",
+                "decoration": "minecraft:monument",
+                "destination": "#minecraft:on_ocean_monument_maps",
+                "search_radius": 100
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "predicates": {
+                    "minecraft:map_id": {}
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:ocean_monument_map"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 13,
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        }
+      ],
+      "id": "cartographer/level_3",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:cartographer/4/emerald_item_frame",
+          "definition": {
+            "gives": {
+              "id": "minecraft:item_frame"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 7,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:cartographer/4/emerald_white_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:white_banner"
+            },
+            "max_uses": 12,
+            "merchant_predicate": {
+              "type": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "minecraft:predicates": {
+                  "minecraft:villager/variant": [
+                    "minecraft:snow",
+                    "minecraft:plains"
+                  ]
+                }
+              }
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 2,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:cartographer/4/emerald_orange_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:orange_banner"
+            },
+            "max_uses": 12,
+            "merchant_predicate": {
+              "type": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "minecraft:predicates": {
+                  "minecraft:villager/variant": [
+                    "minecraft:savanna",
+                    "minecraft:desert"
+                  ]
+                }
+              }
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 2,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:cartographer/4/emerald_magenta_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:magenta_banner"
+            },
+            "max_uses": 12,
+            "merchant_predicate": {
+              "type": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "minecraft:predicates": {
+                  "minecraft:villager/variant": "minecraft:savanna"
+                }
+              }
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 2,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:cartographer/4/emerald_blue_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:blue_banner"
+            },
+            "max_uses": 12,
+            "merchant_predicate": {
+              "type": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "minecraft:predicates": {
+                  "minecraft:villager/variant": [
+                    "minecraft:snow",
+                    "minecraft:taiga"
+                  ]
+                }
+              }
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 2,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:cartographer/4/emerald_light_blue_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:light_blue_banner"
+            },
+            "max_uses": 12,
+            "merchant_predicate": {
+              "type": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "minecraft:predicates": {
+                  "minecraft:villager/variant": [
+                    "minecraft:snow",
+                    "minecraft:swamp"
+                  ]
+                }
+              }
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 2,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:cartographer/4/emerald_yellow_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:yellow_banner"
+            },
+            "max_uses": 12,
+            "merchant_predicate": {
+              "type": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "minecraft:predicates": {
+                  "minecraft:villager/variant": [
+                    "minecraft:plains",
+                    "minecraft:jungle"
+                  ]
+                }
+              }
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 2,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:cartographer/4/emerald_lime_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:lime_banner"
+            },
+            "max_uses": 12,
+            "merchant_predicate": {
+              "type": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "minecraft:predicates": {
+                  "minecraft:villager/variant": [
+                    "minecraft:desert",
+                    "minecraft:taiga"
+                  ]
+                }
+              }
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 2,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:cartographer/4/emerald_pink_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:pink_banner"
+            },
+            "max_uses": 12,
+            "merchant_predicate": {
+              "type": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "minecraft:predicates": {
+                  "minecraft:villager/variant": [
+                    "minecraft:taiga",
+                    "minecraft:plains"
+                  ]
+                }
+              }
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 2,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:cartographer/4/emerald_gray_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:gray_banner"
+            },
+            "max_uses": 12,
+            "merchant_predicate": {
+              "type": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "minecraft:predicates": {
+                  "minecraft:villager/variant": "minecraft:desert"
+                }
+              }
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 2,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:cartographer/4/emerald_cyan_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:cyan_banner"
+            },
+            "max_uses": 12,
+            "merchant_predicate": {
+              "type": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "minecraft:predicates": {
+                  "minecraft:villager/variant": [
+                    "minecraft:desert",
+                    "minecraft:snow"
+                  ]
+                }
+              }
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 2,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:cartographer/4/emerald_purple_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:purple_banner"
+            },
+            "max_uses": 12,
+            "merchant_predicate": {
+              "type": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "minecraft:predicates": {
+                  "minecraft:villager/variant": [
+                    "minecraft:taiga",
+                    "minecraft:swamp"
+                  ]
+                }
+              }
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 2,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:cartographer/4/emerald_brown_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:brown_banner"
+            },
+            "max_uses": 12,
+            "merchant_predicate": {
+              "type": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "minecraft:predicates": {
+                  "minecraft:villager/variant": [
+                    "minecraft:plains",
+                    "minecraft:jungle"
+                  ]
+                }
+              }
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 2,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:cartographer/4/emerald_green_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:green_banner"
+            },
+            "max_uses": 12,
+            "merchant_predicate": {
+              "type": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "minecraft:predicates": {
+                  "minecraft:villager/variant": [
+                    "minecraft:desert",
+                    "minecraft:savanna",
+                    "minecraft:jungle"
+                  ]
+                }
+              }
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 2,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:cartographer/4/emerald_red_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:red_banner"
+            },
+            "max_uses": 12,
+            "merchant_predicate": {
+              "type": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "minecraft:predicates": {
+                  "minecraft:villager/variant": [
+                    "minecraft:snow",
+                    "minecraft:savanna"
+                  ]
+                }
+              }
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 2,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:cartographer/4/emerald_black_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:black_banner"
+            },
+            "max_uses": 12,
+            "merchant_predicate": {
+              "type": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "minecraft:predicates": {
+                  "minecraft:villager/variant": "minecraft:swamp"
+                }
+              }
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 2,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        }
+      ],
+      "id": "cartographer/level_4",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:cartographer/5/emerald_globe_banner_pattern",
+          "definition": {
+            "gives": {
+              "id": "minecraft:globe_banner_pattern"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 8,
+              "id": "minecraft:emerald"
+            },
+            "xp": 30
+          }
+        },
+        {
+          "id": "minecraft:cartographer/5/emerald_and_compass_woodland_mansion_map",
+          "definition": {
+            "additional_wants": {
+              "id": "minecraft:compass"
+            },
+            "given_item_modifier": [
+              {
+                "type": "minecraft:exploration_map",
+                "destination": "#minecraft:on_woodland_mansion_maps",
+                "search_radius": 100
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "predicates": {
+                    "minecraft:map_id": {}
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:woodland_mansion_map"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 14,
+              "id": "minecraft:emerald"
+            },
+            "xp": 30
+          }
+        }
+      ],
+      "id": "cartographer/level_5",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:cleric/1/rotten_flesh_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 32,
+              "id": "minecraft:rotten_flesh"
+            },
+            "xp": 2
+          }
+        },
+        {
+          "id": "minecraft:cleric/1/emerald_redstone",
+          "definition": {
+            "gives": {
+              "count": 2,
+              "id": "minecraft:redstone"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        }
+      ],
+      "id": "cleric/level_1",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:cleric/2/gold_ingot_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:gold_ingot"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:cleric/2/emerald_lapis_lazuli",
+          "definition": {
+            "gives": {
+              "id": "minecraft:lapis_lazuli"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        }
+      ],
+      "id": "cleric/level_2",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:cleric/3/rabbit_foot_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 2,
+              "id": "minecraft:rabbit_foot"
+            },
+            "xp": 20
+          }
+        },
+        {
+          "id": "minecraft:cleric/3/emerald_glowstone",
+          "definition": {
+            "gives": {
+              "id": "minecraft:glowstone"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 4,
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        }
+      ],
+      "id": "cleric/level_3",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:cleric/4/turtle_scute_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 4,
+              "id": "minecraft:turtle_scute"
+            },
+            "xp": 30
+          }
+        },
+        {
+          "id": "minecraft:cleric/4/glass_bottle_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 9,
+              "id": "minecraft:glass_bottle"
+            },
+            "xp": 30
+          }
+        },
+        {
+          "id": "minecraft:cleric/4/emerald_ender_pearl",
+          "definition": {
+            "gives": {
+              "id": "minecraft:ender_pearl"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 5,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        }
+      ],
+      "id": "cleric/level_4",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:cleric/5/nether_wart_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 22,
+              "id": "minecraft:nether_wart"
+            },
+            "xp": 30
+          }
+        },
+        {
+          "id": "minecraft:cleric/5/emerald_experience_bottle",
+          "definition": {
+            "gives": {
+              "id": "minecraft:experience_bottle"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 30
+          }
+        }
+      ],
+      "id": "cleric/level_5",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:farmer/1/wheat_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 20,
+              "id": "minecraft:wheat"
+            },
+            "xp": 2
+          }
+        },
+        {
+          "id": "minecraft:farmer/1/potato_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 26,
+              "id": "minecraft:potato"
+            },
+            "xp": 2
+          }
+        },
+        {
+          "id": "minecraft:farmer/1/carrot_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 22,
+              "id": "minecraft:carrot"
+            },
+            "xp": 2
+          }
+        },
+        {
+          "id": "minecraft:farmer/1/beetroot_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 15,
+              "id": "minecraft:beetroot"
+            },
+            "xp": 2
+          }
+        },
+        {
+          "id": "minecraft:farmer/1/emerald_bread",
+          "definition": {
+            "gives": {
+              "count": 6,
+              "id": "minecraft:bread"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        }
+      ],
+      "id": "farmer/level_1",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:farmer/2/pumpkin_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 6,
+              "id": "minecraft:pumpkin"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:farmer/2/emerald_pumpkin_pie",
+          "definition": {
+            "gives": {
+              "count": 4,
+              "id": "minecraft:pumpkin_pie"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:farmer/2/emerald_apple",
+          "definition": {
+            "gives": {
+              "count": 4,
+              "id": "minecraft:apple"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        }
+      ],
+      "id": "farmer/level_2",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:farmer/3/emerald_cookie",
+          "definition": {
+            "gives": {
+              "count": 18,
+              "id": "minecraft:cookie"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:farmer/3/melon_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 4,
+              "id": "minecraft:melon"
+            },
+            "xp": 20
+          }
+        }
+      ],
+      "id": "farmer/level_3",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:farmer/4/emerald_cake",
+          "definition": {
+            "gives": {
+              "id": "minecraft:cake"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:farmer/4/emerald_suspicious_stew",
+          "definition": {
+            "given_item_modifier": {
+              "type": "minecraft:set_stew_effect",
+              "effects": [
+                {
+                  "type": "minecraft:night_vision",
+                  "duration": 5
+                },
+                {
+                  "type": "minecraft:jump_boost",
+                  "duration": 8
+                },
+                {
+                  "type": "minecraft:weakness",
+                  "duration": 7
+                },
+                {
+                  "type": "minecraft:blindness",
+                  "duration": 6
+                },
+                {
+                  "type": "minecraft:poison",
+                  "duration": 14
+                },
+                {
+                  "type": "minecraft:saturation",
+                  "duration": 7
+                }
+              ]
+            },
+            "gives": {
+              "id": "minecraft:suspicious_stew"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        }
+      ],
+      "id": "farmer/level_4",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:farmer/5/emerald_golden_carrot",
+          "definition": {
+            "gives": {
+              "count": 3,
+              "id": "minecraft:golden_carrot"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 30
+          }
+        },
+        {
+          "id": "minecraft:farmer/5/emerald_glistening_melon_slice",
+          "definition": {
+            "gives": {
+              "count": 3,
+              "id": "minecraft:glistering_melon_slice"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 4,
+              "id": "minecraft:emerald"
+            },
+            "xp": 30
+          }
+        }
+      ],
+      "id": "farmer/level_5",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:fisherman/1/string_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 20,
+              "id": "minecraft:string"
+            },
+            "xp": 2
+          }
+        },
+        {
+          "id": "minecraft:fisherman/1/coal_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 10,
+              "id": "minecraft:coal"
+            },
+            "xp": 2
+          }
+        },
+        {
+          "id": "minecraft:fisherman/1/raw_cod_and_emerald_cooked_cod",
+          "definition": {
+            "additional_wants": {
+              "id": "minecraft:emerald"
+            },
+            "gives": {
+              "count": 6,
+              "id": "minecraft:cooked_cod"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 6,
+              "id": "minecraft:cod"
+            }
+          }
+        },
+        {
+          "id": "minecraft:fisherman/1/emerald_cod_bucket",
+          "definition": {
+            "gives": {
+              "id": "minecraft:cod_bucket"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            }
+          }
+        }
+      ],
+      "id": "fisherman/level_1",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:fisherman/2/cod_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 15,
+              "id": "minecraft:cod"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:fisherman/2/salmon_and_emerald_cooked_salmon",
+          "definition": {
+            "additional_wants": {
+              "id": "minecraft:emerald"
+            },
+            "gives": {
+              "count": 6,
+              "id": "minecraft:cooked_salmon"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 6,
+              "id": "minecraft:salmon"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:fisherman/2/emerald_campfire",
+          "definition": {
+            "gives": {
+              "id": "minecraft:campfire"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 2,
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        }
+      ],
+      "id": "fisherman/level_2",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:fisherman/3/salmon_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 13,
+              "id": "minecraft:salmon"
+            },
+            "xp": 20
+          }
+        },
+        {
+          "id": "minecraft:fisherman/3/emerald_enchanted_fishing_rod",
+          "definition": {
+            "given_item_modifier": [
+              {
+                "type": "minecraft:enchant_with_levels",
+                "include_additional_cost_component": true,
+                "levels": {
+                  "type": "minecraft:uniform",
+                  "max": 19,
+                  "min": 5
+                },
+                "options": "#minecraft:on_traded_equipment"
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "items": "minecraft:fishing_rod",
+                  "predicates": {
+                    "minecraft:enchantments": [
+                      {}
+                    ]
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:fishing_rod"
+            },
+            "max_uses": 3,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        }
+      ],
+      "id": "fisherman/level_3",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:fisherman/4/tropical_fish_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 6,
+              "id": "minecraft:tropical_fish"
+            },
+            "xp": 30
+          }
+        }
+      ],
+      "id": "fisherman/level_4",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:fisherman/5/pufferfish_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 4,
+              "id": "minecraft:pufferfish"
+            },
+            "xp": 30
+          }
+        },
+        {
+          "id": "minecraft:fisherman/5/oak_boat_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "merchant_predicate": {
+              "type": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "minecraft:predicates": {
+                  "minecraft:villager/variant": "minecraft:plains"
+                }
+              }
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:oak_boat"
+            },
+            "xp": 30
+          }
+        },
+        {
+          "id": "minecraft:fisherman/5/spruce_boat_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "merchant_predicate": {
+              "type": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "minecraft:predicates": {
+                  "minecraft:villager/variant": [
+                    "minecraft:taiga",
+                    "minecraft:snow"
+                  ]
+                }
+              }
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:spruce_boat"
+            },
+            "xp": 30
+          }
+        },
+        {
+          "id": "minecraft:fisherman/5/jungle_boat_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "merchant_predicate": {
+              "type": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "minecraft:predicates": {
+                  "minecraft:villager/variant": [
+                    "minecraft:desert",
+                    "minecraft:jungle"
+                  ]
+                }
+              }
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:jungle_boat"
+            },
+            "xp": 30
+          }
+        },
+        {
+          "id": "minecraft:fisherman/5/acacia_boat_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "merchant_predicate": {
+              "type": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "minecraft:predicates": {
+                  "minecraft:villager/variant": "minecraft:savanna"
+                }
+              }
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:acacia_boat"
+            },
+            "xp": 30
+          }
+        },
+        {
+          "id": "minecraft:fisherman/5/dark_oak_boat_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "merchant_predicate": {
+              "type": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "minecraft:predicates": {
+                  "minecraft:villager/variant": "minecraft:swamp"
+                }
+              }
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:dark_oak_boat"
+            },
+            "xp": 30
+          }
+        }
+      ],
+      "id": "fisherman/level_5",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:fletcher/1/stick_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 32,
+              "id": "minecraft:stick"
+            },
+            "xp": 2
+          }
+        },
+        {
+          "id": "minecraft:fletcher/1/emerald_arrow",
+          "definition": {
+            "gives": {
+              "count": 16,
+              "id": "minecraft:arrow"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:fletcher/1/gravel_and_emerald_flint",
+          "definition": {
+            "additional_wants": {
+              "id": "minecraft:emerald"
+            },
+            "gives": {
+              "count": 10,
+              "id": "minecraft:flint"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 10,
+              "id": "minecraft:gravel"
+            }
+          }
+        }
+      ],
+      "id": "fletcher/level_1",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:fletcher/2/flint_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 26,
+              "id": "minecraft:flint"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:fletcher/2/emerald_bow",
+          "definition": {
+            "gives": {
+              "id": "minecraft:bow"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 2,
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        }
+      ],
+      "id": "fletcher/level_2",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:fletcher/3/string_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 14,
+              "id": "minecraft:string"
+            },
+            "xp": 20
+          }
+        },
+        {
+          "id": "minecraft:fletcher/3/emerald_crossbow",
+          "definition": {
+            "gives": {
+              "id": "minecraft:crossbow"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        }
+      ],
+      "id": "fletcher/level_3",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:fletcher/4/feather_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 24,
+              "id": "minecraft:feather"
+            },
+            "xp": 30
+          }
+        },
+        {
+          "id": "minecraft:fletcher/4/emerald_enchanted_bow",
+          "definition": {
+            "given_item_modifier": [
+              {
+                "type": "minecraft:enchant_with_levels",
+                "include_additional_cost_component": true,
+                "levels": {
+                  "type": "minecraft:uniform",
+                  "max": 19,
+                  "min": 5
+                },
+                "options": "#minecraft:on_traded_equipment"
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "items": "minecraft:bow",
+                  "predicates": {
+                    "minecraft:enchantments": [
+                      {}
+                    ]
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:bow"
+            },
+            "max_uses": 3,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 2,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        }
+      ],
+      "id": "fletcher/level_4",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:fletcher/5/tripwire_hook_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 8,
+              "id": "minecraft:tripwire_hook"
+            },
+            "xp": 30
+          }
+        },
+        {
+          "id": "minecraft:fletcher/5/emerald_enchanted_crossbow",
+          "definition": {
+            "given_item_modifier": [
+              {
+                "type": "minecraft:enchant_with_levels",
+                "include_additional_cost_component": true,
+                "levels": {
+                  "type": "minecraft:uniform",
+                  "max": 19,
+                  "min": 5
+                },
+                "options": "#minecraft:on_traded_equipment"
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "items": "minecraft:crossbow",
+                  "predicates": {
+                    "minecraft:enchantments": [
+                      {}
+                    ]
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:crossbow"
+            },
+            "max_uses": 3,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:fletcher/5/arrow_and_emerald_tipped_arrow",
+          "definition": {
+            "additional_wants": {
+              "count": 5,
+              "id": "minecraft:arrow"
+            },
+            "given_item_modifier": {
+              "type": "minecraft:set_random_potion",
+              "options": "#minecraft:tradeable"
+            },
+            "gives": {
+              "count": 5,
+              "id": "minecraft:tipped_arrow"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 2,
+              "id": "minecraft:emerald"
+            },
+            "xp": 30
+          }
+        }
+      ],
+      "id": "fletcher/level_5",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:leatherworker/1/leather_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 6,
+              "id": "minecraft:leather"
+            },
+            "xp": 2
+          }
+        },
+        {
+          "id": "minecraft:leatherworker/1/emerald_dyed_leather_leggings",
+          "definition": {
+            "given_item_modifier": [
+              {
+                "type": "minecraft:set_random_dyes",
+                "number_of_dyes": {
+                  "type": "minecraft:add",
+                  "inputs": [
+                    1,
+                    {
+                      "type": "minecraft:binomial",
+                      "n": 2,
+                      "p": 0.75
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "items": "minecraft:leather_leggings",
+                  "predicates": {
+                    "minecraft:dyed_color": {}
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:leather_leggings"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:leatherworker/1/emerald_dyed_leather_chestplate",
+          "definition": {
+            "given_item_modifier": [
+              {
+                "type": "minecraft:set_random_dyes",
+                "number_of_dyes": {
+                  "type": "minecraft:add",
+                  "inputs": [
+                    1,
+                    {
+                      "type": "minecraft:binomial",
+                      "n": 2,
+                      "p": 0.75
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "items": "minecraft:leather_chestplate",
+                  "predicates": {
+                    "minecraft:dyed_color": {}
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:leather_chestplate"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 7,
+              "id": "minecraft:emerald"
+            }
+          }
+        }
+      ],
+      "id": "leatherworker/level_1",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:leatherworker/2/flint_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 26,
+              "id": "minecraft:flint"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:leatherworker/2/emerald_dyed_leather_helmet",
+          "definition": {
+            "given_item_modifier": [
+              {
+                "type": "minecraft:set_random_dyes",
+                "number_of_dyes": {
+                  "type": "minecraft:add",
+                  "inputs": [
+                    1,
+                    {
+                      "type": "minecraft:binomial",
+                      "n": 2,
+                      "p": 0.75
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "items": "minecraft:leather_helmet",
+                  "predicates": {
+                    "minecraft:dyed_color": {}
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:leather_helmet"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 5,
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:leatherworker/2/emerald_dyed_leather_boots",
+          "definition": {
+            "given_item_modifier": [
+              {
+                "type": "minecraft:set_random_dyes",
+                "number_of_dyes": {
+                  "type": "minecraft:add",
+                  "inputs": [
+                    1,
+                    {
+                      "type": "minecraft:binomial",
+                      "n": 2,
+                      "p": 0.75
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "items": "minecraft:leather_boots",
+                  "predicates": {
+                    "minecraft:dyed_color": {}
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:leather_boots"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 4,
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        }
+      ],
+      "id": "leatherworker/level_2",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:leatherworker/3/rabbit_hide_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 9,
+              "id": "minecraft:rabbit_hide"
+            },
+            "xp": 20
+          }
+        },
+        {
+          "id": "minecraft:leatherworker/3/emerald_dyed_leather_chestplate",
+          "definition": {
+            "given_item_modifier": [
+              {
+                "type": "minecraft:set_random_dyes",
+                "number_of_dyes": {
+                  "type": "minecraft:add",
+                  "inputs": [
+                    1,
+                    {
+                      "type": "minecraft:binomial",
+                      "n": 2,
+                      "p": 0.75
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "items": "minecraft:leather_chestplate",
+                  "predicates": {
+                    "minecraft:dyed_color": {}
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:leather_chestplate"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 7,
+              "id": "minecraft:emerald"
+            }
+          }
+        }
+      ],
+      "id": "leatherworker/level_3",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:leatherworker/4/turtle_scute_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 4,
+              "id": "minecraft:turtle_scute"
+            },
+            "xp": 30
+          }
+        },
+        {
+          "id": "minecraft:leatherworker/4/emerald_dyed_leather_horse_armor",
+          "definition": {
+            "given_item_modifier": [
+              {
+                "type": "minecraft:set_random_dyes",
+                "number_of_dyes": {
+                  "type": "minecraft:add",
+                  "inputs": [
+                    1,
+                    {
+                      "type": "minecraft:binomial",
+                      "n": 2,
+                      "p": 0.75
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "items": "minecraft:leather_horse_armor",
+                  "predicates": {
+                    "minecraft:dyed_color": {}
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:leather_horse_armor"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 6,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        }
+      ],
+      "id": "leatherworker/level_4",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:leatherworker/5/emerald_saddle",
+          "definition": {
+            "gives": {
+              "id": "minecraft:saddle"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 6,
+              "id": "minecraft:emerald"
+            },
+            "xp": 30
+          }
+        },
+        {
+          "id": "minecraft:leatherworker/5/emerald_dyed_leather_helmet",
+          "definition": {
+            "given_item_modifier": [
+              {
+                "type": "minecraft:set_random_dyes",
+                "number_of_dyes": {
+                  "type": "minecraft:add",
+                  "inputs": [
+                    1,
+                    {
+                      "type": "minecraft:binomial",
+                      "n": 2,
+                      "p": 0.75
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "items": "minecraft:leather_helmet",
+                  "predicates": {
+                    "minecraft:dyed_color": {}
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:leather_helmet"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 5,
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        }
+      ],
+      "id": "leatherworker/level_5",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:librarian/1/paper_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 24,
+              "id": "minecraft:paper"
+            },
+            "xp": 2
+          }
+        },
+        {
+          "id": "minecraft:librarian/1/emerald_and_book_enchanted_book",
+          "definition": {
+            "additional_wants": {
+              "id": "minecraft:book"
+            },
+            "double_trade_price_enchantments": "#minecraft:double_trade_price",
+            "given_item_modifier": [
+              {
+                "type": "minecraft:enchant_randomly",
+                "include_additional_cost_component": true,
+                "only_compatible": false,
+                "options": "#minecraft:tradeable"
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "items": "minecraft:enchanted_book",
+                  "predicates": {
+                    "minecraft:stored_enchantments": [
+                      {}
+                    ]
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:enchanted_book"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 0,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:librarian/1/emerald_bookshelf",
+          "definition": {
+            "gives": {
+              "id": "minecraft:bookshelf"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 9,
+              "id": "minecraft:emerald"
+            }
+          }
+        }
+      ],
+      "id": "librarian/level_1",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:librarian/2/book_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 4,
+              "id": "minecraft:book"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:librarian/2/emerald_and_book_enchanted_book",
+          "definition": {
+            "additional_wants": {
+              "id": "minecraft:book"
+            },
+            "double_trade_price_enchantments": "#minecraft:double_trade_price",
+            "given_item_modifier": [
+              {
+                "type": "minecraft:enchant_randomly",
+                "include_additional_cost_component": true,
+                "only_compatible": false,
+                "options": "#minecraft:tradeable"
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "items": "minecraft:enchanted_book",
+                  "predicates": {
+                    "minecraft:stored_enchantments": [
+                      {}
+                    ]
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:enchanted_book"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 0,
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:librarian/2/emerald_lantern",
+          "definition": {
+            "gives": {
+              "id": "minecraft:lantern"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        }
+      ],
+      "id": "librarian/level_2",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:librarian/3/ink_sac_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 5,
+              "id": "minecraft:ink_sac"
+            },
+            "xp": 20
+          }
+        },
+        {
+          "id": "minecraft:librarian/3/emerald_and_book_enchanted_book",
+          "definition": {
+            "additional_wants": {
+              "id": "minecraft:book"
+            },
+            "double_trade_price_enchantments": "#minecraft:double_trade_price",
+            "given_item_modifier": [
+              {
+                "type": "minecraft:enchant_randomly",
+                "include_additional_cost_component": true,
+                "only_compatible": false,
+                "options": "#minecraft:tradeable"
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "items": "minecraft:enchanted_book",
+                  "predicates": {
+                    "minecraft:stored_enchantments": [
+                      {}
+                    ]
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:enchanted_book"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 0,
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:librarian/3/emerald_glass",
+          "definition": {
+            "gives": {
+              "count": 4,
+              "id": "minecraft:glass"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        }
+      ],
+      "id": "librarian/level_3",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:librarian/4/writable_book_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 2,
+              "id": "minecraft:writable_book"
+            },
+            "xp": 30
+          }
+        },
+        {
+          "id": "minecraft:librarian/4/emerald_book_and_enchanted_book",
+          "definition": {
+            "additional_wants": {
+              "id": "minecraft:book"
+            },
+            "double_trade_price_enchantments": "#minecraft:double_trade_price",
+            "given_item_modifier": [
+              {
+                "type": "minecraft:enchant_randomly",
+                "include_additional_cost_component": true,
+                "only_compatible": false,
+                "options": "#minecraft:tradeable"
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "items": "minecraft:enchanted_book",
+                  "predicates": {
+                    "minecraft:stored_enchantments": [
+                      {}
+                    ]
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:enchanted_book"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 0,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:librarian/4/emerald_clock",
+          "definition": {
+            "gives": {
+              "id": "minecraft:clock"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 5,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:librarian/4/emerald_compass",
+          "definition": {
+            "gives": {
+              "id": "minecraft:compass"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 4,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        }
+      ],
+      "id": "librarian/level_4",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:librarian/5/emerald_yellow_candle",
+          "definition": {
+            "gives": {
+              "id": "minecraft:yellow_candle"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 30
+          }
+        },
+        {
+          "id": "minecraft:librarian/5/emerald_red_candle",
+          "definition": {
+            "gives": {
+              "id": "minecraft:red_candle"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 30
+          }
+        }
+      ],
+      "id": "librarian/level_5",
+      "amount": 3
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:mason/1/clay_ball_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 10,
+              "id": "minecraft:clay_ball"
+            },
+            "xp": 2
+          }
+        },
+        {
+          "id": "minecraft:mason/1/emerald_brick",
+          "definition": {
+            "gives": {
+              "count": 10,
+              "id": "minecraft:brick"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        }
+      ],
+      "id": "mason/level_1",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:mason/2/stone_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 20,
+              "id": "minecraft:stone"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:mason/2/emerald_chiseled_stone_bricks",
+          "definition": {
+            "gives": {
+              "count": 4,
+              "id": "minecraft:chiseled_stone_bricks"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        }
+      ],
+      "id": "mason/level_2",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:mason/3/granite_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 16,
+              "id": "minecraft:granite"
+            },
+            "xp": 20
+          }
+        },
+        {
+          "id": "minecraft:mason/3/andesite_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 16,
+              "id": "minecraft:andesite"
+            },
+            "xp": 20
+          }
+        },
+        {
+          "id": "minecraft:mason/3/diorite_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 16,
+              "id": "minecraft:diorite"
+            },
+            "xp": 20
+          }
+        },
+        {
+          "id": "minecraft:mason/3/emerald_dripstone_block",
+          "definition": {
+            "gives": {
+              "count": 4,
+              "id": "minecraft:dripstone_block"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:mason/3/emerald_polished_andesite",
+          "definition": {
+            "gives": {
+              "count": 4,
+              "id": "minecraft:polished_andesite"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:mason/3/emerald_polished_diorite",
+          "definition": {
+            "gives": {
+              "count": 4,
+              "id": "minecraft:polished_diorite"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:mason/3/emerald_polished_granite",
+          "definition": {
+            "gives": {
+              "count": 4,
+              "id": "minecraft:polished_granite"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        }
+      ],
+      "id": "mason/level_3",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:mason/4/quartz_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 12,
+              "id": "minecraft:quartz"
+            },
+            "xp": 30
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_white_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:white_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_orange_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:orange_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_magenta_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:magenta_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_light_blue_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:light_blue_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_yellow_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:yellow_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_lime_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:lime_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_pink_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:pink_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_gray_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:gray_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_light_gray_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:light_gray_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_cyan_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:cyan_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_purple_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:purple_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_blue_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:blue_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_brown_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:brown_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_green_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:green_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_red_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:red_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_black_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:black_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_white_glazed_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:white_glazed_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_orange_glazed_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:orange_glazed_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_magenta_glazed_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:magenta_glazed_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_light_blue_glazed_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:light_blue_glazed_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_yellow_glazed_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:yellow_glazed_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_lime_glazed_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:lime_glazed_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_pink_glazed_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:pink_glazed_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_gray_glazed_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:gray_glazed_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_light_gray_glazed_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:light_gray_glazed_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_cyan_glazed_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:cyan_glazed_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_purple_glazed_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:purple_glazed_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_blue_glazed_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:blue_glazed_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_brown_glazed_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:brown_glazed_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_green_glazed_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:green_glazed_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_red_glazed_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:red_glazed_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:mason/4/emerald_black_glazed_terracotta",
+          "definition": {
+            "gives": {
+              "id": "minecraft:black_glazed_terracotta"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        }
+      ],
+      "id": "mason/level_4",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:mason/5/emerald_quartz_pillar",
+          "definition": {
+            "gives": {
+              "id": "minecraft:quartz_pillar"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 30
+          }
+        },
+        {
+          "id": "minecraft:mason/5/emerald_quartz_block",
+          "definition": {
+            "gives": {
+              "id": "minecraft:quartz_block"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 30
+          }
+        }
+      ],
+      "id": "mason/level_5",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:shepherd/1/white_wool_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 18,
+              "id": "minecraft:white_wool"
+            },
+            "xp": 2
+          }
+        },
+        {
+          "id": "minecraft:shepherd/1/brown_wool_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 18,
+              "id": "minecraft:brown_wool"
+            },
+            "xp": 2
+          }
+        },
+        {
+          "id": "minecraft:shepherd/1/gray_wool_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 18,
+              "id": "minecraft:gray_wool"
+            },
+            "xp": 2
+          }
+        },
+        {
+          "id": "minecraft:shepherd/1/black_wool_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 18,
+              "id": "minecraft:black_wool"
+            },
+            "xp": 2
+          }
+        },
+        {
+          "id": "minecraft:shepherd/1/emerald_shears",
+          "definition": {
+            "gives": {
+              "id": "minecraft:shears"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 2,
+              "id": "minecraft:emerald"
+            }
+          }
+        }
+      ],
+      "id": "shepherd/level_1",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:shepherd/2/white_dye_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 12,
+              "id": "minecraft:white_dye"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/gray_dye_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 12,
+              "id": "minecraft:gray_dye"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/black_dye_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 12,
+              "id": "minecraft:black_dye"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/light_blue_dye_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 12,
+              "id": "minecraft:light_blue_dye"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/lime_dye_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 12,
+              "id": "minecraft:lime_dye"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_white_wool",
+          "definition": {
+            "gives": {
+              "id": "minecraft:white_wool"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_orange_wool",
+          "definition": {
+            "gives": {
+              "id": "minecraft:orange_wool"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_magenta_wool",
+          "definition": {
+            "gives": {
+              "id": "minecraft:magenta_wool"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_light_blue_wool",
+          "definition": {
+            "gives": {
+              "id": "minecraft:light_blue_wool"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_yellow_wool",
+          "definition": {
+            "gives": {
+              "id": "minecraft:yellow_wool"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_lime_wool",
+          "definition": {
+            "gives": {
+              "id": "minecraft:lime_wool"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_pink_wool",
+          "definition": {
+            "gives": {
+              "id": "minecraft:pink_wool"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_gray_wool",
+          "definition": {
+            "gives": {
+              "id": "minecraft:gray_wool"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_light_gray_wool",
+          "definition": {
+            "gives": {
+              "id": "minecraft:light_gray_wool"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_cyan_wool",
+          "definition": {
+            "gives": {
+              "id": "minecraft:cyan_wool"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_purple_wool",
+          "definition": {
+            "gives": {
+              "id": "minecraft:purple_wool"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_blue_wool",
+          "definition": {
+            "gives": {
+              "id": "minecraft:blue_wool"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_brown_wool",
+          "definition": {
+            "gives": {
+              "id": "minecraft:brown_wool"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_green_wool",
+          "definition": {
+            "gives": {
+              "id": "minecraft:green_wool"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_red_wool",
+          "definition": {
+            "gives": {
+              "id": "minecraft:red_wool"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_black_wool",
+          "definition": {
+            "gives": {
+              "id": "minecraft:black_wool"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_white_carpet",
+          "definition": {
+            "gives": {
+              "count": 4,
+              "id": "minecraft:white_carpet"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_orange_carpet",
+          "definition": {
+            "gives": {
+              "count": 4,
+              "id": "minecraft:orange_carpet"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_magenta_carpet",
+          "definition": {
+            "gives": {
+              "count": 4,
+              "id": "minecraft:magenta_carpet"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_light_blue_carpet",
+          "definition": {
+            "gives": {
+              "count": 4,
+              "id": "minecraft:light_blue_carpet"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_yellow_carpet",
+          "definition": {
+            "gives": {
+              "count": 4,
+              "id": "minecraft:yellow_carpet"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_lime_carpet",
+          "definition": {
+            "gives": {
+              "count": 4,
+              "id": "minecraft:lime_carpet"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_pink_carpet",
+          "definition": {
+            "gives": {
+              "count": 4,
+              "id": "minecraft:pink_carpet"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_gray_carpet",
+          "definition": {
+            "gives": {
+              "count": 4,
+              "id": "minecraft:gray_carpet"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_light_gray_carpet",
+          "definition": {
+            "gives": {
+              "count": 4,
+              "id": "minecraft:light_gray_carpet"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_cyan_carpet",
+          "definition": {
+            "gives": {
+              "count": 4,
+              "id": "minecraft:cyan_carpet"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_purple_carpet",
+          "definition": {
+            "gives": {
+              "count": 4,
+              "id": "minecraft:purple_carpet"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_blue_carpet",
+          "definition": {
+            "gives": {
+              "count": 4,
+              "id": "minecraft:blue_carpet"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_brown_carpet",
+          "definition": {
+            "gives": {
+              "count": 4,
+              "id": "minecraft:brown_carpet"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_green_carpet",
+          "definition": {
+            "gives": {
+              "count": 4,
+              "id": "minecraft:green_carpet"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_red_carpet",
+          "definition": {
+            "gives": {
+              "count": 4,
+              "id": "minecraft:red_carpet"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        },
+        {
+          "id": "minecraft:shepherd/2/emerald_black_carpet",
+          "definition": {
+            "gives": {
+              "count": 4,
+              "id": "minecraft:black_carpet"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        }
+      ],
+      "id": "shepherd/level_2",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:shepherd/3/yellow_dye_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 12,
+              "id": "minecraft:yellow_dye"
+            },
+            "xp": 20
+          }
+        },
+        {
+          "id": "minecraft:shepherd/3/light_gray_dye_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 12,
+              "id": "minecraft:light_gray_dye"
+            },
+            "xp": 20
+          }
+        },
+        {
+          "id": "minecraft:shepherd/3/orange_dye_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 12,
+              "id": "minecraft:orange_dye"
+            },
+            "xp": 20
+          }
+        },
+        {
+          "id": "minecraft:shepherd/3/red_dye_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 12,
+              "id": "minecraft:red_dye"
+            },
+            "xp": 20
+          }
+        },
+        {
+          "id": "minecraft:shepherd/3/pink_dye_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 12,
+              "id": "minecraft:pink_dye"
+            },
+            "xp": 20
+          }
+        },
+        {
+          "id": "minecraft:shepherd/3/emerald_white_bed",
+          "definition": {
+            "gives": {
+              "id": "minecraft:white_bed"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:shepherd/3/emerald_orange_bed",
+          "definition": {
+            "gives": {
+              "id": "minecraft:orange_bed"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:shepherd/3/emerald_magenta_bed",
+          "definition": {
+            "gives": {
+              "id": "minecraft:magenta_bed"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:shepherd/3/emerald_light_blue_bed",
+          "definition": {
+            "gives": {
+              "id": "minecraft:light_blue_bed"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:shepherd/3/emerald_yellow_bed",
+          "definition": {
+            "gives": {
+              "id": "minecraft:yellow_bed"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:shepherd/3/emerald_lime_bed",
+          "definition": {
+            "gives": {
+              "id": "minecraft:lime_bed"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:shepherd/3/emerald_pink_bed",
+          "definition": {
+            "gives": {
+              "id": "minecraft:pink_bed"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:shepherd/3/emerald_gray_bed",
+          "definition": {
+            "gives": {
+              "id": "minecraft:gray_bed"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:shepherd/3/emerald_light_gray_bed",
+          "definition": {
+            "gives": {
+              "id": "minecraft:light_gray_bed"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:shepherd/3/emerald_cyan_bed",
+          "definition": {
+            "gives": {
+              "id": "minecraft:cyan_bed"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:shepherd/3/emerald_purple_bed",
+          "definition": {
+            "gives": {
+              "id": "minecraft:purple_bed"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:shepherd/3/emerald_blue_bed",
+          "definition": {
+            "gives": {
+              "id": "minecraft:blue_bed"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:shepherd/3/emerald_brown_bed",
+          "definition": {
+            "gives": {
+              "id": "minecraft:brown_bed"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:shepherd/3/emerald_green_bed",
+          "definition": {
+            "gives": {
+              "id": "minecraft:green_bed"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:shepherd/3/emerald_red_bed",
+          "definition": {
+            "gives": {
+              "id": "minecraft:red_bed"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:shepherd/3/emerald_black_bed",
+          "definition": {
+            "gives": {
+              "id": "minecraft:black_bed"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        }
+      ],
+      "id": "shepherd/level_3",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:shepherd/4/brown_dye_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 12,
+              "id": "minecraft:brown_dye"
+            },
+            "xp": 30
+          }
+        },
+        {
+          "id": "minecraft:shepherd/4/purple_dye_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 12,
+              "id": "minecraft:purple_dye"
+            },
+            "xp": 30
+          }
+        },
+        {
+          "id": "minecraft:shepherd/4/blue_dye_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 12,
+              "id": "minecraft:blue_dye"
+            },
+            "xp": 30
+          }
+        },
+        {
+          "id": "minecraft:shepherd/4/green_dye_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 12,
+              "id": "minecraft:green_dye"
+            },
+            "xp": 30
+          }
+        },
+        {
+          "id": "minecraft:shepherd/4/magenta_dye_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 12,
+              "id": "minecraft:magenta_dye"
+            },
+            "xp": 30
+          }
+        },
+        {
+          "id": "minecraft:shepherd/4/cyan_dye_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 12,
+              "id": "minecraft:cyan_dye"
+            },
+            "xp": 30
+          }
+        },
+        {
+          "id": "minecraft:shepherd/4/emerald_white_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:white_banner"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:shepherd/4/emerald_orange_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:orange_banner"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:shepherd/4/emerald_magenta_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:magenta_banner"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:shepherd/4/emerald_light_blue_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:light_blue_banner"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:shepherd/4/emerald_yellow_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:yellow_banner"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:shepherd/4/emerald_lime_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:lime_banner"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:shepherd/4/emerald_pink_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:pink_banner"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:shepherd/4/emerald_gray_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:gray_banner"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:shepherd/4/emerald_light_gray_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:light_gray_banner"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:shepherd/4/emerald_cyan_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:cyan_banner"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:shepherd/4/emerald_purple_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:purple_banner"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:shepherd/4/emerald_blue_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:blue_banner"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:shepherd/4/emerald_brown_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:brown_banner"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:shepherd/4/emerald_green_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:green_banner"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:shepherd/4/emerald_red_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:red_banner"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:shepherd/4/emerald_black_banner",
+          "definition": {
+            "gives": {
+              "id": "minecraft:black_banner"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        }
+      ],
+      "id": "shepherd/level_4",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:shepherd/5/emerald_painting",
+          "definition": {
+            "gives": {
+              "count": 3,
+              "id": "minecraft:painting"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 2,
+              "id": "minecraft:emerald"
+            },
+            "xp": 30
+          }
+        }
+      ],
+      "id": "shepherd/level_5",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:smith/1/coal_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 15,
+              "id": "minecraft:coal"
+            },
+            "xp": 2
+          }
+        },
+        {
+          "id": "minecraft:toolsmith/1/emerald_stone_axe",
+          "definition": {
+            "gives": {
+              "id": "minecraft:stone_axe"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:toolsmith/1/emerald_stone_shovel",
+          "definition": {
+            "gives": {
+              "id": "minecraft:stone_shovel"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:toolsmith/1/emerald_stone_pickaxe",
+          "definition": {
+            "gives": {
+              "id": "minecraft:stone_pickaxe"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:toolsmith/1/emerald_stone_hoe",
+          "definition": {
+            "gives": {
+              "id": "minecraft:stone_hoe"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        }
+      ],
+      "id": "toolsmith/level_1",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:smith/2/iron_ingot_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 4,
+              "id": "minecraft:iron_ingot"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:smith/2/emerald_bell",
+          "definition": {
+            "gives": {
+              "id": "minecraft:bell"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 36,
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        }
+      ],
+      "id": "toolsmith/level_2",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:toolsmith/3/flint_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 30,
+              "id": "minecraft:flint"
+            },
+            "xp": 20
+          }
+        },
+        {
+          "id": "minecraft:toolsmith/3/emerald_enchanted_iron_axe",
+          "definition": {
+            "given_item_modifier": [
+              {
+                "type": "minecraft:enchant_with_levels",
+                "include_additional_cost_component": true,
+                "levels": {
+                  "type": "minecraft:uniform",
+                  "max": 19,
+                  "min": 5
+                },
+                "options": "#minecraft:on_traded_equipment"
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "items": "minecraft:iron_axe",
+                  "predicates": {
+                    "minecraft:enchantments": [
+                      {}
+                    ]
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:iron_axe"
+            },
+            "max_uses": 3,
+            "reputation_discount": 0.2,
+            "wants": {
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:toolsmith/3/emerald_enchanted_iron_shovel",
+          "definition": {
+            "given_item_modifier": [
+              {
+                "type": "minecraft:enchant_with_levels",
+                "include_additional_cost_component": true,
+                "levels": {
+                  "type": "minecraft:uniform",
+                  "max": 19,
+                  "min": 5
+                },
+                "options": "#minecraft:on_traded_equipment"
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "items": "minecraft:iron_shovel",
+                  "predicates": {
+                    "minecraft:enchantments": [
+                      {}
+                    ]
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:iron_shovel"
+            },
+            "max_uses": 3,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 2,
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:toolsmith/3/emerald_enchanted_iron_pickaxe",
+          "definition": {
+            "given_item_modifier": [
+              {
+                "type": "minecraft:enchant_with_levels",
+                "include_additional_cost_component": true,
+                "levels": {
+                  "type": "minecraft:uniform",
+                  "max": 19,
+                  "min": 5
+                },
+                "options": "#minecraft:on_traded_equipment"
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "items": "minecraft:iron_pickaxe",
+                  "predicates": {
+                    "minecraft:enchantments": [
+                      {}
+                    ]
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:iron_pickaxe"
+            },
+            "max_uses": 3,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:toolsmith/3/emerald_diamond_hoe",
+          "definition": {
+            "gives": {
+              "id": "minecraft:diamond_hoe"
+            },
+            "max_uses": 3,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 4,
+              "id": "minecraft:emerald"
+            },
+            "xp": 10
+          }
+        }
+      ],
+      "id": "toolsmith/level_3",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:toolsmith/4/emerald_enchanted_diamond_axe",
+          "definition": {
+            "given_item_modifier": [
+              {
+                "type": "minecraft:enchant_with_levels",
+                "include_additional_cost_component": true,
+                "levels": {
+                  "type": "minecraft:uniform",
+                  "max": 19,
+                  "min": 5
+                },
+                "options": "#minecraft:on_traded_equipment"
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "items": "minecraft:diamond_axe",
+                  "predicates": {
+                    "minecraft:enchantments": [
+                      {}
+                    ]
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:diamond_axe"
+            },
+            "max_uses": 3,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 12,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:toolsmith/4/emerald_enchanted_diamond_shovel",
+          "definition": {
+            "given_item_modifier": [
+              {
+                "type": "minecraft:enchant_with_levels",
+                "include_additional_cost_component": true,
+                "levels": {
+                  "type": "minecraft:uniform",
+                  "max": 19,
+                  "min": 5
+                },
+                "options": "#minecraft:on_traded_equipment"
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "items": "minecraft:diamond_shovel",
+                  "predicates": {
+                    "minecraft:enchantments": [
+                      {}
+                    ]
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:diamond_shovel"
+            },
+            "max_uses": 3,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 5,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:toolsmith/4/diamond_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:diamond"
+            },
+            "xp": 30
+          }
+        }
+      ],
+      "id": "toolsmith/level_4",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:toolsmith/5/emerald_enchanted_diamond_pickaxe",
+          "definition": {
+            "given_item_modifier": [
+              {
+                "type": "minecraft:enchant_with_levels",
+                "include_additional_cost_component": true,
+                "levels": {
+                  "type": "minecraft:uniform",
+                  "max": 19,
+                  "min": 5
+                },
+                "options": "#minecraft:on_traded_equipment"
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "items": "minecraft:diamond_pickaxe",
+                  "predicates": {
+                    "minecraft:enchantments": [
+                      {}
+                    ]
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:diamond_pickaxe"
+            },
+            "max_uses": 3,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 13,
+              "id": "minecraft:emerald"
+            },
+            "xp": 30
+          }
+        }
+      ],
+      "id": "toolsmith/level_5",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:smith/1/coal_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 16,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 15,
+              "id": "minecraft:coal"
+            },
+            "xp": 2
+          }
+        },
+        {
+          "id": "minecraft:weaponsmith/1/emerald_iron_axe",
+          "definition": {
+            "gives": {
+              "id": "minecraft:iron_axe"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:weaponsmith/1/emerald_enchanted_iron_sword",
+          "definition": {
+            "given_item_modifier": [
+              {
+                "type": "minecraft:enchant_with_levels",
+                "include_additional_cost_component": true,
+                "levels": {
+                  "type": "minecraft:uniform",
+                  "max": 19,
+                  "min": 5
+                },
+                "options": "#minecraft:on_traded_equipment"
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "items": "minecraft:iron_sword",
+                  "predicates": {
+                    "minecraft:enchantments": [
+                      {}
+                    ]
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:iron_sword"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 2,
+              "id": "minecraft:emerald"
+            }
+          }
+        }
+      ],
+      "id": "weaponsmith/level_1",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:smith/2/iron_ingot_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 4,
+              "id": "minecraft:iron_ingot"
+            },
+            "xp": 10
+          }
+        },
+        {
+          "id": "minecraft:smith/2/emerald_bell",
+          "definition": {
+            "gives": {
+              "id": "minecraft:bell"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 36,
+              "id": "minecraft:emerald"
+            },
+            "xp": 5
+          }
+        }
+      ],
+      "id": "weaponsmith/level_2",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:weaponsmith/3/flint_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 24,
+              "id": "minecraft:flint"
+            },
+            "xp": 20
+          }
+        }
+      ],
+      "id": "weaponsmith/level_3",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:weaponsmith/4/emerald_enchanted_diamond_axe",
+          "definition": {
+            "given_item_modifier": [
+              {
+                "type": "minecraft:enchant_with_levels",
+                "include_additional_cost_component": true,
+                "levels": {
+                  "type": "minecraft:uniform",
+                  "max": 19,
+                  "min": 5
+                },
+                "options": "#minecraft:on_traded_equipment"
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "items": "minecraft:diamond_axe",
+                  "predicates": {
+                    "minecraft:enchantments": [
+                      {}
+                    ]
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:diamond_axe"
+            },
+            "max_uses": 3,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 12,
+              "id": "minecraft:emerald"
+            },
+            "xp": 15
+          }
+        },
+        {
+          "id": "minecraft:weaponsmith/4/diamond_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:diamond"
+            },
+            "xp": 30
+          }
+        }
+      ],
+      "id": "weaponsmith/level_4",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:weaponsmith/5/emerald_enchanted_diamond_sword",
+          "definition": {
+            "given_item_modifier": [
+              {
+                "type": "minecraft:enchant_with_levels",
+                "include_additional_cost_component": true,
+                "levels": {
+                  "type": "minecraft:uniform",
+                  "max": 19,
+                  "min": 5
+                },
+                "options": "#minecraft:on_traded_equipment"
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "items": "minecraft:diamond_sword",
+                  "predicates": {
+                    "minecraft:enchantments": [
+                      {}
+                    ]
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:diamond_sword"
+            },
+            "max_uses": 3,
+            "reputation_discount": 0.2,
+            "wants": {
+              "count": 8,
+              "id": "minecraft:emerald"
+            },
+            "xp": 30
+          }
+        }
+      ],
+      "id": "weaponsmith/level_5",
+      "amount": 2
+    }
+  ]
+}

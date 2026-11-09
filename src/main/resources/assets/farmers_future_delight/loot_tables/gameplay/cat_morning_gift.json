@@ -1,0 +1,46 @@
+{
+  "pools": [
+    {
+      "name": "main",
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "item",
+          "name": "minecraft:rabbit_hide",
+          "weight": 10,
+          "entryName": "rabbit_hide"
+        },
+        {
+          "type": "item",
+          "name": "minecraft:rabbit_foot",
+          "weight": 10,
+          "entryName": "rabbit_foot"
+        },
+        {
+          "type": "item",
+          "name": "minecraft:chicken",
+          "weight": 10,
+          "entryName": "chicken"
+        },
+        {
+          "type": "item",
+          "name": "minecraft:feather",
+          "weight": 10,
+          "entryName": "feather"
+        },
+        {
+          "type": "item",
+          "name": "minecraft:rotten_flesh",
+          "weight": 10,
+          "entryName": "rotten_flesh"
+        },
+        {
+          "type": "item",
+          "name": "minecraft:string",
+          "weight": 10,
+          "entryName": "string"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "forge_marker": 1,
+  "variants": {
+    "facing=north": {"model": "farmers_future_delight:cartography_table"},
+    "facing=south": {"model": "farmers_future_delight:cartography_table", "y": 180},
+    "facing=west": {"model": "farmers_future_delight:cartography_table", "y": 270},
+    "facing=east": {"model": "farmers_future_delight:cartography_table", "y": 90}
+  }
+}

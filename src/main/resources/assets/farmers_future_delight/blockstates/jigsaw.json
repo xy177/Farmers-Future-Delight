@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "orientation=down_east": {"model": "farmers_future_delight:jigsaw", "x": 90, "y": 90},
+    "orientation=down_north": {"model": "farmers_future_delight:jigsaw", "x": 90},
+    "orientation=down_south": {"model": "farmers_future_delight:jigsaw", "x": 90, "y": 180},
+    "orientation=down_west": {"model": "farmers_future_delight:jigsaw", "x": 90, "y": 270},
+    "orientation=east_up": {"model": "farmers_future_delight:jigsaw", "y": 90},
+    "orientation=north_up": {"model": "farmers_future_delight:jigsaw"},
+    "orientation=south_up": {"model": "farmers_future_delight:jigsaw", "y": 180},
+    "orientation=up_east": {"model": "farmers_future_delight:jigsaw", "x": 270, "y": 270},
+    "orientation=up_north": {"model": "farmers_future_delight:jigsaw", "x": 270, "y": 180},
+    "orientation=up_south": {"model": "farmers_future_delight:jigsaw", "x": 270},
+    "orientation=up_west": {"model": "farmers_future_delight:jigsaw", "x": 270, "y": 90},
+    "orientation=west_up": {"model": "farmers_future_delight:jigsaw", "y": 270}
+  }
+}

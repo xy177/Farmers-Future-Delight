@@ -1,0 +1,56 @@
+{
+  "parent": "minecraft:husbandry/tame_an_animal",
+  "display": {
+    "icon": {
+      "item": "minecraft:fish"
+    },
+    "title": {
+      "translate": "advancements.husbandry.complete_catalogue.title"
+    },
+    "description": {
+      "translate": "advancements.husbandry.complete_catalogue.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "all_black": {
+      "trigger": "farmers_future_delight:tame_cat_all_black"
+    },
+    "black": {
+      "trigger": "farmers_future_delight:tame_cat_black"
+    },
+    "british_shorthair": {
+      "trigger": "farmers_future_delight:tame_cat_british_shorthair"
+    },
+    "calico": {
+      "trigger": "farmers_future_delight:tame_cat_calico"
+    },
+    "jellie": {
+      "trigger": "farmers_future_delight:tame_cat_jellie"
+    },
+    "persian": {
+      "trigger": "farmers_future_delight:tame_cat_persian"
+    },
+    "ragdoll": {
+      "trigger": "farmers_future_delight:tame_cat_ragdoll"
+    },
+    "red": {
+      "trigger": "farmers_future_delight:tame_cat_red"
+    },
+    "siamese": {
+      "trigger": "farmers_future_delight:tame_cat_siamese"
+    },
+    "tabby": {
+      "trigger": "farmers_future_delight:tame_cat_tabby"
+    },
+    "white": {
+      "trigger": "farmers_future_delight:tame_cat_white"
+    }
+  },
+  "rewards": {
+    "experience": 50
+  }
+}

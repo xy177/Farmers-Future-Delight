@@ -1,0 +1,191 @@
+{
+  "pools": [
+    {
+      "name": "pool_0",
+      "rolls": {
+        "min": 3,
+        "max": 8
+      },
+      "entries": [
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:blue_ice"
+            }
+          ],
+          "entryName": "pool_0_entry_0"
+        },
+        {
+          "type": "item",
+          "weight": 4,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:snow_block"
+            }
+          ],
+          "entryName": "pool_0_entry_1"
+        },
+        {
+          "type": "item",
+          "weight": 10,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:potato"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 7
+              }
+            }
+          ],
+          "entryName": "pool_0_entry_2"
+        },
+        {
+          "type": "item",
+          "weight": 10,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:bread"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 4
+              }
+            }
+          ],
+          "entryName": "pool_0_entry_3"
+        },
+        {
+          "type": "item",
+          "weight": 10,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:beetroot_seeds"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 5
+              }
+            }
+          ],
+          "entryName": "pool_0_entry_4"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:beetroot_soup"
+            }
+          ],
+          "entryName": "pool_0_entry_5"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:furnace"
+            }
+          ],
+          "entryName": "pool_0_entry_6"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:emerald"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 4
+              }
+            }
+          ],
+          "entryName": "pool_0_entry_7"
+        },
+        {
+          "type": "item",
+          "weight": 10,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:snowball"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 7
+              }
+            }
+          ],
+          "entryName": "pool_0_entry_8"
+        },
+        {
+          "type": "item",
+          "weight": 5,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:coal"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 4
+              }
+            }
+          ],
+          "entryName": "pool_0_entry_9"
+        }
+      ]
+    },
+    {
+      "name": "pool_1",
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "empty",
+          "weight": 1,
+          "entryName": "pool_1_entry_0"
+        },
+        {
+          "type": "empty",
+          "weight": 2,
+          "entryName": "pool_1_entry_1"
+        }
+      ]
+    }
+  ]
+}

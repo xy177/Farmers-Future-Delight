@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "down": "minecraft:blocks/planks_birch",
+    "east": "farmers_future_delight:blocks/fletching_table_side",
+    "north": "farmers_future_delight:blocks/fletching_table_front",
+    "particle": "farmers_future_delight:blocks/fletching_table_front",
+    "south": "farmers_future_delight:blocks/fletching_table_front",
+    "up": "farmers_future_delight:blocks/fletching_table_top",
+    "west": "farmers_future_delight:blocks/fletching_table_side"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "pools": [
+    {
+      "name": "ominous_bottle",
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "item",
+          "name": "farmers_future_delight:ominous_bottle",
+          "entryName": "amplifier_0"
+        },
+        {
+          "type": "item",
+          "name": "farmers_future_delight:ominous_bottle",
+          "entryName": "amplifier_1",
+          "functions": [
+            {
+              "function": "set_nbt",
+              "tag": "{OminousBottleAmplifier:1}"
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "farmers_future_delight:ominous_bottle",
+          "entryName": "amplifier_2",
+          "functions": [
+            {
+              "function": "set_nbt",
+              "tag": "{OminousBottleAmplifier:2}"
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "farmers_future_delight:ominous_bottle",
+          "entryName": "amplifier_3",
+          "functions": [
+            {
+              "function": "set_nbt",
+              "tag": "{OminousBottleAmplifier:3}"
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "farmers_future_delight:ominous_bottle",
+          "entryName": "amplifier_4",
+          "functions": [
+            {
+              "function": "set_nbt",
+              "tag": "{OminousBottleAmplifier:4}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

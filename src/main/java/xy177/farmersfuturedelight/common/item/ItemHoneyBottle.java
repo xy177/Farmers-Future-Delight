@@ -54,6 +54,10 @@ public class ItemHoneyBottle extends ItemFood {
         if (!world.isRemote) {
             consumer.removePotionEffect(MobEffects.POISON);
         }
+        if (consumer instanceof EntityPlayer
+                && ((EntityPlayer) consumer).capabilities.isCreativeMode) {
+            return remaining;
+        }
         if (remaining.isEmpty()) {
             return new ItemStack(Items.GLASS_BOTTLE);
         }

@@ -52,6 +52,56 @@ public final class FFDImprovedNoise {
         return sample(x, y, z, 0.0D, 0.0D);
     }
 
+    public strictfp float sampleFloat(double inputX, double inputY, double inputZ) {
+        double x = wrap(inputX) + offsetX;
+        double y = wrap(inputY) + offsetY;
+        double z = wrap(inputZ) + offsetZ;
+        int floorX = floor(x);
+        int floorY = floor(y);
+        int floorZ = floor(z);
+        float localX = (float) (x - floorX);
+        float localY = (float) (y - floorY);
+        float localZ = (float) (z - floorZ);
+        int x0 = permutations[floorX & 255];
+        int x1 = permutations[(floorX + 1) & 255];
+        int xy00 = permutations[(x0 + floorY) & 255];
+        int xy01 = permutations[(x0 + floorY + 1) & 255];
+        int xy10 = permutations[(x1 + floorY) & 255];
+        int xy11 = permutations[(x1 + floorY + 1) & 255];
+        float d000 = gradientFloat(permutations[(xy00 + floorZ) & 255], localX, localY, localZ);
+        float d100 = gradientFloat(permutations[(xy10 + floorZ) & 255], localX - 1.0F, localY, localZ);
+        float d010 = gradientFloat(permutations[(xy01 + floorZ) & 255], localX, localY - 1.0F, localZ);
+        float d110 = gradientFloat(permutations[(xy11 + floorZ) & 255], localX - 1.0F, localY - 1.0F, localZ);
+        float d001 = gradientFloat(permutations[(xy00 + floorZ + 1) & 255], localX, localY, localZ - 1.0F);
+        float d101 = gradientFloat(permutations[(xy10 + floorZ + 1) & 255], localX - 1.0F, localY, localZ - 1.0F);
+        float d011 = gradientFloat(permutations[(xy01 + floorZ + 1) & 255], localX, localY - 1.0F, localZ - 1.0F);
+        float d111 = gradientFloat(permutations[(xy11 + floorZ + 1) & 255], localX - 1.0F, localY - 1.0F,
+                localZ - 1.0F);
+        float alphaX = smoothstepFloat(localX);
+        float alphaY = smoothstepFloat(localY);
+        float alphaZ = smoothstepFloat(localZ);
+        return lerpFloat(alphaZ,
+                lerpFloat(alphaY, lerpFloat(alphaX, d000, d100), lerpFloat(alphaX, d010, d110)),
+                lerpFloat(alphaY, lerpFloat(alphaX, d001, d101), lerpFloat(alphaX, d011, d111)));
+    }
+
+    private static double wrap(double value) {
+        return value - Math.floor(value / 33554432.0D + 0.5D) * 33554432.0D;
+    }
+
+    private static float gradientFloat(int hash, float x, float y, float z) {
+        int index = hash & 15;
+        return GRADIENT_X[index] * x + GRADIENT_Y[index] * y + GRADIENT_Z[index] * z;
+    }
+
+    private static float smoothstepFloat(float value) {
+        return value * value * value * (value * (value * 6.0F - 15.0F) + 10.0F);
+    }
+
+    private static float lerpFloat(float amount, float first, float second) {
+        return first + amount * (second - first);
+    }
+
     public double sample(double inputX, double inputY, double inputZ, double yScale, double yFudge) {
         double x = inputX + offsetX;
         double y = inputY + offsetY;

@@ -28,6 +28,8 @@ public final class FFDFeatureConditionFactory implements IConditionFactory {
                         || FFDEntities.isLocalSalmonEnabled()
                         || FFDEntities.isLocalPufferfishEnabled()
                         || FFDEntities.isLocalTropicalFishEnabled();
+            case "honey":
+                return FFDItems::isHoneyEnabled;
             case "trident":
                 return () -> FFDItems.isItemRegistered(FFDItems.TRIDENT);
             default:

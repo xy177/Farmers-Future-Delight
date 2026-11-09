@@ -17,7 +17,6 @@ import net.minecraft.world.gen.feature.WorldGenTaiga1;
 import net.minecraft.world.gen.feature.WorldGenTaiga2;
 import net.minecraft.world.gen.feature.WorldGenerator;
 
-import xy177.farmersfuturedelight.common.FFDWorldGenerator;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiome;
@@ -84,9 +83,7 @@ public final class WorldGenModernMountainBiomes {
                 IBlockState snow = removeSnowLayer(world, treePos);
                 WorldGenerator tree = random.nextBoolean()
                         ? new WorldGenBigTree(false) : new WorldGenBirchTree(false, true);
-                if (tree.generate(world, random, treePos)) {
-                    FFDWorldGenerator.addGuaranteedBeeNest(random, world, treePos);
-                } else {
+                if (!BeeNestTreeGeneration.generate(tree, world, random, treePos, 1.0F)) {
                     restoreSnowLayer(world, treePos, snow);
                 }
             }

@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/outer_stairs",
+  "textures": {
+    "top": "minecraft:blocks/end_bricks",
+    "bottom": "minecraft:blocks/end_bricks",
+    "side": "minecraft:blocks/end_bricks"
+  }
+}

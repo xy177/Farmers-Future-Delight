@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "hanging=false": {
+      "model": "farmers_future_delight:lantern"
+    },
+    "hanging=true": {
+      "model": "farmers_future_delight:lantern_hanging"
+    }
+  }
+}

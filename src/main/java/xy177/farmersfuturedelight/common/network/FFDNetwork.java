@@ -38,6 +38,87 @@ public final class FFDNetwork {
                 PacketFluidMigration.class, 7, Side.SERVER);
         CHANNEL.registerMessage(PacketDrownedConverting.Handler.class,
                 PacketDrownedConverting.class, 8, Side.CLIENT);
+        CHANNEL.registerMessage(PacketMooshroomState.Handler.class,
+                PacketMooshroomState.class, 9, Side.CLIENT);
+        CHANNEL.registerMessage(PacketSignText.Handler.class,
+                PacketSignText.class, 10, Side.SERVER);
+        CHANNEL.registerMessage(PacketMerchantState.Handler.class,
+                PacketMerchantState.class, 11, Side.CLIENT);
+        CHANNEL.registerMessage(PacketMerchantSelect.Handler.class,
+                PacketMerchantSelect.class, 12, Side.SERVER);
+        CHANNEL.registerMessage(PacketVillagerState.Handler.class,
+                PacketVillagerState.class, 13, Side.CLIENT);
+        CHANNEL.registerMessage(PacketJigsawEdit.Handler.class,
+                PacketJigsawEdit.class, 14, Side.SERVER);
+        CHANNEL.registerMessage(PacketMapDecorations.Handler.class,
+                PacketMapDecorations.class, 15, Side.CLIENT);
+        CHANNEL.registerMessage(PacketImmediateRespawnRule.Handler.class,
+                PacketImmediateRespawnRule.class, 16, Side.CLIENT);
+        CHANNEL.registerMessage(PacketCookingBook.ClientHandler.class,
+                PacketCookingBook.class, 17, Side.CLIENT);
+        CHANNEL.registerMessage(PacketCookingBook.ServerHandler.class,
+                PacketCookingBook.class, 18, Side.SERVER);
+        CHANNEL.registerMessage(PacketAgeLockState.Handler.class,
+                PacketAgeLockState.class, 19, Side.CLIENT);
+    }
+
+    public static void sendAgeLockState(net.minecraft.entity.EntityLivingBase entity) {
+        CHANNEL.sendToAllTracking(new PacketAgeLockState(entity), entity);
+    }
+
+    public static void sendAgeLockState(EntityPlayerMP player, net.minecraft.entity.EntityLivingBase entity) {
+        CHANNEL.sendTo(new PacketAgeLockState(entity), player);
+    }
+
+    public static void sendCookingBook(EntityPlayerMP player, net.minecraft.nbt.NBTTagCompound data) {
+        CHANNEL.sendTo(new PacketCookingBook(data), player);
+    }
+
+    public static void updateCookingBook(net.minecraft.nbt.NBTTagCompound data) {
+        CHANNEL.sendToServer(new PacketCookingBook(data));
+    }
+
+    public static void sendMapDecorations(EntityPlayerMP player, String mapName,
+                                          net.minecraft.nbt.NBTTagCompound decorations) {
+        CHANNEL.sendTo(new PacketMapDecorations(mapName, decorations), player);
+    }
+
+    public static void sendImmediateRespawnRule(EntityPlayerMP player, boolean enabled) {
+        CHANNEL.sendTo(new PacketImmediateRespawnRule(enabled), player);
+    }
+
+    public static void editJigsaw(PacketJigsawEdit packet) {
+        CHANNEL.sendToServer(packet);
+    }
+
+    public static void sendVillagerState(net.minecraft.entity.passive.EntityVillager villager) {
+        CHANNEL.sendToAllTracking(new PacketVillagerState(villager), villager);
+    }
+
+    public static void sendVillagerState(EntityPlayerMP player,
+                                         net.minecraft.entity.passive.EntityVillager villager) {
+        CHANNEL.sendTo(new PacketVillagerState(villager), player);
+    }
+
+    public static void sendMerchantState(EntityPlayerMP player, PacketMerchantState packet) {
+        CHANNEL.sendTo(packet, player);
+    }
+
+    public static void sendVillagerState(net.minecraft.entity.monster.EntityZombieVillager zombie) {
+        CHANNEL.sendToAllTracking(new PacketVillagerState(zombie), zombie);
+    }
+
+    public static void sendVillagerState(EntityPlayerMP player,
+                                         net.minecraft.entity.monster.EntityZombieVillager zombie) {
+        CHANNEL.sendTo(new PacketVillagerState(zombie), player);
+    }
+
+    public static void selectMerchantTrade(int windowId, int selection) {
+        CHANNEL.sendToServer(new PacketMerchantSelect(windowId, selection));
+    }
+
+    public static void sendSignText(PacketSignText packet) {
+        CHANNEL.sendToServer(packet);
     }
 
     public static void sendVerticalBiomes(EntityPlayerMP player, int dimension,
@@ -115,6 +196,16 @@ public final class FFDNetwork {
         if (converting) {
             CHANNEL.sendTo(new PacketDrownedConverting(entity, true), player);
         }
+    }
+
+    public static void sendMooshroomState(
+            net.minecraft.entity.passive.EntityMooshroom entity, boolean brown) {
+        CHANNEL.sendToAllTracking(new PacketMooshroomState(entity, brown), entity);
+    }
+
+    public static void sendMooshroomState(EntityPlayerMP player,
+            net.minecraft.entity.passive.EntityMooshroom entity, boolean brown) {
+        CHANNEL.sendTo(new PacketMooshroomState(entity, brown), player);
     }
 
     public static void sendFluidloggedChunk(EntityPlayerMP player, World world,

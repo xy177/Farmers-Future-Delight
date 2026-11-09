@@ -1,0 +1,7 @@
+{
+  "parent": "farmers_future_delight:block/campfire_template",
+  "textures": {
+    "fire": "farmers_future_delight:blocks/campfire_fire",
+    "lit_log": "farmers_future_delight:blocks/campfire_log_lit"
+  }
+}

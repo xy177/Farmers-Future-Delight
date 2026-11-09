@@ -1,0 +1,4 @@
+{
+  "parent": "farmers_future_delight:block/smoker",
+  "textures": { "front": "farmers_future_delight:blocks/smoker_front_on" }
+}

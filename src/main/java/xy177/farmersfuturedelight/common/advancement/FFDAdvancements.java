@@ -54,6 +54,20 @@ public final class FFDAdvancements {
     public static final SimpleTrigger CONSUME_DRIED_KELP =
             register("consume_dried_kelp");
     public static final SimpleTrigger BRED_BEE = register("bred_bee");
+    public static final SimpleTrigger BRED_CAT = register("bred_cat");
+    public static final SimpleTrigger BRED_FOX = register("bred_fox");
+    public static final SimpleTrigger BRED_PANDA = register("bred_panda");
+    public static final SimpleTrigger KILL_PILLAGER = register("kill_pillager");
+    public static final SimpleTrigger KILL_RAVAGER = register("kill_ravager");
+    public static final SimpleTrigger BEE_OUR_GUEST = register("bee_our_guest");
+    public static final SimpleTrigger TOTAL_BEELOCATION = register("total_beelocation");
+    public static final SimpleTrigger STICKY_SITUATION = register("sticky_situation");
+    public static final SimpleTrigger VOLUNTARY_EXILE = register("voluntary_exile");
+    public static final SimpleTrigger HERO_OF_THE_VILLAGE = register("hero_of_the_village");
+    public static final SimpleTrigger SHOT_CROSSBOW = register("shot_crossbow");
+    public static final SimpleTrigger TWO_BIRDS_ONE_ARROW = register("two_birds_one_arrow");
+    public static final SimpleTrigger ARBALISTIC = register("arbalistic");
+    private static final Map<String, SimpleTrigger> CAT_VARIANTS = createCatTriggers();
     public static final SimpleTrigger BRED_TURTLE = register("bred_turtle");
     public static final SimpleTrigger BRED_GOAT = register("bred_goat");
     public static final SimpleTrigger BRED_AXOLOTL = register("bred_axolotl");
@@ -77,6 +91,28 @@ public final class FFDAdvancements {
     }
 
     public static void init() {
+    }
+
+    public static void tamedCat(EntityPlayerMP player, String variant) {
+        SimpleTrigger trigger = CAT_VARIANTS.get(variant);
+        if (trigger != null) {
+            trigger.trigger(player);
+        }
+    }
+
+    public static void completeCatCatalogue(EntityPlayerMP player) {
+        for (SimpleTrigger trigger : CAT_VARIANTS.values()) {
+            trigger.trigger(player);
+        }
+    }
+
+    private static Map<String, SimpleTrigger> createCatTriggers() {
+        Map<String, SimpleTrigger> triggers = Maps.newLinkedHashMap();
+        for (String variant : new String[]{"all_black", "black", "british_shorthair", "calico",
+                "jellie", "persian", "ragdoll", "red", "siamese", "tabby", "white"}) {
+            triggers.put(variant, register("tame_cat_" + variant));
+        }
+        return triggers;
     }
 
     public static void triggerVerticalBiome(EntityPlayerMP player, FFDVerticalBiome biome) {

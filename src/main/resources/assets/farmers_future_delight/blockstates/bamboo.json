@@ -1,0 +1,58 @@
+{
+  "multipart": [
+    {
+      "apply": [
+        {
+          "model": "farmers_future_delight:bamboo1_age0"
+        },
+        {
+          "model": "farmers_future_delight:bamboo2_age0"
+        },
+        {
+          "model": "farmers_future_delight:bamboo3_age0"
+        },
+        {
+          "model": "farmers_future_delight:bamboo4_age0"
+        }
+      ],
+      "when": {
+        "age": "0"
+      }
+    },
+    {
+      "apply": [
+        {
+          "model": "farmers_future_delight:bamboo1_age1"
+        },
+        {
+          "model": "farmers_future_delight:bamboo2_age1"
+        },
+        {
+          "model": "farmers_future_delight:bamboo3_age1"
+        },
+        {
+          "model": "farmers_future_delight:bamboo4_age1"
+        }
+      ],
+      "when": {
+        "age": "1"
+      }
+    },
+    {
+      "apply": {
+        "model": "farmers_future_delight:bamboo_small_leaves"
+      },
+      "when": {
+        "leaves": "small"
+      }
+    },
+    {
+      "apply": {
+        "model": "farmers_future_delight:bamboo_large_leaves"
+      },
+      "when": {
+        "leaves": "large"
+      }
+    }
+  ]
+}

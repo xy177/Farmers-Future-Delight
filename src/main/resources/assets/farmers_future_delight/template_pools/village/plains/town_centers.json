@@ -1,0 +1,79 @@
+{
+  "elements": [
+    {
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "farmers_future_delight:village/plains/town_centers/plains_fountain_01",
+        "processors": "farmers_future_delight:mossify_20_percent",
+        "projection": "rigid"
+      },
+      "weight": 50
+    },
+    {
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "farmers_future_delight:village/plains/town_centers/plains_meeting_point_1",
+        "processors": "farmers_future_delight:mossify_20_percent",
+        "projection": "rigid"
+      },
+      "weight": 50
+    },
+    {
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "farmers_future_delight:village/plains/town_centers/plains_meeting_point_2",
+        "processors": {
+          "processors": []
+        },
+        "projection": "rigid"
+      },
+      "weight": 50
+    },
+    {
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "farmers_future_delight:village/plains/town_centers/plains_meeting_point_3",
+        "processors": "farmers_future_delight:mossify_70_percent",
+        "projection": "rigid"
+      },
+      "weight": 50
+    },
+    {
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "farmers_future_delight:village/plains/zombie/town_centers/plains_fountain_01",
+        "processors": "farmers_future_delight:zombie_plains",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "farmers_future_delight:village/plains/zombie/town_centers/plains_meeting_point_1",
+        "processors": "farmers_future_delight:zombie_plains",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "farmers_future_delight:village/plains/zombie/town_centers/plains_meeting_point_2",
+        "processors": "farmers_future_delight:zombie_plains",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "farmers_future_delight:village/plains/zombie/town_centers/plains_meeting_point_3",
+        "processors": "farmers_future_delight:zombie_plains",
+        "projection": "rigid"
+      },
+      "weight": 1
+    }
+  ],
+  "fallback": "minecraft:empty"
+}

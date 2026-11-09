@@ -3,6 +3,7 @@ package xy177.farmersfuturedelight.client.render;
 import java.util.List;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockStandingSign;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiUtilRenderComponents;
 import net.minecraft.client.model.ModelSign;
@@ -15,6 +16,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 
 import xy177.farmersfuturedelight.common.FFDSignText;
+import xy177.farmersfuturedelight.FarmerFutureDelight;
+import xy177.farmersfuturedelight.common.block.IBlockWoodSign;
 
 public class RenderSign extends TileEntitySpecialRenderer<TileEntitySign> {
     private static final ResourceLocation SIGN_TEXTURE = new ResourceLocation("textures/entity/sign.png");
@@ -25,7 +28,7 @@ public class RenderSign extends TileEntitySpecialRenderer<TileEntitySign> {
                        int destroyStage, float alpha) {
         Block block = sign.getBlockType();
         GlStateManager.pushMatrix();
-        if (block == Blocks.STANDING_SIGN) {
+        if (block instanceof BlockStandingSign) {
             GlStateManager.translate((float) x + 0.5F, (float) y + 0.5F, (float) z + 0.5F);
             GlStateManager.rotate(-(float) (sign.getBlockMetadata() * 360) / 16.0F,
                     0.0F, 1.0F, 0.0F);
@@ -48,7 +51,10 @@ public class RenderSign extends TileEntitySpecialRenderer<TileEntitySign> {
             GlStateManager.translate(0.0625F, 0.0625F, 0.0625F);
             GlStateManager.matrixMode(5888);
         } else {
-            bindTexture(SIGN_TEXTURE);
+            bindTexture(block instanceof IBlockWoodSign
+                    ? new ResourceLocation(FarmerFutureDelight.MODID, "textures/entity/signs/"
+                            + ((IBlockWoodSign) block).getWoodName() + ".png")
+                    : SIGN_TEXTURE);
         }
 
         GlStateManager.enableRescaleNormal();
@@ -58,41 +64,14 @@ public class RenderSign extends TileEntitySpecialRenderer<TileEntitySign> {
         GlStateManager.popMatrix();
 
         FontRenderer font = getFontRenderer();
-        GlStateManager.translate(0.0F, 0.33333334F, 0.046666667F);
-        GlStateManager.scale(0.010416667F, -0.010416667F, 0.010416667F);
-        GlStateManager.glNormal3f(0.0F, 0.0F, -0.010416667F);
         GlStateManager.depthMask(false);
-
-        boolean glowing = FFDSignText.isGlowing(sign) && destroyStage < 0;
-        if (glowing) {
-            GlStateManager.disableLighting();
-            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 61680.0F, 0.0F);
-        }
         if (destroyStage < 0) {
-            for (int line = 0; line < sign.signText.length; line++) {
-                if (sign.signText[line] == null) {
-                    continue;
-                }
-                ITextComponent text = sign.signText[line];
-                List<ITextComponent> split = GuiUtilRenderComponents.splitText(
-                        text, 90, font, false, true);
-                String value = split != null && !split.isEmpty()
-                        ? split.get(0).getFormattedText() : "";
-                if (line == sign.lineBeingEdited) {
-                    value = "> " + value + " <";
-                }
-                font.drawString(value, -font.getStringWidth(value) / 2,
-                        line * 10 - sign.signText.length * 5, 0);
+            drawTextSide(sign, sign.signText, font, false);
+            if (sign.getTileData().hasKey("backText1")) {
+                ITextComponent[] backText = FFDSignText.getBackText(sign);
+                drawTextSide(sign, backText, font, true);
             }
         }
-        if (glowing) {
-            int packed = sign.getWorld() == null ? 0
-                    : sign.getWorld().getCombinedLight(sign.getPos(), 0);
-            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit,
-                    packed % 65536, packed / 65536);
-            GlStateManager.enableLighting();
-        }
-
         GlStateManager.depthMask(true);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.popMatrix();
@@ -101,5 +80,44 @@ public class RenderSign extends TileEntitySpecialRenderer<TileEntitySign> {
             GlStateManager.popMatrix();
             GlStateManager.matrixMode(5888);
         }
+    }
+
+    private void drawTextSide(TileEntitySign sign, ITextComponent[] lines,
+                              FontRenderer font, boolean back) {
+        GlStateManager.pushMatrix();
+        if (back) {
+            GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
+        }
+        GlStateManager.translate(0.0F, 0.33333334F, 0.046666667F);
+        GlStateManager.scale(0.010416667F, -0.010416667F, 0.010416667F);
+        GlStateManager.glNormal3f(0.0F, 0.0F, back ? 0.010416667F : -0.010416667F);
+        boolean glowing = FFDSignText.isGlowing(sign, back);
+        int packed = sign.getWorld() == null ? 0
+                : sign.getWorld().getCombinedLight(sign.getPos(), 0);
+        if (glowing) {
+            GlStateManager.disableLighting();
+            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 61680.0F, 0.0F);
+        }
+        for (int line = 0; line < lines.length; line++) {
+            if (lines[line] == null) {
+                continue;
+            }
+            ITextComponent text = lines[line];
+            List<ITextComponent> split = GuiUtilRenderComponents.splitText(
+                    text, 90, font, false, true);
+            String value = split != null && !split.isEmpty()
+                    ? split.get(0).getFormattedText() : "";
+            if (!back && line == sign.lineBeingEdited) {
+                value = "> " + value + " <";
+            }
+            font.drawString(value, -font.getStringWidth(value) / 2,
+                    line * 10 - lines.length * 5, 0);
+        }
+        if (glowing) {
+            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit,
+                    packed % 65536, packed / 65536);
+            GlStateManager.enableLighting();
+        }
+        GlStateManager.popMatrix();
     }
 }

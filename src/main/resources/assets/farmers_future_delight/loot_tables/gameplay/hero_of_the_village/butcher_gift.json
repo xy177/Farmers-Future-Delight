@@ -1,0 +1,40 @@
+{
+  "pools": [
+    {
+      "name": "pool_0",
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "item",
+          "name": "minecraft:cooked_rabbit",
+          "entryName": "minecraft:cooked_rabbit",
+          "weight": 1
+        },
+        {
+          "type": "item",
+          "name": "minecraft:cooked_chicken",
+          "entryName": "minecraft:cooked_chicken",
+          "weight": 1
+        },
+        {
+          "type": "item",
+          "name": "minecraft:cooked_porkchop",
+          "entryName": "minecraft:cooked_porkchop",
+          "weight": 1
+        },
+        {
+          "type": "item",
+          "name": "minecraft:cooked_beef",
+          "entryName": "minecraft:cooked_beef",
+          "weight": 1
+        },
+        {
+          "type": "item",
+          "name": "minecraft:cooked_mutton",
+          "entryName": "minecraft:cooked_mutton",
+          "weight": 1
+        }
+      ]
+    }
+  ]
+}

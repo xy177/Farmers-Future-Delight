@@ -1,0 +1,22 @@
+{
+  "pools": [
+    {
+      "name": "pool_0",
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "item",
+          "name": "minecraft:map",
+          "entryName": "minecraft:map",
+          "weight": 1
+        },
+        {
+          "type": "item",
+          "name": "minecraft:paper",
+          "entryName": "minecraft:paper",
+          "weight": 1
+        }
+      ]
+    }
+  ]
+}

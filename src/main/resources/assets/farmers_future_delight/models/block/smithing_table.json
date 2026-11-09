@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "down": "farmers_future_delight:blocks/smithing_table_bottom",
+    "east": "farmers_future_delight:blocks/smithing_table_side",
+    "north": "farmers_future_delight:blocks/smithing_table_front",
+    "particle": "farmers_future_delight:blocks/smithing_table_front",
+    "south": "farmers_future_delight:blocks/smithing_table_front",
+    "up": "farmers_future_delight:blocks/smithing_table_top",
+    "west": "farmers_future_delight:blocks/smithing_table_side"
+  }
+}

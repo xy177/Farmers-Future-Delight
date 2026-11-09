@@ -1,0 +1,25 @@
+{
+  "recipes": [
+    {
+      "id": "farmers_future_delight:example_smoking",
+      "type": "smoking",
+      "group": "example_cooked_beef",
+      "ingredient": { "id": "minecraft:beef", "meta": 0 },
+      "result": { "id": "minecraft:cooked_beef", "count": 1, "nbt": "{}" },
+      "processingTime": 100,
+      "experience": 0.35
+    },
+    {
+      "id": "farmers_future_delight:example_smithing_transform",
+      "type": "smithing",
+      "ingredient": ["farmers_future_delight:netherite_upgrade_smithing_template", "minecraft:diamond_sword", "farmers_future_delight:netherite_ingot"],
+      "result": { "id": "farmers_future_delight:netherite_sword" },
+      "copyInput": 1,
+      "processingTime": 1,
+      "experience": 0
+    }
+  ],
+  "remove": [
+    { "type": "smoking", "id": "minecraft:cooked_beef_from_smoking" }
+  ]
+}

@@ -52,7 +52,7 @@ public final class FFDUnderwaterBonemeal {
     public static boolean grow(ItemStack stack, World world, BlockPos origin, EnumFacing face) {
         if (!FFDItems.isBlockRegistered(FFDBlocks.SEAGRASS)
                 || !FFDItems.isSeagrassEnabled() || !world.isBlockLoaded(origin)
-                || !isWaterSource(world.getBlockState(origin))) {
+                || !isFullWater(world.getBlockState(origin))) {
             return false;
         }
         if (world.isRemote) {
@@ -109,7 +109,7 @@ public final class FFDUnderwaterBonemeal {
                 continue;
             }
             IBlockState current = world.getBlockState(target);
-            if (isWaterSource(current)) {
+            if (isFullWater(current)) {
                 world.setBlockState(target, growth, 3);
             } else if (current.getBlock() == FFDBlocks.SEAGRASS
                     && ((IGrowable) current.getBlock()).canGrow(world, target, current, false)
@@ -129,8 +129,8 @@ public final class FFDUnderwaterBonemeal {
                         : state.getBlock().canPlaceBlockAt(world, pos);
     }
 
-    private static boolean isWaterSource(IBlockState state) {
+    private static boolean isFullWater(IBlockState state) {
         return (state.getBlock() == Blocks.WATER || state.getBlock() == Blocks.FLOWING_WATER)
-                && state.getValue(BlockLiquid.LEVEL) == 0;
+                && (state.getValue(BlockLiquid.LEVEL) == 0 || state.getValue(BlockLiquid.LEVEL) >= 8);
     }
 }

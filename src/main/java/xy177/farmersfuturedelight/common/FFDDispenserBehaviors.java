@@ -29,6 +29,9 @@ public final class FFDDispenserBehaviors {
 
     public static void register() {
         registerUnderwaterBonemeal();
+        registerWaterBottles();
+        registerShearing();
+        registerFireworks();
         for (Item item : new Item[] {FFDItems.COD_BUCKET, FFDItems.SALMON_BUCKET,
                 FFDItems.PUFFERFISH_BUCKET, FFDItems.TROPICAL_FISH_BUCKET}) {
             if (FFDItems.isItemRegistered(item)) {
@@ -124,6 +127,105 @@ public final class FFDDispenserBehaviors {
                 });
     }
 
+    private static void registerFireworks() {
+        BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.putObject(Items.FIREWORKS,
+                new BehaviorDefaultDispenseItem() {
+                    @Override
+                    protected ItemStack dispenseStack(IBlockSource source, ItemStack stack) {
+                        EnumFacing facing = source.getBlockState().getValue(BlockDispenser.FACING);
+                        World world = source.getWorld();
+                        ItemStack projectile = stack.copy();
+                        projectile.setCount(1);
+                        net.minecraft.entity.item.EntityFireworkRocket rocket =
+                                new net.minecraft.entity.item.EntityFireworkRocket(world,
+                                        source.getX() + facing.getFrontOffsetX() * 0.5000099999997474D,
+                                        source.getY() + facing.getFrontOffsetY() * 0.5000099999997474D,
+                                        source.getZ() + facing.getFrontOffsetZ() * 0.5000099999997474D,
+                                        projectile);
+                        xy177.farmersfuturedelight.core.FFDFireworkHooks.setShotAtAngle(rocket, true);
+                        double spread = 0.0172275D;
+                        rocket.motionX = (facing.getFrontOffsetX()
+                                + (world.rand.nextDouble() - world.rand.nextDouble()) * spread) * 0.5D;
+                        rocket.motionY = (facing.getFrontOffsetY()
+                                + (world.rand.nextDouble() - world.rand.nextDouble()) * spread) * 0.5D;
+                        rocket.motionZ = (facing.getFrontOffsetZ()
+                                + (world.rand.nextDouble() - world.rand.nextDouble()) * spread) * 0.5D;
+                        world.spawnEntity(rocket);
+                        stack.shrink(1);
+                        return stack;
+                    }
+
+                    @Override
+                    protected void playDispenseSound(IBlockSource source) {
+                        source.getWorld().playEvent(1004, source.getBlockPos(), 0);
+                    }
+                });
+    }
+
+    private static void registerWaterBottles() {
+        final IBehaviorDispenseItem previous =
+                BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.getObject(Items.GLASS_BOTTLE);
+        BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.putObject(Items.GLASS_BOTTLE, (source, stack) -> {
+            EnumFacing facing = source.getBlockState().getValue(BlockDispenser.FACING);
+            BlockPos target = source.getBlockPos().offset(facing);
+            net.minecraft.block.state.IBlockState fluid =
+                    xy177.farmersfuturedelight.api.WaterloggedBlockApi
+                            .getFluidState(source.getWorld(), target);
+            if (fluid.getMaterial() != net.minecraft.block.material.Material.WATER) {
+                if (previous.getClass() == BehaviorDefaultDispenseItem.class) {
+                    BehaviorDefaultDispenseItem.doDispense(source.getWorld(), stack.splitStack(1),
+                            6, facing, BlockDispenser.getDispensePosition(source));
+                    source.getWorld().playEvent(1001, source.getBlockPos(), 0);
+                    source.getWorld().playEvent(2000, source.getBlockPos(), particleData(facing));
+                    return stack;
+                }
+                return previous.dispense(source, stack);
+            }
+            ItemStack filled = net.minecraft.potion.PotionUtils.addPotionToItemStack(
+                    new ItemStack(Items.POTIONITEM), net.minecraft.init.PotionTypes.WATER);
+            source.getWorld().playEvent(1000, source.getBlockPos(), 0);
+            source.getWorld().playEvent(2000, source.getBlockPos(), particleData(facing));
+            return consumeWithRemainder(source, stack, filled);
+        });
+    }
+
+    private static void registerShearing() {
+        final IBehaviorDispenseItem previous =
+                BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.getObject(Items.SHEARS);
+        BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.putObject(Items.SHEARS, (source, stack) -> {
+            EnumFacing facing = source.getBlockState().getValue(BlockDispenser.FACING);
+            BlockPos target = source.getBlockPos().offset(facing);
+            World world = source.getWorld();
+            for (net.minecraft.entity.EntityLivingBase entity : world.getEntitiesWithinAABB(
+                    net.minecraft.entity.EntityLivingBase.class,
+                    new net.minecraft.util.math.AxisAlignedBB(target))) {
+                if (!entity.isEntityAlive() || !(entity instanceof net.minecraftforge.common.IShearable)) {
+                    continue;
+                }
+                net.minecraftforge.common.IShearable shearable =
+                        (net.minecraftforge.common.IShearable) entity;
+                if (!shearable.isShearable(stack, world, target)) {
+                    continue;
+                }
+                for (ItemStack drop : shearable.onSheared(stack, world, target,
+                        net.minecraft.enchantment.EnchantmentHelper.getEnchantmentLevel(
+                                net.minecraft.init.Enchantments.FORTUNE, stack))) {
+                    entity.entityDropItem(drop, 1.0F);
+                }
+                damageDispensedShears(stack, world);
+                world.playEvent(1000, source.getBlockPos(), 0);
+                world.playEvent(2000, source.getBlockPos(), particleData(facing));
+                return stack;
+            }
+            if (previous.getClass() != BehaviorDefaultDispenseItem.class) {
+                return previous.dispense(source, stack);
+            }
+            world.playEvent(1001, source.getBlockPos(), 0);
+            world.playEvent(2000, source.getBlockPos(), particleData(facing));
+            return stack;
+        });
+    }
+
     private static void registerUnderwaterBonemeal() {
         IBehaviorDispenseItem previous = BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.getObject(Items.DYE);
         BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.putObject(Items.DYE, (source, stack) -> {
@@ -179,6 +281,9 @@ public final class FFDDispenserBehaviors {
                                 shears ? FFDItems.HONEYCOMB : FFDItems.HONEY_BOTTLE);
                         boolean success = hive.getHoneyLevel() >= TileEntityBeehive.MAX_HONEY_LEVEL
                                 && !harvested.isEmpty();
+                        if (!success && !shears) {
+                            return previous.dispense(source, stack);
+                        }
                         if (success) {
                             hive.setHoneyLevel(0);
                             hive.releaseAll(TileEntityBeehive.ReleaseStatus.BEE_RELEASED, null);
@@ -188,10 +293,7 @@ public final class FFDDispenserBehaviors {
                                 for (int count = 0; count < 3; count++) {
                                     Block.spawnAsEntity(world, target, harvested.copy());
                                 }
-                                if (stack.attemptDamageItem(1, world.rand, null)) {
-                                    stack.shrink(1);
-                                    stack.setItemDamage(0);
-                                }
+                                damageDispensedShears(stack, world);
                             } else {
                                 stack = consumeWithRemainder(source, stack, harvested);
                             }
@@ -201,6 +303,14 @@ public final class FFDDispenserBehaviors {
                         return stack;
                     }
                 });
+    }
+
+    private static void damageDispensedShears(ItemStack stack, World world) {
+        if (stack.attemptDamageItem(1, world.rand, null)
+                || stack.getItemDamage() >= stack.getMaxDamage()) {
+            stack.shrink(1);
+            stack.setItemDamage(0);
+        }
     }
 
     private static ItemStack consumeWithRemainder(IBlockSource source, ItemStack stack,

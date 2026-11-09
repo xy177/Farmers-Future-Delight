@@ -190,7 +190,7 @@ public final class MapGenFFDShipwreck extends MapGenStructure {
         private void loadTemplate(TemplateManager manager) {
             ResourceLocation id = new ResourceLocation(FarmerFutureDelight.MODID,
                     "shipwreck/" + templateName + "_p" + palette);
-            Template template = manager.getTemplate((MinecraftServer) null, id);
+            Template template = FFDJigsawPlacement.readTemplate(manager, id);
             PlacementSettings settings = new PlacementSettings().setIgnoreEntities(true)
                     .setRotation(rotation).setMirror(Mirror.NONE)
                     .setReplacedBlock(net.minecraft.init.Blocks.AIR);

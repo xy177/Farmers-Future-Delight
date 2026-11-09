@@ -1,0 +1,26 @@
+{
+  "parent": "farmers_future_delight:adventure/ol_betsy",
+  "display": {
+    "icon": {
+      "item": "farmers_future_delight:crossbow"
+    },
+    "title": {
+      "translate": "advancements.adventure.arbalistic.title"
+    },
+    "description": {
+      "translate": "advancements.adventure.arbalistic.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": true
+  },
+  "criteria": {
+    "arbalistic": {
+      "trigger": "farmers_future_delight:arbalistic"
+    }
+  },
+  "rewards": {
+    "experience": 85
+  }
+}

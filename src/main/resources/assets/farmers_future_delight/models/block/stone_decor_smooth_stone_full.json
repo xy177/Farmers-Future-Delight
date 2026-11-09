@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "farmers_future_delight:blocks/smooth_stone",
+    "side": "farmers_future_delight:blocks/smooth_stone_slab_side"
+  }
+}

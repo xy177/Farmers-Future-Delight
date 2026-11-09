@@ -207,7 +207,7 @@ public class BlockSeaPickle extends BlockBush implements IGrowable, IWaterloggab
     @Override
     @Nullable
     public AxisAlignedBB getCollisionBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
-        return NULL_AABB;
+        return getBoundingBox(state, world, pos);
     }
 
     @Override

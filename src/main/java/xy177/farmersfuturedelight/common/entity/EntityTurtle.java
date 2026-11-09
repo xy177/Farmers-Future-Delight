@@ -245,25 +245,13 @@ public class EntityTurtle extends net.minecraft.entity.passive.EntityAnimal {
     }
 
     @Override
-    protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
-        if (!FFDItems.isTurtleEnabled()) {
-            return;
-        }
-        int amount = rand.nextInt(3) + rand.nextInt(lootingModifier + 1);
-        if (amount > 0) {
-            Item seagrass = getPrimarySeagrassItem();
-            if (seagrass != null) {
-                entityDropItem(new ItemStack(seagrass, amount), 0.0F);
-            }
-        }
+    protected ResourceLocation getLootTable() {
+        return xy177.farmersfuturedelight.common.FFDEntityLootTables.TURTLE;
     }
 
     @Override
     public void onStruckByLightning(EntityLightningBolt lightningBolt) {
         if (!world.isRemote) {
-            if (world.getGameRules().getBoolean("doMobLoot")) {
-                entityDropItem(new ItemStack(Items.BOWL), 0.0F);
-            }
             attackEntityFrom(DamageSource.LIGHTNING_BOLT, Float.MAX_VALUE);
         }
     }
@@ -855,7 +843,7 @@ public class EntityTurtle extends net.minecraft.entity.passive.EntityAnimal {
     }
 
     @Nullable
-    private static Item getPrimarySeagrassItem() {
+    public static Item getPrimarySeagrassItem() {
         Set<Item> items = getSeagrassItems();
         return items.isEmpty() ? null : items.iterator().next();
     }

@@ -1,11 +1,11 @@
 package xy177.farmersfuturedelight.common;
 
-import java.util.ArrayDeque;
-import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
+import net.minecraft.block.BlockDoublePlant;
+import net.minecraft.block.BlockFlower;
 import net.minecraft.block.BlockNewLeaf;
 import net.minecraft.block.BlockNewLog;
 import net.minecraft.block.BlockOldLeaf;
@@ -35,7 +35,10 @@ import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.tile.TileEntityBeehive;
 import xy177.farmersfuturedelight.common.worldgen.WorldGenCoralReefs;
 import xy177.farmersfuturedelight.common.worldgen.WorldGenModernIcebergs;
+import xy177.farmersfuturedelight.common.worldgen.WorldGenModernFlowers;
 import xy177.farmersfuturedelight.common.worldgen.WorldGenLegacyAmethystGeodes;
+import xy177.farmersfuturedelight.common.worldgen.WorldGenAncientDebris;
+import xy177.farmersfuturedelight.common.worldgen.WorldGenBlackstoneOre;
 import xy177.farmersfuturedelight.common.worldgen.FFDOceanStructures;
 import xy177.farmersfuturedelight.common.worldgen.BeeNestLeaves;
 import xy177.farmersfuturedelight.core.FFDHeightHooks;
@@ -45,11 +48,22 @@ public class FFDWorldGenerator implements IWorldGenerator {
     private static final NoiseGeneratorPerlin KELP_NOISE =
             new NoiseGeneratorPerlin(new Random(2345L), 1);
     private final WorldGenLegacyAmethystGeodes legacyGeodes = new WorldGenLegacyAmethystGeodes();
+    private final WorldGenAncientDebris ancientDebris = new WorldGenAncientDebris();
+    private final WorldGenBlackstoneOre blackstoneOre = new WorldGenBlackstoneOre();
 
     @Override
     public void generate(Random random, int chunkX, int chunkZ, World world,
                          net.minecraft.world.gen.IChunkGenerator chunkGenerator,
                          net.minecraft.world.chunk.IChunkProvider chunkProvider) {
+        if (world.provider.getDimension() == -1 && FFDItems.isNetheriteEnabled()
+                && FFDItems.isBlockRegistered(FFDBlocks.ANCIENT_DEBRIS)) {
+            ancientDebris.generate(world, chunkX, chunkZ);
+        }
+        if (world.provider.getDimension() == -1 && FFDItems.isBlackstoneEnabled()
+                && FFDItems.isBlockRegistered(FFDBlocks.BLACKSTONE)) {
+            blackstoneOre.generate(world, random, chunkX, chunkZ);
+            return;
+        }
         if (world.provider.getDimension() != 0) {
             return;
         }
@@ -57,7 +71,12 @@ public class FFDWorldGenerator implements IWorldGenerator {
              WaterloggedPlantFluid.WorldgenScope ignoredFluid = WaterloggedPlantFluid.enterWorldgen()) {
             BlockPos chunkOrigin = new BlockPos(chunkX * 16, 0, chunkZ * 16);
             Biome biome = world.getBiome(chunkOrigin);
+            Random flowerRandom = new Random(world.getSeed()
+                    ^ ((long) chunkX * 341873128712L) ^ ((long) chunkZ * 132897987541L));
+            WorldGenModernFlowers.generate(flowerRandom, chunkX, chunkZ, world,
+                    world.getBiome(chunkOrigin.add(8, 0, 8)));
             FFDOceanStructures.generate(world, chunkX, chunkZ);
+            xy177.farmersfuturedelight.common.worldgen.FFDModernStructures.generate(world, chunkX, chunkZ);
             if (!FFDHeightHooks.isExtended(world)) {
                 new WorldGenModernIcebergs(world.getSeed()).generate(world, chunkX, chunkZ);
                 legacyGeodes.generate(world, chunkX, chunkZ);
@@ -93,9 +112,6 @@ public class FFDWorldGenerator implements IWorldGenerator {
                 generateSeaPickles(random, chunkX, chunkZ, world);
             }
 
-            if (FFDItems.isBlockRegistered(FFDBlocks.BEE_NEST)) {
-                generateBeeNests(random, chunkX, chunkZ, world, biome);
-            }
             if (seagrass != null) {
                 for (int x = chunkX - 1; x <= chunkX + 1; x++) {
                     for (int z = chunkZ - 1; z <= chunkZ + 1; z++) {
@@ -132,70 +148,6 @@ public class FFDWorldGenerator implements IWorldGenerator {
         }
     }
 
-    private void generateBeeNests(Random random, int chunkX, int chunkZ, World world, Biome biome) {
-        float chance = getBeeNestChance(biome);
-        if (chance <= 0.0F) {
-            return;
-        }
-        int minX = chunkX * 16;
-        int minZ = chunkZ * 16;
-        Set<BlockPos> visitedLogs = new HashSet<>();
-        for (int x = minX; x < minX + 16; x++) {
-            for (int z = minZ; z < minZ + 16; z++) {
-                int topY = world.getHeight(x, z) - 1;
-                int bottomY = Math.max(FFDHeightHooks.minY(world) + 1, topY - 32);
-                for (int y = topY; y >= bottomY; y--) {
-                    BlockPos trunkTop = new BlockPos(x, y, z);
-                    if (!isVerticalLog(world, trunkTop)
-                            || isVerticalLog(world, trunkTop.up())
-                            || !hasLeavesNearby(world, trunkTop, chunkX, chunkZ)) {
-                        continue;
-                    }
-                    if (visitedLogs.contains(trunkTop)) {
-                        break;
-                    }
-                    markConnectedTreeLogs(world, trunkTop, chunkX, chunkZ, visitedLogs);
-                    if (random.nextFloat() < chance) {
-                        placeBeeNest(random, world, trunkTop, chunkX, chunkZ);
-                    }
-                    break;
-                }
-            }
-        }
-    }
-
-    private static void markConnectedTreeLogs(World world, BlockPos start, int chunkX, int chunkZ,
-                                              Set<BlockPos> visitedLogs) {
-        ArrayDeque<BlockPos> pending = new ArrayDeque<>();
-        pending.add(start);
-        while (!pending.isEmpty()) {
-            BlockPos current = pending.removeFirst();
-            if (!isInChunk(current, chunkX, chunkZ) || !isTreeLog(world, current)
-                    || !visitedLogs.add(current)) {
-                continue;
-            }
-            for (EnumFacing direction : EnumFacing.values()) {
-                pending.addLast(current.offset(direction));
-            }
-        }
-    }
-
-    private static float getBeeNestChance(Biome biome) {
-        ResourceLocation id = biome.getRegistryName();
-        String path = id == null ? "" : id.getResourcePath();
-        if ("mutated_forest".equals(path)) {
-            return FFDConfig.beeNestFlowerForestChance;
-        }
-        if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.PLAINS)
-                || "mutated_plains".equals(path)) {
-            return FFDConfig.beeNestPlainsChance;
-        }
-        if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.FOREST)) {
-            return FFDConfig.beeNestForestChance;
-        }
-        return 0.0F;
-    }
-
     private static boolean isVerticalLog(World world, BlockPos pos) {
         if (!isTreeLog(world, pos)) {
             return false;
@@ -210,10 +162,15 @@ public class FFDWorldGenerator implements IWorldGenerator {
     }
 
     private static boolean hasLeavesNearby(World world, BlockPos trunkTop, int chunkX, int chunkZ) {
+        return hasLeavesNearby(world, trunkTop, chunkX, chunkZ, true);
+    }
+
+    private static boolean hasLeavesNearby(World world, BlockPos trunkTop, int chunkX,
+                                           int chunkZ, boolean restrictToChunk) {
         IBlockState trunk = world.getBlockState(trunkTop);
         for (BlockPos.MutableBlockPos pos : BlockPos.getAllInBoxMutable(trunkTop.add(-2, 0, -2),
                 trunkTop.add(2, 4, 2))) {
-            if (!isInChunk(pos, chunkX, chunkZ)) {
+            if (restrictToChunk && !isInChunk(pos, chunkX, chunkZ)) {
                 continue;
             }
             IBlockState leaves = world.getBlockState(pos);
@@ -237,6 +194,11 @@ public class FFDWorldGenerator implements IWorldGenerator {
 
     private static boolean placeBeeNest(Random random, World world, BlockPos trunkTop,
                                         int chunkX, int chunkZ) {
+        return placeBeeNest(random, world, trunkTop, chunkX, chunkZ, true);
+    }
+
+    private static boolean placeBeeNest(Random random, World world, BlockPos trunkTop,
+                                        int chunkX, int chunkZ, boolean restrictToChunk) {
         EnumFacing[] directions = {EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST};
         for (int depth = 0; depth < 4; depth++) {
             BlockPos trunk = trunkTop.down(depth);
@@ -248,8 +210,8 @@ public class FFDWorldGenerator implements IWorldGenerator {
                 EnumFacing placementSide = directions[(start + index) % directions.length];
                 BlockPos nestPos = trunk.offset(placementSide);
                 BlockPos entrancePos = nestPos.offset(EnumFacing.SOUTH);
-                if (!isInChunk(nestPos, chunkX, chunkZ)
-                        || !isInChunk(entrancePos, chunkX, chunkZ)
+                if ((restrictToChunk && (!isInChunk(nestPos, chunkX, chunkZ)
+                        || !isInChunk(entrancePos, chunkX, chunkZ)))
                         || !world.isAirBlock(nestPos) || !world.isAirBlock(entrancePos)) {
                     continue;
                 }
@@ -259,9 +221,101 @@ public class FFDWorldGenerator implements IWorldGenerator {
                 if (tile instanceof TileEntityBeehive) {
                     int count = FFDConfig.beeNestMinBees + random.nextInt(
                             FFDConfig.beeNestMaxBees - FFDConfig.beeNestMinBees + 1);
-                    ((TileEntityBeehive) tile).addNewBees(count);
+                    ((TileEntityBeehive) tile).addNewBees(count, random);
                 }
                 return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean tryAddSaplingBeeNest(Random random, World world, BlockPos trunkBase) {
+        return tryAddSaplingBeeNest(random, world, trunkBase, hasNearbyFlower(world, trunkBase));
+    }
+
+    public static boolean tryAddSaplingBeeNest(Random random, World world, BlockPos trunkBase,
+                                               boolean hadFlowers) {
+        if (world.isRemote || !FFDItems.isBlockRegistered(FFDBlocks.BEE_NEST)
+                || !xy177.farmersfuturedelight.common.registry.FFDEntities.isLocalBeeEnabled()) {
+            return false;
+        }
+        IBlockState trunk = world.getBlockState(trunkBase);
+        if (!isOakOrBirchLog(trunk) || !hadFlowers
+                || random.nextFloat() >= 0.05F) {
+            return false;
+        }
+        BlockPos trunkTop = trunkBase;
+        while (trunkTop.getY() + 1 < FFDHeightHooks.maxYExclusive(world)
+                && isVerticalLog(world, trunkTop.up())) {
+            trunkTop = trunkTop.up();
+        }
+        if (!hasLeavesNearby(world, trunkTop, 0, 0, false)) {
+            return false;
+        }
+        int lowestLeaves = trunkTop.getY() + 1;
+        java.util.List<BlockPos> logs = new java.util.ArrayList<>();
+        for (BlockPos trunkPos = trunkBase; trunkPos.getY() <= trunkTop.getY();
+                trunkPos = trunkPos.up()) {
+            if (!isVerticalLog(world, trunkPos)) continue;
+            logs.add(trunkPos);
+            for (BlockPos leafPos : BlockPos.getAllInBox(trunkPos.add(-2, 0, -2),
+                    trunkPos.add(2, 1, 2))) {
+                IBlockState leaves = world.getBlockState(leafPos);
+                if (leaves.getBlock().isLeaves(leaves, world, leafPos)
+                        && BeeNestLeaves.matches(leaves) && sameVanillaTree(trunk, leaves)) {
+                    lowestLeaves = Math.min(lowestLeaves, leafPos.getY());
+                }
+            }
+        }
+        int nestY = Math.max(lowestLeaves - 1, trunkBase.getY() + 1);
+        java.util.List<BlockPos> candidates = new java.util.ArrayList<>();
+        for (BlockPos log : logs) {
+            if (log.getY() != nestY) continue;
+            candidates.add(log.south());
+            candidates.add(log.west());
+            candidates.add(log.east());
+        }
+        java.util.Collections.shuffle(candidates, random);
+        for (BlockPos candidate : candidates) {
+            if (!world.isAirBlock(candidate) || !world.isAirBlock(candidate.south())) continue;
+            if (!world.setBlockState(candidate, FFDBlocks.BEE_NEST.getDefaultState()
+                    .withProperty(BlockBeehive.FACING, EnumFacing.SOUTH), WORLDGEN_FLAGS)) continue;
+            TileEntity tile = world.getTileEntity(candidate);
+            if (tile instanceof TileEntityBeehive) {
+                int count = FFDConfig.beeNestMinBees + random.nextInt(
+                        FFDConfig.beeNestMaxBees - FFDConfig.beeNestMinBees + 1);
+                ((TileEntityBeehive) tile).addNewBees(count, random);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean isOakOrBirchLog(IBlockState state) {
+        if (state.getBlock() != Blocks.LOG) {
+            return false;
+        }
+        BlockPlanks.EnumType type = state.getValue(BlockOldLog.VARIANT);
+        return type == BlockPlanks.EnumType.OAK || type == BlockPlanks.EnumType.BIRCH;
+    }
+
+    public static boolean hasNearbyFlower(World world, BlockPos origin) {
+        for (BlockPos flowerPos : BlockPos.getAllInBox(origin.add(-2, -1, -2),
+                origin.add(2, 1, 2))) {
+            IBlockState flower = world.getBlockState(flowerPos);
+            Block block = flower.getBlock();
+            if (block instanceof BlockFlower
+                    || xy177.farmersfuturedelight.common.block.BlockFutureFlower.isFlower(block)) {
+                return true;
+            }
+            if (block instanceof BlockDoublePlant) {
+                if (flower.getValue(BlockDoublePlant.HALF) == BlockDoublePlant.EnumBlockHalf.UPPER) {
+                    flower = world.getBlockState(flowerPos.down());
+                }
+                if (flower.getBlock() != block) continue;
+                BlockDoublePlant.EnumPlantType type = flower.getValue(BlockDoublePlant.VARIANT);
+                if (type != BlockDoublePlant.EnumPlantType.GRASS
+                        && type != BlockDoublePlant.EnumPlantType.FERN) return true;
             }
         }
         return false;

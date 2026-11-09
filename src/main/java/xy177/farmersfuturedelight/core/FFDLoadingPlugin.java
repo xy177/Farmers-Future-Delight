@@ -12,9 +12,24 @@ public final class FFDLoadingPlugin implements IFMLLoadingPlugin {
     @Override
     public String[] getASMTransformerClass() {
         if (Boolean.TRUE.equals(Launch.blackboard.get("ffd.cleanMixActive"))) {
-            return new String[0];
+            return new String[] {
+                    FFDRabbitJumpTransformer.class.getName(),
+                    FFDCreativeInventoryTransformer.class.getName(),
+                    FFDMenuTransformer.class.getName(),
+                    FFDFunctionPermissionTransformer.class.getName(),
+                    FFDCommandPermissionTransformer.class.getName(),
+                    FFDVanillaAdvancementTransformer.class.getName()
+            };
         }
-        return new String[] {FFDHeightTransformer.class.getName()};
+        return new String[] {
+                FFDHeightTransformer.class.getName(),
+                FFDRabbitJumpTransformer.class.getName(),
+                FFDCreativeInventoryTransformer.class.getName(),
+                FFDMenuTransformer.class.getName(),
+                FFDFunctionPermissionTransformer.class.getName(),
+                FFDCommandPermissionTransformer.class.getName(),
+                FFDVanillaAdvancementTransformer.class.getName()
+        };
     }
 
     @Override

@@ -1,0 +1,23 @@
+{
+  "parent": "minecraft:adventure/root",
+  "display": {
+    "icon": {
+      "item": "farmers_future_delight:crossbow"
+    },
+    "title": {
+      "translate": "advancements.adventure.ol_betsy.title"
+    },
+    "description": {
+      "translate": "advancements.adventure.ol_betsy.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "shot_crossbow": {
+      "trigger": "farmers_future_delight:shot_crossbow"
+    }
+  }
+}

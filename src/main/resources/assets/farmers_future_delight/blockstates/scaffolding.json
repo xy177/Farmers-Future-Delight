@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "bottom=false": {
+      "model": "farmers_future_delight:scaffolding_stable"
+    },
+    "bottom=true": {
+      "model": "farmers_future_delight:scaffolding_unstable"
+    }
+  }
+}

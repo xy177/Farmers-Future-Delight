@@ -1,0 +1,149 @@
+{
+  "elements": [
+    {
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "farmers_future_delight:village/snowy/streets/corner_01",
+        "processors": "farmers_future_delight:street_snowy_or_taiga",
+        "projection": "terrain_matching"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "farmers_future_delight:village/snowy/streets/corner_02",
+        "processors": "farmers_future_delight:street_snowy_or_taiga",
+        "projection": "terrain_matching"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "farmers_future_delight:village/snowy/streets/corner_03",
+        "processors": "farmers_future_delight:street_snowy_or_taiga",
+        "projection": "terrain_matching"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "farmers_future_delight:village/snowy/streets/square_01",
+        "processors": "farmers_future_delight:street_snowy_or_taiga",
+        "projection": "terrain_matching"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "farmers_future_delight:village/snowy/streets/straight_01",
+        "processors": "farmers_future_delight:street_snowy_or_taiga",
+        "projection": "terrain_matching"
+      },
+      "weight": 4
+    },
+    {
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "farmers_future_delight:village/snowy/streets/straight_02",
+        "processors": "farmers_future_delight:street_snowy_or_taiga",
+        "projection": "terrain_matching"
+      },
+      "weight": 4
+    },
+    {
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "farmers_future_delight:village/snowy/streets/straight_03",
+        "processors": "farmers_future_delight:street_snowy_or_taiga",
+        "projection": "terrain_matching"
+      },
+      "weight": 4
+    },
+    {
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "farmers_future_delight:village/snowy/streets/straight_04",
+        "processors": "farmers_future_delight:street_snowy_or_taiga",
+        "projection": "terrain_matching"
+      },
+      "weight": 7
+    },
+    {
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "farmers_future_delight:village/snowy/streets/straight_06",
+        "processors": "farmers_future_delight:street_snowy_or_taiga",
+        "projection": "terrain_matching"
+      },
+      "weight": 4
+    },
+    {
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "farmers_future_delight:village/snowy/streets/straight_08",
+        "processors": "farmers_future_delight:street_snowy_or_taiga",
+        "projection": "terrain_matching"
+      },
+      "weight": 4
+    },
+    {
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "farmers_future_delight:village/snowy/streets/crossroad_02",
+        "processors": "farmers_future_delight:street_snowy_or_taiga",
+        "projection": "terrain_matching"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "farmers_future_delight:village/snowy/streets/crossroad_03",
+        "processors": "farmers_future_delight:street_snowy_or_taiga",
+        "projection": "terrain_matching"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "farmers_future_delight:village/snowy/streets/crossroad_04",
+        "processors": "farmers_future_delight:street_snowy_or_taiga",
+        "projection": "terrain_matching"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "farmers_future_delight:village/snowy/streets/crossroad_05",
+        "processors": "farmers_future_delight:street_snowy_or_taiga",
+        "projection": "terrain_matching"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "farmers_future_delight:village/snowy/streets/crossroad_06",
+        "processors": "farmers_future_delight:street_snowy_or_taiga",
+        "projection": "terrain_matching"
+      },
+      "weight": 2
+    },
+    {
+      "element": {
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "farmers_future_delight:village/snowy/streets/turn_01",
+        "processors": "farmers_future_delight:street_snowy_or_taiga",
+        "projection": "terrain_matching"
+      },
+      "weight": 3
+    }
+  ],
+  "fallback": "farmers_future_delight:village/snowy/terminators"
+}

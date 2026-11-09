@@ -33,9 +33,12 @@ import xy177.farmersfuturedelight.common.worldgen.WorldGenModernIcebergs;
 import xy177.farmersfuturedelight.common.worldgen.WorldGenModernOres;
 import xy177.farmersfuturedelight.common.worldgen.WorldGenUnderwaterMagma;
 import xy177.farmersfuturedelight.common.worldgen.WorldGenModernMountainBiomes;
+import xy177.farmersfuturedelight.common.worldgen.WorldGenModernBamboo;
 import xy177.farmersfuturedelight.common.worldgen.WorldGenVerticalCaveBiomes;
 import xy177.farmersfuturedelight.common.worldgen.WorldGenModernCarvers;
 import xy177.farmersfuturedelight.common.worldgen.FFDStructureHooks;
+import xy177.farmersfuturedelight.common.worldgen.FFDStructureBeard;
+import xy177.farmersfuturedelight.common.worldgen.FFDModernStructures;
 import xy177.farmersfuturedelight.common.worldgen.FFDLushCaveBlockProvider;
 import xy177.farmersfuturedelight.common.worldgen.FFDModernStoneProvider;
 import xy177.farmersfuturedelight.common.worldgen.MapGenLushCaves;
@@ -118,6 +121,23 @@ public final class ChunkGeneratorExtended extends ChunkGeneratorOverworld {
         return worldgenData.preliminarySurfaceLevel(x, z);
     }
 
+    public int structureSurfaceHeight(int blockX, int blockZ) {
+        return structureSurfaceHeight(blockX, blockZ, FFDStructureBeard.EMPTY);
+    }
+
+    public int structureSurfaceHeight(int blockX, int blockZ, FFDStructureBeard beard) {
+        GenerationRegion region = new GenerationRegion(regionGenerationCache, worldgenData, densityGridCache, modernCarvers);
+        TerrainSample sample = region.sample(blockX >> 4, blockZ >> 4);
+        DensitySampler.Column column = sample.densitySampler.new Column(blockX & 15, blockZ & 15);
+        for (int height = FFDModernWorldgenData.MIN_Y + FFDModernWorldgenData.HEIGHT - 1;
+             height >= FFDModernWorldgenData.MIN_Y; height--) {
+            if (sample.baseStateForDensity(blockX, height, blockZ,
+                    column.sample(height) + beard.sample(blockX, height, blockZ), surfaceRules)
+                    .getMaterial() != net.minecraft.block.material.Material.AIR) return height + 1;
+        }
+        return FFDModernWorldgenData.MIN_Y;
+    }
+
     @Override
     public Chunk generateChunk(int chunkX, int chunkZ) {
         long profileChunkStart = FFDWorldgenProfiler.ENABLED ? System.nanoTime() : 0L;
@@ -133,6 +153,7 @@ public final class ChunkGeneratorExtended extends ChunkGeneratorOverworld {
         int startZ = chunkZ << 4;
         DensitySampler densitySampler = terrainSample.densitySampler;
         densitySampler.fill(densityScratch);
+        FFDStructureBeard structureBeard = FFDModernStructures.prepareTerrain(world, this, chunkX, chunkZ);
         if (FFDWorldgenProfiler.ENABLED) {
             profileStages[0] = System.nanoTime() - profileStageStart;
             profileStageStart = System.nanoTime();
@@ -148,7 +169,7 @@ public final class ChunkGeneratorExtended extends ChunkGeneratorOverworld {
                 int worldZ = startZ + localZ;
                 for (int y = FFDModernWorldgenData.MIN_Y;
                      y < FFDModernWorldgenData.MIN_Y + FFDModernWorldgenData.HEIGHT; y++) {
-                    double density = densityScratch[densityIndex(localX, y, localZ)];
+                    double density = densityScratch[densityIndex(localX, y, localZ)] + structureBeard.sample(worldX, y, worldZ);
                     IBlockState substance = aquifer.computeSubstance(worldX, y, worldZ, density);
                     IBlockState state = substance;
                     if (state == null) {
@@ -169,7 +190,7 @@ public final class ChunkGeneratorExtended extends ChunkGeneratorOverworld {
                 }
             }
         }
-        terrainSample.rememberSurfaceHeights(oceanFloorY);
+        if (structureBeard.isEmpty()) terrainSample.rememberSurfaceHeights(oceanFloorY);
         if (FFDWorldgenProfiler.ENABLED) {
             profileStages[1] = System.nanoTime() - profileStageStart;
             profileStageStart = System.nanoTime();
@@ -215,7 +236,8 @@ public final class ChunkGeneratorExtended extends ChunkGeneratorOverworld {
 
             @Override
             public int surfaceY(int localX, int localZ) {
-                return terrainSample.surfaceY(localX, localZ, surfaceRules);
+                return structureBeard.isEmpty() ? terrainSample.surfaceY(localX, localZ, surfaceRules)
+                        : oceanFloorY[localZ * 16 + localX];
             }
         });
         if (FFDWorldgenProfiler.ENABLED) {
@@ -223,7 +245,7 @@ public final class ChunkGeneratorExtended extends ChunkGeneratorOverworld {
             profileStageStart = System.nanoTime();
         }
         recomputeOceanFloor(chunk, oceanFloorY);
-        clearLegacyBedrockLayer(chunk, densitySampler, aquifer, startX, startZ, fluidUpdates);
+        clearLegacyBedrockLayer(chunk, densitySampler, aquifer, structureBeard, startX, startZ, fluidUpdates);
         Set<Integer> generatedGlowLichen = new HashSet<>();
         NeighborAwareCaveAccess caveAccess = caveBiomeAccess(chunk, chunkX, chunkZ,
                 verticalBiomes, fluidUpdates, oceanFloorY, generationRegion,
@@ -810,7 +832,8 @@ public final class ChunkGeneratorExtended extends ChunkGeneratorOverworld {
     }
 
     private void clearLegacyBedrockLayer(Chunk chunk, DensitySampler densitySampler, FFDModernAquifer aquifer,
-                                         int startX, int startZ, @Nullable List<Integer> fluidUpdates) {
+                                         FFDStructureBeard structureBeard, int startX, int startZ,
+                                         @Nullable List<Integer> fluidUpdates) {
         for (int localX = 0; localX < 16; localX++) {
             for (int localZ = 0; localZ < 16; localZ++) {
                 for (int y = 0; y < 5; y++) {
@@ -818,7 +841,8 @@ public final class ChunkGeneratorExtended extends ChunkGeneratorOverworld {
                     if (chunk.getBlockState(pos).getBlock() != Blocks.BEDROCK) {
                         continue;
                     }
-                    double density = densitySampler.sample(localX, y, localZ);
+                    double density = densitySampler.sample(localX, y, localZ)
+                            + structureBeard.sample(pos.getX(), y, pos.getZ());
                     IBlockState substance = aquifer.computeSubstance(pos.getX(), y, pos.getZ(), density);
                     IBlockState replacement = substance == null
                             ? surfaceRules.stoneStateAt(pos.getX(), y, pos.getZ()) : substance;
@@ -841,7 +865,8 @@ public final class ChunkGeneratorExtended extends ChunkGeneratorOverworld {
         TerrainSample terrainSample = terrainSample(chunkX, chunkZ);
         DensitySampler densitySampler = terrainSample.densitySampler;
         FFDModernAquifer aquifer = terrainSample.aquifer;
-        clearLegacyBedrockLayer(chunk, densitySampler, aquifer, startX, startZ, fluidUpdates);
+        FFDStructureBeard structureBeard = FFDModernStructures.prepareTerrain(world, this, chunkX, chunkZ);
+        clearLegacyBedrockLayer(chunk, densitySampler, aquifer, structureBeard, startX, startZ, fluidUpdates);
         chunk.markDirty();
         return fluidUpdates;
     }
@@ -1216,6 +1241,7 @@ public final class ChunkGeneratorExtended extends ChunkGeneratorOverworld {
         try (FFDHeightHooks.WorldgenHeightScope ignored = FFDHeightHooks.enterLegacyWorldgenHeight()) {
             super.populate(x, z);
         }
+        WorldGenModernBamboo.generate(world, x, z);
         mountainBiomes.generate(world, x, z);
         modernFossils.generateChunk(world, x, z);
         Chunk chunk = world.getChunkFromChunkCoords(x, z);

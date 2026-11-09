@@ -1,0 +1,19 @@
+{
+  "rules": [
+    {
+      "id": "farmers_future_delight:example_compostable",
+      "item": { "id": "minecraft:rotten_flesh", "meta": 0 },
+      "chance": 0.5,
+      "villagerCanCompost": false
+    },
+    {
+      "id": "minecraft:wheat_seeds",
+      "item": "minecraft:wheat_seeds",
+      "chance": 0.3,
+      "villagerCanCompost": true
+    }
+  ],
+  "remove": [
+    { "id": "minecraft:wheat_seeds" }
+  ]
+}

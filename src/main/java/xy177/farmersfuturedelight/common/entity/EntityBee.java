@@ -37,6 +37,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.MobEffects;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -49,6 +50,7 @@ import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
@@ -65,6 +67,8 @@ import xy177.farmersfuturedelight.common.block.BlockSweetBerryBush;
 import xy177.farmersfuturedelight.common.block.BlockCaveVinesBase;
 import xy177.farmersfuturedelight.common.tile.TileEntityBeehive;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
+import xy177.farmersfuturedelight.common.registry.FFDItems;
+import xy177.farmersfuturedelight.common.block.BlockFutureFlower;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
 import xy177.farmersfuturedelight.common.worldgen.FFDLushCaveBlockProvider;
 
@@ -437,6 +441,23 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
     }
 
     @Override
+    public boolean processInteract(EntityPlayer player, EnumHand hand) {
+        ItemStack held = player.getHeldItem(hand);
+        if (held.getItem() instanceof ItemBlock
+                && ((ItemBlock) held.getItem()).getBlock() == FFDItems.effectiveBlock(FFDBlocks.WITHER_ROSE)
+                && isBreedingItem(held)) {
+            if (!player.capabilities.isCreativeMode) {
+                held.shrink(1);
+            }
+            if (!world.isRemote) {
+                addPotionEffect(new PotionEffect(MobEffects.WITHER, 40));
+            }
+            return true;
+        }
+        return super.processInteract(player, hand);
+    }
+
+    @Override
     public EntityAgeable createChild(EntityAgeable ageable) {
         return new EntityBee(world);
     }
@@ -547,7 +568,9 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
 
     private static boolean isBeeAttractiveBlock(IBlockState state) {
         Block block = state.getBlock();
-        return block instanceof BlockFlower || block == Blocks.CHORUS_FLOWER
+        return block instanceof BlockFlower
+                || BlockFutureFlower.isFlower(block)
+                || block == Blocks.CHORUS_FLOWER
                 || FFDLushCaveBlockProvider.get().isFloweringAzalea(state)
                 || FFDLushCaveBlockProvider.get().isSporeBlossom(state)
                 || BeePollinationTargets.matches(state);

@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": {"model": "farmers_future_delight:stonecutter"},
+    "facing=east": {"model": "farmers_future_delight:stonecutter", "y": 90},
+    "facing=south": {"model": "farmers_future_delight:stonecutter", "y": 180},
+    "facing=west": {"model": "farmers_future_delight:stonecutter", "y": 270}
+  }
+}

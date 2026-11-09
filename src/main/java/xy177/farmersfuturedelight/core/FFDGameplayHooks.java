@@ -7,16 +7,28 @@ import java.lang.reflect.Method;
 import java.util.Random;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityAgeable;
+import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.monster.EntityShulker;
 import net.minecraft.entity.projectile.EntityShulkerBullet;
 import net.minecraft.entity.projectile.EntityArrow;
+import net.minecraft.entity.projectile.EntityFireball;
+import net.minecraft.entity.projectile.EntityThrowable;
+import net.minecraft.entity.item.EntityMinecartTNT;
+import net.minecraft.entity.item.EntityTNTPrimed;
+import net.minecraft.entity.monster.AbstractSkeleton;
+import net.minecraft.entity.monster.EntityCreeper;
+import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockCauldron;
+import net.minecraft.block.BlockFenceGate;
 import net.minecraft.block.BlockJukebox;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.util.EnumFacing;
@@ -26,9 +38,14 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.init.MobEffects;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.pathfinding.PathNodeType;
+import net.minecraft.pathfinding.Path;
+import net.minecraft.pathfinding.PathPoint;
+import net.minecraft.pathfinding.WalkNodeProcessor;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvent;
@@ -41,6 +58,7 @@ import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraft.world.GameRules;
+import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.Fluid;
@@ -48,9 +66,14 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityBeacon;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemWritableBook;
+import net.minecraft.item.ItemWrittenBook;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.SoundCategory;
 import java.util.Map;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import xy177.farmersfuturedelight.common.FFDConfig;
 import xy177.farmersfuturedelight.common.FFDPowderSnowEvents;
@@ -63,21 +86,281 @@ import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.registry.FFDPotions;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
+import xy177.farmersfuturedelight.common.item.INetheriteItem;
 
 public final class FFDGameplayHooks {
+    private static final Logger LOGGER = LogManager.getLogger("FFD Gameplay Hooks");
     public static final String PLAYERS_SLEEPING_PERCENTAGE_RULE = "playersSleepingPercentage";
     private static final int DEFAULT_SLEEPING_PERCENTAGE = 100;
     private static final float MODERN_CLOUD_HEIGHT = 192.0F;
     private static final int LIGHTNING_ROD_RANGE = 128;
     private static final String XP_MERGE_COUNT_TAG = "ffdExperienceOrbCount";
+    private static final int MAX_BOOK_PAGES = 100;
+    private static final int MAX_BOOK_PAGE_LENGTH = 1024;
     private static final Map<Entity, Boolean> SWEET_BERRY_SLOWDOWN =
             new MapMaker().weakKeys().makeMap();
     private static final DamageSource SWEET_BERRY_DAMAGE = new DamageSource("sweetBerryBush");
     private static Method shulkerTeleportMethod;
     private static DataParameter<Byte> entityFlags;
     private static boolean entityFlagsResolved;
+    private static net.minecraft.block.Block blockFlowerChorus;
+    private static final ThreadLocal<FFDSpawnGroupData> NATURAL_SPAWN_GROUP = new ThreadLocal<>();
 
     private FFDGameplayHooks() {
+    }
+
+    public static boolean isWritableBookEditValid(NBTTagCompound tag) {
+        return ItemWritableBook.isNBTValid(tag) && isBookPageContentValid(tag);
+    }
+
+    public static boolean isWrittenBookSignValid(NBTTagCompound tag) {
+        return ItemWrittenBook.validBookTagContents(tag) && isBookPageContentValid(tag);
+    }
+
+    private static boolean isBookPageContentValid(NBTTagCompound tag) {
+        NBTTagList pages = tag.getTagList("pages", 8);
+        if (pages.tagCount() > MAX_BOOK_PAGES) return false;
+        for (int index = 0; index < pages.tagCount(); index++) {
+            if (pages.getStringTagAt(index).length() > MAX_BOOK_PAGE_LENGTH) return false;
+        }
+        return true;
+    }
+
+    public static boolean canEatFood(boolean original, EntityPlayer player) {
+        return original || player.capabilities.disableDamage;
+    }
+
+    public static boolean canPistonBlocksStick(IBlockState first, IBlockState second) {
+        Block firstBlock = first.getBlock();
+        Block secondBlock = second.getBlock();
+        return !((firstBlock == FFDBlocks.HONEY_BLOCK && secondBlock == Blocks.SLIME_BLOCK)
+                || (firstBlock == Blocks.SLIME_BLOCK && secondBlock == FFDBlocks.HONEY_BLOCK));
+    }
+
+    public static boolean pistonAcceleratesEntities(boolean sticky, IBlockState state) {
+        return sticky && state.getBlock() != FFDBlocks.HONEY_BLOCK;
+    }
+
+    public static boolean canPistonPullBlock(boolean allowed, IBlockState first, IBlockState second) {
+        return allowed && canPistonBlocksStick(first, second);
+    }
+
+    public static void moveHoneyPistonEntities(net.minecraft.tileentity.TileEntityPiston piston,
+                                               float progress, float newProgress,
+                                               ThreadLocal<EnumFacing> movingEntity) {
+        if (piston.getPistonState().getBlock() != FFDBlocks.HONEY_BLOCK) return;
+        EnumFacing facing = piston.getFacing();
+        EnumFacing movement = piston.isExtending() ? facing : facing.getOpposite();
+        if (movement.getAxis() == EnumFacing.Axis.Y) return;
+        World world = piston.getWorld();
+        BlockPos pos = piston.getPos();
+        double offset = piston.isExtending() ? progress - 1.0D : 1.0D - progress;
+        AxisAlignedBB box = new AxisAlignedBB(0.0D, 0.9375D, 0.0D,
+                1.0D, 1.500001D, 1.0D).offset(pos)
+                .offset(offset * facing.getFrontOffsetX(), 0.0D,
+                        offset * facing.getFrontOffsetZ());
+        double distance = newProgress - progress;
+        for (Entity entity : world.getEntitiesWithinAABBExcludingEntity(null, box)) {
+            boolean supported = new BlockPos(entity.posX,
+                    entity.getEntityBoundingBox().minY - 0.2D, entity.posZ).equals(pos);
+            if (entity.getPushReaction() != net.minecraft.block.material.EnumPushReaction.NORMAL
+                    || !entity.onGround || !supported && (entity.posX < box.minX
+                    || entity.posX > box.maxX || entity.posZ < box.minZ || entity.posZ > box.maxZ)) {
+                continue;
+            }
+            EnumFacing previous = movingEntity.get();
+            movingEntity.set(movement);
+            try {
+                entity.move(MoverType.PISTON, distance * movement.getFrontOffsetX(), 0.0D,
+                        distance * movement.getFrontOffsetZ());
+            } finally {
+                movingEntity.set(previous);
+            }
+        }
+    }
+
+    public static IEntityLivingData prepareNaturalSpawnGroupData(IEntityLivingData data) {
+        FFDSpawnGroupData group = data instanceof FFDSpawnGroupData
+                ? (FFDSpawnGroupData) data : new FFDSpawnGroupData(data);
+        NATURAL_SPAWN_GROUP.set(group);
+        return group.delegate;
+    }
+
+    public static IEntityLivingData finishNaturalSpawn(EntityLiving entity,
+                                                        IEntityLivingData data) {
+        FFDSpawnGroupData group = NATURAL_SPAWN_GROUP.get();
+        NATURAL_SPAWN_GROUP.remove();
+        if (group == null) {
+            return data;
+        }
+        group.delegate = data;
+        if (entity instanceof EntityAgeable && group.groupSize > 0
+                && entity.world.rand.nextFloat() < 0.05F) {
+            ((EntityAgeable) entity).setGrowingAge(-24000);
+        }
+        group.groupSize++;
+        return group;
+    }
+
+    private static final class FFDSpawnGroupData implements IEntityLivingData {
+        private IEntityLivingData delegate;
+        private int groupSize;
+
+        private FFDSpawnGroupData(IEntityLivingData delegate) {
+            this.delegate = delegate;
+        }
+    }
+
+    public static boolean holdClimbingPosition(boolean sneaking, EntityLivingBase entity) {
+        return sneaking && entity.world.getBlockState(new BlockPos(entity.posX, entity.posY, entity.posZ))
+                .getBlock() != FFDBlocks.SCAFFOLDING;
+    }
+
+    public static float explosionDropChance(float original, Entity source, World world) {
+        if (!(source instanceof EntityTNTPrimed) && !(source instanceof EntityMinecartTNT)) {
+            return original;
+        }
+        return world.getGameRules().getBoolean("tntExplosionDropDecay") ? original : 1.0F;
+    }
+
+    public static void ensurePortingGameRules(GameRules rules) {
+        if (!rules.hasRule("tntExplosionDropDecay")) {
+            rules.addGameRule("tntExplosionDropDecay", "false", GameRules.ValueType.BOOLEAN_VALUE);
+        }
+        if (!rules.hasRule("projectilesCanBreakBlocks")) {
+            rules.addGameRule("projectilesCanBreakBlocks", "true", GameRules.ValueType.BOOLEAN_VALUE);
+        }
+    }
+
+    public static boolean breakChorusFlowerOnProjectile(Entity projectile, RayTraceResult hit) {
+        if (projectile.world.isRemote || !projectile.world.getGameRules().getBoolean("projectilesCanBreakBlocks")
+                || !(projectile instanceof EntityArrow || projectile instanceof EntityFireball
+                || projectile instanceof net.minecraft.entity.projectile.EntitySnowball
+                || projectile instanceof net.minecraft.entity.projectile.EntityEgg
+                || projectile instanceof net.minecraft.entity.item.EntityFireworkRocket) || hit == null
+                || hit.typeOfHit != RayTraceResult.Type.BLOCK) {
+            return false;
+        }
+        BlockPos pos = hit.getBlockPos();
+        if (blockFlowerChorus == null) {
+            blockFlowerChorus = Block.REGISTRY.getObject(new net.minecraft.util.ResourceLocation(
+                    "minecraft:chorus_flower"));
+        }
+        if (projectile.world.getBlockState(pos).getBlock() != blockFlowerChorus) {
+            return false;
+        }
+        Entity owner = projectile instanceof EntityArrow ? ((EntityArrow) projectile).shootingEntity
+                : projectile instanceof EntityFireball ? ((EntityFireball) projectile).shootingEntity
+                : projectile instanceof net.minecraft.entity.item.EntityFireworkRocket
+                ? FFDFireworkHooks.getShooter(
+                        (net.minecraft.entity.item.EntityFireworkRocket) projectile)
+                : projectile instanceof EntityThrowable ? ((EntityThrowable) projectile).getThrower() : null;
+        if (owner != null && !(owner instanceof EntityPlayer)
+                && !projectile.world.getGameRules().getBoolean("mobGriefing")) {
+            return false;
+        }
+        Block block = projectile.world.getBlockState(pos).getBlock();
+        if (owner == null && projectile.world.getWorldInfo().getGameType()
+                == net.minecraft.world.GameType.ADVENTURE
+                && !canProjectileBreak(projectile, block)) {
+            return false;
+        }
+        if (owner instanceof EntityPlayer) {
+            EntityPlayer player = (EntityPlayer) owner;
+            boolean adventure = player instanceof EntityPlayerMP
+                    ? ((EntityPlayerMP) player).interactionManager.getGameType() == net.minecraft.world.GameType.ADVENTURE
+                    : !player.capabilities.allowEdit;
+            if (adventure && !canProjectileBreak(projectile, block)
+                    || !projectile.world.isBlockModifiable(player, pos)) {
+                return false;
+            }
+        }
+        return projectile.world.destroyBlock(pos, true);
+    }
+
+    public static void captureProjectileCanDestroy(Entity projectile, ItemStack ammunition) {
+        if (projectile == null || ammunition == null || !ammunition.hasTagCompound()
+                || !ammunition.getTagCompound().hasKey("CanDestroy", 9)) {
+            return;
+        }
+        NBTTagList canDestroy = ammunition.getTagCompound().getTagList("CanDestroy", 8);
+        projectile.getEntityData().setTag("ffdCanDestroy", canDestroy.copy());
+    }
+
+    private static boolean canProjectileBreak(Entity projectile, Block block) {
+        NBTTagCompound data = projectile.getEntityData();
+        if (!data.hasKey("ffdCanDestroy", 9)) {
+            return false;
+        }
+        ItemStack permissions = new ItemStack(Items.ARROW);
+        NBTTagCompound tag = new NBTTagCompound();
+        tag.setTag("CanDestroy", data.getTagList("ffdCanDestroy", 8).copy());
+        permissions.setTagCompound(tag);
+        return permissions.canDestroy(block);
+    }
+
+    public static void dropCreeperDiscs(LivingDropsEvent event) {
+        EntityLivingBase victim = event.getEntityLiving();
+        Entity attacker = event.getSource().getTrueSource();
+        if (!(victim instanceof EntityCreeper) || !(attacker instanceof AbstractSkeleton
+                || attacker instanceof net.minecraft.entity.passive.EntitySkeletonHorse)
+                || attacker instanceof EntitySkeleton
+                || !victim.world.getGameRules().getBoolean("doMobLoot")) {
+            return;
+        }
+        WorldServer world = (WorldServer) victim.world;
+        net.minecraft.world.storage.loot.LootContext context =
+                xy177.farmersfuturedelight.common.FFDEntityLootTables.deathContext(
+                        world, victim, event.getSource(), event.isRecentlyHit());
+        for (ItemStack stack : world.getLootTableManager().getLootTableFromLocation(
+                xy177.farmersfuturedelight.common.FFDEntityLootTables.CREEPER_MUSIC_DISCS)
+                .generateLootForPools(victim.getRNG(), context)) {
+            event.getDrops().add(new EntityItem(world, victim.posX, victim.posY, victim.posZ, stack));
+        }
+    }
+
+    public static boolean dryPlacedSponge(World world, BlockPos pos, IBlockState state) {
+        if (!state.getValue(net.minecraft.block.BlockSponge.WET)
+                || !world.provider.doesWaterVaporize()) {
+            return false;
+        }
+        if (!world.isRemote) {
+            world.setBlockState(pos, Blocks.SPONGE.getDefaultState(), 3);
+            if (world instanceof WorldServer) {
+                for (int particle = 0; particle < 8; particle++) {
+                    ((WorldServer) world).spawnParticle(net.minecraft.util.EnumParticleTypes.CLOUD,
+                            pos.getX() + world.rand.nextDouble(), pos.getY() + 1.2D,
+                            pos.getZ() + world.rand.nextDouble(), 1, 0.0D, 0.0D, 0.0D, 0.0D);
+                }
+            }
+            world.playSound(null, pos, FFDSounds.WET_SPONGE_DRIES, SoundCategory.BLOCKS,
+                    1.0F, (1.0F + world.rand.nextFloat() * 0.2F) * 0.7F);
+        }
+        return true;
+    }
+
+    public static void consumeFood(ItemStack stack, int count, EntityLivingBase consumer) {
+        if (!(consumer instanceof EntityPlayer)
+                || !((EntityPlayer) consumer).capabilities.isCreativeMode) {
+            stack.shrink(count);
+        }
+    }
+
+    public static ItemStack foodRemainder(ItemStack remainder, ItemStack original,
+                                          EntityLivingBase consumer) {
+        if (consumer instanceof EntityPlayer) {
+            EntityPlayer player = (EntityPlayer) consumer;
+            if (player.capabilities.isCreativeMode) {
+                return original;
+            }
+            if (!original.isEmpty()) {
+                if (!player.inventory.addItemStackToInventory(remainder)) {
+                    player.dropItem(remainder, false);
+                }
+                return original;
+            }
+        }
+        return remainder;
     }
 
     public static boolean cannotBePickedUpByBoat(Entity entity) {
@@ -143,7 +426,7 @@ public final class FFDGameplayHooks {
     }
 
     public static double consumeSweetBerrySlowdown(Entity entity, MoverType type) {
-        if (SWEET_BERRY_SLOWDOWN.remove(entity) == null) {
+        if (!SWEET_BERRY_SLOWDOWN.containsKey(entity) || SWEET_BERRY_SLOWDOWN.remove(entity) == null) {
             return 1.0D;
         }
         entity.motionX = 0.0D;
@@ -317,8 +600,16 @@ public final class FFDGameplayHooks {
         if (!areaLoaded) {
             return false;
         }
+        if (grassNeedsDecay(world, pos)) {
+            world.setBlockState(pos, Blocks.DIRT.getDefaultState());
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean grassNeedsDecay(World world, BlockPos pos) {
         if (world.getBlockState(pos).getBlock() != Blocks.GRASS) {
-            return true;
+            return false;
         }
         BlockPos abovePos = pos.up();
         IBlockState above = world.getBlockState(abovePos);
@@ -326,22 +617,23 @@ public final class FFDGameplayHooks {
                 || WaterloggedBlockApi.isFluidSource(world, abovePos)
                 || above.getBlock() instanceof BlockLiquid
                         && above.getValue(BlockLiquid.LEVEL) >= 8) {
-            world.setBlockState(pos, Blocks.DIRT.getDefaultState());
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     public static boolean setGrassTickState(World world, BlockPos pos, IBlockState state) {
-        if (state.getBlock() == Blocks.GRASS) {
-            IBlockState above = world.getBlockState(pos.up());
-            if (above.getMaterial().isLiquid()
-                    || WaterloggedBlockApi.isWaterlogged(above)
-                    || WaterloggedBlockApi.getFluidForBlock(above.getBlock()) != null) {
-                return false;
-            }
+        if (state.getBlock() == Blocks.GRASS
+                && !canGrassSpreadAt(world, pos.getX(), pos.getY(), pos.getZ())) {
+            return false;
         }
         return world.setBlockState(pos, state);
+    }
+
+    public static boolean canGrassSpreadAt(World world, int x, int y, int z) {
+        IBlockState above = world.getBlockState(new BlockPos(x, y + 1, z));
+        return !above.getMaterial().isLiquid() && !WaterloggedBlockApi.isWaterlogged(above)
+                && WaterloggedBlockApi.getFluidForBlock(above.getBlock()) == null;
     }
 
     public static boolean blocksFlowingWater(Block liquid, IBlockState targetState,
@@ -421,6 +713,10 @@ public final class FFDGameplayHooks {
         }
         block.updateTick(world, pos, state, random);
         IBlockState current = world.getBlockState(pos);
+        if (pos.getY() == 0 && FFDHeightHooks.isExtended(world)
+                && FFDHeightHooks.minY(world) == 0) {
+            xy177.farmersfuturedelight.common.world.FFDWorldgenFluidUpdates.queue(world, pos);
+        }
         if (WaterloggedBlockApi.isWaterlogged(world, pos)) {
             WaterloggedBlockApi.updateTick(world, pos, current);
         } else if (!WaterloggedBlockApi.isWaterlogged(current)) {
@@ -464,6 +760,19 @@ public final class FFDGameplayHooks {
         }
         return WaterloggedBlockApi.isWaterlogged(state)
                 ? WaterloggedBlockApi.getFluidState(world, pos) : state;
+    }
+
+    public static boolean farmlandShouldTurnToDirt(Material aboveMaterial, World world,
+                                                    BlockPos farmlandPos) {
+        if (!aboveMaterial.isSolid()) {
+            return false;
+        }
+        return !farmlandHasMaintainingBlock(world, farmlandPos);
+    }
+
+    public static boolean farmlandHasMaintainingBlock(World world, BlockPos farmlandPos) {
+        Block above = world.getBlockState(farmlandPos.up()).getBlock();
+        return above == Blocks.PISTON_EXTENSION || above instanceof BlockFenceGate;
     }
 
     public static boolean isWaterloggedStateForLiquid(IBlockState state) {
@@ -643,6 +952,56 @@ public final class FFDGameplayHooks {
         return 0.0F;
     }
 
+    public static int waterSinkingPathY(PathPoint point, WalkNodeProcessor processor,
+                                        IBlockAccess access, EntityLiving entity) {
+        if (point == null) {
+            return 0;
+        }
+        if (point.nodeType != PathNodeType.WATER || processor.getCanSwim()
+                || !shouldSinkInWater(entity)) {
+            return point.y;
+        }
+        int lowestY = point.y;
+        int minimumY = FFDHeightHooks.minY(entity);
+        int width = MathHelper.floor(entity.width + 1.0F);
+        int height = MathHelper.floor(entity.height + 1.0F);
+        while (lowestY - 1 > minimumY
+                && processor.getPathNodeType(access, point.x, lowestY - 1, point.z,
+                        entity, width, height, width, processor.getCanOpenDoors(),
+                        processor.getCanEnterDoors()) == PathNodeType.WATER) {
+            lowestY--;
+        }
+        return lowestY;
+    }
+
+    public static void advanceWaterSinkingPath(EntityLiving entity) {
+        if (!shouldSinkInWater(entity) || !entity.onGround
+                || entity.getNavigator().getNodeProcessor().getCanSwim()) {
+            return;
+        }
+        Path path = entity.getNavigator().getPath();
+        if (path == null || path.getCurrentPathIndex() + 1 >= path.getCurrentPathLength()) {
+            return;
+        }
+        PathPoint current = path.getPathPointFromIndex(path.getCurrentPathIndex());
+        PathPoint next = path.getPathPointFromIndex(path.getCurrentPathIndex() + 1);
+        if (current.nodeType != PathNodeType.WATER || next.nodeType != PathNodeType.WATER) {
+            return;
+        }
+        Vec3d towardCurrent = new Vec3d(current.x + 0.5D - entity.posX,
+                current.y - entity.posY, current.z + 0.5D - entity.posZ);
+        double currentDistance = towardCurrent.lengthSquared();
+        if (currentDistance >= 4.0D) {
+            return;
+        }
+        Vec3d towardNext = new Vec3d(next.x + 0.5D - entity.posX,
+                next.y - entity.posY, next.z + 0.5D - entity.posZ);
+        if ((currentDistance < 0.5D || towardNext.lengthSquared() < currentDistance)
+                && towardNext.normalize().dotProduct(towardCurrent.normalize()) < 0.0D) {
+            path.incrementPathIndex();
+        }
+    }
+
     public static Block pumpkinStemFruit(Block original) {
         return original == Blocks.PUMPKIN && FFDItems.isPumpkinEnabled()
                 && FFDItems.isItemRegistered(FFDItems.PUMPKIN) ? FFDBlocks.PUMPKIN : original;
@@ -664,27 +1023,71 @@ public final class FFDGameplayHooks {
 
     public static boolean itemWaterBuoyancy(boolean noGravity,
                                             net.minecraft.entity.item.EntityItem item) {
+        if (isNetheriteItemEntity(item) && isItemSubmerged(item, Material.LAVA)) {
+            applyItemFluidMovement(item, (double) 0.95F);
+            return true;
+        }
         if (Loader.isModLoaded("aquaacrobatics")) {
             return noGravity;
         }
+        if (!isItemSubmerged(item, Material.WATER)) {
+            return noGravity;
+        }
+        if (FFDConfig.isConfiguredItem(FFDConfig.waterSinkingItems, item.getItem())) {
+            return noGravity;
+        }
+        applyItemFluidMovement(item, (double) 0.99F);
+        return true;
+    }
+
+    private static boolean isItemSubmerged(EntityItem item, Material material) {
         double y = item.getEntityBoundingBox().minY + (double) 0.1F;
         BlockPos pos = new BlockPos(item.posX, y, item.posZ);
         IBlockState state = item.world.getBlockState(pos);
-        if (state.getBlock() instanceof BlockLiquid && state.getMaterial() == Material.WATER
+        if (state.getBlock() instanceof BlockLiquid && state.getMaterial() == Material.LAVA
+                && material == Material.LAVA) {
+            float height = item.world.getBlockState(pos.up()).getMaterial() == Material.LAVA
+                    ? 1.0F : 1.0F - BlockLiquid.getLiquidHeightPercent(state.getValue(BlockLiquid.LEVEL));
+            return y < pos.getY() + height;
+        }
+        if (state.getBlock() instanceof BlockLiquid && state.getMaterial() == material
                 && y >= pos.getY() + BlockLiquid.getBlockLiquidHeight(state, item.world, pos)) {
-            return noGravity;
+            return false;
         }
         AxisAlignedBB slice = new AxisAlignedBB(item.posX - 0.001D, y, item.posZ - 0.001D,
                 item.posX + 0.001D, y + 0.001D, item.posZ + 0.001D);
-        if (!item.world.isMaterialInBB(slice, Material.WATER)) {
-            return noGravity;
-        }
+        return item.world.isMaterialInBB(slice, material);
+    }
+
+    private static void applyItemFluidMovement(EntityItem item, double drag) {
         if (item.motionY < (double) 0.06F) {
             item.motionY += (double) 0.0005F;
         }
-        item.motionX *= (double) 0.99F;
-        item.motionZ *= (double) 0.99F;
-        return true;
+        item.motionX *= drag;
+        item.motionZ *= drag;
+    }
+
+    public static void updateNetheriteItemFireImmunity(EntityItem item) {
+        if (isNetheriteItemEntity(item)) {
+            if (!item.isImmuneToFire()) {
+                ObfuscationReflectionHelper.setPrivateValue(Entity.class, item, true,
+                        "field_70178_ae", "isImmuneToFire");
+            }
+            item.extinguish();
+        }
+    }
+
+    public static boolean cancelNetheriteItemFireDamage(EntityItem entityItem,
+                                                        DamageSource source) {
+        return source.isFireDamage() && isNetheriteItemEntity(entityItem);
+    }
+
+    public static boolean isNetheriteItemEntity(EntityItem entityItem) {
+        if (entityItem == null) {
+            return false;
+        }
+        ItemStack stack = entityItem.getItem();
+        return stack != null && !stack.isEmpty() && stack.getItem() instanceof INetheriteItem;
     }
 
     public static boolean isClimbableStep(Block block, Block ladder, Entity entity) {
@@ -755,19 +1158,72 @@ public final class FFDGameplayHooks {
         }
         boolean swimming = isSwimming(player);
         boolean next;
-        if (player.capabilities.isFlying || player.isSpectator() || player.isRiding()) {
+        if (player.capabilities.isFlying || player.isSpectator() || player.isRiding()
+                || player.isPlayerSleeping()) {
             next = false;
-        } else if (swimming) {
-            next = player.isSprinting() && player.isInWater();
+        } else if (player.isInWater()) {
+            next = swimming ? player.isSprinting()
+                    : player.isSprinting() && player.isInsideOfMaterial(Material.WATER);
         } else {
-            next = player.isSprinting() && player.isInWater()
-                    && player.isInsideOfMaterial(Material.WATER);
+            next = false;
         }
         setSwimming(player, next);
     }
 
     public static boolean useSwimmingSize(EntityPlayer player) {
-        return isSwimming(player);
+        if (player == null || !isSwimmingSystemEnabled() || player.isPlayerSleeping()
+                || player.isSpectator() || player.isRiding()) {
+            return false;
+        }
+        if (!canPlayerFitAtHeight(player, 0.6D)) {
+            return hasSwimmingPose(player);
+        }
+        return isSwimming(player) || !player.isElytraFlying()
+                && !canPlayerFitAtHeight(player, 1.8D)
+                && !canPlayerFitAtHeight(player, 1.5D);
+    }
+
+    public static boolean hasSwimmingPose(EntityPlayer player) {
+        return isSwimmingSystemEnabled() && player.height == 0.6F
+                && !player.isElytraFlying() && !player.isPlayerSleeping();
+    }
+
+    public static float crouchingHeight(float original) {
+        return isSwimmingSystemEnabled() ? 1.5F : original;
+    }
+
+    public static float playerEyeHeight(float original, EntityPlayer player) {
+        if (player == null || !isSwimmingSystemEnabled()
+                || player.isPlayerSleeping() || player.isRiding()) {
+            return original;
+        }
+        if (player.isElytraFlying() || hasSwimmingPose(player)) {
+            return 0.4F;
+        }
+        return player.height == 1.5F ? 1.27F : original;
+    }
+
+    public static boolean shouldUseCrouchingPose(boolean sneaking, EntityPlayer player) {
+        if (player == null || !isSwimmingSystemEnabled()) {
+            return sneaking;
+        }
+        return sneaking && !player.capabilities.isFlying
+                || !player.isElytraFlying() && !player.isPlayerSleeping()
+                && !player.isSpectator() && !player.isRiding()
+                && !canPlayerFitAtHeight(player, 1.8D)
+                && canPlayerFitAtHeight(player, 1.5D);
+    }
+
+    public static boolean shouldUseCrouchingModelPose(boolean sneaking, Entity entity) {
+        return entity instanceof EntityPlayer
+                && isSwimmingSystemEnabled() ? entity.height == 1.5F : sneaking;
+    }
+
+    private static boolean canPlayerFitAtHeight(EntityPlayer player, double height) {
+        AxisAlignedBB bounds = player.getEntityBoundingBox();
+        AxisAlignedBB candidate = new AxisAlignedBB(bounds.minX, bounds.minY, bounds.minZ,
+                bounds.maxX, bounds.minY + height, bounds.maxZ).shrink(1.0E-7D);
+        return player.world.getCollisionBoxes(player, candidate).isEmpty();
     }
 
     public static boolean handleSwimmingTravel(EntityPlayer player, float strafe,

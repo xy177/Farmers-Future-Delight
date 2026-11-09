@@ -1,0 +1,12 @@
+{
+  "parent": "farmers_future_delight:block/template_cube_directional",
+  "textures": {
+    "down": "farmers_future_delight:blocks/jigsaw_side",
+    "east": "farmers_future_delight:blocks/jigsaw_side",
+    "north": "farmers_future_delight:blocks/jigsaw_top",
+    "particle": "farmers_future_delight:blocks/jigsaw_top",
+    "south": "farmers_future_delight:blocks/jigsaw_bottom",
+    "up": "farmers_future_delight:blocks/jigsaw_lock",
+    "west": "farmers_future_delight:blocks/jigsaw_side"
+  }
+}

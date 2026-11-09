@@ -1,0 +1,1416 @@
+{
+  "tradedEnchantments": ["minecraft:protection","minecraft:fire_protection","minecraft:feather_falling","minecraft:blast_protection","minecraft:projectile_protection","minecraft:respiration","minecraft:aqua_affinity","minecraft:thorns","minecraft:depth_strider","minecraft:sharpness","minecraft:smite","minecraft:bane_of_arthropods","minecraft:knockback","minecraft:fire_aspect","minecraft:looting","minecraft:sweeping_edge","minecraft:efficiency","minecraft:silk_touch","minecraft:unbreaking","minecraft:fortune","minecraft:power","minecraft:punch","minecraft:flame","minecraft:infinity","minecraft:luck_of_the_sea","minecraft:lure","minecraft:loyalty","minecraft:impaling","minecraft:riptide","minecraft:channeling","minecraft:multishot","minecraft:quick_charge","minecraft:piercing","minecraft:density","minecraft:breach","minecraft:lunge"],
+  "groups": [
+    {
+      "trades": [
+        {
+          "id": "minecraft:wandering_trader/water_bottle_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 2,
+            "reputation_discount": 0.05,
+            "wants": {
+              "components": {
+                "minecraft:potion_contents": {
+                  "potion": "minecraft:water"
+                }
+              },
+              "id": "minecraft:potion"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/water_bucket_emerald",
+          "definition": {
+            "gives": {
+              "count": 2,
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 2,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:water_bucket"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/milk_bucket_emerald",
+          "definition": {
+            "gives": {
+              "count": 2,
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 2,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:milk_bucket"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/fermented_spider_eye_emerald",
+          "definition": {
+            "gives": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 2,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:fermented_spider_eye"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/baked_potato_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 2,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 4,
+              "id": "minecraft:baked_potato"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/hay_block_emerald",
+          "definition": {
+            "gives": {
+              "id": "minecraft:emerald"
+            },
+            "max_uses": 2,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:hay_block"
+            }
+          }
+        }
+      ],
+      "group": "buying",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:wandering_trader/emerald_packed_ice",
+          "definition": {
+            "gives": {
+              "id": "minecraft:packed_ice"
+            },
+            "max_uses": 6,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_blue_ice",
+          "definition": {
+            "gives": {
+              "id": "minecraft:blue_ice"
+            },
+            "max_uses": 6,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 6,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_gunpowder",
+          "definition": {
+            "gives": {
+              "count": 4,
+              "id": "minecraft:gunpowder"
+            },
+            "max_uses": 2,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_podzol",
+          "definition": {
+            "gives": {
+              "count": 3,
+              "id": "minecraft:podzol"
+            },
+            "max_uses": 6,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_acacia_log",
+          "definition": {
+            "gives": {
+              "count": 8,
+              "id": "minecraft:acacia_log"
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_birch_log",
+          "definition": {
+            "gives": {
+              "count": 8,
+              "id": "minecraft:birch_log"
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_dark_oak_log",
+          "definition": {
+            "gives": {
+              "count": 8,
+              "id": "minecraft:dark_oak_log"
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_jungle_log",
+          "definition": {
+            "gives": {
+              "count": 8,
+              "id": "minecraft:jungle_log"
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_oak_log",
+          "definition": {
+            "gives": {
+              "count": 8,
+              "id": "minecraft:oak_log"
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_spruce_log",
+          "definition": {
+            "gives": {
+              "count": 8,
+              "id": "minecraft:spruce_log"
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_cherry_log",
+          "definition": {
+            "gives": {
+              "count": 8,
+              "id": "minecraft:cherry_log"
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_mangrove_log",
+          "definition": {
+            "gives": {
+              "count": 8,
+              "id": "minecraft:mangrove_log"
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_pale_oak_log",
+          "definition": {
+            "gives": {
+              "count": 8,
+              "id": "minecraft:pale_oak_log"
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_poplar_log",
+          "definition": {
+            "gives": {
+              "count": 8,
+              "id": "minecraft:poplar_log"
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_enchanted_iron_pickaxe",
+          "definition": {
+            "given_item_modifier": [
+              {
+                "type": "minecraft:enchant_with_levels",
+                "include_additional_cost_component": true,
+                "levels": {
+                  "type": "minecraft:uniform",
+                  "max": 19,
+                  "min": 5
+                },
+                "options": "#minecraft:on_traded_equipment"
+              },
+              {
+                "type": "minecraft:filtered",
+                "item_filter": {
+                  "items": "minecraft:iron_pickaxe",
+                  "predicates": {
+                    "minecraft:enchantments": [
+                      {}
+                    ]
+                  }
+                },
+                "on_fail": {
+                  "type": "minecraft:discard"
+                }
+              }
+            ],
+            "gives": {
+              "id": "minecraft:iron_pickaxe"
+            },
+            "max_uses": 1,
+            "reputation_discount": 0.2,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_long_invisibility_potion",
+          "definition": {
+            "given_item_modifier": {
+              "type": "minecraft:set_potion",
+              "id": "minecraft:long_invisibility"
+            },
+            "gives": {
+              "id": "minecraft:potion"
+            },
+            "max_uses": 1,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 5,
+              "id": "minecraft:emerald"
+            }
+          }
+        }
+      ],
+      "group": "uncommon",
+      "amount": 2
+    },
+    {
+      "trades": [
+        {
+          "id": "minecraft:wandering_trader/emerald_white_dye",
+          "definition": {
+            "gives": {
+              "count": 3,
+              "id": "minecraft:white_dye"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_orange_dye",
+          "definition": {
+            "gives": {
+              "count": 3,
+              "id": "minecraft:orange_dye"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_magenta_dye",
+          "definition": {
+            "gives": {
+              "count": 3,
+              "id": "minecraft:magenta_dye"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_light_blue_dye",
+          "definition": {
+            "gives": {
+              "count": 3,
+              "id": "minecraft:light_blue_dye"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_yellow_dye",
+          "definition": {
+            "gives": {
+              "count": 3,
+              "id": "minecraft:yellow_dye"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_lime_dye",
+          "definition": {
+            "gives": {
+              "count": 3,
+              "id": "minecraft:lime_dye"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_pink_dye",
+          "definition": {
+            "gives": {
+              "count": 3,
+              "id": "minecraft:pink_dye"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_gray_dye",
+          "definition": {
+            "gives": {
+              "count": 3,
+              "id": "minecraft:gray_dye"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_light_gray_dye",
+          "definition": {
+            "gives": {
+              "count": 3,
+              "id": "minecraft:light_gray_dye"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_cyan_dye",
+          "definition": {
+            "gives": {
+              "count": 3,
+              "id": "minecraft:cyan_dye"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_purple_dye",
+          "definition": {
+            "gives": {
+              "count": 3,
+              "id": "minecraft:purple_dye"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_blue_dye",
+          "definition": {
+            "gives": {
+              "count": 3,
+              "id": "minecraft:blue_dye"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_brown_dye",
+          "definition": {
+            "gives": {
+              "count": 3,
+              "id": "minecraft:brown_dye"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_green_dye",
+          "definition": {
+            "gives": {
+              "count": 3,
+              "id": "minecraft:green_dye"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_red_dye",
+          "definition": {
+            "gives": {
+              "count": 3,
+              "id": "minecraft:red_dye"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_black_dye",
+          "definition": {
+            "gives": {
+              "count": 3,
+              "id": "minecraft:black_dye"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_fish_bucket",
+          "definition": {
+            "gives": {
+              "id": "minecraft:tropical_fish_bucket"
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_pufferfish_bucket",
+          "definition": {
+            "gives": {
+              "id": "minecraft:pufferfish_bucket"
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_sea_pickle",
+          "definition": {
+            "gives": {
+              "id": "minecraft:sea_pickle"
+            },
+            "max_uses": 5,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 2,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_slime_ball",
+          "definition": {
+            "gives": {
+              "id": "minecraft:slime_ball"
+            },
+            "max_uses": 5,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 4,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_glowstone",
+          "definition": {
+            "gives": {
+              "id": "minecraft:glowstone"
+            },
+            "max_uses": 5,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 2,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_nautilus_shell",
+          "definition": {
+            "gives": {
+              "id": "minecraft:nautilus_shell"
+            },
+            "max_uses": 5,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 5,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_fern",
+          "definition": {
+            "gives": {
+              "id": "minecraft:fern"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_sugar_cane",
+          "definition": {
+            "gives": {
+              "id": "minecraft:sugar_cane"
+            },
+            "max_uses": 8,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_pumpkin",
+          "definition": {
+            "gives": {
+              "id": "minecraft:pumpkin"
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_kelp",
+          "definition": {
+            "gives": {
+              "id": "minecraft:kelp"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_cactus",
+          "definition": {
+            "gives": {
+              "id": "minecraft:cactus"
+            },
+            "max_uses": 8,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_dandelion",
+          "definition": {
+            "gives": {
+              "id": "minecraft:dandelion"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_poppy",
+          "definition": {
+            "gives": {
+              "id": "minecraft:poppy"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_blue_orchid",
+          "definition": {
+            "gives": {
+              "id": "minecraft:blue_orchid"
+            },
+            "max_uses": 8,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_allium",
+          "definition": {
+            "gives": {
+              "id": "minecraft:allium"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_azure_bluet",
+          "definition": {
+            "gives": {
+              "id": "minecraft:azure_bluet"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_red_tulip",
+          "definition": {
+            "gives": {
+              "id": "minecraft:red_tulip"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_orange_tulip",
+          "definition": {
+            "gives": {
+              "id": "minecraft:orange_tulip"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_white_tulip",
+          "definition": {
+            "gives": {
+              "id": "minecraft:white_tulip"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_pink_tulip",
+          "definition": {
+            "gives": {
+              "id": "minecraft:pink_tulip"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_oxeye_daisy",
+          "definition": {
+            "gives": {
+              "id": "minecraft:oxeye_daisy"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_cornflower",
+          "definition": {
+            "gives": {
+              "id": "minecraft:cornflower"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_lily_of_the_valley",
+          "definition": {
+            "gives": {
+              "id": "minecraft:lily_of_the_valley"
+            },
+            "max_uses": 7,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_open_eyeblossom",
+          "definition": {
+            "gives": {
+              "id": "minecraft:open_eyeblossom"
+            },
+            "max_uses": 7,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_wheat_seeds",
+          "definition": {
+            "gives": {
+              "id": "minecraft:wheat_seeds"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_beetroot_seeds",
+          "definition": {
+            "gives": {
+              "id": "minecraft:beetroot_seeds"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_pumpkin_seeds",
+          "definition": {
+            "gives": {
+              "id": "minecraft:pumpkin_seeds"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_melon_seeds",
+          "definition": {
+            "gives": {
+              "id": "minecraft:melon_seeds"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_acacia_sapling",
+          "definition": {
+            "gives": {
+              "id": "minecraft:acacia_sapling"
+            },
+            "max_uses": 8,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 5,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_birch_sapling",
+          "definition": {
+            "gives": {
+              "id": "minecraft:birch_sapling"
+            },
+            "max_uses": 8,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 5,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_dark_oak_sapling",
+          "definition": {
+            "gives": {
+              "id": "minecraft:dark_oak_sapling"
+            },
+            "max_uses": 8,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 5,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_jungle_sapling",
+          "definition": {
+            "gives": {
+              "id": "minecraft:jungle_sapling"
+            },
+            "max_uses": 8,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 5,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_oak_sapling",
+          "definition": {
+            "gives": {
+              "id": "minecraft:oak_sapling"
+            },
+            "max_uses": 8,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 5,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_spruce_sapling",
+          "definition": {
+            "gives": {
+              "id": "minecraft:spruce_sapling"
+            },
+            "max_uses": 8,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 5,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_cherry_sapling",
+          "definition": {
+            "gives": {
+              "id": "minecraft:cherry_sapling"
+            },
+            "max_uses": 8,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 5,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_pale_oak_sapling",
+          "definition": {
+            "gives": {
+              "id": "minecraft:pale_oak_sapling"
+            },
+            "max_uses": 8,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 5,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_mangrove_propagule",
+          "definition": {
+            "gives": {
+              "id": "minecraft:mangrove_propagule"
+            },
+            "max_uses": 8,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 5,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_poplar_sapling",
+          "definition": {
+            "gives": {
+              "id": "minecraft:poplar_sapling"
+            },
+            "max_uses": 8,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 5,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_brain_coral_block",
+          "definition": {
+            "gives": {
+              "id": "minecraft:brain_coral_block"
+            },
+            "max_uses": 8,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_bubble_coral_block",
+          "definition": {
+            "gives": {
+              "id": "minecraft:bubble_coral_block"
+            },
+            "max_uses": 8,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_fire_coral_block",
+          "definition": {
+            "gives": {
+              "id": "minecraft:fire_coral_block"
+            },
+            "max_uses": 8,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_horn_coral_block",
+          "definition": {
+            "gives": {
+              "id": "minecraft:horn_coral_block"
+            },
+            "max_uses": 8,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_tube_coral_block",
+          "definition": {
+            "gives": {
+              "id": "minecraft:tube_coral_block"
+            },
+            "max_uses": 8,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_vine",
+          "definition": {
+            "gives": {
+              "count": 3,
+              "id": "minecraft:vine"
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_pale_hanging_moss",
+          "definition": {
+            "gives": {
+              "count": 3,
+              "id": "minecraft:pale_hanging_moss"
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_brown_mushroom",
+          "definition": {
+            "gives": {
+              "count": 3,
+              "id": "minecraft:brown_mushroom"
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_red_mushroom",
+          "definition": {
+            "gives": {
+              "count": 3,
+              "id": "minecraft:red_mushroom"
+            },
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_lily_pad",
+          "definition": {
+            "gives": {
+              "count": 5,
+              "id": "minecraft:lily_pad"
+            },
+            "max_uses": 2,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_small_dripleaf",
+          "definition": {
+            "gives": {
+              "count": 2,
+              "id": "minecraft:small_dripleaf"
+            },
+            "max_uses": 5,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_sand",
+          "definition": {
+            "gives": {
+              "count": 8,
+              "id": "minecraft:sand"
+            },
+            "max_uses": 8,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_red_sand",
+          "definition": {
+            "gives": {
+              "count": 4,
+              "id": "minecraft:red_sand"
+            },
+            "max_uses": 6,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_pointed_dripstone",
+          "definition": {
+            "gives": {
+              "count": 2,
+              "id": "minecraft:pointed_dripstone"
+            },
+            "max_uses": 5,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_sulfur_spike",
+          "definition": {
+            "gives": {
+              "count": 2,
+              "id": "minecraft:sulfur_spike"
+            },
+            "max_uses": 5,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_rooted_dirt",
+          "definition": {
+            "gives": {
+              "count": 2,
+              "id": "minecraft:rooted_dirt"
+            },
+            "max_uses": 5,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_moss_block",
+          "definition": {
+            "gives": {
+              "count": 2,
+              "id": "minecraft:moss_block"
+            },
+            "max_uses": 5,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_pale_moss_block",
+          "definition": {
+            "gives": {
+              "count": 2,
+              "id": "minecraft:pale_moss_block"
+            },
+            "max_uses": 5,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_wildflowers",
+          "definition": {
+            "gives": {
+              "id": "minecraft:wildflowers"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_dry_tall_grass",
+          "definition": {
+            "gives": {
+              "id": "minecraft:tall_dry_grass"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_firefly_bush",
+          "definition": {
+            "gives": {
+              "id": "minecraft:firefly_bush"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 3,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_golden_dandelion",
+          "definition": {
+            "gives": {
+              "id": "minecraft:golden_dandelion"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "count": 2,
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_name_tag",
+          "definition": {
+            "gives": {
+              "id": "minecraft:name_tag"
+            },
+            "max_uses": 5,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        },
+        {
+          "id": "minecraft:wandering_trader/emerald_shelf_mushroom",
+          "definition": {
+            "gives": {
+              "count": 3,
+              "id": "minecraft:shelf_mushroom"
+            },
+            "max_uses": 12,
+            "reputation_discount": 0.05,
+            "wants": {
+              "id": "minecraft:emerald"
+            }
+          }
+        }
+      ],
+      "group": "common",
+      "amount": 5
+    }
+  ],
+  "source": "Minecraft Java 26.3"
+}

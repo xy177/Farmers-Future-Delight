@@ -9,6 +9,7 @@ import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
@@ -37,6 +38,16 @@ public abstract class BlockFutureSlab extends BlockSlab implements IWaterloggabl
     public static final PropertyBool WATERLOGGED = PropertyBool.create("waterlogged");
 
     private final BlockSlab itemSlab;
+    private MapColor mapColor = MapColor.STONE;
+
+    public void setMapColor(MapColor color) {
+        this.mapColor = color;
+    }
+
+    @Override
+    public MapColor getMapColor(IBlockState state, IBlockAccess world, BlockPos pos) {
+        return mapColor;
+    }
 
     protected BlockFutureSlab(String name, SoundType sound, BlockSlab itemSlab) {
         super(Material.ROCK);

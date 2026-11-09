@@ -57,6 +57,7 @@ public final class FFDOceanStructures implements FFDOceanStructureLocator.Locato
             return;
         }
         initialized = true;
+        FFDModernStructures.init();
         MapGenStructureIO.registerStructure(MapGenFFDShipwreck.Start.class, "FFDShipwreck");
         MapGenStructureIO.registerStructureComponent(MapGenFFDShipwreck.Piece.class, "FFDShipwreckPiece");
         MapGenStructureIO.registerStructure(MapGenFFDOceanRuin.Start.class, "FFDOceanRuin");
@@ -66,6 +67,8 @@ public final class FFDOceanStructures implements FFDOceanStructureLocator.Locato
                 "FFDBuriedTreasurePiece");
         LootFunctionManager.registerFunction(new FFDBuriedTreasureMapFunction.Serializer());
         LootFunctionManager.registerFunction(new FFDEffectiveAquaticItemFunction.Serializer());
+        LootFunctionManager.registerFunction(new FFDSuspiciousStewLootFunction.Serializer());
+        LootFunctionManager.registerFunction(new FFDModernStructureItemFunction.Serializer());
         FFDOceanStructureLocator.setLocator(INSTANCE);
     }
 

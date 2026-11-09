@@ -1,0 +1,16 @@
+{
+  "pools": [
+    {
+      "name": "pool_0",
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "item",
+          "name": "minecraft:clay_ball",
+          "entryName": "minecraft:clay",
+          "weight": 1
+        }
+      ]
+    }
+  ]
+}

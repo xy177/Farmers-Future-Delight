@@ -21,6 +21,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.block.BlockFutureCauldron;
 import xy177.farmersfuturedelight.common.block.BlockPowderSnow;
+import xy177.farmersfuturedelight.common.item.ItemLeatherHorseArmor;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
@@ -28,6 +29,31 @@ import xy177.farmersfuturedelight.common.registry.FFDSounds;
 @Mod.EventBusSubscriber(modid = FarmerFutureDelight.MODID)
 public final class FFDCauldronEvents {
     private FFDCauldronEvents() {
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onLeatherHorseArmorWash(PlayerInteractEvent.RightClickBlock event) {
+        ItemStack stack = event.getItemStack();
+        if (stack.getItem() != FFDItems.LEATHER_HORSE_ARMOR
+                || !ItemLeatherHorseArmor.hasColor(stack)
+                || event.getUseBlock() == Event.Result.DENY
+                || event.getUseItem() == Event.Result.DENY) return;
+        IBlockState state = event.getWorld().getBlockState(event.getPos());
+        EntityPlayer player = event.getEntityPlayer();
+        EnumFacing face = event.getFace() == null ? EnumFacing.UP : event.getFace();
+        if (state.getBlock() != Blocks.CAULDRON || state.getValue(BlockCauldron.LEVEL) == 0
+                || !event.getWorld().isBlockModifiable(player, event.getPos())
+                || !player.canPlayerEdit(event.getPos(), face, stack)) return;
+        event.setCanceled(true);
+        event.setCancellationResult(EnumActionResult.SUCCESS);
+        if (!event.getWorld().isRemote) {
+            ItemLeatherHorseArmor.removeColor(stack);
+            ((BlockCauldron) Blocks.CAULDRON).setWaterLevel(event.getWorld(), event.getPos(), state,
+                    state.getValue(BlockCauldron.LEVEL) - 1);
+            player.addStat(StatList.ARMOR_CLEANED);
+            player.inventory.markDirty();
+            player.openContainer.detectAndSendChanges();
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

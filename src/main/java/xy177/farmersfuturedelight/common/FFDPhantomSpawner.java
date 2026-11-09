@@ -50,6 +50,15 @@ public final class FFDPhantomSpawner {
         }
     }
 
+    public static EntityPlayer.SleepResult onSleepResult(EntityPlayer.SleepResult result,
+                                                          EntityPlayer player) {
+        if (result == EntityPlayer.SleepResult.OK && !player.world.isRemote
+                && FFDEntities.isLocalPhantomEnabled()) {
+            player.getEntityData().setInteger(REST_TICKS, 0);
+        }
+        return result;
+    }
+
     @SubscribeEvent
     public static void onPlayerWake(PlayerWakeUpEvent event) {
         if (!FFDEntities.isLocalPhantomEnabled()) {
@@ -85,7 +94,8 @@ public final class FFDPhantomSpawner {
         WorldServer world = (WorldServer) event.world;
         if (world.provider.getDimension() != 0
                 || world.getDifficulty() == EnumDifficulty.PEACEFUL
-                || !world.getGameRules().getBoolean("doMobSpawning")) {
+                || !world.getGameRules().getBoolean("doMobSpawning")
+                || !world.getGameRules().getBoolean(FFDPortingGameRules.SPAWN_PHANTOMS)) {
             return;
         }
 

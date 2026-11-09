@@ -2,6 +2,9 @@ package xy177.farmersfuturedelight.common.block;
 
 import java.util.List;
 import java.util.Random;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 
 import javax.annotation.Nullable;
 
@@ -54,6 +57,10 @@ public class BlockPowderSnow extends Block {
     @Override
     public boolean isReplaceable(IBlockAccess world, BlockPos pos) {
         return false;
+    }
+
+    @Override
+    public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> items) {
     }
 
     @Override

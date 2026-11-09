@@ -1,0 +1,297 @@
+{
+  "pools": [
+    {
+      "name": "pool_0",
+      "rolls": {
+        "min": 3,
+        "max": 8
+      },
+      "entries": [
+        {
+          "type": "item",
+          "weight": 3,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:diamond"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 3
+              }
+            }
+          ],
+          "entryName": "pool_0_entry_0"
+        },
+        {
+          "type": "item",
+          "weight": 10,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:iron_ingot"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 5
+              }
+            }
+          ],
+          "entryName": "pool_0_entry_1"
+        },
+        {
+          "type": "item",
+          "weight": 5,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:gold_ingot"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 3
+              }
+            }
+          ],
+          "entryName": "pool_0_entry_2"
+        },
+        {
+          "type": "item",
+          "weight": 15,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:bread"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 3
+              }
+            }
+          ],
+          "entryName": "pool_0_entry_3"
+        },
+        {
+          "type": "item",
+          "weight": 15,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:apple"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 3
+              }
+            }
+          ],
+          "entryName": "pool_0_entry_4"
+        },
+        {
+          "type": "item",
+          "weight": 5,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:iron_pickaxe"
+            }
+          ],
+          "entryName": "pool_0_entry_5"
+        },
+        {
+          "type": "item",
+          "weight": 5,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:iron_sword"
+            }
+          ],
+          "entryName": "pool_0_entry_6"
+        },
+        {
+          "type": "empty",
+          "weight": 5,
+          "entryName": "pool_0_entry_7"
+        },
+        {
+          "type": "empty",
+          "weight": 7,
+          "entryName": "pool_0_entry_8"
+        },
+        {
+          "type": "item",
+          "weight": 5,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:iron_chestplate"
+            }
+          ],
+          "entryName": "pool_0_entry_9"
+        },
+        {
+          "type": "item",
+          "weight": 5,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:iron_helmet"
+            }
+          ],
+          "entryName": "pool_0_entry_10"
+        },
+        {
+          "type": "item",
+          "weight": 5,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:iron_leggings"
+            }
+          ],
+          "entryName": "pool_0_entry_11"
+        },
+        {
+          "type": "item",
+          "weight": 5,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:iron_boots"
+            }
+          ],
+          "entryName": "pool_0_entry_12"
+        },
+        {
+          "type": "item",
+          "weight": 5,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:obsidian"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 3,
+                "max": 7
+              }
+            }
+          ],
+          "entryName": "pool_0_entry_13"
+        },
+        {
+          "type": "item",
+          "weight": 5,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:oak_sapling"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 3,
+                "max": 7
+              }
+            }
+          ],
+          "entryName": "pool_0_entry_14"
+        },
+        {
+          "type": "item",
+          "weight": 3,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:saddle"
+            }
+          ],
+          "entryName": "pool_0_entry_15"
+        },
+        {
+          "type": "empty",
+          "weight": 1,
+          "entryName": "pool_0_entry_16"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:iron_horse_armor"
+            }
+          ],
+          "entryName": "pool_0_entry_17"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:golden_horse_armor"
+            }
+          ],
+          "entryName": "pool_0_entry_18"
+        },
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:diamond_horse_armor"
+            }
+          ],
+          "entryName": "pool_0_entry_19"
+        }
+      ]
+    },
+    {
+      "name": "pool_1",
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "empty",
+          "weight": 1,
+          "entryName": "pool_1_entry_0"
+        },
+        {
+          "type": "empty",
+          "weight": 2,
+          "entryName": "pool_1_entry_1"
+        }
+      ]
+    }
+  ]
+}

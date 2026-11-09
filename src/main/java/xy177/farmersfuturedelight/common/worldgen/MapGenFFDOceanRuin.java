@@ -240,7 +240,7 @@ public final class MapGenFFDOceanRuin extends MapGenStructure {
         }
 
         private void loadTemplate(TemplateManager manager) {
-            Template template = manager.getTemplate((MinecraftServer) null,
+            Template template = FFDJigsawPlacement.readTemplate(manager,
                     new ResourceLocation(FarmerFutureDelight.MODID,
                             "underwater_ruin/" + templateName));
             PlacementSettings settings = new PlacementSettings().setIgnoreEntities(true)

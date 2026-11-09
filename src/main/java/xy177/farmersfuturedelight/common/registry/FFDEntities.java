@@ -26,6 +26,11 @@ import xy177.farmersfuturedelight.common.entity.EntityPufferfish;
 import xy177.farmersfuturedelight.common.entity.EntityTropicalFish;
 import xy177.farmersfuturedelight.common.entity.EntityDolphin;
 import xy177.farmersfuturedelight.common.entity.EntityDrowned;
+import xy177.farmersfuturedelight.common.entity.EntityCat;
+import xy177.farmersfuturedelight.common.entity.EntityFox;
+import xy177.farmersfuturedelight.common.entity.EntityPanda;
+import xy177.farmersfuturedelight.common.entity.EntityPillager;
+import xy177.farmersfuturedelight.common.entity.EntityRavager;
 
 public final class FFDEntities {
     public static final EnumCreatureType UNDERGROUND_WATER_CREATURE =
@@ -57,8 +62,24 @@ public final class FFDEntities {
             new ResourceLocation(FarmerFutureDelight.MODID, "dolphin");
     public static final ResourceLocation DROWNED_ID =
             new ResourceLocation(FarmerFutureDelight.MODID, "drowned");
+    public static final ResourceLocation CAT_ID =
+            new ResourceLocation(FarmerFutureDelight.MODID, "cat");
+    public static final ResourceLocation FOX_ID =
+            new ResourceLocation(FarmerFutureDelight.MODID, "fox");
+    public static final ResourceLocation PANDA_ID =
+            new ResourceLocation(FarmerFutureDelight.MODID, "panda");
+    public static final ResourceLocation PILLAGER_ID =
+            new ResourceLocation(FarmerFutureDelight.MODID, "pillager");
+    public static final ResourceLocation RAVAGER_ID =
+            new ResourceLocation(FarmerFutureDelight.MODID, "ravager");
+    public static final ResourceLocation WANDERING_TRADER_ID =
+            new ResourceLocation(FarmerFutureDelight.MODID, "wandering_trader");
+    public static final ResourceLocation TRADER_LLAMA_ID =
+            new ResourceLocation(FarmerFutureDelight.MODID, "trader_llama");
     public static final ResourceLocation TRIDENT_ID =
             new ResourceLocation(FarmerFutureDelight.MODID, "trident");
+    public static final ResourceLocation CROSSBOW_ARROW_ID =
+            new ResourceLocation(FarmerFutureDelight.MODID, "crossbow_arrow");
     private FFDEntities() {
     }
 
@@ -102,6 +123,8 @@ public final class FFDEntities {
         registerFishSpawns();
         registerDolphinSpawns();
         registerDrownedSpawns();
+        registerFoxSpawns();
+        registerPandaSpawns();
     }
 
     public static boolean isGlowSquidEnabled() {
@@ -191,6 +214,42 @@ public final class FFDEntities {
     public static boolean isLocalDrownedEnabled() {
         return FFDCompat.isLocalEntityEnabled(FFDConfig.drownedMode,
                 FFDCompat.Feature.DROWNED, DROWNED_ID, "drowned");
+    }
+
+    public static boolean isLocalCatEnabled() {
+        return FFDCompat.isLocalEntityEnabled(FFDConfig.catMode,
+                FFDCompat.Feature.CAT, CAT_ID, "cat");
+    }
+
+    public static boolean isLocalWanderingTraderEnabled() {
+        return FFDCompat.isLocalEntityEnabled(FFDConfig.wanderingTraderMode,
+                FFDCompat.Feature.WANDERING_TRADER, WANDERING_TRADER_ID, "wandering_trader");
+    }
+
+    public static boolean isLocalTraderLlamaEnabled() {
+        return FFDCompat.isLocalEntityEnabled(FFDConfig.wanderingTraderMode,
+                FFDCompat.Feature.WANDERING_TRADER, TRADER_LLAMA_ID, "trader_llama");
+    }
+
+    public static boolean isLocalFoxEnabled() {
+        return FFDCompat.isLocalEntityEnabled(FFDConfig.foxMode,
+                FFDCompat.Feature.FOX, FOX_ID, "fox");
+    }
+
+    public static boolean isLocalPandaEnabled() {
+        return FFDCompat.isLocalEntityEnabled(FFDConfig.pandaMode,
+                FFDCompat.Feature.PANDA, PANDA_ID, "panda");
+    }
+
+    public static boolean isLocalPillagerEnabled() {
+        return FFDItems.isLocalCrossbowEnabled()
+                && FFDCompat.isLocalEntityEnabled(FFDConfig.pillagerMode,
+                FFDCompat.Feature.PILLAGER, PILLAGER_ID, "pillager");
+    }
+
+    public static boolean isLocalRavagerEnabled() {
+        return FFDCompat.isLocalEntityEnabled(FFDConfig.ravagerMode,
+                FFDCompat.Feature.RAVAGER, RAVAGER_ID, "ravager");
     }
 
     public static boolean isLocalTridentProjectileEnabled() {
@@ -359,6 +418,28 @@ public final class FFDEntities {
         addMonsterSpawn(EntityDrowned.class, FFDConfig.drownedOceanSpawnWeight, oceans);
         addMonsterSpawn(EntityDrowned.class, FFDConfig.drownedRiverSpawnWeight, rivers);
         addMonsterSpawn(EntityDrowned.class, FFDConfig.drownedFrozenRiverSpawnWeight, frozenRivers);
+    }
+
+    private static void registerFoxSpawns() {
+        if (!isLocalFoxEnabled()) {
+            return;
+        }
+        Set<Biome> taigas = new LinkedHashSet<>();
+        taigas.add(Biomes.TAIGA);
+        taigas.add(Biomes.COLD_TAIGA);
+        taigas.add(Biomes.MUTATED_TAIGA);
+        taigas.add(Biomes.MUTATED_TAIGA_COLD);
+        EntityRegistry.addSpawn(EntityFox.class, 8, 2, 4,
+                EnumCreatureType.CREATURE, taigas.toArray(new Biome[0]));
+    }
+
+    private static void registerPandaSpawns() {
+        if (isLocalPandaEnabled() && FFDItems.isBambooEnabled()) {
+            EntityRegistry.addSpawn(EntityPanda.class, 1, 1, 2,
+                    EnumCreatureType.CREATURE, Biomes.JUNGLE);
+            EntityRegistry.addSpawn(EntityPanda.class, 80, 1, 2,
+                    EnumCreatureType.CREATURE, FFDBiomes.BAMBOO_JUNGLE);
+        }
     }
 
     private static void addSpawn(Class<? extends net.minecraft.entity.EntityLiving> type,

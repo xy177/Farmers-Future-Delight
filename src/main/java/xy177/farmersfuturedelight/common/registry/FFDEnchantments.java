@@ -20,11 +20,19 @@ import xy177.farmersfuturedelight.common.FFDConfig;
 public final class FFDEnchantments {
     private static final EnumEnchantmentType TRIDENT_TYPE = EnumHelper.addEnchantmentType(
             "ffd_trident", FFDEnchantments::isTridentItem);
+    private static final EnumEnchantmentType CROSSBOW_TYPE = EnumHelper.addEnchantmentType(
+            "ffd_crossbow", FFDEnchantments::isCrossbowItem);
 
     public static final Enchantment LOYALTY = new LoyaltyEnchantment();
     public static final Enchantment IMPALING = new ImpalingEnchantment();
     public static final Enchantment RIPTIDE = new RiptideEnchantment();
     public static final Enchantment CHANNELING = new ChannelingEnchantment();
+    public static final Enchantment MULTISHOT = new CrossbowEnchantment(
+            Enchantment.Rarity.RARE, "multishot", 1);
+    public static final Enchantment PIERCING = new CrossbowEnchantment(
+            Enchantment.Rarity.UNCOMMON, "piercing", 4);
+    public static final Enchantment QUICK_CHARGE = new CrossbowEnchantment(
+            Enchantment.Rarity.UNCOMMON, "quick_charge", 3);
 
     private FFDEnchantments() {
     }
@@ -42,11 +50,60 @@ public final class FFDEnchantments {
         if (isLocalEnabled(CHANNELING)) {
             registry.register(CHANNELING);
         }
+        if (isLocalCrossbowEnabled(MULTISHOT)) {
+            registry.register(MULTISHOT);
+        }
+        if (isLocalCrossbowEnabled(PIERCING)) {
+            registry.register(PIERCING);
+        }
+        if (isLocalCrossbowEnabled(QUICK_CHARGE)) {
+            registry.register(QUICK_CHARGE);
+        }
     }
 
     private static boolean isLocalEnabled(Enchantment enchantment, String... aliases) {
         return FFDCompat.isLocalEnchantmentEnabled(FFDConfig.tridentMode,
                 FFDCompat.Feature.TRIDENT, enchantment, aliases);
+    }
+
+    private static boolean isLocalCrossbowEnabled(Enchantment enchantment) {
+        return FFDCompat.isLocalEnchantmentEnabled(FFDConfig.crossbowMode,
+                FFDCompat.Feature.CROSSBOW, enchantment,
+                enchantment.getRegistryName().getResourcePath());
+    }
+
+    public static int getQuickCharge(ItemStack stack) {
+        return getCrossbowLevel(stack, QUICK_CHARGE, "quick_charge");
+    }
+
+    public static int getMultishot(ItemStack stack) {
+        return getCrossbowLevel(stack, MULTISHOT, "multishot");
+    }
+
+    public static int getPiercing(ItemStack stack) {
+        return getCrossbowLevel(stack, PIERCING, "piercing");
+    }
+
+    private static int getCrossbowLevel(ItemStack stack, Enchantment local, String path) {
+        if (stack.isEmpty()) {
+            return 0;
+        }
+        int level = 0;
+        for (Map.Entry<Enchantment, Integer> entry
+                : EnchantmentHelper.getEnchantments(stack).entrySet()) {
+            Enchantment enchantment = entry.getKey();
+            ResourceLocation id = enchantment == null ? null : enchantment.getRegistryName();
+            if (enchantment == local || id != null && path.equals(id.getResourcePath())
+                    && (FarmerFutureDelight.MODID.equals(id.getResourceDomain())
+                    || "futuremc".equals(id.getResourceDomain()))) {
+                level = Math.max(level, entry.getValue());
+            }
+        }
+        return level;
+    }
+
+    private static boolean isCrossbowItem(Item item) {
+        return FFDItems.isCrossbowItem(item);
     }
 
     public static int getLoyalty(ItemStack stack) {
@@ -266,6 +323,60 @@ public final class FFDEnchantments {
         protected boolean canApplyTogether(Enchantment enchantment) {
             return super.canApplyTogether(enchantment)
                     && !hasPath(enchantment, "riptide", "channeling");
+        }
+    }
+
+    private static final class CrossbowEnchantment extends Enchantment {
+        private final int maxLevel;
+        private final String path;
+
+        private CrossbowEnchantment(Rarity rarity, String path, int maxLevel) {
+            super(rarity, CROSSBOW_TYPE,
+                    new EntityEquipmentSlot[] {EntityEquipmentSlot.MAINHAND});
+            this.path = path;
+            this.maxLevel = maxLevel;
+            setRegistryName(FarmerFutureDelight.MODID, path);
+            setName(FarmerFutureDelight.MODID + "." + path);
+        }
+
+        @Override
+        public int getMinEnchantability(int level) {
+            if ("multishot".equals(path)) {
+                return 20;
+            }
+            if ("quick_charge".equals(path)) {
+                return 12 + (level - 1) * 20;
+            }
+            return 1 + (level - 1) * 10;
+        }
+
+        @Override
+        public int getMaxEnchantability(int level) {
+            return getMinEnchantability(level) + ("multishot".equals(path) ? 30 : 50);
+        }
+
+        @Override
+        public int getMaxLevel() {
+            return maxLevel;
+        }
+
+        @Override
+        public boolean canApply(ItemStack stack) {
+            return FFDItems.isCrossbowItem(stack.getItem());
+        }
+
+        @Override
+        public boolean canApplyAtEnchantingTable(ItemStack stack) {
+            return canApply(stack);
+        }
+
+        @Override
+        protected boolean canApplyTogether(Enchantment enchantment) {
+            return super.canApplyTogether(enchantment)
+                    && !("multishot".equals(path)
+                    && (enchantment == PIERCING || hasPath(enchantment, "piercing")))
+                    && !("piercing".equals(path)
+                    && (enchantment == MULTISHOT || hasPath(enchantment, "multishot")));
         }
     }
 }

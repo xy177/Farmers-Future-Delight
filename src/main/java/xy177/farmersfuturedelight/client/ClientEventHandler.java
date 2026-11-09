@@ -3,8 +3,11 @@ package xy177.farmersfuturedelight.client;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.color.BlockColors;
@@ -14,18 +17,23 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundManager;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiChat;
+import net.minecraft.client.gui.GuiGameOver;
+import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.inventory.GuiEditSign;
 import net.minecraft.client.gui.GuiSleepMP;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.passive.EntityHorse;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumHandSide;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Timer;
+import net.minecraft.network.play.client.CPacketClientStatus;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
@@ -58,11 +66,18 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.registries.IRegistryDelegate;
+import net.minecraft.client.renderer.entity.RenderHorse;
+import net.minecraft.client.renderer.entity.RenderLivingBase;
+import net.minecraft.client.model.ModelIronGolem;
+import net.minecraft.entity.monster.EntityIronGolem;
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.api.WaterloggedBlockApi;
 import xy177.farmersfuturedelight.client.model.WaterloggedPlantBakedModel;
 import xy177.farmersfuturedelight.client.model.SpyglassBakedModel;
 import xy177.farmersfuturedelight.client.model.TridentBakedModel;
+import xy177.farmersfuturedelight.client.model.SignParticleBakedModel;
+import xy177.farmersfuturedelight.client.render.LayerLeatherHorseArmor;
+import xy177.farmersfuturedelight.client.render.LayerIronGolemCracks;
 import xy177.farmersfuturedelight.client.model.CustomRawOreModelLoader;
 import xy177.farmersfuturedelight.client.model.CustomDeepslateOreModelLoader;
 import xy177.farmersfuturedelight.client.model.CustomStrippedWoodModelLoader;
@@ -70,9 +85,11 @@ import xy177.farmersfuturedelight.client.sound.MovingSoundBee;
 import xy177.farmersfuturedelight.client.chat.FFDChatScreen;
 import xy177.farmersfuturedelight.client.chat.FFDSleepChatScreen;
 import xy177.farmersfuturedelight.common.FFDConfig;
+import xy177.farmersfuturedelight.common.FFDSignText;
 import xy177.farmersfuturedelight.common.FFDPowderSnowEvents;
 import xy177.farmersfuturedelight.common.FFDRiptide;
 import xy177.farmersfuturedelight.common.entity.EntityBee;
+import xy177.farmersfuturedelight.common.item.ItemCrossbow;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDCustomRawOres;
 import xy177.farmersfuturedelight.common.registry.FFDCustomDeepslateOres;
@@ -96,6 +113,12 @@ public final class ClientEventHandler {
     private static Float savedMouseSensitivity;
     private static final Map<EntityLivingBase, float[]> FROZEN_ROTATIONS =
             new IdentityHashMap<>();
+    private static final Map<RenderLivingBase<?>, Boolean> HORSE_ARMOR_RENDERERS =
+            new WeakHashMap<>();
+    private static final Map<RenderLivingBase<?>, Boolean> IRON_GOLEM_CRACK_RENDERERS =
+            new WeakHashMap<>();
+    private static final Map<RenderLivingBase<?>, Boolean> ILLAGER_HEAD_RENDERERS =
+            new WeakHashMap<>();
     private ClientEventHandler() {
     }
 
@@ -113,6 +136,27 @@ public final class ClientEventHandler {
     @SubscribeEvent
     public static void updateSwimmingInput(InputUpdateEvent event) {
         FFDClientSwimmingHooks.updateSwimmingInput(event);
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void handleImmediateRespawn(GuiOpenEvent event) {
+        Minecraft minecraft = Minecraft.getMinecraft();
+        if (FFDClientGameRules.immediateRespawn() && event.getGui() instanceof GuiGameOver
+                && minecraft.player != null && minecraft.player.connection != null) {
+            minecraft.player.connection.sendPacket(new CPacketClientStatus(
+                    CPacketClientStatus.State.PERFORM_RESPAWN));
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void clearImmediateRespawnWithoutWorld(TickEvent.ClientTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) {
+            Minecraft minecraft = Minecraft.getMinecraft();
+            if (minecraft.world == null && minecraft.currentScreen instanceof GuiMainMenu) {
+                FFDClientGameRules.setImmediateRespawn(false);
+            }
+        }
     }
 
     @SubscribeEvent
@@ -156,6 +200,46 @@ public final class ClientEventHandler {
     }
 
     @SubscribeEvent
+    public static void replaceSignEditor(GuiOpenEvent event) {
+        if (!(event.getGui() instanceof GuiEditSign)) {
+            return;
+        }
+        GuiEditSign screen = (GuiEditSign) event.getGui();
+        net.minecraft.tileentity.TileEntitySign sign = ObfuscationReflectionHelper.getPrivateValue(
+                GuiEditSign.class, screen, "field_146848_f");
+        if (sign != null) {
+            event.setGui(new GuiSignEditor(sign,
+                    FFDSignText.isBackSide(sign, Minecraft.getMinecraft().player)));
+        }
+    }
+
+    @net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+    public static void onWritableBookGuiOpen(net.minecraftforge.client.event.GuiOpenEvent event) {
+        if (event.getGui() == null
+                || event.getGui().getClass() != net.minecraft.client.gui.GuiScreenBook.class) {
+            return;
+        }
+        net.minecraft.client.gui.GuiScreenBook screen =
+                (net.minecraft.client.gui.GuiScreenBook) event.getGui();
+        try {
+            boolean writable = net.minecraftforge.fml.common.ObfuscationReflectionHelper.getPrivateValue(
+                    net.minecraft.client.gui.GuiScreenBook.class, screen, "field_146475_i");
+            net.minecraft.item.ItemStack book =
+                    net.minecraftforge.fml.common.ObfuscationReflectionHelper.getPrivateValue(
+                            net.minecraft.client.gui.GuiScreenBook.class, screen, "field_146474_h");
+            net.minecraft.entity.player.EntityPlayer player =
+                    net.minecraftforge.fml.common.ObfuscationReflectionHelper.getPrivateValue(
+                            net.minecraft.client.gui.GuiScreenBook.class, screen, "field_146468_g");
+            if (writable && book.getItem() == net.minecraft.init.Items.WRITABLE_BOOK) {
+                event.setGui(new GuiWritableBookEditor(player, book));
+            }
+        } catch (RuntimeException exception) {
+            org.apache.logging.log4j.LogManager.getLogger("FFD Client")
+                    .warn("Could not replace writable-book editor", exception);
+        }
+    }
+
+    @SubscribeEvent
     public static void startBeeSound(EntityJoinWorldEvent event) {
         if (event.getWorld().isRemote && event.getEntity() instanceof EntityBee) {
             Minecraft.getMinecraft().getSoundHandler()
@@ -169,8 +253,12 @@ public final class ClientEventHandler {
         event.getMap().registerSprite(id("particle/glow"));
         event.getMap().registerSprite(id("particle/drip_hang"));
         event.getMap().registerSprite(id("particle/drip_fall"));
+        event.getMap().registerSprite(id("particle/age_lock_glint"));
         event.getMap().registerSprite(id("particle/drip_land"));
         event.getMap().registerSprite(id("particle/bubble"));
+        for (int index = 0; index < 12; index++) {
+            event.getMap().registerSprite(id("particle/big_smoke_" + index));
+        }
         event.getMap().registerSprite(id("entity/conduit/break_particle"));
         for (int i = 0; i < 8; i++) {
             event.getMap().registerSprite(id("particle/generic_" + i));
@@ -227,6 +315,21 @@ public final class ClientEventHandler {
             if (flat != null && hand != null && throwing != null) {
                 event.getModelRegistry().putObject(flatLocation,
                         new TridentBakedModel(flat, hand, throwing));
+            }
+        }
+        String[] woods = {"spruce", "birch", "jungle", "acacia", "dark_oak"};
+        for (String wood : woods) {
+            TextureAtlasSprite particle = event.getModelManager().getTextureMap().getAtlasSprite(
+                    new ResourceLocation("minecraft", "blocks/planks_" + (wood.equals("dark_oak") ? "big_oak" : wood)).toString());
+            for (String suffix : new String[] {"_sign", "_wall_sign"}) {
+                ResourceLocation id = new ResourceLocation(FarmerFutureDelight.MODID, wood + suffix);
+                for (ModelResourceLocation location : event.getModelRegistry().getKeys()) {
+                    if (!location.getResourceDomain().equals(id.getResourceDomain())
+                            || !location.getResourcePath().equals(id.getResourcePath())) continue;
+                    IBakedModel model = event.getModelRegistry().getObject(location);
+                    if (model != null) event.getModelRegistry().putObject(location,
+                            new SignParticleBakedModel(model, particle));
+                }
             }
         }
         if (xy177.farmersfuturedelight.common.registry.FFDEntities
@@ -300,6 +403,13 @@ public final class ClientEventHandler {
 
     @SubscribeEvent
     public static void registerCustomRawOreItemColors(ColorHandlerEvent.Item event) {
+        if (FFDItems.isItemRegistered(FFDItems.LEATHER_HORSE_ARMOR)) {
+            event.getItemColors().registerItemColorHandler((stack, tintIndex) ->
+                    tintIndex == 0
+                            ? xy177.farmersfuturedelight.common.item.ItemLeatherHorseArmor
+                                    .getColor(stack)
+                            : 0xFFFFFF, FFDItems.LEATHER_HORSE_ARMOR);
+        }
         ArrayList<net.minecraft.item.Item> customItems = new ArrayList<>();
         for (FFDCustomRawOres.Entry entry : FFDCustomRawOres.entries()) {
             if (entry.isRegistered()) {
@@ -437,6 +547,99 @@ public final class ClientEventHandler {
                 !right);
         GlStateManager.popMatrix();
         event.setCanceled(true);
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void renderCrossbow(RenderSpecificHandEvent event) {
+        Minecraft minecraft = Minecraft.getMinecraft();
+        if (minecraft.player == null) {
+            return;
+        }
+        ItemStack mainHand = minecraft.player.getHeldItemMainhand();
+        ItemStack offHand = minecraft.player.getHeldItemOffhand();
+        boolean holdsCrossbow = mainHand.getItem() instanceof ItemCrossbow
+                || offHand.getItem() instanceof ItemCrossbow;
+        if (!holdsCrossbow) {
+            return;
+        }
+        EnumHand visibleHand = null;
+        if (minecraft.player.isHandActive()) {
+            ItemStack active = minecraft.player.getActiveItemStack();
+            if (active.getItem() instanceof ItemCrossbow
+                    || active.getItem() instanceof net.minecraft.item.ItemBow) {
+                visibleHand = minecraft.player.getActiveHand();
+            } else if (minecraft.player.getActiveHand() == EnumHand.MAIN_HAND
+                    && offHand.getItem() instanceof ItemCrossbow
+                    && ItemCrossbow.isCharged(offHand)) {
+                visibleHand = EnumHand.MAIN_HAND;
+            }
+        } else if (mainHand.getItem() instanceof ItemCrossbow
+                && ItemCrossbow.isCharged(mainHand)) {
+            visibleHand = EnumHand.MAIN_HAND;
+        }
+        if (visibleHand != null && event.getHand() != visibleHand) {
+            event.setCanceled(true);
+            return;
+        }
+        ItemStack stack = event.getItemStack();
+        if (!(stack.getItem() instanceof ItemCrossbow)) {
+            return;
+        }
+        EnumHandSide side = event.getHand() == EnumHand.MAIN_HAND
+                ? minecraft.player.getPrimaryHand() : minecraft.player.getPrimaryHand().opposite();
+        boolean charging = minecraft.player.isHandActive()
+                && minecraft.player.getItemInUseCount() > 0
+                && minecraft.player.getActiveHand() == event.getHand()
+                && !ItemCrossbow.isCharged(stack);
+        GlStateManager.pushMatrix();
+        applyCrossbowTransform(side, event.getEquipProgress(), event.getSwingProgress(),
+                event.getPartialTicks(), event.getHand() == EnumHand.MAIN_HAND,
+                ItemCrossbow.isCharged(stack), charging, stack.getMaxItemUseDuration(),
+                minecraft.player.getItemInUseCount(), ItemCrossbow.getChargeDuration(stack));
+        boolean right = side == EnumHandSide.RIGHT;
+        minecraft.getItemRenderer().renderItemSide(minecraft.player, stack,
+                right ? ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND
+                        : ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND, !right);
+        GlStateManager.popMatrix();
+        event.setCanceled(true);
+    }
+
+    public static void applyCrossbowTransform(EnumHandSide side, float equipProgress,
+                                               float swingProgress, float partialTicks,
+                                               boolean mainHand, boolean charged, boolean charging,
+                                               int useDuration, int useRemaining, int chargeDuration) {
+        int direction = side == EnumHandSide.RIGHT ? 1 : -1;
+        GlStateManager.translate(direction * 0.56F, -0.52F + equipProgress * -0.6F, -0.72F);
+        if (charging) {
+            GlStateManager.translate(direction * -0.4785682F, -0.094387F, 0.05731531F);
+            GlStateManager.rotate(-11.935F, 1.0F, 0.0F, 0.0F);
+            GlStateManager.rotate(direction * 65.3F, 0.0F, 1.0F, 0.0F);
+            GlStateManager.rotate(direction * -9.785F, 0.0F, 0.0F, 1.0F);
+            float timeHeld = useDuration - (useRemaining - partialTicks + 1.0F);
+            float power = Math.min(1.0F, timeHeld / chargeDuration);
+            if (power > 0.1F) {
+                float shake = MathHelper.sin((timeHeld - 0.1F) * 1.3F) * (power - 0.1F);
+                GlStateManager.translate(0.0F, shake * 0.004F, 0.0F);
+            }
+            GlStateManager.translate(0.0F, 0.0F, power * 0.04F);
+            GlStateManager.scale(1.0F, 1.0F, 1.0F + power * 0.2F);
+            GlStateManager.rotate(direction * -45.0F, 0.0F, 1.0F, 0.0F);
+        } else {
+            float rootSwing = MathHelper.sqrt(swingProgress);
+            GlStateManager.translate(direction * -0.4F * MathHelper.sin(rootSwing * (float) Math.PI),
+                    0.2F * MathHelper.sin(rootSwing * (float) (Math.PI * 2.0D)),
+                    -0.2F * MathHelper.sin(swingProgress * (float) Math.PI));
+            float yawSwing = MathHelper.sin(swingProgress * swingProgress * (float) Math.PI);
+            GlStateManager.rotate(direction * (45.0F + yawSwing * -20.0F), 0.0F, 1.0F, 0.0F);
+            float rollSwing = MathHelper.sin(rootSwing * (float) Math.PI);
+            GlStateManager.rotate(direction * rollSwing * -20.0F, 0.0F, 0.0F, 1.0F);
+            GlStateManager.rotate(rollSwing * -80.0F, 1.0F, 0.0F, 0.0F);
+            GlStateManager.rotate(direction * -45.0F, 0.0F, 1.0F, 0.0F);
+            if (charged && swingProgress < 0.001F && mainHand) {
+                GlStateManager.translate(direction * -0.641864F, 0.0F, 0.0F);
+                GlStateManager.rotate(direction * 10.0F, 0.0F, 1.0F, 0.0F);
+            }
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -621,6 +824,30 @@ public final class ClientEventHandler {
         entity.renderYawOffset += shake;
     }
 
+    @SubscribeEvent
+    public static void addHorseArmorLayer(RenderLivingEvent.Pre<?> event) {
+        if (!(event.getEntity() instanceof EntityHorse)
+                || !(event.getRenderer() instanceof RenderHorse)
+                || HORSE_ARMOR_RENDERERS.containsKey(event.getRenderer())) {
+            return;
+        }
+        RenderLivingBase<?> renderer = event.getRenderer();
+        renderer.addLayer(new LayerLeatherHorseArmor(renderer));
+        HORSE_ARMOR_RENDERERS.put(renderer, Boolean.TRUE);
+    }
+
+    @SubscribeEvent
+    public static void addIronGolemCrackLayer(RenderLivingEvent.Pre<?> event) {
+        if (!(event.getEntity() instanceof EntityIronGolem)
+                || IRON_GOLEM_CRACK_RENDERERS.containsKey(event.getRenderer())
+                || !(event.getRenderer().getMainModel() instanceof ModelIronGolem)) {
+            return;
+        }
+        RenderLivingBase<?> renderer = event.getRenderer();
+        renderer.addLayer(new LayerIronGolemCracks(renderer));
+        IRON_GOLEM_CRACK_RENDERERS.put(renderer, Boolean.TRUE);
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void endFrozenShake(RenderLivingEvent.Post<?> event) {
         float[] rotation = FROZEN_ROTATIONS.remove(event.getEntity());
@@ -628,6 +855,24 @@ public final class ClientEventHandler {
             event.getEntity().prevRenderYawOffset = rotation[0];
             event.getEntity().renderYawOffset = rotation[1];
         }
+    }
+
+    @SubscribeEvent
+    public static void addIllagerHeadLayer(RenderLivingEvent.Pre<?> event) {
+        Class<?> entityClass = event.getEntity().getClass();
+        if (entityClass != net.minecraft.entity.monster.EntityEvoker.class
+                && entityClass != net.minecraft.entity.monster.EntityVindicator.class
+                && entityClass != net.minecraft.entity.monster.EntityIllusionIllager.class) return;
+        RenderLivingBase<?> renderer = event.getRenderer();
+        if (!(renderer.getMainModel() instanceof net.minecraft.client.model.ModelIllager)
+                || ILLAGER_HEAD_RENDERERS.containsKey(renderer)) return;
+        Class<?> rendererClass = renderer.getClass();
+        if (rendererClass != net.minecraft.client.renderer.entity.RenderEvoker.class
+                && rendererClass != net.minecraft.client.renderer.entity.RenderVindicator.class
+                && rendererClass != net.minecraft.client.renderer.entity.RenderIllusionIllager.class) return;
+        renderer.addLayer(new net.minecraft.client.renderer.entity.layers.LayerCustomHead(
+                ((net.minecraft.client.model.ModelIllager) renderer.getMainModel()).head));
+        ILLAGER_HEAD_RENDERERS.put(renderer, Boolean.TRUE);
     }
 
     @SubscribeEvent

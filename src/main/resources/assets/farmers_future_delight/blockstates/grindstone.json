@@ -1,0 +1,18 @@
+{
+  "variants": {
+    "normal": {"model": "farmers_future_delight:grindstone"},
+    "inventory": {"model": "farmers_future_delight:grindstone"},
+    "face=floor,facing=north": {"model": "farmers_future_delight:grindstone"},
+    "face=floor,facing=east": {"model": "farmers_future_delight:grindstone", "y": 90},
+    "face=floor,facing=south": {"model": "farmers_future_delight:grindstone", "y": 180},
+    "face=floor,facing=west": {"model": "farmers_future_delight:grindstone", "y": 270},
+    "face=wall,facing=north": {"model": "farmers_future_delight:grindstone", "x": 90},
+    "face=wall,facing=east": {"model": "farmers_future_delight:grindstone", "x": 90, "y": 90},
+    "face=wall,facing=south": {"model": "farmers_future_delight:grindstone", "x": 90, "y": 180},
+    "face=wall,facing=west": {"model": "farmers_future_delight:grindstone", "x": 90, "y": 270},
+    "face=ceiling,facing=north": {"model": "farmers_future_delight:grindstone", "x": 180, "y": 180},
+    "face=ceiling,facing=east": {"model": "farmers_future_delight:grindstone", "x": 180, "y": 270},
+    "face=ceiling,facing=south": {"model": "farmers_future_delight:grindstone", "x": 180},
+    "face=ceiling,facing=west": {"model": "farmers_future_delight:grindstone", "x": 180, "y": 90}
+  }
+}

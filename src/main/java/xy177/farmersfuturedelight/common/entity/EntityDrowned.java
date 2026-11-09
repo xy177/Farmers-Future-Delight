@@ -30,6 +30,7 @@ import net.minecraft.entity.ai.EntityAIWander;
 import net.minecraft.entity.ai.EntityAIWatchClosest;
 import net.minecraft.entity.ai.EntityAIZombieAttack;
 import net.minecraft.entity.ai.EntityMoveHelper;
+import net.minecraft.entity.ai.EntityLookHelper;
 import net.minecraft.entity.ai.RandomPositionGenerator;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttribute;
@@ -65,6 +66,7 @@ import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.FFDPowderSnowEvents;
 import xy177.farmersfuturedelight.common.registry.FFDEntities;
@@ -91,6 +93,8 @@ public class EntityDrowned extends EntityZombie implements IRangedAttackMob {
         super(world);
         stepHeight = 1.0F;
         moveHelper = new DrownedMoveHelper(this);
+        ObfuscationReflectionHelper.setPrivateValue(EntityLiving.class, this,
+                new DrownedLookHelper(this), "field_70749_g", "lookHelper");
         setPathPriority(PathNodeType.WATER, 0.0F);
         waterNavigator = new PathNavigateSwimmer(this, world);
         groundNavigator = new PathNavigateGround(this, world);
@@ -445,17 +449,6 @@ public class EntityDrowned extends EntityZombie implements IRangedAttackMob {
     @Override
     protected ResourceLocation getLootTable() {
         return LOOT;
-    }
-
-    @Override
-    protected void dropLoot(boolean wasRecentlyHit, int lootingModifier, DamageSource source) {
-        super.dropLoot(wasRecentlyHit, lootingModifier, source);
-        if (wasRecentlyHit && rand.nextFloat() < 0.11F + 0.02F * lootingModifier) {
-            ItemStack copper = FFDItems.effectiveStack(FFDItems.COPPER_INGOT);
-            if (!copper.isEmpty()) {
-                entityDropItem(copper, 0.0F);
-            }
-        }
     }
 
     @Override
@@ -857,6 +850,46 @@ public class EntityDrowned extends EntityZombie implements IRangedAttackMob {
                     drowned.getNavigator().tryMoveToXYZ(target.x, target.y, target.z, speed);
                 }
             }
+        }
+    }
+
+    private static final class DrownedLookHelper extends EntityLookHelper {
+        private int remainingTicks;
+        private float deltaYaw;
+        private float deltaPitch;
+
+        private DrownedLookHelper(EntityDrowned drowned) {
+            super(drowned);
+        }
+
+        @Override
+        public void setLookPositionWithEntity(Entity entity, float yaw, float pitch) {
+            super.setLookPositionWithEntity(entity, yaw, pitch);
+            remainingTicks = 2;
+            deltaYaw = yaw;
+            deltaPitch = pitch;
+        }
+
+        @Override
+        public void setLookPosition(double x, double y, double z, float yaw, float pitch) {
+            super.setLookPosition(x, y, z, yaw, pitch);
+            remainingTicks = 2;
+            deltaYaw = yaw;
+            deltaPitch = pitch;
+        }
+
+        @Override
+        public void onUpdateLook() {
+            if (remainingTicks > 0) {
+                remainingTicks--;
+                super.setLookPosition(getLookPosX(), getLookPosY(), getLookPosZ(), deltaYaw, deltaPitch);
+            }
+            super.onUpdateLook();
+        }
+
+        @Override
+        public boolean getIsLooking() {
+            return remainingTicks > 0;
         }
     }
 

@@ -1,25 +1,28 @@
-# eclipse
-bin
-*.launch
-.settings
-.metadata
-.classpath
-.project
-
-# idea
-out
-*.ipr
-*.iws
-*.iml
-.idea
-
-# gradle
-build
-.gradle
-
-# other
-eclipse
-run
-
-# Files from Forge MDK
-forge*changelog.txt
+/*
+!/.gitignore
+!/LICENSE
+!/THIRD_PARTY_NOTICES.md
+!/build.gradle
+!/gradle.properties
+!/gradlew
+!/gradlew.bat
+!/gradle/
+/gradle/*
+!/gradle/wrapper/
+/gradle/wrapper/*
+!/gradle/wrapper/gradle-wrapper.jar
+!/gradle/wrapper/gradle-wrapper.properties
+!/src/
+/src/*
+!/src/main/
+/src/main/*
+!/src/main/java/
+!/src/main/resources/
+*.class
+*.log
+*.tmp
+*.bak
+*.orig
+*~
+.DS_Store
+Thumbs.db

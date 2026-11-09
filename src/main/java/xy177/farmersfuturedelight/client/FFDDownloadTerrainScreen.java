@@ -25,6 +25,7 @@ public final class FFDDownloadTerrainScreen extends GuiDownloadTerrain {
     private static final ResourceLocation LOADING_GLYPH_TEXTURE = new ResourceLocation(
             FarmerFutureDelight.MODID, "textures/gui/loading/chinese_1_20_6.png");
     private final long createdAt = Minecraft.getSystemTime();
+    private final int transition = FFDMenuTransitions.consume();
     private boolean positionReceived;
     private boolean closing;
     private FontRenderer latinFont;
@@ -97,7 +98,8 @@ public final class FFDDownloadTerrainScreen extends GuiDownloadTerrain {
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         Minecraft minecraft = Minecraft.getMinecraft();
-        panoramaRenderer.render(minecraft, width, height, minecraft.getFramebuffer());
+        if (!FFDMenuTransitions.terrain(transition, width, height))
+            panoramaRenderer.render(minecraft, width, height, minecraft.getFramebuffer());
         String text = I18n.format("ffd.loading.terrain");
         if (drawLoadingGlyphs(text, width / 2, height / 2 - 50)) {
             return;

@@ -361,6 +361,9 @@ public final class FFDCompat {
                 contentWithLocalPaths("Oceanic Expanse", null, ids("oe", "trident"),
                         null, null, null, "trident", "loyalty", "impaling", "riptide",
                         "channeling")),
+        CROSSBOW(
+                contentWithLocalPaths("Future MC", null, ids("futuremc", "crossbow"),
+                        null, null, null, "crossbow", "multishot", "piercing", "quick_charge")),
         TURTLE(
                 blocks("Oceanic Expanse", "oe", "turtle_egg"),
                 items("Oceanic Expanse", "oe", "turtle_scute", "turtle_helmet"),
@@ -371,6 +374,12 @@ public final class FFDCompat {
         AXOLOTL(
                 items("Caves Not Cliffs", "cavesnotcliffs", "axolotl_bucket"),
                 entities("Caves Not Cliffs", "cavesnotcliffs", "axolotl")),
+        CAT(entities("Future MC", "futuremc", "cat")),
+        FOX(entities("Future MC", "futuremc", "fox")),
+        PANDA(entities("Future MC", "futuremc", "panda")),
+        PILLAGER(entities("Future MC", "futuremc", "pillager")),
+        RAVAGER(entities("Future MC", "futuremc", "ravager")),
+        WANDERING_TRADER(),
         PHANTOM(
                 content("Phantoms", null, ids("phantoms", "phantom_membrane"),
                         ids("phantoms", "phantom"))),
@@ -394,6 +403,30 @@ public final class FFDCompat {
                         "tinted_glass"),
                 items("Caves Not Cliffs", "cavesnotcliffs", "amethyst_shard"),
                 futureDecorationAmethyst()),
+        NETHERITE(
+                blocks("Future MC", "futuremc", "ancient_debris", "netherite_block"),
+                items("Future MC", "futuremc", "netherite_scrap", "netherite_ingot",
+                        "netherite_block", "netherite_upgrade_smithing_template", "netherite_sword",
+                        "netherite_pickaxe", "netherite_axe", "netherite_shovel",
+                        "netherite_hoe", "netherite_helmet", "netherite_chestplate",
+                        "netherite_leggings", "netherite_boots", "netherite_horse_armor")),
+        BLACKSTONE(
+                blocks("Future MC", "futuremc",
+                        "blackstone", "polished_blackstone", "polished_blackstone_bricks", "cracked_polished_blackstone_bricks", "chiseled_polished_blackstone", "gilded_blackstone", "blackstone_stairs", "polished_blackstone_stairs", "polished_blackstone_brick_stairs", "blackstone_wall", "polished_blackstone_wall", "polished_blackstone_brick_wall", "polished_blackstone_button", "polished_blackstone_pressure_plate", "blackstone_slab", "polished_blackstone_slab", "polished_blackstone_brick_slab", "blackstone_double_slab", "polished_blackstone_double_slab", "polished_blackstone_brick_double_slab"),
+                blocks("Unseens Nether Backport", "nb",
+                        "blackstone", "polished_blackstone", "polished_blackstone_bricks", "cracked_polished_blackstone_bricks", "chiseled_polished_blackstone", "gilded_blackstone", "blackstone_stairs", "polished_blackstone_stairs", "polished_blackstone_brick_stairs", "blackstone_wall", "polished_blackstone_wall", "polished_blackstone_brick_wall", "polished_blackstone_button", "polished_blackstone_pressure_plate", "blackstone_slab", "polished_blackstone_slab", "polished_blackstone_brick_slab", "blackstone_double_slab", "polished_blackstone_double_slab", "polished_blackstone_brick_double_slab"),
+                blocks("Netherized", "netherized",
+                        "blackstone", "polished_blackstone", "polished_blackstone_bricks", "cracked_polished_blackstone_bricks", "chiseled_polished_blackstone", "gilded_blackstone", "blackstone_stairs", "polished_blackstone_stairs", "polished_blackstone_brick_stairs", "blackstone_wall", "polished_blackstone_wall", "polished_blackstone_brick_wall", "polished_blackstone_button", "polished_blackstone_pressure_plate", "blackstone_slab", "polished_blackstone_slab", "polished_blackstone_brick_slab", "blackstone_double_slab", "polished_blackstone_double_slab", "polished_blackstone_brick_double_slab")),
+        QUARTZ_BRICKS(
+                blocks("Unseens Nether Backport", "nb", "quartz_bricks"),
+                items("Unseens Nether Backport", "nb", "quartz_bricks"),
+                blocks("Netherized", "netherized", "quartz_bricks"),
+                items("Netherized", "netherized", "quartz_bricks")),
+        CRYING_OBSIDIAN(
+                blocks("Future MC", "futuremc", "crying_obsidian"),
+                items("Future MC", "futuremc", "crying_obsidian"),
+                blocks("Netherized", "netherized", "crying_obsidian"),
+                items("Netherized", "netherized", "crying_obsidian")),
         DEEPSLATE(
                 depthsUpdateDeepslate(),
                 deeperDepthsDeepslate(),
@@ -416,6 +449,30 @@ public final class FFDCompat {
                 blocks("Depths Update", "depthsupdate", "dripstone_block", "pointed_dripstone"),
                 blocks("Caves Not Cliffs", "cavesnotcliffs", "dripstone_block",
                         "pointed_dripstone")),
+        LANTERN(blocks("Future MC", "futuremc", "lantern")),
+        BARREL(blocks("Future MC", "futuremc", "barrel")),
+        CAMPFIRE(blocks("Future MC", "futuremc", "campfire")),
+        SMOKER(blocks("Future MC", "futuremc", "smoker")),
+        BLAST_FURNACE(blocks("Future MC", "futuremc", "blast_furnace")),
+        COMPOSTER(blocks("Future MC", "futuremc", "composter")),
+        STONECUTTER(blocks("Future MC", "futuremc", "stonecutter")),
+        GRINDSTONE(blocks("Future MC", "futuremc", "grindstone")),
+        CARTOGRAPHY_TABLE(blocks("Future MC", "futuremc", "cartography_table")),
+        LECTERN(blocks("Future MC", "futuremc", "lectern")),
+        FLETCHING_TABLE(blocks("Future MC", "futuremc", "fletching_table")),
+        SMITHING_TABLE(blocks("Future MC", "futuremc", "smithing_table")),
+        BELL(blocks("Future MC", "futuremc", "bell")),
+        LOOM(blocks("Future MC", "futuremc", "loom"),
+                items("Future MC", "futuremc", "flower_banner_pattern",
+                        "creeper_banner_pattern", "skull_banner_pattern",
+                        "mojang_banner_pattern")),
+        SUSPICIOUS_STEW(items("Future MC", "futuremc", "suspicious_stew")),
+        LEATHER_HORSE_ARMOR(),
+        STONE_DECOR(stoneDecorProvider()),
+        FLOWERS(blocks("Future MC", "futuremc", "cornflower", "lily_of_the_valley", "wither_rose",
+                "potted_cornflower", "potted_lily_of_the_valley", "potted_wither_rose")),
+        BAMBOO(blocks("Future MC", "futuremc", "bamboo", "bamboo_sapling", "potted_bamboo")),
+        SCAFFOLDING(blocks("Future MC", "futuremc", "scaffolding")),
         IRON_CHAIN(
                 contentWithLocalPaths("Future MC", ids("futuremc", "chain"), null, null,
                         null, null, "iron_chain"),
@@ -532,6 +589,34 @@ public final class FFDCompat {
 
     private static ProviderSet blocks(String name, String namespace, String... paths) {
         return content(name, ids(namespace, paths), null, null);
+    }
+
+    private static ProviderSet stoneDecorProvider() {
+        Set<String> paths = new LinkedHashSet<>();
+        java.util.Collections.addAll(paths, "smooth_stone", "smooth_sandstone",
+                "smooth_red_sandstone", "smooth_quartz");
+        String[] families = {"polished_granite", "smooth_red_sandstone", "mossy_stone_brick",
+                "polished_diorite", "mossy_cobblestone", "end_stone_brick", "stone",
+                "smooth_sandstone", "smooth_quartz", "granite", "andesite", "red_nether_brick",
+                "polished_andesite", "diorite", "cut_sandstone", "cut_red_sandstone"};
+        for (String family : families) {
+            if (!family.startsWith("cut_")) {
+                paths.add(family + "_stairs");
+            }
+            paths.add(family + "_slab");
+            paths.add(family + "_double_slab");
+        }
+        for (String family : new String[] {"brick", "prismarine", "red_sandstone",
+                "mossy_stone_brick", "granite", "stone_brick", "nether_brick", "andesite",
+                "red_nether_brick", "sandstone", "end_stone_brick", "diorite"}) {
+            paths.add(family + "_wall");
+        }
+        ContentVariant[] aliases = {
+                variant("mossy_cobblestone_slab", "futuremc", "mossy_stone_slab", 0),
+                variant("mossy_cobblestone_double_slab", "futuremc", "mossy_stone_double_slab", 0)
+        };
+        return content("Future MC", ids("futuremc", paths.toArray(new String[0])),
+                null, null, aliases, aliases);
     }
 
     private static ProviderSet items(String name, String namespace, String... paths) {

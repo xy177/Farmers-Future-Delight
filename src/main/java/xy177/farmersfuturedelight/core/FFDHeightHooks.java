@@ -399,7 +399,8 @@ public final class FFDHeightHooks {
 
     public static boolean isOutsideBuildHeight(World world, BlockPos pos) {
         int y = pos.getY();
-        return y < minY(world) || y >= maxYExclusive(world);
+        return (y < 0 || y >= 256) && (y < MIN_Y || y >= MAX_Y_EXCLUSIVE
+                || !usesExtendedHeight(world) || usesLegacyWorldgenHeight());
     }
 
     public static BlockPos parseBlockPos(ICommandSender sender, String[] args, int startIndex,
@@ -1213,6 +1214,7 @@ public final class FFDHeightHooks {
         if (!(world instanceof WorldServer)) {
             return;
         }
+        List<Map.Entry<Chunk, Integer>> pendingChunks = new ArrayList<>();
         synchronized (PENDING_WATER_LIGHT_SYNC) {
             Iterator<Map.Entry<Chunk, Integer>> iterator = PENDING_WATER_LIGHT_SYNC.entrySet().iterator();
             while (iterator.hasNext()) {
@@ -1223,11 +1225,15 @@ public final class FFDHeightHooks {
                 }
                 int sections = pending.getValue();
                 iterator.remove();
-                PlayerChunkMapEntry entry = ((WorldServer) world).getPlayerChunkMap().getEntry(chunk.x, chunk.z);
-                if (entry != null && entry.getChunk() == chunk && entry.isSentToPlayers()
-                        && !entry.getWatchingPlayers().isEmpty() && !PENDING_WATER_RELIGHT.contains(chunk)) {
-                    entry.sendPacket(new SPacketChunkData(chunk, sections));
-                }
+                pendingChunks.add(new java.util.AbstractMap.SimpleImmutableEntry<>(chunk, sections));
+            }
+        }
+        for (Map.Entry<Chunk, Integer> pending : pendingChunks) {
+            Chunk chunk = pending.getKey();
+            PlayerChunkMapEntry entry = ((WorldServer) world).getPlayerChunkMap().getEntry(chunk.x, chunk.z);
+            if (entry != null && entry.getChunk() == chunk && entry.isSentToPlayers()
+                    && !entry.getWatchingPlayers().isEmpty() && !PENDING_WATER_RELIGHT.contains(chunk)) {
+                entry.sendPacket(new SPacketChunkData(chunk, pending.getValue()));
             }
         }
     }

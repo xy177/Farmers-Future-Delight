@@ -94,7 +94,7 @@ public class EntityGlowSquid extends EntitySquid {
             FarmerFutureDelight.proxy.spawnGlowParticle(this);
             return;
         }
-        if (isEntityAlive() && growingAge != 0) {
+        if (isEntityAlive() && growingAge != 0 && !(growingAge < 0 && FFDAgeLock.isLocked(this))) {
             setGrowingAge(growingAge + (growingAge < 0 ? 1 : -1));
         }
         if (getDarkTicksRemaining() > 0) {
@@ -181,18 +181,7 @@ public class EntityGlowSquid extends EntitySquid {
 
     @Override
     protected ResourceLocation getLootTable() {
-        return FFDItems.isItemRegistered(FFDItems.GLOW_INK_SAC) ? LOOT_TABLE : null;
-    }
-
-    @Override
-    protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
-        ItemStack ink = FFDItems.effectiveStack(FFDItems.GLOW_INK_SAC);
-        if (ink.isEmpty()) {
-            return;
-        }
-        ink.setCount(1 + rand.nextInt(3)
-                + (lootingModifier <= 0 ? 0 : rand.nextInt(lootingModifier + 1)));
-        entityDropItem(ink, 0.0F);
+        return LOOT_TABLE;
     }
 
     @Override

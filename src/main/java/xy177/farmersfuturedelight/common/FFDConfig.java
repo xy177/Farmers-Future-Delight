@@ -23,6 +23,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
@@ -66,6 +68,20 @@ public final class FFDConfig {
         }
     }
 
+    public enum CreativeInventoryMode {
+        MOD_TAB,
+        CLASSIC,
+        MODERN;
+
+        public static CreativeInventoryMode parse(String value) {
+            try {
+                return valueOf(value.trim().toUpperCase(Locale.ROOT));
+            } catch (IllegalArgumentException ex) {
+                return MODERN;
+            }
+        }
+    }
+
     public enum WaterVisualMode {
         MODERN,
         LEGACY;
@@ -102,7 +118,8 @@ public final class FFDConfig {
     private static final String CATEGORY_DEBUG = "debug";
     private static final String CATEGORY_INTERNAL = "internal";
     private static final String CATEGORY_COMPATIBILITY = "compatibility";
-    private static final int CURRENT_CONFIG_VERSION = 18;
+    private static final String CATEGORY_COMMANDS = "commands";
+    private static final int CURRENT_CONFIG_VERSION = 21;
     private static final String AUTO_COMPATIBILITY_COMMENT = "逐个控制 AUTO 自动避让的外部模组。仅当对应内容开关为 AUTO 时生效。每行格式为 内容注册名@外部模组ID=true或false：true 表示该模组提供对应内容时让位给它，false 表示忽略该模组并继续使用未世之乐内容。默认全部为 true，名单包含所有已支持的内容与模组组合，即使对应模组未安装也会保留；未列出的组合继续使用 AUTO 的正常判定。使用 /ffd_compat preset 可用内置的约定预设覆盖此名单。修改后需重启游戏或服务端。";
 
     public static FeatureMode sweetBerryMode;
@@ -135,12 +152,35 @@ public final class FFDConfig {
     public static FeatureMode dolphinMode;
     public static FeatureMode drownedMode;
     public static FeatureMode tridentMode;
+    public static FeatureMode crossbowMode;
     public static FeatureMode turtleMode;
     public static FeatureMode axolotlMode;
+    public static FeatureMode catMode;
+    public static FeatureMode foxMode;
+    public static FeatureMode pandaMode;
+    public static FeatureMode pillagerMode;
+    public static FeatureMode ravagerMode;
+    public static FeatureMode wanderingTraderMode;
+    public static int wanderingTraderCheckInterval;
+    public static int wanderingTraderSpawnInterval;
+    public static int wanderingTraderInitialChance;
+    public static int wanderingTraderChanceStep;
+    public static int wanderingTraderMaximumChance;
+    public static int wanderingTraderPositionChance;
+    public static int wanderingTraderSpawnRadius;
+    public static int wanderingTraderMeetingPointRange;
+    public static int wanderingTraderSpawnAttempts;
+    public static int wanderingTraderDespawnDelay;
+    public static int wanderingTraderLlamaCount;
+    public static int wanderingTraderLlamaRadius;
     public static FeatureMode goatMode;
     public static FeatureMode phantomMode;
     public static FeatureMode othersideMode;
     public static FeatureMode amethystMode;
+    public static FeatureMode netheriteMode;
+    public static FeatureMode blackstoneMode;
+    public static FeatureMode quartzBricksMode;
+    public static FeatureMode cryingObsidianMode;
     public static FeatureMode deepslateMode;
     public static String[] deepslateCompatToggles;
     public static String[] deepslateCompatGenerationToggles;
@@ -149,6 +189,27 @@ public final class FFDConfig {
     public static FeatureMode copperMode;
     public static FeatureMode dripstoneMode;
     public static FeatureMode ironChainMode;
+    public static FeatureMode lanternMode;
+    public static FeatureMode barrelMode;
+    public static FeatureMode campfireMode;
+    public static FeatureMode smokerMode;
+    public static FeatureMode blastFurnaceMode;
+    public static FeatureMode composterMode;
+    public static FeatureMode stonecutterMode;
+    public static FeatureMode grindstoneMode;
+    public static FeatureMode cartographyTableMode;
+    public static FeatureMode loomMode;
+    public static FeatureMode lecternMode;
+    public static FeatureMode fletchingTableMode;
+    public static FeatureMode smithingTableMode;
+    public static FeatureMode bellMode;
+    public static int bellRaidHighlightRange;
+    public static FeatureMode flowersMode;
+    public static FeatureMode suspiciousStewMode;
+    public static FeatureMode stoneDecorMode;
+    public static FeatureMode leatherHorseArmorMode;
+    public static FeatureMode bambooMode;
+    public static FeatureMode scaffoldingMode;
     public static FeatureMode candleMode;
     public static FeatureMode powderSnowMode;
     public static FeatureMode crimsonMode;
@@ -166,12 +227,21 @@ public final class FFDConfig {
     public static FeatureMode aquaAcrobaticsMode;
     public static String[] conduitFrameBlocks;
     public static FeatureMode commandCompletionMode;
+    public static FeatureMode gameModeSwitcherMode = FeatureMode.AUTO;
+    public static int scheduledFunctionPermissionLevel = 2;
 
     public static boolean hostileMobsRequireZeroBlockLight;
     public static CloudHeightMode cloudHeightMode;
     public static boolean smoothBiomeSkyColors;
+    public static CreativeInventoryMode creativeInventoryMode = CreativeInventoryMode.MODERN;
     public static WaterVisualMode waterVisualMode;
     public static boolean modernWorldLoadingScreen;
+    public static boolean modernMenuVisuals;
+    public static boolean modernCreateWorldScreen;
+    public static boolean modernVillagerSystem = true;
+    public static boolean mainMenuBackgroundBlur;
+    public static String menuPanorama = "RESOURCE_PACK";
+    public static boolean modernBabyModels = true;
     public static boolean cavesAndCliffsBackgroundMusic;
     public static boolean shovelCreatesDirtPath;
     public static boolean shearsStopPlantGrowth;
@@ -218,6 +288,8 @@ public final class FFDConfig {
     public static boolean shulkerDuplication;
     public static boolean experienceOrbMerging;
     public static boolean illagersIgnoreBabyVillagers;
+    public static boolean villagerWorkstationLossParticles;
+    public static boolean legacyDyeCompatibility;
     public static boolean logAutoCompatibilityDecisions;
     public static String[] beeAdditionalPollinationTargets;
     public static String[] powderSnowMobTransformations;
@@ -229,9 +301,11 @@ public final class FFDConfig {
     public static String[] turtleEggDestroyingMobs;
     public static String[] turtleBabyPredatorMobs;
     public static String[] waterSinkingMobs;
+    public static String[] waterSinkingItems;
     public static String[] waterDrowningImmuneMobs;
     public static String[] drownedTransformationMobs;
     public static String[] impalingDamageMobs;
+    public static String[] suspiciousStewIngredients;
     private static volatile Map<ResourceLocation, ResourceLocation> drownedTransformationTargets =
             Collections.emptyMap();
     public static float goatScreamingChance;
@@ -505,12 +579,51 @@ public final class FFDConfig {
         dolphinMode = readMode(config, "dolphinMode", "海豚与海豚的恩惠内容开关");
         drownedMode = readMode(config, "drownedMode", "溺尸、自然生成与僵尸转化内容开关");
         tridentMode = readMode(config, "tridentMode", "三叉戟与对应投射物内容开关");
+        crossbowMode = readMode(config, "crossbowMode", "弩与对应附魔内容开关");
         turtleMode = readMode(config, "turtleMode", "海龟内容开关");
         axolotlMode = readMode(config, "axolotlMode", "美西螈与美西螈桶内容开关");
+        catMode = readMode(config, "catMode", "猫内容开关");
+        foxMode = readMode(config, "foxMode", "狐狸内容开关");
+        pandaMode = readMode(config, "pandaMode", "熊猫内容开关");
+        pillagerMode = readMode(config, "pillagerMode", "掠夺者内容开关");
+        ravagerMode = readMode(config, "ravagerMode", "劫掠兽内容开关");
+        wanderingTraderMode = readMode(config, "wanderingTraderMode", "流浪商人与行商羊驼内容开关");
+        wanderingTraderCheckInterval = config.getInt("wanderingTraderCheckInterval", CATEGORY_GAMEPLAY,
+                1200, 20, 24000, "流浪商人生成检查间隔，单位为 tick。默认 1200。");
+        wanderingTraderSpawnInterval = config.getInt("wanderingTraderSpawnInterval", CATEGORY_GAMEPLAY,
+                24000, 1200, 240000, "流浪商人生成尝试间隔，单位为 tick。默认 24000。");
+        wanderingTraderInitialChance = config.getInt("wanderingTraderInitialChance", CATEGORY_GAMEPLAY,
+                25, 0, 100, "流浪商人生成概率的初始值，单位为百分比。默认 25。");
+        wanderingTraderChanceStep = config.getInt("wanderingTraderChanceStep", CATEGORY_GAMEPLAY,
+                25, 0, 100, "每次生成尝试未成功时生成概率增加的百分比。默认 25。");
+        wanderingTraderMaximumChance = config.getInt("wanderingTraderMaximumChance", CATEGORY_GAMEPLAY,
+                75, 0, 100, "流浪商人生成概率的上限，单位为百分比。默认 75。");
+        if (wanderingTraderMaximumChance < wanderingTraderInitialChance) {
+            wanderingTraderMaximumChance = wanderingTraderInitialChance;
+            config.get(CATEGORY_GAMEPLAY, "wanderingTraderMaximumChance", 75).set(wanderingTraderMaximumChance);
+        }
+        wanderingTraderPositionChance = config.getInt("wanderingTraderPositionChance", CATEGORY_GAMEPLAY,
+                10, 0, 100, "通过一次位置检查的概率，单位为百分比。默认 10。");
+        wanderingTraderSpawnRadius = config.getInt("wanderingTraderSpawnRadius", CATEGORY_GAMEPLAY,
+                48, 1, 128, "流浪商人相对参考点的生成半径，单位为方块。默认 48。");
+        wanderingTraderMeetingPointRange = config.getInt("wanderingTraderMeetingPointRange", CATEGORY_GAMEPLAY,
+                48, 1, 128, "流浪商人搜索钟作为参考点的范围，单位为方块。默认 48。");
+        wanderingTraderSpawnAttempts = config.getInt("wanderingTraderSpawnAttempts", CATEGORY_GAMEPLAY,
+                10, 1, 100, "流浪商人每次生成尝试检查的位置数量。默认 10。");
+        wanderingTraderDespawnDelay = config.getInt("wanderingTraderDespawnDelay", CATEGORY_GAMEPLAY,
+                48000, 1, 2400000, "流浪商人生成后的消失时间，单位为 tick。默认 48000。");
+        wanderingTraderLlamaCount = config.getInt("wanderingTraderLlamaCount", CATEGORY_GAMEPLAY,
+                2, 0, 4, "每名流浪商人生成的行商羊驼数量。默认 2。");
+        wanderingTraderLlamaRadius = config.getInt("wanderingTraderLlamaRadius", CATEGORY_GAMEPLAY,
+                4, 1, 16, "行商羊驼围绕流浪商人的生成半径，单位为方块。默认 4。");
         goatMode = readMode(config, "goatMode", "山羊与山羊角内容开关");
         phantomMode = readMode(config, "phantomMode", "幻翼与幻翼膜内容开关");
         othersideMode = readMode(config, "othersideMode", "《otherside》音乐唱片内容开关");
         amethystMode = readMode(config, "amethystMode", "紫水晶与紫水晶晶洞内容开关");
+        netheriteMode = readMode(config, "netheriteMode", "远古残骸与下界合金内容开关");
+        blackstoneMode = readMode(config, "blackstoneMode", "黑石、黑石建筑方块与下界黑石矿团内容开关");
+        quartzBricksMode = readMode(config, "quartzBricksMode", "石英砖内容开关");
+        cryingObsidianMode = readMode(config, "cryingObsidianMode", "哭泣的黑曜石内容开关");
         deepslateMode = readMode(config, "deepslateMode", "深板岩、凝灰岩与深层矿石内容开关");
         deepslateCompatToggles = config.getStringList(
                 "deepslateCompatToggles", CATEGORY_FEATURES,
@@ -553,6 +666,28 @@ public final class FFDConfig {
         copperMode = readMode(config, "copperMode", "铜矿石、粗铜与铜制内容开关");
         dripstoneMode = readMode(config, "dripstoneMode", "滴水石块与滴水石锥内容开关");
         ironChainMode = readMode(config, "ironChainMode", "铁链内容开关");
+        lanternMode = readMode(config, "lanternMode", "灯笼内容开关");
+        barrelMode = readMode(config, "barrelMode", "木桶内容开关");
+        campfireMode = readMode(config, "campfireMode", "营火内容开关");
+        smokerMode = readMode(config, "smokerMode", "烟熏炉内容开关");
+        blastFurnaceMode = readMode(config, "blastFurnaceMode", "高炉内容开关");
+        composterMode = readMode(config, "composterMode", "堆肥桶内容开关");
+        stonecutterMode = readMode(config, "stonecutterMode", "切石机内容开关");
+        grindstoneMode = readMode(config, "grindstoneMode", "砂轮内容开关");
+        cartographyTableMode = readMode(config, "cartographyTableMode", "制图台内容开关");
+        loomMode = readMode(config, "loomMode", "织布机与旗帜图案内容开关");
+        lecternMode = readMode(config, "lecternMode", "讲台内容开关");
+        fletchingTableMode = readMode(config, "fletchingTableMode", "制箭台内容开关");
+        smithingTableMode = readMode(config, "smithingTableMode", "锻造台基础内容开关");
+        bellMode = readMode(config, "bellMode", "钟内容开关");
+        bellRaidHighlightRange = config.getInt("bellRaidHighlightRange", CATEGORY_GAMEPLAY,
+                48, 1, 128, "敲钟显示袭击者的范围，单位为方块。默认 48。修改后需重启游戏。");
+        flowersMode = readMode(config, "flowersMode", "矢车菊、铃兰、凋灵玫瑰与对应盆栽内容开关");
+        suspiciousStewMode = readMode(config, "suspiciousStewMode", "谜之炖菜内容开关");
+        stoneDecorMode = readMode(config, "stoneDecorMode", "平滑石材及新增石材楼梯、台阶、墙内容开关");
+        leatherHorseArmorMode = readMode(config, "leatherHorseArmorMode", "皮革马铠内容开关");
+        bambooMode = readMode(config, "bambooMode", "竹子、竹笋与竹子盆栽内容开关");
+        scaffoldingMode = readMode(config, "scaffoldingMode", "脚手架内容开关");
         candleMode = readMode(config, "candleMode", "蜡烛与蜡烛蛋糕内容开关");
         powderSnowMode = readMode(config, "powderSnowMode", "细雪与细雪桶内容开关");
         crimsonMode = readMode(config, "crimsonMode", "绯红植物内容开关");
@@ -582,6 +717,11 @@ public final class FFDConfig {
                 "潮涌核心框架方块列表。格式为 namespace:block 或 namespace:block:metadata；不填写 metadata 时接受该方块的全部变体。默认包括海晶石全部变体和海晶灯，修改后需重启游戏。");
         commandCompletionMode = readMode(config, "commandCompletionMode",
                 "高版本风格指令补全开关。ENABLED 使用本模组的补全界面；DISABLED 关闭；AUTO 在检测到 Cleanroom Loader 时让位给它。安装 Salutation 时，ENABLED 和 AUTO 均让位给 Salutation，避免聊天界面冲突");
+        gameModeSwitcherMode = readMode(config, "gameModeSwitcherMode",
+                "F3＋F4 游戏模式切换界面开关。ENABLED 使用本模组的切换界面；DISABLED 关闭；AUTO 在安装未来的 MC（Future MC）时让位给它，仅影响客户端，修改后需重启游戏");
+        scheduledFunctionPermissionLevel = config.getInt("scheduledFunctionPermissionLevel",
+                CATEGORY_COMMANDS, 2, 0, 4,
+                "函数允许使用的最高指令权限等级，包含原版循环函数和本模组 /schedule 调度的函数。默认 2；范围 0-4，修改后需重启。");
 
         String[] defaultAutoCompatibilityToggles = FFDCompat.defaultAutoCompatibilityToggles();
         String[] configuredAutoCompatibilityToggles = config.getStringList(
@@ -599,15 +739,18 @@ public final class FFDConfig {
                 "lushCaveMode", "azaleaMode", "dripleafMode", "rootedDirtMode", "hangingRootsMode",
                 "sporeBlossomMode", "glowLichenMode", "kelpMode", "seagrassMode", "seaPickleMode",
                 "coralMode", "blueIceMode", "strippedWoodMode", "pumpkinMode", "prismarineDecorMode", "conduitMode",
-                "bubbleColumnMode", "fishMode", "dolphinMode", "drownedMode", "tridentMode",
-                "turtleMode", "axolotlMode", "goatMode", "phantomMode", "othersideMode",
-                "amethystMode", "deepslateMode", "deepslateCompatToggles", "rawOreMode",
+                "bubbleColumnMode", "fishMode", "dolphinMode", "drownedMode", "tridentMode", "crossbowMode",
+                "turtleMode", "axolotlMode", "catMode", "foxMode", "goatMode", "phantomMode", "othersideMode",
+                "pillagerMode",
+                "ravagerMode",
+                "wanderingTraderMode",
+                "amethystMode", "netheriteMode", "blackstoneMode", "quartzBricksMode", "cryingObsidianMode", "deepslateMode", "deepslateCompatToggles", "rawOreMode",
                 "rawOreMaterialToggles", "copperMode", "dripstoneMode",
-                "ironChainMode", "candleMode", "powderSnowMode", "crimsonMode", "warpedMode",
+                "ironChainMode", "lanternMode", "barrelMode", "campfireMode", "smokerMode", "blastFurnaceMode", "composterMode", "stonecutterMode", "grindstoneMode", "cartographyTableMode", "loomMode", "lecternMode", "fletchingTableMode", "smithingTableMode", "bellMode", "flowersMode", "suspiciousStewMode", "stoneDecorMode", "leatherHorseArmorMode", "bambooMode", "scaffoldingMode", "candleMode", "powderSnowMode", "crimsonMode", "warpedMode",
                 "crimsonWoodMode", "warpedWoodMode", "glowItemFrameMode", "signTextMode", "lightBlockMode",
                 "waterloggingMode", "fluidloggingScope", "fluidloggingFluidList", "waterloggingAdditionalBlocks",
                 "aquaAcrobaticsMode", "conduitFrameBlocks",
-                "commandCompletionMode",
+                "commandCompletionMode", "gameModeSwitcherMode",
                 "autoCompatibilityToggles")));
 
         hostileMobsRequireZeroBlockLight = config.getBoolean(
@@ -619,6 +762,10 @@ public final class FFDConfig {
                 new String[]{"DISABLED", "CAVES_CLIFFS_ONLY", "ALL_WORLDS"}));
         smoothBiomeSkyColors = config.getBoolean("smoothBiomeSkyColors", CATEGORY_GAMEPLAY,
                 true, "是否在群系边界平滑混合天空颜色。关闭时直接使用玩家所在位置群系的天空颜色。仅影响客户端显示。");
+        creativeInventoryMode = CreativeInventoryMode.parse(config.getString("creativeInventoryMode",
+                CATEGORY_GAMEPLAY, "MODERN",
+                "创造模式物品栏分类。MOD_TAB 使用未世之乐专属页签；CLASSIC 按旧版原版分类放入对应页签；MODERN 使用新版分类与排列。特殊内容保留在未世之乐页签。修改后需重启游戏。",
+                new String[]{"MOD_TAB", "CLASSIC", "MODERN"}));
         waterVisualMode = WaterVisualMode.parse(config.getString("waterVisualMode",
                 CATEGORY_GAMEPLAY, "MODERN",
                 "水体视觉模式。MODERN 使用 1.13 风格灰度水纹理、群系染色、水下雾色和逐步提升的水下能见度；LEGACY 保留 1.12.2 水体视觉。仅影响客户端显示，修改后需重启游戏。",
@@ -626,6 +773,19 @@ public final class FFDConfig {
         modernWorldLoadingScreen = config.getBoolean("modernWorldLoadingScreen",
                 CATEGORY_GAMEPLAY, false,
                 "是否在创建或进入世界时使用高版本风格的加载画面。");
+        modernMenuVisuals = config.getBoolean("modernMenuVisuals", CATEGORY_GAMEPLAY, false,
+                "是否使用新版菜单背景、布局和维度过渡画面。修改后需重启游戏。");
+        modernCreateWorldScreen = config.getBoolean("modernCreateWorldScreen", CATEGORY_GAMEPLAY, false,
+                "是否使用新版创建世界页面和游戏规则编辑页面。修改后需重启游戏。");
+        modernVillagerSystem = config.getBoolean("modernVillagerSystem", CATEGORY_GAMEPLAY, true,
+                "是否使用现代村民职业系统。开启后村民职业跟随工作方块绑定与变化；关闭后村民使用出生时职业。修改后需重启游戏。");
+        mainMenuBackgroundBlur = config.getBoolean("mainMenuBackgroundBlur", CATEGORY_GAMEPLAY, true,
+                "是否模糊主菜单全景图背景。");
+        menuPanorama = config.getString("menuPanorama", CATEGORY_GAMEPLAY, "RESOURCE_PACK",
+                "主菜单、菜单子页面和加载画面使用的全景图。RESOURCE_PACK 跟随当前资源包；填写版本号使用 FFD 额外资源包提供的对应全景图。\n1.13.2, 1.14.4, 1.15.2, 1.16.5, 1.17.1, 1.18.2, 1.19.4, 1.20.6, 26.1, 26.3",
+                new String[]{"RESOURCE_PACK", "1.13.2", "1.14.4", "1.15.2", "1.16.5", "1.17.1", "1.18.2", "1.19.4", "1.20.6", "26.1", "26.3"});
+        modernBabyModels = config.getBoolean("modernBabyModels", CATEGORY_GAMEPLAY,
+                true, "是否使用新版幼年生物模型。");
         cavesAndCliffsBackgroundMusic = config.getBoolean("cavesAndCliffsBackgroundMusic",
                 CATEGORY_GAMEPLAY, true,
                 "是否将 1.18 的八首背景音乐加入所有世界类型的生存模式与主菜单音乐池。");
@@ -640,7 +800,7 @@ public final class FFDConfig {
         denseRawOreDrop = config.getBoolean("denseRawOreDrop", CATEGORY_COMPATIBILITY,
                 true, "是否按 Dense Metals 的富集矿石倍率增加粗矿掉落；Raw Ore 1.5.4 默认开启。");
         osvDenseRawOreMultiplier = config.getInt("osvDenseRawOreMultiplier", CATEGORY_COMPATIBILITY,
-                2, 1, 64, "矿石石材变种致密矿转换为粗矿时的掉落倍率，仅影响 osv 的致密矿，不影响其他模组；默认值为 2。");
+                2, 1, 64, "矿石石材变种（osv）致密矿转换为粗矿时的掉落倍率，默认值为 2。");
         furnaceOutputAmount = config.getInt("furnaceOutputAmount", CATEGORY_COMPATIBILITY,
                 1, 1, 64, "熔炉处理粗矿时的锭产物数量；Raw Ore 1.5.4 默认值为 1。");
         rawBlockSmelt = config.getBoolean("rawBlockSmelt", CATEGORY_COMPATIBILITY,
@@ -751,6 +911,10 @@ public final class FFDConfig {
                 true, "是否允许相同经验值的经验球按高版本规则合并，且拾取时不损失经验。对所有世界类型生效。");
         illagersIgnoreBabyVillagers = config.getBoolean("illagersIgnoreBabyVillagers", CATEGORY_GAMEPLAY,
                 true, "是否让灾厄村民不再主动攻击或伤害幼年村民。对所有世界类型生效。");
+        villagerWorkstationLossParticles = config.getBoolean("villagerWorkstationLossParticles", CATEGORY_GAMEPLAY,
+                true, "村民失去工作方块时显示生气粒子。");
+        legacyDyeCompatibility = config.getBoolean("legacyDyeCompatibility", CATEGORY_GAMEPLAY,
+                false, "是否允许骨粉、墨囊、青金石和可可豆作为对应白、黑、蓝、棕色染料使用。");
         beeAdditionalPollinationTargets = config.getStringList(
                 "beeAdditionalPollinationTargets", CATEGORY_GAMEPLAY, new String[0],
                 "蜜蜂可额外用于授粉的方块或方块状态。支持 模组ID:方块ID、模组ID:方块ID@metadata、模组ID:方块ID[属性=值,属性=值] 三种格式。");
@@ -790,6 +954,9 @@ public final class FFDConfig {
                         "minecraft:zombie_pigman", "minecraft:skeleton", "minecraft:stray",
                         "minecraft:wither_skeleton"},
                 "在水中不能主动游泳、只会下沉的生物注册名列表。默认包含 26.3 中在 1.12.2 可对应的僵尸和骷髅变种；无效注册名不会产生效果。");
+        waterSinkingItems = config.getStringList(
+                "waterSinkingItems", CATEGORY_GAMEPLAY, new String[0],
+                "在水中不获得浮力、会按正常重力下沉的物品列表。每行填写物品注册名或物品注册名:metadata；不填写 metadata 时接受该物品的全部变体。空列表表示所有物品继续使用浮力；无效注册名不会产生效果。修改后需重启游戏。");
         waterDrowningImmuneMobs = config.getStringList(
                 "waterDrowningImmuneMobs", CATEGORY_GAMEPLAY,
                 new String[]{"minecraft:zombie", "minecraft:zombie_villager", "minecraft:husk",
@@ -804,6 +971,23 @@ public final class FFDConfig {
         drownedTransformationMobs = normalizeDrownedTransformationEntries(config,
                 drownedTransformationMobs);
         reloadDrownedTransformationRules();
+        suspiciousStewIngredients = config.getStringList(
+                "suspiciousStewIngredients", CATEGORY_GAMEPLAY,
+                new String[]{"minecraft:yellow_flower;0;minecraft:saturation;7",
+                        "farmers_future_delight:golden_dandelion;0;minecraft:saturation;7",
+                        "minecraft:red_flower;0;minecraft:night_vision;100",
+                        "minecraft:red_flower;1;minecraft:saturation;7",
+                        "minecraft:red_flower;2;minecraft:fire_resistance;60",
+                        "minecraft:red_flower;3;minecraft:blindness;220",
+                        "minecraft:red_flower;4;minecraft:weakness;140",
+                        "minecraft:red_flower;5;minecraft:weakness;140",
+                        "minecraft:red_flower;6;minecraft:weakness;140",
+                        "minecraft:red_flower;7;minecraft:weakness;140",
+                        "minecraft:red_flower;8;minecraft:regeneration;140",
+                        "farmers_future_delight:cornflower;0;minecraft:jump_boost;100",
+                        "farmers_future_delight:lily_of_the_valley;0;minecraft:poison;220",
+                        "farmers_future_delight:wither_rose;0;minecraft:wither;140"},
+                "谜之炖菜的原料与效果，每行填写 物品注册名;元数据;药水效果注册名;持续刻数。20 刻为 1 秒；瞬时效果也填写正整数刻数。元数据可填写 * 匹配所有变种，精确元数据优先。同一规则同时用于合成和喂食棕色哞菇；删除条目可禁用对应原料，空名单禁用全部原料。支持模组物品和效果，未世之乐原料会按避让设置采用有效物品。无效或重复条目会跳过并记录日志，修改后重启游戏生效。");
         impalingDamageMobs = config.getStringList(
                 "impalingDamageMobs", CATEGORY_GAMEPLAY,
                 new String[]{"minecraft:guardian", "minecraft:elder_guardian", "minecraft:squid",
@@ -817,7 +1001,7 @@ public final class FFDConfig {
                         "futuremc:cod", "futuremc:salmon", "futuremc:pufferfish",
                         "futuremc:tropical_fish", "oe:cod", "oe:salmon", "oe:pufferfish",
                         "oe:tropical_fish", "oe:dolphin", "oe:turtle", "oe:glow_squid"},
-                "可受到穿刺附魔额外伤害的生物注册名列表。穿刺每级默认额外造成 2.5 点伤害。修改名单不会改变三叉戟激流的使用条件。");
+                "可受到穿刺附魔额外伤害的生物注册名列表。穿刺每级默认额外造成 2.5 点伤害。");
         logAutoCompatibilityDecisions = config.getBoolean("logAutoCompatibilityDecisions", CATEGORY_DEBUG,
                 false, "是否在日志中逐项显示 AUTO 自动避让的内容与世界生成判定。默认关闭；仅建议排查兼容问题时开启。");
 
@@ -1297,6 +1481,10 @@ public final class FFDConfig {
         }
     }
 
+    public static boolean canScheduledFunctionUseCommand(int permissionLevel) {
+        return permissionLevel <= scheduledFunctionPermissionLevel;
+    }
+
     private static void migrateLegacyDefaults(Configuration config, int loadedConfigVersion) {
         if (loadedConfigVersion < 12 && drownedRiverSpawnWeight == 1) {
             drownedRiverSpawnWeight = 100;
@@ -1452,6 +1640,9 @@ public final class FFDConfig {
         if (CATEGORY_COMPATIBILITY.equals(category)) {
             return "模组联动配方设置。\nCross-mod recipe compatibility settings.";
         }
+        if (CATEGORY_COMMANDS.equals(category)) {
+            return "函数与命令权限设置。\nFunction and command permission settings.";
+        }
         return "配置分类：" + humanizeKey(category) + "。\nConfiguration category: "
                 + humanizeKey(category) + ".";
     }
@@ -1472,11 +1663,131 @@ public final class FFDConfig {
     }
 
     private static String englishDescription(String category, String key) {
+        if ("scheduledFunctionPermissionLevel".equals(key)) {
+            return "Maximum command permission level available to functions, including vanilla game-loop functions and functions scheduled by this mod's /schedule command. Defaults to 2; valid range is 0-4. Restart required.";
+        }
+        if ("smokerMode".equals(key)) {
+            return "Feature mode for smokers. Defaults to AUTO; yields to a supported external smoker provider. Restart required.";
+        }
+        if ("campfireMode".equals(key)) {
+            return "Feature mode for campfires. Defaults to AUTO; yields to a supported external campfire provider. Restart required.";
+        }
+        if ("blastFurnaceMode".equals(key)) {
+            return "Feature mode for blast furnaces. Defaults to AUTO; yields to a supported external blast furnace provider. Restart required.";
+        }
+        if ("composterMode".equals(key)) {
+            return "Feature mode for composters. Defaults to AUTO; yields to a supported external composter provider. Restart required.";
+        }
+        if ("barrelMode".equals(key)) {
+            return "Feature mode for barrels. Defaults to AUTO; yields to a supported external barrel provider. Restart required.";
+        }
+        if ("stonecutterMode".equals(key)) {
+            return "Feature mode for the stonecutter. Defaults to AUTO; yields to a supported external stonecutter provider. Restart required.";
+        }
+        if ("loomMode".equals(key)) {
+            return "Feature mode for the loom and banner patterns. Defaults to AUTO; yields to a supported external loom provider. Restart required.";
+        }
+        if ("lecternMode".equals(key)) {
+            return "Feature mode for the lectern. Defaults to AUTO; yields to a supported external provider. Restart required.";
+        }
+        if ("fletchingTableMode".equals(key)) {
+            return "Feature mode for the fletching table. Defaults to AUTO; yields to a supported external provider. Restart required.";
+        }
+        if ("smithingTableMode".equals(key)) {
+            return "Feature mode for the smithing table. Defaults to AUTO; yields to a supported external provider. Restart required.";
+        }
+        if ("bellMode".equals(key)) {
+            return "Feature mode for bells. Defaults to AUTO; yields to a supported external provider. Restart required.";
+        }
+        if ("bellRaidHighlightRange".equals(key)) {
+            return "Range in blocks in which ringing a bell highlights raiders. Defaults to 48. Restart required.";
+        }
+        if ("catMode".equals(key)) {
+            return "Feature mode for cats. Defaults to AUTO; yields to Future MC when it provides cats. Restart required.";
+        }
+        if ("foxMode".equals(key)) {
+            return "Feature mode for foxes. Defaults to AUTO; yields to Future MC when it provides foxes. Restart required.";
+        }
+        if ("pandaMode".equals(key)) {
+            return "Feature mode for pandas. Defaults to AUTO; yields to Future MC when it provides pandas. Restart required.";
+        }
+        if ("pillagerMode".equals(key)) {
+            return "Feature mode for pillagers. Defaults to AUTO; yields to Future MC when it provides pillagers. Requires the local crossbow feature. Restart required.";
+        }
+        if ("ravagerMode".equals(key)) {
+            return "Feature mode for ravagers. Defaults to AUTO; yields to Future MC when it provides ravagers. Restart required.";
+        }
+        if ("wanderingTraderMode".equals(key)) {
+            return "Feature mode for wandering traders and trader llamas. Defaults to AUTO. Natural spawning follows doTraderSpawning. Restart required.";
+        }
+        if ("wanderingTraderCheckInterval".equals(key)) {
+            return "Interval between wandering trader spawn checks in ticks. Defaults to 1200. Restart required.";
+        }
+        if ("wanderingTraderSpawnInterval".equals(key)) {
+            return "Interval between wandering trader spawn attempts in ticks. Defaults to 24000. Restart required.";
+        }
+        if ("wanderingTraderInitialChance".equals(key)) {
+            return "Initial wandering trader spawn chance as a percentage. Defaults to 25. Restart required.";
+        }
+        if ("wanderingTraderChanceStep".equals(key)) {
+            return "Percentage added to the wandering trader spawn chance after an unsuccessful attempt. Defaults to 25. Restart required.";
+        }
+        if ("wanderingTraderMaximumChance".equals(key)) {
+            return "Maximum wandering trader spawn chance as a percentage. Defaults to 75. Restart required.";
+        }
+        if ("wanderingTraderPositionChance".equals(key)) {
+            return "Chance of accepting one wandering trader spawn position as a percentage. Defaults to 10. Restart required.";
+        }
+        if ("wanderingTraderSpawnRadius".equals(key)) {
+            return "Wandering trader spawn radius around the reference point in blocks. Defaults to 48. Restart required.";
+        }
+        if ("wanderingTraderMeetingPointRange".equals(key)) {
+            return "Range in which bells are searched for the wandering trader reference point in blocks. Defaults to 48. Restart required.";
+        }
+        if ("wanderingTraderSpawnAttempts".equals(key)) {
+            return "Number of positions checked during one wandering trader spawn attempt. Defaults to 10. Restart required.";
+        }
+        if ("wanderingTraderDespawnDelay".equals(key)) {
+            return "Wandering trader lifetime in ticks. Defaults to 48000. Restart required.";
+        }
+        if ("wanderingTraderLlamaCount".equals(key)) {
+            return "Number of trader llamas spawned with each wandering trader. Defaults to 2. Restart required.";
+        }
+        if ("wanderingTraderLlamaRadius".equals(key)) {
+            return "Trader llama spawn radius around the wandering trader in blocks. Defaults to 4. Restart required.";
+        }
+        if ("leatherHorseArmorMode".equals(key)) {
+            return "Feature mode for dyeable leather horse armor. Defaults to AUTO. Restart required.";
+        }
+        if ("stoneDecorMode".equals(key)) {
+            return "Feature mode for smooth stone blocks and additional stone stairs, slabs and walls. Defaults to AUTO; yields to supported external providers per content. Restart required.";
+        }
+        if ("quartzBricksMode".equals(key)) {
+            return "Feature mode for quartz bricks. Defaults to AUTO; yields to Unseens Nether Backport or Netherized when either provides the block. Restart required.";
+        }
+        if ("cryingObsidianMode".equals(key)) {
+            return "Feature mode for crying obsidian. Defaults to AUTO; yields to Future MC or Netherized when either provides the block. Restart required.";
+        }
+        if ("suspiciousStewMode".equals(key)) {
+            return "Feature mode for suspicious stew. Defaults to AUTO; yields to a supported external provider. Restart required.";
+        }
+        if ("scaffoldingMode".equals(key)) {
+            return "Feature mode for scaffolding. Defaults to AUTO; yields to a supported external provider. Restart required.";
+        }
+        if ("bambooMode".equals(key)) {
+            return "Feature mode for bamboo plants, shoots and potted bamboo. Defaults to AUTO; yields to supported external providers per content. Restart required.";
+        }
+        if ("lanternMode".equals(key)) {
+            return "Feature mode for lanterns. Defaults to AUTO. ENABLED uses this mod's lantern; DISABLED turns it off; AUTO yields to a supported external lantern provider. Restart required.";
+        }
+        if ("flowersMode".equals(key)) {
+            return "Feature mode for cornflowers, lilies of the valley, wither roses and their potted variants. Defaults to AUTO; yields to supported external providers per content. Restart required.";
+        }
         if ("autoCompatibilityToggles".equals(key)) {
             return "Per-content AUTO compatibility overrides in content_path@mod_id=true or content_path@mod_id=false form. true yields to that mod when it provides the matching content; false ignores that mod for this content. All entries default to true. The list includes every supported content and mod combination, including mods that are not installed. Missing combinations use the normal AUTO decision. Use /ffd_compat preset to replace this list with the built-in agreed preset. Restart the game or server after changes.";
         }
         if ("signTextMode".equals(key)) {
-            return "Enables or disables sign text dyeing and glowing. This behavior has no AUTO compatibility target; legacy AUTO values are treated as ENABLED. Restart required.";
+            return "Enables or disables sign text dyeing and glowing. Options: ENABLED and DISABLED. Defaults to ENABLED. Restart required.";
         }
         if ("rawOreMaterialToggles".equals(key)) {
             return "Per-material raw-ore toggles in material=true or material=false form. Each entry controls that raw material, its storage block, ore-drop replacement, and compatibility recipes. Missing materials default to true. Restart required.";
@@ -1510,6 +1821,9 @@ public final class FFDConfig {
         }
         if ("commandCompletionMode".equals(key)) {
             return "Feature mode for the high-version-style command completion screen. ENABLED uses this mod's screen; DISABLED turns it off; AUTO yields to Cleanroom Loader when it is detected. When Salutation is installed, both ENABLED and AUTO yield to it to prevent chat-screen conflicts. Restart required.";
+        }
+        if ("gameModeSwitcherMode".equals(key)) {
+            return "F3+F4 game mode switcher. ENABLED uses this mod's screen; DISABLED turns it off; AUTO yields when Future MC is installed. Defaults to AUTO. Client-side only. Restart required.";
         }
         if (CATEGORY_FEATURES.equals(category)) {
             String featureName = "strippedWoodMode".equals(key)
@@ -1549,11 +1863,35 @@ public final class FFDConfig {
         if ("smoothBiomeSkyColors".equals(key)) {
             return "Smoothly blend sky colors across biome borders. When disabled, use the sky color of the biome at the player's position. Client-side display only.";
         }
+        if ("creativeInventoryMode".equals(key)) {
+            return "Creative inventory categories. MOD_TAB uses the Farmer's Future Delight tab; CLASSIC places items in the classic vanilla categories; MODERN uses modern categories and ordering. Special content appears in the Farmer's Future Delight tab. Restart required.";
+        }
         if ("waterVisualMode".equals(key)) {
             return "Water visual mode. MODERN uses 1.13-style grayscale water textures, biome tinting, underwater fog colors, and gradually improving underwater visibility; LEGACY preserves the 1.12.2 water visuals. Client-side only. Restart required.";
         }
         if ("modernWorldLoadingScreen".equals(key)) {
             return "Use the modern-style loading screen while creating or entering a world.";
+        }
+        if ("modernMenuVisuals".equals(key)) {
+            return "Use modern menu backgrounds, layouts, and dimension transitions. Restart required.";
+        }
+        if ("modernCreateWorldScreen".equals(key)) {
+            return "Use the modern Create World screen and game rule editor. Restart required.";
+        }
+        if ("modernVillagerSystem".equals(key)) {
+            return "Use the modern villager profession system, where professions follow workstation binding and changes; when disabled, villagers keep the profession assigned at birth. Restart required.";
+        }
+        if ("mainMenuBackgroundBlur".equals(key)) {
+            return "Whether to blur the main menu panorama background.";
+        }
+        if ("menuPanorama".equals(key)) {
+            return "Panorama for the title screen, menu screens, and loading screens. RESOURCE_PACK follows the active resource pack; a version number selects the corresponding panorama from the FFD Additional Resource Pack.\n1.13.2, 1.14.4, 1.15.2, 1.16.5, 1.17.1, 1.18.2, 1.19.4, 1.20.6, 26.1, 26.3";
+        }
+        if ("modernBabyModels".equals(key)) {
+            return "Whether to use modern baby mob models.";
+        }
+        if ("legacyDyeCompatibility".equals(key)) {
+            return "Allow bone meal, ink sacs, lapis lazuli, and cocoa beans to act as white, black, blue, and brown dyes.";
         }
         if ("cavesAndCliffsBackgroundMusic".equals(key)) {
             return "Add the eight Minecraft 1.18 background tracks to the survival and main-menu music pools in every world type.";
@@ -1574,7 +1912,7 @@ public final class FFDConfig {
             return "Apply the Dense Metals dense-ore multiplier to raw-material drops. Enabled by default, matching Raw Ore 1.5.4.";
         }
         if ("osvDenseRawOreMultiplier".equals(key)) {
-            return "Raw-material drop multiplier for Ore Stone Variants dense ores. This only affects dense ores from osv and does not affect other mods. The default is 2.";
+            return "Raw-material drop multiplier for Ore Stone Variants (osv) dense ores. The default is 2.";
         }
         if ("furnaceOutputAmount".equals(key)) {
             return "Ingot output amount when a raw ore is smelted in a furnace. The Raw Ore 1.5.4 default is 1.";
@@ -1699,6 +2037,9 @@ public final class FFDConfig {
         if ("experienceOrbMerging".equals(key)) {
             return "Merge nearby experience orbs with the same value without losing experience, and pick up merged units one at a time.";
         }
+        if ("villagerWorkstationLossParticles".equals(key)) {
+            return "Show angry particles when villagers lose their workstation.";
+        }
         if ("illagersIgnoreBabyVillagers".equals(key)) {
             return "Prevent illagers from targeting or damaging baby villagers in every world type.";
         }
@@ -1735,6 +2076,9 @@ public final class FFDConfig {
         if ("waterSinkingMobs".equals(key)) {
             return "Entity registry names that cannot actively swim and only sink in water. Defaults to the zombie and skeleton variants present in 1.12.2 that sink in 26.3; invalid IDs have no effect.";
         }
+        if ("waterSinkingItems".equals(key)) {
+            return "Items that do not receive FFD water buoyancy and sink with normal gravity. Use one item registry name or item registry name:metadata per line; omitting metadata accepts every variant. An empty list keeps buoyancy for all items; invalid IDs have no effect. Restart required.";
+        }
         if ("waterDrowningImmuneMobs".equals(key)) {
             return "Entity registry names that do not lose air or drown in water, independently of the sinking list. Defaults to 26.3 undead types present in 1.12.2; innate underwater breathing, lava damage, and in-wall suffocation are unchanged.";
         }
@@ -1742,7 +2086,10 @@ public final class FFDConfig {
             return "Submerged entity transformation rules, one source entity registry name;target entity registry name per line. Defaults to minecraft:zombie;farmers_future_delight:drowned. Legacy source-only entries receive the drowned target automatically. Each step in a chain requires a new submersion countdown; cyclic rules are ignored.";
         }
         if ("impalingDamageMobs".equals(key)) {
-            return "Entity registry names that receive extra Impaling damage. Each enchantment level adds 2.5 damage by default. Changing this list does not change when Riptide can be used.";
+            return "Entity registry names that receive extra Impaling damage. Each enchantment level adds 2.5 damage by default.";
+        }
+        if ("suspiciousStewIngredients".equals(key)) {
+            return "Suspicious stew ingredient rules: item registry name;metadata;potion effect registry name;duration in ticks. 20 ticks = 1 second; instant effects also require a positive duration. Use * for all metadata; exact metadata takes priority. Rules apply to crafting and feeding brown mooshrooms. Remove entries to disable ingredients; an empty list disables all ingredients. Modded items and effects are supported; local FFD ingredients follow effective compatibility replacements. Invalid or duplicate entries are logged and skipped. Restart the game after changes.";
         }
         if ("goatScreamingChance".equals(key)) {
             return "Base chance for a spawned or bred goat to be a screaming goat. The 26.3 default is 0.02.";
@@ -1912,6 +2259,28 @@ public final class FFDConfig {
 
     private static FeatureMode defaultFeatureMode(String key) {
         switch (key) {
+            case "barrelMode":
+            case "campfireMode":
+            case "smokerMode":
+            case "blastFurnaceMode":
+            case "composterMode":
+            case "stonecutterMode":
+            case "grindstoneMode":
+            case "cartographyTableMode":
+            case "loomMode":
+            case "lecternMode":
+            case "fletchingTableMode":
+            case "smithingTableMode":
+            case "bellMode":
+            case "bambooMode":
+            case "scaffoldingMode":
+            case "lanternMode":
+            case "flowersMode":
+            case "suspiciousStewMode":
+            case "stoneDecorMode":
+            case "quartzBricksMode":
+            case "cryingObsidianMode":
+            case "leatherHorseArmorMode":
             case "kelpMode":
             case "seagrassMode":
             case "seaPickleMode":
@@ -1925,12 +2294,20 @@ public final class FFDConfig {
             case "dolphinMode":
             case "drownedMode":
             case "tridentMode":
+            case "crossbowMode":
             case "turtleMode":
             case "axolotlMode":
+            case "catMode":
+            case "foxMode":
+            case "pandaMode":
+            case "pillagerMode":
+            case "ravagerMode":
+            case "wanderingTraderMode":
             case "glowSquidMode":
             case "glowItemFrameMode":
             case "waterloggingMode":
             case "aquaAcrobaticsMode":
+            case "gameModeSwitcherMode":
                 return FeatureMode.AUTO;
             default:
                 return FeatureMode.ENABLED;
@@ -1942,7 +2319,7 @@ public final class FFDConfig {
         String value = config.getString(key, CATEGORY_FEATURES, defaultMode.name(),
                 comment + "。默认值为 " + defaultMode.name()
                         + "。可选值：ENABLED、DISABLED、AUTO。"
-                        + ("commandCompletionMode".equals(key) ? ""
+                        + ("commandCompletionMode".equals(key) || "gameModeSwitcherMode".equals(key) ? ""
                                 : "ENABLED 关闭自动避让并使用本模组实现；AUTO 会逐个识别外部内容单元，并仅由本模组补齐缺失内容。"),
                 new String[]{"ENABLED", "DISABLED", "AUTO"});
         return FeatureMode.parse(value, defaultMode);
@@ -1950,7 +2327,7 @@ public final class FFDConfig {
 
     private static FeatureMode readNonAvoidingMode(Configuration config, String key, String comment) {
         Property property = config.get(CATEGORY_FEATURES, key, "ENABLED",
-                comment + "。默认值为 ENABLED。可选值：ENABLED、DISABLED；此功能没有自动避让主体。");
+                comment + "。默认值为 ENABLED。可选值：ENABLED、DISABLED。");
         property.setValidValues(new String[]{"ENABLED", "DISABLED"});
         FeatureMode mode = FeatureMode.parse(property.getString());
         if (mode == FeatureMode.AUTO) {
@@ -2046,6 +2423,46 @@ public final class FFDConfig {
         String normalized = id.toString().toLowerCase(Locale.ROOT);
         for (String entry : entries) {
             if (entry != null && normalized.equals(entry.trim().toLowerCase(Locale.ROOT))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isConfiguredItem(String[] entries, ItemStack stack) {
+        if (entries == null || stack == null || stack.isEmpty()
+                || stack.getItem() == null || stack.getItem().getRegistryName() == null) {
+            return false;
+        }
+        int metadata = stack.getMetadata();
+        for (String entry : entries) {
+            if (entry == null) {
+                continue;
+            }
+            String value = entry.trim();
+            if (value.isEmpty()) {
+                continue;
+            }
+            int separator = value.lastIndexOf(':');
+            String configuredId = value;
+            Integer requestedMetadata = null;
+            if (separator > 0 && separator < value.length() - 1) {
+                String suffix = value.substring(separator + 1).trim();
+                try {
+                    requestedMetadata = Integer.valueOf(suffix);
+                    configuredId = value.substring(0, separator).trim();
+                } catch (NumberFormatException ignored) {
+                }
+            }
+            ResourceLocation configured;
+            try {
+                configured = new ResourceLocation(configuredId);
+            } catch (IllegalArgumentException ignored) {
+                continue;
+            }
+            Item configuredItem = ForgeRegistries.ITEMS.getValue(configured);
+            if (configuredItem == stack.getItem()
+                    && (requestedMetadata == null || requestedMetadata.intValue() == metadata)) {
                 return true;
             }
         }
@@ -2307,6 +2724,11 @@ public final class FFDConfig {
             return !isCleanroomLoaderPresent();
         }
         return true;
+    }
+
+    public static boolean isGameModeSwitcherEnabled() {
+        return gameModeSwitcherMode == FeatureMode.ENABLED
+                || gameModeSwitcherMode == FeatureMode.AUTO && !Loader.isModLoaded("futuremc");
     }
 
     private static boolean isCleanroomLoaderPresent() {

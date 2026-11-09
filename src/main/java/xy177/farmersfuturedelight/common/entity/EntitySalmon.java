@@ -107,11 +107,8 @@ public class EntitySalmon extends EntitySchoolingFish {
     }
 
     @Override
-    protected void dropFewItems(boolean recentlyHit, int looting) {
-        entityDropItem(new ItemStack(isBurning() ? Items.COOKED_FISH : Items.FISH, 1, 1), 0.0F);
-        if (rand.nextFloat() < 0.05F) {
-            entityDropItem(new ItemStack(Items.DYE, 1, 15), 0.0F);
-        }
+    protected net.minecraft.util.ResourceLocation getLootTable() {
+        return xy177.farmersfuturedelight.common.FFDEntityLootTables.SALMON;
     }
 
     @Override

@@ -1,0 +1,6 @@
+{
+    "parent": "farmers_future_delight:item/crossbow_base",
+    "textures": {
+        "layer0": "farmers_future_delight:items/crossbow_firework"
+    }
+}

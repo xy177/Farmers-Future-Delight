@@ -13,6 +13,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -30,6 +31,7 @@ import net.minecraft.world.World;
 import net.minecraft.util.ITickable;
 
 import xy177.farmersfuturedelight.common.block.BlockBeehive;
+import xy177.farmersfuturedelight.common.advancement.FFDAdvancements;
 import xy177.farmersfuturedelight.common.entity.EntityBee;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDEntities;
@@ -37,6 +39,11 @@ import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
 
 public class TileEntityBeehive extends TileEntity implements ITickable {
+    @Override
+    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState) {
+        return oldState.getBlock() != newState.getBlock();
+    }
+
     public static final int MAX_BEES = 3;
     public static final int MAX_HONEY_LEVEL = 5;
 
@@ -109,6 +116,10 @@ public class TileEntityBeehive extends TileEntity implements ITickable {
     }
 
     public void addNewBees(int count) {
+        addNewBees(count, world == null ? new java.util.Random() : world.rand);
+    }
+
+    public void addNewBees(int count, java.util.Random random) {
         if (world == null || world.isRemote || !FFDEntities.isLocalBeeEnabled()) {
             return;
         }
@@ -118,7 +129,7 @@ public class TileEntityBeehive extends TileEntity implements ITickable {
             NBTTagCompound entityData = new NBTTagCompound();
             if (bee.writeToNBTAtomically(entityData)) {
                 cleanStoredBeeData(entityData);
-                occupants.add(new BeeOccupant(entityData, world.rand.nextInt(599), 600));
+                occupants.add(new BeeOccupant(entityData, random.nextInt(599), 600));
             }
         }
         markDirty();
@@ -174,6 +185,7 @@ public class TileEntityBeehive extends TileEntity implements ITickable {
         }
         if (held.getItem() == Items.GLASS_BOTTLE) {
             if (!world.isRemote) {
+                boolean sedated = isSedated();
                 held.shrink(1);
                 ItemStack honeyBottle = FFDItems.effectiveStack(FFDItems.HONEY_BOTTLE);
                 if (held.isEmpty()) {
@@ -186,7 +198,10 @@ public class TileEntityBeehive extends TileEntity implements ITickable {
                         SoundCategory.BLOCKS, 1.0F, 1.0F);
                 player.addStat(StatList.getObjectUseStats(Items.GLASS_BOTTLE));
                 setHoneyLevel(0);
-                if (!isSedated() && !isEmpty()) {
+                if (sedated && player instanceof EntityPlayerMP) {
+                    FFDAdvancements.BEE_OUR_GUEST.trigger((EntityPlayerMP) player);
+                }
+                if (!sedated && !isEmpty()) {
                     angerNearbyBees();
                     releaseAll(ReleaseStatus.EMERGENCY, player);
                 }
@@ -242,28 +257,30 @@ public class TileEntityBeehive extends TileEntity implements ITickable {
         for (int distance = 1; distance <= 5; distance++) {
             BlockPos smokePos = pos.down(distance);
             IBlockState state = world.getBlockState(smokePos);
-            if (isLitSmokeSource(state)) {
+            if (isLitSmokeSource(state, smokePos)) {
                 return true;
             }
             if (blocksSmoke(state, smokePos)) {
-                return isLitSmokeSource(world.getBlockState(smokePos.down()));
+                return isLitSmokeSource(world.getBlockState(smokePos.down()), smokePos.down());
             }
         }
         return false;
     }
 
     private boolean blocksSmoke(IBlockState state, BlockPos smokePos) {
-        AxisAlignedBB box = state.getCollisionBoundingBox(world, smokePos);
-        if (box == null) {
-            return false;
-        }
-        double centerX = box.maxX > 1.0D ? smokePos.getX() + 0.5D : 0.5D;
-        double centerZ = box.maxZ > 1.0D ? smokePos.getZ() + 0.5D : 0.5D;
-        return box.minX <= centerX && box.maxX >= centerX
-                && box.minZ <= centerZ && box.maxZ >= centerZ;
+        AxisAlignedBB column = new AxisAlignedBB(0.375D, 0, 0.375D, 0.625D, 1, 0.625D)
+                .offset(smokePos);
+        List<AxisAlignedBB> collisions = new ArrayList<>();
+        state.addCollisionBoxToList(world, smokePos, column, collisions, null, false);
+        return !collisions.isEmpty();
     }
 
-    private static boolean isLitSmokeSource(IBlockState state) {
+    private boolean isLitSmokeSource(IBlockState state, BlockPos smokePos) {
+        if (xy177.farmersfuturedelight.api.WaterloggedBlockApi.isWaterlogged(world, smokePos)
+                || xy177.farmersfuturedelight.common.fluid.FFDFluidloggedApiAccess
+                        .getFluid(world, smokePos) != null) {
+            return false;
+        }
         if (state.getBlock().getRegistryName() == null) {
             return false;
         }
@@ -332,8 +349,11 @@ public class TileEntityBeehive extends TileEntity implements ITickable {
     }
 
     public ItemStack createItemStack() {
-        IBlockState state = world.getBlockState(pos);
-        ItemStack stack = new ItemStack(state.getBlock());
+        return createItemStack(world.getBlockState(pos));
+    }
+
+    public ItemStack createItemStack(IBlockState state) {
+        ItemStack stack = new ItemStack(net.minecraft.item.Item.getItemFromBlock(state.getBlock()));
         NBTTagCompound tag = new NBTTagCompound();
         writeToNBT(tag);
         tag.removeTag("id");

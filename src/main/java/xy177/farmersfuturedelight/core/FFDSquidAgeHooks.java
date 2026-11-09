@@ -64,7 +64,7 @@ public final class FFDSquidAgeHooks {
             return;
         }
         int age = getAge(squid);
-        if (age != 0) {
+        if (age != 0 && !(age < 0 && xy177.farmersfuturedelight.common.entity.FFDAgeLock.isLocked(squid))) {
             setAge(squid, age + (age < 0 ? 1 : -1));
         }
     }

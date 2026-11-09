@@ -1,0 +1,19 @@
+{
+  "existingProfessionMode": 2,
+  "mappings": [
+    { "profession": "minecraft:farmer", "career": "farmer", "workstations": [{ "block": "farmers_future_delight:composter" }] },
+    { "profession": "minecraft:farmer", "career": "fisherman", "workstations": [{ "block": "farmers_future_delight:barrel" }] },
+    { "profession": "minecraft:farmer", "career": "shepherd", "workstations": [{ "block": "farmers_future_delight:loom" }] },
+    { "profession": "minecraft:farmer", "career": "fletcher", "workstations": [{ "block": "farmers_future_delight:fletching_table" }] },
+    { "profession": "minecraft:librarian", "career": "librarian", "workstations": [{ "block": "farmers_future_delight:lectern" }] },
+    { "profession": "minecraft:librarian", "career": "cartographer", "workstations": [{ "block": "farmers_future_delight:cartography_table" }] },
+    { "profession": "minecraft:priest", "career": "cleric", "workstations": [{ "block": "minecraft:brewing_stand" }] },
+    { "profession": "minecraft:smith", "career": "armor", "workstations": [{ "block": "farmers_future_delight:blast_furnace" }] },
+    { "profession": "minecraft:smith", "career": "weapon", "workstations": [{ "block": "farmers_future_delight:grindstone" }] },
+    { "profession": "minecraft:smith", "career": "tool", "workstations": [{ "block": "farmers_future_delight:smithing_table" }] },
+    { "profession": "minecraft:butcher", "career": "butcher", "workstations": [{ "block": "farmers_future_delight:smoker" }] },
+    { "profession": "minecraft:butcher", "career": "leather", "workstations": [{ "block": "minecraft:cauldron" }] },
+    { "profession": "farmers_future_delight:mason", "career": "mason", "workstations": [{ "block": "farmers_future_delight:stonecutter" }] },
+    { "profession": "minecraft:nitwit", "career": "nitwit", "enabled": false, "workstations": [] }
+  ]
+}
