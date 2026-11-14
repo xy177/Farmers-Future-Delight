@@ -10,11 +10,16 @@ import net.minecraft.world.gen.structure.MapGenMineshaft;
 import net.minecraft.world.gen.structure.StructureMineshaftStart;
 import net.minecraft.world.gen.structure.StructureStart;
 import xy177.farmersfuturedelight.common.world.ChunkGeneratorExtended;
+import xy177.farmersfuturedelight.common.world.FFDWorldgenTerrain;
 
 public final class FFDModernMineshaftGenerator extends MapGenMineshaft {
-    private final ChunkGeneratorExtended extendedGenerator;
+    private final FFDWorldgenTerrain extendedGenerator;
 
     public FFDModernMineshaftGenerator(ChunkGeneratorExtended extendedGenerator) {
+        this((FFDWorldgenTerrain) extendedGenerator);
+    }
+
+    public FFDModernMineshaftGenerator(FFDWorldgenTerrain extendedGenerator) {
         this.extendedGenerator = extendedGenerator;
     }
 

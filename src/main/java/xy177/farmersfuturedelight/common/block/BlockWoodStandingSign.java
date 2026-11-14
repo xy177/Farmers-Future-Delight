@@ -18,7 +18,8 @@ public class BlockWoodStandingSign extends BlockStandingSign implements IBlockWo
         setRegistryName(FarmerFutureDelight.MODID, woodName + "_sign");
         setUnlocalizedName(FarmerFutureDelight.MODID + "." + woodName + "_sign");
         setHardness(1.0F);
-        setSoundType(SoundType.WOOD);
+        setSoundType(isNetherWood() ? xy177.farmersfuturedelight.common.registry.FFDSounds.NETHER_WOOD
+                : SoundType.WOOD);
     }
 
     @Override

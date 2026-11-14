@@ -14,6 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.worldgen.FFDModernLootTable;
+import xy177.farmersfuturedelight.common.worldgen.FFDNetherStructures;
 import xy177.farmersfuturedelight.common.worldgen.FFDOceanStructures;
 
 @Mod.EventBusSubscriber(modid = FarmerFutureDelight.MODID)
@@ -38,6 +39,7 @@ public final class FFDLootEvents {
 
     @SubscribeEvent
     public static void onLootTableLoad(LootTableLoadEvent event) {
+        FFDFishing.adjust(event);
         if (FFDItems.isGlowBerryEnabled()
                 && LootTableList.CHESTS_ABANDONED_MINESHAFT.equals(event.getName())) {
             addGlowBerries(event);
@@ -51,7 +53,7 @@ public final class FFDLootEvents {
         if (FFDItems.isNetheriteEnabled() && NETHER_BRIDGE_LOOT.equals(event.getName())) {
             addNetheriteTemplate(event);
         }
-        if (FFDOceanStructures.isOceanLootTable(event.getName())
+        if ((FFDOceanStructures.isOceanLootTable(event.getName()) || FFDNetherStructures.isLootTable(event.getName()))
                 && !(event.getTable() instanceof FFDModernLootTable)) {
             event.setTable(new FFDModernLootTable(event.getTable()));
         }
@@ -125,6 +127,7 @@ public final class FFDLootEvents {
             return;
         }
         pool.addEntry(new LootEntryItem(template.getItem(), 1, 0,
-                new LootFunction[0], new LootCondition[0], NETHERITE_TEMPLATE_ENTRY));
+                new LootFunction[0], new LootCondition[] {(random, context) -> !FFDNetherStructures.generatesBastions(context.getWorld())},
+                NETHERITE_TEMPLATE_ENTRY));
     }
 }

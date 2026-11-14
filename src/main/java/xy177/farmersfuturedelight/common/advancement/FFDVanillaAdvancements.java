@@ -19,7 +19,8 @@ public final class FFDVanillaAdvancements {
     private static final Set<String> OVERRIDES = new HashSet<>(Arrays.asList(
             "adventure/adventuring_time.json", "adventure/kill_a_mob.json",
             "adventure/kill_all_mobs.json", "husbandry/balanced_diet.json",
-            "husbandry/bred_all_animals.json"));
+            "husbandry/bred_all_animals.json", "story/mine_stone.json",
+            "husbandry/break_diamond_hoe.json"));
 
     private FFDVanillaAdvancements() {
     }
@@ -33,7 +34,9 @@ public final class FFDVanillaAdvancements {
         int prefixIndex = normalized.indexOf(PREFIX);
         if (prefixIndex >= 0) {
             String relative = normalized.substring(prefixIndex + PREFIX.length());
-            if (OVERRIDES.contains(relative)) {
+            if (OVERRIDES.contains(relative) && (!"husbandry/break_diamond_hoe.json".equals(relative)
+                    || xy177.farmersfuturedelight.common.registry.FFDItems.isItemRegistered(
+                            xy177.farmersfuturedelight.common.registry.FFDItems.NETHERITE_HOE))) {
                 InputStream resource = FFDVanillaAdvancements.class.getResourceAsStream(
                         "/assets/" + FarmerFutureDelight.MODID + "/advancement_overrides/" + relative);
                 if (resource != null) {

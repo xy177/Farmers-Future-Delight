@@ -426,6 +426,9 @@ public final class FFDHeightHooks {
 
     public static boolean isAreaLoaded(World world, int xStart, int yStart, int zStart,
             int xEnd, int yEnd, int zEnd, boolean allowEmpty) {
+        int prepared = xy177.farmersfuturedelight.common.world.modern.ModernLightAccess.areaLoaded(
+                world, xStart, yStart, zStart, xEnd, yEnd, zEnd);
+        if (prepared >= 0) return prepared != 0;
         int minimumY = minY(world);
         if (yEnd < minimumY || yStart >= maxYExclusive(world)) {
             return false;
@@ -957,6 +960,8 @@ public final class FFDHeightHooks {
     }
 
     public static int getWorldLightFor(World world, EnumSkyBlock type, BlockPos pos) {
+        int prepared = xy177.farmersfuturedelight.common.world.modern.ModernLightAccess.light(world, type, pos);
+        if (prepared >= 0) return prepared;
         if (pos.getY() < minY(world)) {
             pos = new BlockPos(pos.getX(), minY(world), pos.getZ());
         }
@@ -1056,7 +1061,8 @@ public final class FFDHeightHooks {
         int x = (pos.getX() >> 4) - chunkX;
         int z = (pos.getZ() >> 4) - chunkZ;
         return isChunkCacheIndexValid(chunks, x, z) ? chunks[x][z].getBlockState(pos)
-                : Blocks.AIR.getDefaultState();
+                : xy177.farmersfuturedelight.common.world.modern.ModernGenerationLifecycle.isActive(world)
+                        ? Blocks.BARRIER.getDefaultState() : Blocks.AIR.getDefaultState();
     }
 
     public static int getChunkCacheLightForExt(World world, int chunkX, int chunkZ,
@@ -1193,16 +1199,17 @@ public final class FFDHeightHooks {
 
     private static void queueWaterLightSync(Chunk chunk, BlockPos pos, int section) {
         World world = chunk.getWorld();
-        if (!(world instanceof WorldServer) || PENDING_WATER_RELIGHT.contains(chunk)) {
+        if (!(world instanceof WorldServer)) {
             return;
         }
         PlayerChunkMapEntry entry = ((WorldServer) world).getPlayerChunkMap().getEntry(chunk.x, chunk.z);
-        if (entry == null || !entry.isSentToPlayers() || entry.getWatchingPlayers().isEmpty()) {
+        if (entry == null || !entry.isSentToPlayers() || entry.getWatchingPlayers().isEmpty()
+                || PENDING_WATER_RELIGHT.contains(chunk)) {
             return;
         }
-        IBlockState state = chunk.getBlockState(pos);
-        if (state.getMaterial() != Material.WATER && !WaterloggedBlockApi.isWaterlogged(state)) {
-            return;
+        if (world.provider.getDimension() != -1 || !xy177.farmersfuturedelight.common.world.nether.NetherGeneration.isModern(world)) {
+            IBlockState state = chunk.getBlockState(pos);
+            if (state.getMaterial() != Material.WATER && !WaterloggedBlockApi.isWaterlogged(state)) return;
         }
         synchronized (PENDING_WATER_LIGHT_SYNC) {
             Integer pending = PENDING_WATER_LIGHT_SYNC.get(chunk);
@@ -1459,6 +1466,11 @@ public final class FFDHeightHooks {
         World world = chunk.getWorld();
         int sectionCount = sectionCount(world);
         int totalChecks = totalRelightChecks(world);
+        if (!world.isRemote && world.provider.getDimension() == -1
+                && xy177.farmersfuturedelight.common.world.nether.NetherChunkLighting.isInitialized(chunk)) {
+            if (PENDING_WATER_RELIGHT.remove(chunk)) chunk.markDirty();
+            return totalChecks;
+        }
         if (queuedLightChecks >= totalChecks) {
             return queuedLightChecks;
         }
@@ -1510,6 +1522,10 @@ public final class FFDHeightHooks {
 
     public static boolean checkChunkColumnLight(Chunk chunk, int x, int z) {
         World world = chunk.getWorld();
+        if (chunk.getClass() == Chunk.class
+                && xy177.farmersfuturedelight.common.world.modern.ModernGenerationLifecycle.isActive(world)) {
+            return xy177.farmersfuturedelight.common.world.modern.ModernChunkLighting.checkColumn(chunk, x, z);
+        }
         int minY = minY(world);
         int topY = getTopFilledSegment(chunk) + 15;
         boolean foundOpaque = false;
@@ -1527,9 +1543,9 @@ public final class FFDHeightHooks {
             } else if (foundOpaque) {
                 IBlockState state = chunk.getBlockState(cursor);
                 if ((opacity == 0 || state.getMaterial() == Material.WATER
-                        || WaterloggedBlockApi.isWaterlogged(state)
                         || chunk.getLightFor(EnumSkyBlock.BLOCK, cursor) > 0
-                        || chunk.getLightFor(EnumSkyBlock.SKY, cursor) > 0) && !world.checkLight(cursor)) {
+                        || chunk.getLightFor(EnumSkyBlock.SKY, cursor) > 0
+                        || WaterloggedBlockApi.isWaterlogged(state)) && !world.checkLight(cursor)) {
                     return false;
                 }
             }
@@ -1538,9 +1554,9 @@ public final class FFDHeightHooks {
             cursor.setY(y);
             IBlockState state = chunk.getBlockState(cursor);
             if ((state.getLightValue(world, cursor) > 0 || state.getMaterial() == Material.WATER
-                    || WaterloggedBlockApi.isWaterlogged(state)
                     || chunk.getLightFor(EnumSkyBlock.BLOCK, cursor) > 0
-                    || chunk.getLightFor(EnumSkyBlock.SKY, cursor) > 0) && !world.checkLight(cursor)) {
+                    || chunk.getLightFor(EnumSkyBlock.SKY, cursor) > 0
+                    || WaterloggedBlockApi.isWaterlogged(state)) && !world.checkLight(cursor)) {
                 return false;
             }
         }

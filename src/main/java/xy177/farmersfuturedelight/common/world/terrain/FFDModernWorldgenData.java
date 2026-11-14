@@ -30,7 +30,7 @@ public final class FFDModernWorldgenData {
     private final long worldSeed;
     private final Map<String, FFDNormalNoise> noises = new HashMap<>();
     private final Map<String, FFDDensityFunction> densityFunctions = new HashMap<>();
-    private final Map<Long, Integer> finalSurfaceCache = new HashMap<>();
+    private final Map<Long, Integer> finalSurfaceCache;
     private final FinalDensityComponents finalDensityComponents;
     private final VeinDensityComponents veinDensityComponents;
     private final FFDNoiseRouter router;
@@ -39,6 +39,18 @@ public final class FFDModernWorldgenData {
     private final FFDNormalNoise surfaceSecondaryNoise;
 
     public FFDModernWorldgenData(long seed) {
+        this(seed, 0);
+    }
+
+    public FFDModernWorldgenData(long seed, int surfaceCacheLimit) {
+        if (surfaceCacheLimit < 0) throw new IllegalArgumentException("Surface cache limit must be nonnegative");
+        finalSurfaceCache = surfaceCacheLimit == 0 ? new HashMap<>()
+                : new java.util.LinkedHashMap<Long, Integer>(surfaceCacheLimit, 0.75F, true) {
+                    @Override
+                    protected boolean removeEldestEntry(Map.Entry<Long, Integer> eldest) {
+                        return size() > surfaceCacheLimit;
+                    }
+                };
         worldSeed = seed;
         positionalRandom = new FFDXoroshiroRandom(seed).forkPositional();
         JsonObject settings = loadJson("noise_settings/overworld.json").getAsJsonObject();
@@ -69,6 +81,10 @@ public final class FFDModernWorldgenData {
 
     public FFDNoiseRouter router() {
         return router;
+    }
+
+    public long worldSeed() {
+        return worldSeed;
     }
 
     public FinalDensityComponents finalDensityComponents() {
@@ -114,7 +130,7 @@ public final class FFDModernWorldgenData {
     public int finalDensitySurfaceLevel(int x, int z) {
         int cacheX = Math.floorDiv(x, CELL_WIDTH) * CELL_WIDTH;
         int cacheZ = Math.floorDiv(z, CELL_WIDTH) * CELL_WIDTH;
-        long key = (cacheX & 0xFFFFFFFFL) | (long) cacheZ << 32;
+        long key = it.unimi.dsi.fastutil.HashCommon.mix((cacheX & 0xFFFFFFFFL) | (long) cacheZ << 32);
         Integer cached = finalSurfaceCache.get(key);
         if (cached != null) {
             return cached;

@@ -2,6 +2,8 @@ package xy177.farmersfuturedelight.common.block;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.FFDCreativeTab;
 
@@ -14,5 +16,11 @@ public final class BlockNetheriteBlock extends Block {
         setHardness(50.0F);
         setResistance(1200.0F);
         setHarvestLevel("pickaxe", 3);
+        setSoundType(xy177.farmersfuturedelight.common.registry.FFDSounds.NETHERITE_BLOCK);
+    }
+
+    @Override
+    public boolean isBeaconBase(IBlockAccess world, BlockPos pos, BlockPos beacon) {
+        return true;
     }
 }

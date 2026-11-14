@@ -17,6 +17,7 @@ public class ContainerStonecutter extends ContainerWorkstation {
     private final TileEntityStonecutter source;
     private final InventoryBasic output = new InventoryBasic("stonecutter_result", false, 1);
     private int selectedRecipeIndex = -1;
+    private long lastSoundTick = Long.MIN_VALUE;
 
     public ContainerStonecutter(InventoryPlayer playerInventory, TileEntityStonecutter stonecutter) {
         super(2);
@@ -216,9 +217,13 @@ public class ContainerStonecutter extends ContainerWorkstation {
                 stonecutter.consumeInput();
                 FMLCommonHandler.instance().firePlayerCraftingEvent(this.player, crafted,
                         stonecutter);
-                player.world.playSound(null, stonecutter.getPos(),
-                        xy177.farmersfuturedelight.common.registry.FFDSounds.STONECUTTER_TAKE_RESULT,
-                        SoundCategory.BLOCKS, 1.0F, 1.0F);
+                long tick = player.world.getTotalWorldTime();
+                if (tick != lastSoundTick) {
+                    lastSoundTick = tick;
+                    player.world.playSound(null, stonecutter.getPos(),
+                            xy177.farmersfuturedelight.common.registry.FFDSounds.STONECUTTER_TAKE_RESULT,
+                            SoundCategory.BLOCKS, 1.0F, 1.0F);
+                }
             }
             removed = 0;
             refreshResult();

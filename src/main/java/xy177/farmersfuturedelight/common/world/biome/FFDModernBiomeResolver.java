@@ -10,10 +10,13 @@ import xy177.farmersfuturedelight.common.world.terrain.FFDNoiseRouter;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class FFDModernBiomeResolver {
     private static final int SAMPLE_STEP = FFDModernWorldgenData.CELL_WIDTH;
     private static final int MAX_CACHE_ENTRIES = 32768;
+    private static final Map<Biome, Set<BiomeDictionary.Type>> BIOME_TYPES = new ConcurrentHashMap<>();
     private static final int[] COAST_CHECK_OFFSETS = {
             -32, 0, 32, 0, 0, -32, 0, 32,
             -24, -24, -24, 24, 24, -24, 24, 24
@@ -22,6 +25,7 @@ public final class FFDModernBiomeResolver {
     private final FFDModernWorldgenData data;
     private final FFDNoiseRouter router;
     private final long zoomSeed;
+    private final boolean stableTies;
     private final Map<Long, Sample> cache = new LinkedHashMap<Long, Sample>(MAX_CACHE_ENTRIES, 0.75F, true) {
         @Override
         protected boolean removeEldestEntry(Map.Entry<Long, Sample> eldest) {
@@ -34,7 +38,12 @@ public final class FFDModernBiomeResolver {
     }
 
     public FFDModernBiomeResolver(FFDModernWorldgenData data, long worldSeed) {
+        this(data, worldSeed, false);
+    }
+
+    public FFDModernBiomeResolver(FFDModernWorldgenData data, long worldSeed, boolean stableTies) {
         this.data = data;
+        this.stableTies = stableTies;
         router = data.router();
         zoomSeed = FFDVerticalBiomeZoomer.obfuscateSeed(worldSeed);
     }
@@ -66,12 +75,12 @@ public final class FFDModernBiomeResolver {
         double erosion = FFDModernSurfaceBiomeMap.unquantize(erosionValue);
         double weirdness = FFDModernSurfaceBiomeMap.unquantize(weirdnessValue);
         ModernBiome biome = FFDModernSurfaceBiomeMap.select(
-                temperatureValue, humidityValue, continentalnessValue, erosionValue, weirdnessValue);
+                temperatureValue, humidityValue, continentalnessValue, erosionValue, weirdnessValue, stableTies);
         if (biome.isCoast() && !isValidCoast(x, z, biome)) {
             long inlandContinentalness = Math.max(continentalnessValue,
                     FFDModernSurfaceBiomeMap.quantize(0.03D));
             biome = FFDModernSurfaceBiomeMap.select(temperatureValue, humidityValue,
-                    inlandContinentalness, erosionValue, weirdnessValue);
+                    inlandContinentalness, erosionValue, weirdnessValue, stableTies);
         }
         TerrainRole role = roleFor(biome);
         Sample created = new Sample(temperature, humidity, continentalness, erosion, weirdness,
@@ -183,22 +192,27 @@ public final class FFDModernBiomeResolver {
         if (biome == Biomes.MUSHROOM_ISLAND || biome == Biomes.MUSHROOM_ISLAND_SHORE) {
             return TerrainRole.MUSHROOM;
         }
-        if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.MUSHROOM)) {
+        Set<BiomeDictionary.Type> types = biomeTypes(biome);
+        if (types.contains(BiomeDictionary.Type.MUSHROOM)) {
             return TerrainRole.MUSHROOM;
         }
-        if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.OCEAN)) {
+        if (types.contains(BiomeDictionary.Type.OCEAN)) {
             return TerrainRole.OCEAN;
         }
-        if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.RIVER)) {
+        if (types.contains(BiomeDictionary.Type.RIVER)) {
             return TerrainRole.RIVER;
         }
-        if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.BEACH)) {
+        if (types.contains(BiomeDictionary.Type.BEACH)) {
             return TerrainRole.COAST;
         }
-        if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.SWAMP)) {
+        if (types.contains(BiomeDictionary.Type.SWAMP)) {
             return TerrainRole.SWAMP;
         }
         return TerrainRole.LAND;
+    }
+
+    static Set<BiomeDictionary.Type> biomeTypes(Biome biome) {
+        return BIOME_TYPES.computeIfAbsent(biome, BiomeDictionary::getTypes);
     }
 
     static boolean isCompatible(Sample sample, Biome candidate) {
@@ -216,7 +230,7 @@ public final class FFDModernBiomeResolver {
                 return false;
             }
         } else if (sample.role == TerrainRole.COAST) {
-            boolean sandy = BiomeDictionary.hasType(candidate, BiomeDictionary.Type.SANDY);
+            boolean sandy = biomeTypes(candidate).contains(BiomeDictionary.Type.SANDY);
             if (candidateRole != TerrainRole.COAST
                     && !(sample.biome == ModernBiome.DESERT && sandy)) {
                 return false;
@@ -236,8 +250,8 @@ public final class FFDModernBiomeResolver {
 
         if ((sample.biome == ModernBiome.FROZEN_OCEAN
                 || sample.biome == ModernBiome.DEEP_FROZEN_OCEAN)
-                && !BiomeDictionary.hasType(candidate, BiomeDictionary.Type.COLD)
-                && !BiomeDictionary.hasType(candidate, BiomeDictionary.Type.SNOWY)) {
+                && !biomeTypes(candidate).contains(BiomeDictionary.Type.COLD)
+                && !biomeTypes(candidate).contains(BiomeDictionary.Type.SNOWY)) {
             return false;
         }
 
@@ -288,15 +302,16 @@ public final class FFDModernBiomeResolver {
     }
 
     static int candidateTemperatureBand(Biome biome) {
-        if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.SNOWY)) {
+        Set<BiomeDictionary.Type> types = biomeTypes(biome);
+        if (types.contains(BiomeDictionary.Type.SNOWY)) {
             return 0;
         }
-        if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.COLD)) {
+        if (types.contains(BiomeDictionary.Type.COLD)) {
             return 1;
         }
-        boolean hot = BiomeDictionary.hasType(biome, BiomeDictionary.Type.HOT);
-        boolean dry = BiomeDictionary.hasType(biome, BiomeDictionary.Type.DRY)
-                || BiomeDictionary.hasType(biome, BiomeDictionary.Type.SANDY);
+        boolean hot = types.contains(BiomeDictionary.Type.HOT);
+        boolean dry = types.contains(BiomeDictionary.Type.DRY)
+                || types.contains(BiomeDictionary.Type.SANDY);
         if (hot && dry) {
             return 4;
         }
@@ -326,7 +341,7 @@ public final class FFDModernBiomeResolver {
     }
 
     private static long key(int x, int z) {
-        return (x & 0xFFFFFFFFL) | (long) z << 32;
+        return it.unimi.dsi.fastutil.HashCommon.mix((x & 0xFFFFFFFFL) | (long) z << 32);
     }
 
     public enum TerrainRole {

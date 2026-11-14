@@ -15,10 +15,33 @@ public final class FFDSounds {
     public static final SoundEvent GLOW_INK_SAC_USE = sound("item.glow_ink_sac.use");
     public static final SoundEvent INK_SAC_USE = sound("item.ink_sac.use");
     public static final SoundEvent DYE_USE = sound("item.dye.use");
+    public static final SoundEvent BONE_MEAL_USE = sound("item.bone_meal.use");
     public static final SoundEvent GOLDEN_DANDELION_USE = sound("item.golden_dandelion.use");
     public static final SoundEvent GOLDEN_DANDELION_UNUSE = sound("item.golden_dandelion.unuse");
     public static final SoundEvent IRON_GOLEM_REPAIR = sound("entity.iron_golem.repair");
     public static final SoundEvent IRON_GOLEM_DAMAGE = sound("entity.iron_golem.damage");
+    public static final SoundEvent CAT_AMBIENT = sound("entity.cat.ambient");
+    public static final SoundEvent CAT_STRAY_AMBIENT = sound("entity.cat.stray_ambient");
+    public static final SoundEvent CAT_BEG_FOR_FOOD = sound("entity.cat.beg_for_food");
+    public static final SoundEvent CAT_EAT = sound("entity.cat.eat");
+    public static final SoundEvent CAT_HISS = sound("entity.cat.hiss");
+    public static final SoundEvent CAT_HURT = sound("entity.cat.hurt");
+    public static final SoundEvent CAT_DEATH = sound("entity.cat.death");
+    public static final SoundEvent CAT_PURR = sound("entity.cat.purr");
+    public static final SoundEvent CAT_PURREOW = sound("entity.cat.purreow");
+    public static final SoundEvent BABY_CAT_AMBIENT = sound("entity.baby_cat.ambient");
+    public static final SoundEvent BABY_CAT_STRAY_AMBIENT = sound("entity.baby_cat.stray_ambient");
+    public static final SoundEvent BABY_CAT_BEG_FOR_FOOD = sound("entity.baby_cat.beg_for_food");
+    public static final SoundEvent BABY_CAT_EAT = sound("entity.baby_cat.eat");
+    public static final SoundEvent BABY_CAT_HISS = sound("entity.baby_cat.hiss");
+    public static final SoundEvent BABY_CAT_HURT = sound("entity.baby_cat.hurt");
+    public static final SoundEvent BABY_CAT_DEATH = sound("entity.baby_cat.death");
+    public static final SoundEvent BABY_CAT_PURR = sound("entity.baby_cat.purr");
+    public static final SoundEvent BABY_CAT_PURREOW = sound("entity.baby_cat.purreow");
+    private static final java.util.Map<String, SoundEvent> ROYAL_CAT_SOUNDS = royalCatSounds();
+    public static final SoundEvent OCELOT_AMBIENT = sound("entity.ocelot.ambient");
+    public static final SoundEvent OCELOT_HURT = sound("entity.ocelot.hurt");
+    public static final SoundEvent OCELOT_DEATH = sound("entity.ocelot.death");
     public static final SoundEvent CROP_PLANT = sound("item.crop.plant");
     public static final SoundEvent VILLAGER_WORK_ARMORER = sound("entity.villager.work_armorer");
     public static final SoundEvent VILLAGER_WORK_BUTCHER = sound("entity.villager.work_butcher");
@@ -54,6 +77,7 @@ public final class FFDSounds {
     public static final SoundEvent COMPOSTER_READY = sound("block.composter.ready");
     public static final SoundEvent STONECUTTER_TAKE_RESULT = sound("ui.stonecutter.take_result");
     public static final SoundEvent GRINDSTONE_USE = sound("block.grindstone.use");
+    public static final SoundEvent SMITHING_TABLE_USE = sound("block.smithing_table.use");
     public static final SoundEvent CARTOGRAPHY_TABLE_TAKE_RESULT =
             sound("ui.cartography_table.take_result");
     public static final SoundEvent BELL_USE = sound("block.bell.use");
@@ -98,6 +122,7 @@ public final class FFDSounds {
     public static final SoundEvent PHANTOM_HURT = sound("entity.phantom.hurt");
     public static final SoundEvent PHANTOM_SWOOP = sound("entity.phantom.swoop");
     public static final SoundEvent MUSIC_DISC_OTHERSIDE = sound("music_disc.otherside");
+    public static final SoundEvent MUSIC_DISC_PIGSTEP = sound("music_disc.pigstep");
     public static final SoundEvent CAVES_AND_CLIFFS_MUSIC = sound("music.caves_and_cliffs");
     public static final SoundEvent HONEY_BLOCK_BREAK = sound("block.honey_block.break");
     public static final SoundEvent HONEY_BLOCK_STEP = sound("block.honey_block.step");
@@ -350,6 +375,22 @@ public final class FFDSounds {
             sound("item.goat_horn.sound.7")
     };
     public static final SoundType GILDED_BLACKSTONE = blockSoundType("gilded_blackstone");
+    public static final SoundType NETHERITE_BLOCK = blockSoundType("netherite_block");
+    public static final SoundType NETHERRACK = blockSoundType("netherrack");
+    public static final SoundType NETHER_ORE = blockSoundType("nether_ore");
+    public static final SoundType SOUL_SAND = blockSoundType("soul_sand");
+    public static final SoundEvent NETHER_WART_BREAK = sound("block.nether_wart.break");
+    public static final SoundEvent NETHER_WART_PLANTED = sound("item.nether_wart.plant");
+    public static final SoundType NETHER_WART = new SoundType(1.0F, 1.0F, NETHER_WART_BREAK,
+            SoundEvents.BLOCK_STONE_STEP, NETHER_WART_PLANTED,
+            SoundEvents.BLOCK_STONE_HIT, SoundEvents.BLOCK_STONE_FALL);
+    public static final SoundType NETHER_BRICKS = blockSoundType("nether_bricks");
+    public static final SoundType LODESTONE = blockSoundType("lodestone");
+    public static final SoundEvent LODESTONE_COMPASS_LOCK = sound("item.lodestone_compass.lock");
+    public static final SoundEvent RESPAWN_ANCHOR_CHARGE = sound("block.respawn_anchor.charge");
+    public static final SoundEvent RESPAWN_ANCHOR_SET_SPAWN = sound("block.respawn_anchor.set_spawn");
+    public static final SoundEvent RESPAWN_ANCHOR_DEPLETE = sound("block.respawn_anchor.deplete");
+    public static final SoundEvent RESPAWN_ANCHOR_AMBIENT = sound("block.respawn_anchor.ambient");
     public static final SoundType AZALEA = blockSoundType("azalea");
     public static final SoundType FLOWERING_AZALEA = blockSoundType("flowering_azalea");
     public static final SoundType AZALEA_LEAVES = blockSoundType("azalea_leaves");
@@ -426,6 +467,20 @@ public final class FFDSounds {
             sound("ambient.warped_forest.loop");
     public static final SoundEvent WARPED_FOREST_MOOD =
             sound("ambient.warped_forest.mood");
+    public static final SoundEvent NETHER_WASTES_LOOP = sound("ambient.nether_wastes.loop");
+    public static final SoundEvent NETHER_WASTES_ADDITIONS = sound("ambient.nether_wastes.additions");
+    public static final SoundEvent NETHER_WASTES_MOOD = sound("ambient.nether_wastes.mood");
+    public static final SoundEvent SOUL_SAND_VALLEY_LOOP = sound("ambient.soul_sand_valley.loop");
+    public static final SoundEvent SOUL_SAND_VALLEY_ADDITIONS = sound("ambient.soul_sand_valley.additions");
+    public static final SoundEvent SOUL_SAND_VALLEY_MOOD = sound("ambient.soul_sand_valley.mood");
+    public static final SoundEvent BASALT_DELTAS_LOOP = sound("ambient.basalt_deltas.loop");
+    public static final SoundEvent BASALT_DELTAS_ADDITIONS = sound("ambient.basalt_deltas.additions");
+    public static final SoundEvent BASALT_DELTAS_MOOD = sound("ambient.basalt_deltas.mood");
+    public static final SoundEvent NETHER_WASTES_MUSIC = sound("music.nether.nether_wastes");
+    public static final SoundEvent SOUL_SAND_VALLEY_MUSIC = sound("music.nether.soul_sand_valley");
+    public static final SoundEvent CRIMSON_FOREST_MUSIC = sound("music.nether.crimson_forest");
+    public static final SoundEvent WARPED_FOREST_MUSIC = sound("music.nether.warped_forest");
+    public static final SoundEvent BASALT_DELTAS_MUSIC = sound("music.nether.basalt_deltas");
     public static final SoundEvent AXE_STRIP = sound("item.axe.strip");
     public static final SoundEvent AXE_SCRAPE = sound("item.axe.scrape");
     public static final SoundEvent AXE_WAX_OFF = sound("item.axe.wax_off");
@@ -440,6 +495,9 @@ public final class FFDSounds {
     public static final SoundType POWDER_SNOW = blockSoundType("powder_snow");
     public static final SoundType CHAIN = blockSoundType("chain");
     public static final SoundType LANTERN = blockSoundType("lantern");
+    public static final SoundType SOUL_SOIL = blockSoundType("soul_soil");
+    public static final SoundType NETHER_GOLD_ORE = blockSoundType("nether_gold_ore");
+    public static final SoundEvent SOUL_ESCAPE = sound("particle.soul_escape");
     public static final SoundType BAMBOO = blockSoundType("bamboo");
     public static final SoundType SCAFFOLDING = blockSoundType("scaffolding");
     public static final SoundType BAMBOO_SAPLING = new SoundType(1.0F, 1.0F,
@@ -483,12 +541,68 @@ public final class FFDSounds {
             sound("block.bubble_column.whirlpool_inside");
     public static final SoundEvent VINE_STEP = sound("block.vine.step");
     public static final SoundEvent PUMPKIN_CARVE = sound("block.pumpkin.carve");
+    public static final SoundEvent PIGLIN_ADMIRING_ITEM = sound("entity.piglin.admiring_item");
+    public static final SoundEvent PIGLIN_AMBIENT = sound("entity.piglin.ambient");
+    public static final SoundEvent PIGLIN_ANGRY = sound("entity.piglin.angry");
+    public static final SoundEvent PIGLIN_CELEBRATE = sound("entity.piglin.celebrate");
+    public static final SoundEvent PIGLIN_CONVERTED_TO_ZOMBIFIED = sound("entity.piglin.converted_to_zombified");
+    public static final SoundEvent PIGLIN_DEATH = sound("entity.piglin.death");
+    public static final SoundEvent PIGLIN_HURT = sound("entity.piglin.hurt");
+    public static final SoundEvent PIGLIN_JEALOUS = sound("entity.piglin.jealous");
+    public static final SoundEvent PIGLIN_RETREAT = sound("entity.piglin.retreat");
+    public static final SoundEvent PIGLIN_STEP = sound("entity.piglin.step");
+    public static final SoundEvent PIGLIN_BRUTE_AMBIENT = sound("entity.piglin_brute.ambient");
+    public static final SoundEvent PIGLIN_BRUTE_ANGRY = sound("entity.piglin_brute.angry");
+    public static final SoundEvent PIGLIN_BRUTE_CONVERTED_TO_ZOMBIFIED = sound("entity.piglin_brute.converted_to_zombified");
+    public static final SoundEvent PIGLIN_BRUTE_DEATH = sound("entity.piglin_brute.death");
+    public static final SoundEvent PIGLIN_BRUTE_HURT = sound("entity.piglin_brute.hurt");
+    public static final SoundEvent PIGLIN_BRUTE_STEP = sound("entity.piglin_brute.step");
+    public static final SoundEvent ZOMBIFIED_PIGLIN_AMBIENT = sound("entity.zombified_piglin.ambient");
+    public static final SoundEvent ZOMBIFIED_PIGLIN_ANGRY = sound("entity.zombified_piglin.angry");
+    public static final SoundEvent ZOMBIFIED_PIGLIN_DEATH = sound("entity.zombified_piglin.death");
+    public static final SoundEvent ZOMBIFIED_PIGLIN_HURT = sound("entity.zombified_piglin.hurt");
+    public static final SoundEvent STRIDER_AMBIENT = sound("entity.strider.ambient");
+    public static final SoundEvent STRIDER_DEATH = sound("entity.strider.death");
+    public static final SoundEvent STRIDER_EAT = sound("entity.strider.eat");
+    public static final SoundEvent STRIDER_HAPPY = sound("entity.strider.happy");
+    public static final SoundEvent STRIDER_HURT = sound("entity.strider.hurt");
+    public static final SoundEvent STRIDER_RETREAT = sound("entity.strider.retreat");
+    public static final SoundEvent STRIDER_SADDLE = sound("entity.strider.saddle");
+    public static final SoundEvent STRIDER_STEP = sound("entity.strider.step");
+    public static final SoundEvent STRIDER_STEP_LAVA = sound("entity.strider.step_lava");
+    public static final SoundEvent HOGLIN_AMBIENT = sound("entity.hoglin.ambient");
+    public static final SoundEvent HOGLIN_ANGRY = sound("entity.hoglin.angry");
+    public static final SoundEvent HOGLIN_ATTACK = sound("entity.hoglin.attack");
+    public static final SoundEvent HOGLIN_CONVERTED_TO_ZOMBIFIED = sound("entity.hoglin.converted_to_zombified");
+    public static final SoundEvent HOGLIN_DEATH = sound("entity.hoglin.death");
+    public static final SoundEvent HOGLIN_HURT = sound("entity.hoglin.hurt");
+    public static final SoundEvent HOGLIN_RETREAT = sound("entity.hoglin.retreat");
+    public static final SoundEvent HOGLIN_STEP = sound("entity.hoglin.step");
+    public static final SoundEvent ZOGLIN_AMBIENT = sound("entity.zoglin.ambient");
+    public static final SoundEvent ZOGLIN_ANGRY = sound("entity.zoglin.angry");
+    public static final SoundEvent ZOGLIN_ATTACK = sound("entity.zoglin.attack");
+    public static final SoundEvent ZOGLIN_DEATH = sound("entity.zoglin.death");
+    public static final SoundEvent ZOGLIN_HURT = sound("entity.zoglin.hurt");
+    public static final SoundEvent ZOGLIN_STEP = sound("entity.zoglin.step");
 
     private FFDSounds() {
     }
 
     public static SoundEvent[] all() {
         return ALL.toArray(new SoundEvent[0]);
+    }
+
+    private static java.util.Map<String, SoundEvent> royalCatSounds() {
+        java.util.Map<String, SoundEvent> sounds = new java.util.HashMap<>();
+        for (String action : new String[]{"ambient", "stray_ambient", "beg_for_food", "eat",
+                "hiss", "hurt", "death", "purr", "purreow"}) {
+            sounds.put("entity.cat." + action, sound("entity.cat_royal." + action));
+        }
+        return sounds;
+    }
+
+    public static SoundEvent royalCatSound(SoundEvent original) {
+        return ROYAL_CAT_SOUNDS.getOrDefault(original.getRegistryName().getResourcePath(), original);
     }
 
     private static SoundType blockSoundType(String name) {

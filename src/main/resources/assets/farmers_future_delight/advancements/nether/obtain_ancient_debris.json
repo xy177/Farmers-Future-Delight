@@ -1,0 +1,28 @@
+{
+  "conditions": [
+    {
+      "type": "farmers_future_delight:feature_enabled",
+      "feature": "ancient_debris"
+    }
+  ],
+  "parent": "minecraft:nether/root",
+  "display": {
+    "description": {
+      "translate": "advancements.nether.obtain_ancient_debris.description"
+    },
+    "icon": {
+      "item": "farmers_future_delight:ancient_debris"
+    },
+    "title": {
+      "translate": "advancements.nether.obtain_ancient_debris.title"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "obtain_ancient_debris": {
+      "trigger": "farmers_future_delight:obtain_ancient_debris"
+    }
+  }
+}

@@ -24,6 +24,7 @@ public final class FFDEnchantments {
             "ffd_crossbow", FFDEnchantments::isCrossbowItem);
 
     public static final Enchantment LOYALTY = new LoyaltyEnchantment();
+    public static final Enchantment SOUL_SPEED = new xy177.farmersfuturedelight.common.enchantment.EnchantmentSoulSpeed();
     public static final Enchantment IMPALING = new ImpalingEnchantment();
     public static final Enchantment RIPTIDE = new RiptideEnchantment();
     public static final Enchantment CHANNELING = new ChannelingEnchantment();
@@ -38,6 +39,7 @@ public final class FFDEnchantments {
     }
 
     public static void register(IForgeRegistry<Enchantment> registry) {
+        if (FFDCompat.isLocalEnchantmentEnabled(FFDConfig.soulSpeedMode,FFDCompat.Feature.SOUL_SPEED,SOUL_SPEED,"soul_speed")) registry.register(SOUL_SPEED);
         if (isLocalEnabled(LOYALTY)) {
             registry.register(LOYALTY);
         }

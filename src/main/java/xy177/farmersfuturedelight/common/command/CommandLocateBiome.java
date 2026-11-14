@@ -16,11 +16,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
-import xy177.farmersfuturedelight.FarmerFutureDelight;
+import xy177.farmersfuturedelight.api.biome.VerticalBiomeDefinition;
 import xy177.farmersfuturedelight.common.world.biome.FFDModernBiomeProvider;
 import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiome;
-import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiomeData;
-import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiomeSampler;
+import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiomeManager;
+import xy177.farmersfuturedelight.common.world.nether.NetherGeneration;
 import xy177.farmersfuturedelight.common.world.terrain.FFDModernWorldgenData;
 import xy177.farmersfuturedelight.core.FFDHeightHooks;
 
@@ -28,9 +28,6 @@ public final class CommandLocateBiome extends CommandBase {
     private static final int MAX_RADIUS = 6400;
     private static final int HORIZONTAL_STEP = 32;
     private static final int VERTICAL_STEP = 16;
-    private static final String LUSH_CAVES = FarmerFutureDelight.MODID + ":lush_caves";
-    private static final String DRIPSTONE_CAVES = FarmerFutureDelight.MODID + ":dripstone_caves";
-
     @Override
     public String getName() {
         return "locatebiome";
@@ -54,7 +51,7 @@ public final class CommandLocateBiome extends CommandBase {
         }
 
         String requested = normalize(args[0]);
-        FFDVerticalBiome verticalTarget = caveTarget(requested);
+        FFDVerticalBiome verticalTarget = verticalTarget(requested);
         Biome surfaceTarget = verticalTarget == null
                 ? ForgeRegistries.BIOMES.getValue(new ResourceLocation(requested)) : null;
         if (verticalTarget == null && surfaceTarget == null) {
@@ -63,7 +60,13 @@ public final class CommandLocateBiome extends CommandBase {
         }
 
         World world = sender.getEntityWorld();
-        if (verticalTarget != null && !FFDHeightHooks.isExtended(world)) {
+        boolean netherTarget = verticalTarget != null
+                && verticalTarget.definition().getCategory() == VerticalBiomeDefinition.Category.NETHER;
+        if (netherTarget && !NetherGeneration.isModern(world)) {
+            throw new CommandException(
+                    "commands.farmers_future_delight.locatebiome.nether_only", requested);
+        }
+        if (verticalTarget != null && !netherTarget && !FFDHeightHooks.isExtended(world)) {
             throw new CommandException(
                     "commands.farmers_future_delight.locatebiome.extended_only", requested);
         }
@@ -71,7 +74,7 @@ public final class CommandLocateBiome extends CommandBase {
         BlockPos origin = sender.getPosition();
         BlockPos found = verticalTarget == null
                 ? findSurfaceBiome(world, origin, surfaceTarget)
-                : findCaveBiome(world, origin, verticalTarget);
+                : findVerticalBiome(world, origin, verticalTarget);
         if (found == null) {
             throw new CommandException(
                     "commands.farmers_future_delight.locatebiome.not_found", requested,
@@ -96,8 +99,13 @@ public final class CommandLocateBiome extends CommandBase {
                 ids.add(biome.getRegistryName().toString());
             }
         }
-        ids.add(LUSH_CAVES);
-        ids.add(DRIPSTONE_CAVES);
+        for (FFDVerticalBiome biome : FFDVerticalBiome.values()) {
+            if (biome != FFDVerticalBiome.NONE
+                    && (biome.isCave() || biome.definition().getSelectionRule() != null)
+                    && !ids.contains(biome.registryName().toString())) {
+                ids.add(biome.registryName().toString());
+            }
+        }
         Collections.sort(ids);
         return getListOfStringsMatchingLastWord(args, ids);
     }
@@ -137,10 +145,10 @@ public final class CommandLocateBiome extends CommandBase {
     }
 
     @Nullable
-    private static BlockPos findCaveBiome(World world, BlockPos origin,
-                                           FFDVerticalBiome target) {
-        FFDVerticalBiomeSampler sampler =
-                new FFDVerticalBiomeSampler(new FFDModernWorldgenData(world.getSeed()));
+    private static BlockPos findVerticalBiome(World world, BlockPos origin,
+                                              FFDVerticalBiome target) {
+        int minimumY = FFDHeightHooks.minY(world);
+        int maximumY = FFDHeightHooks.maxYExclusive(world);
         int originX = Math.floorDiv(origin.getX(), HORIZONTAL_STEP) * HORIZONTAL_STEP;
         int originZ = Math.floorDiv(origin.getZ(), HORIZONTAL_STEP) * HORIZONTAL_STEP;
         int rings = MAX_RADIUS / HORIZONTAL_STEP;
@@ -154,16 +162,11 @@ public final class CommandLocateBiome extends CommandBase {
                     }
                     int x = originX + dx * HORIZONTAL_STEP;
                     int z = originZ + dz * HORIZONTAL_STEP;
-                    for (int y = FFDHeightHooks.MIN_Y;
-                         y < FFDHeightHooks.MAX_Y_EXCLUSIVE; y += VERTICAL_STEP) {
-                        FFDVerticalBiome sampled = sampler.sampleNoiseBiome(
-                                Math.floorDiv(x, FFDVerticalBiomeData.CELL_SIZE),
-                                Math.floorDiv(y, FFDVerticalBiomeData.CELL_SIZE),
-                                Math.floorDiv(z, FFDVerticalBiomeData.CELL_SIZE));
-                        if (sampled != target) {
+                    for (int y = minimumY; y < maximumY; y += VERTICAL_STEP) {
+                        BlockPos candidate = new BlockPos(x, y, z);
+                        if (FFDVerticalBiomeManager.getBiome(world, candidate) != target) {
                             continue;
                         }
-                        BlockPos candidate = new BlockPos(x, y, z);
                         double distance = origin.distanceSq(candidate);
                         if (distance < bestDistance) {
                             bestDistance = distance;
@@ -191,14 +194,11 @@ public final class CommandLocateBiome extends CommandBase {
     }
 
     @Nullable
-    private static FFDVerticalBiome caveTarget(String id) {
-        if (LUSH_CAVES.equals(id)) {
-            return FFDVerticalBiome.LUSH_CAVES;
-        }
-        if (DRIPSTONE_CAVES.equals(id)) {
-            return FFDVerticalBiome.DRIPSTONE_CAVES;
-        }
-        return null;
+    private static FFDVerticalBiome verticalTarget(String id) {
+        FFDVerticalBiome biome = FFDVerticalBiome.byRegistryName(new ResourceLocation(id));
+        return biome != FFDVerticalBiome.NONE
+                && (biome.isCave() || biome.definition().getSelectionRule() != null)
+                ? biome : null;
     }
 
     private static String normalize(String id) {

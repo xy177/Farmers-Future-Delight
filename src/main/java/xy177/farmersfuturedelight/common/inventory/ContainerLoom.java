@@ -255,6 +255,7 @@ public class ContainerLoom extends ContainerWorkstation {
             for (BannerPattern candidate : BannerPattern.values()) {
                 if (candidate != BannerPattern.BASE && candidate
                         != xy177.farmersfuturedelight.common.registry.FFDBannerPatterns.GLOBE
+                        && candidate != FFDBannerPatterns.PIGLIN
                         && !candidate.hasPatternItem()) {
                     selectablePatterns.add(candidate);
                 }

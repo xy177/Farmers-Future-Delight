@@ -37,6 +37,7 @@ public final class NetherForestWorldgenEvents {
     @SubscribeEvent
     public static void assignForestBiome(PopulateChunkEvent.Pre event) {
         World world = event.getWorld();
+        if (xy177.farmersfuturedelight.common.world.nether.NetherGeneration.isModern(world)) return;
         int chunkX = event.getChunkX();
         int chunkZ = event.getChunkZ();
         ForestColumnMap forestMap = getForestMap(world, chunkX, chunkZ);
@@ -67,6 +68,7 @@ public final class NetherForestWorldgenEvents {
 
     @SubscribeEvent
     public static void generateForest(PopulateChunkEvent.Post event) {
+        if (xy177.farmersfuturedelight.common.world.nether.NetherGeneration.isModern(event.getWorld())) return;
         if (Boolean.TRUE.equals(GENERATING_FOREST.get())) {
             return;
         }

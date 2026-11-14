@@ -1,0 +1,32 @@
+{
+  "elements": [
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "farmers_future_delight:bastion/treasure/connectors/center_to_wall_middle",
+        "processors": "farmers_future_delight:treasure_rooms",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "farmers_future_delight:bastion/treasure/connectors/center_to_wall_top",
+        "processors": "farmers_future_delight:treasure_rooms",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "farmers_future_delight:bastion/treasure/connectors/center_to_wall_top_entrance",
+        "processors": "farmers_future_delight:treasure_rooms",
+        "projection": "rigid"
+      },
+      "weight": 1
+    }
+  ],
+  "fallback": "minecraft:empty"
+}

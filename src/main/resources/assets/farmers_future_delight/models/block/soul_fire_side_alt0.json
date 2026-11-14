@@ -1,0 +1,6 @@
+{
+  "parent": "farmers_future_delight:block/soul_template_fire_side_alt",
+  "textures": {
+    "fire": "farmers_future_delight:blocks/soul_fire_0"
+  }
+}

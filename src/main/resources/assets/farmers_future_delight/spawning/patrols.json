@@ -1,0 +1,26 @@
+{
+  "enabled": true,
+  "intervalMinTicks": 12000,
+  "intervalMaxTicks": 13199,
+  "spawnChance": 0.2,
+  "minimumWorldTime": 120000,
+  "daytimeOnly": true,
+  "dimensions": [0],
+  "villageAvoidanceSections": 2,
+  "playerOffsetMin": 24,
+  "playerOffsetMax": 47,
+  "memberSpread": 4,
+  "loadedAreaRadius": 10,
+  "maximumBlockLight": 8,
+  "excludedBiomes": ["minecraft:mushroom_island", "minecraft:mushroom_island_shore"],
+  "members": [
+    {
+      "entity": "minecraft:pillager",
+      "minCount": 1,
+      "maxCount": 1,
+      "addLocalDifficulty": true,
+      "leader": true,
+      "nbt": "{}"
+    }
+  ]
+}

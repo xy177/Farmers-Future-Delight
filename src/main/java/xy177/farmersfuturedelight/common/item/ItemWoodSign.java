@@ -30,6 +30,11 @@ public class ItemWoodSign extends ItemSign {
     }
 
     @Override
+    public int getItemBurnTime(ItemStack stack) {
+        return standingSign.isNetherWood() ? 0 : 200;
+    }
+
+    @Override
     public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos,
                                       EnumHand hand, EnumFacing facing,
                                       float hitX, float hitY, float hitZ) {
@@ -64,6 +69,8 @@ public class ItemWoodSign extends ItemSign {
         } else {
             placeState = wallSign.getDefaultState().withProperty(BlockWallSign.FACING, placementFacing);
         }
+        placeState = xy177.farmersfuturedelight.core.FFDGameplayHooks
+                .waterlogPlacedBlockState(placeState, world, pos);
         if (!world.setBlockState(pos, placeState, 11)) {
             return EnumActionResult.FAIL;
         }

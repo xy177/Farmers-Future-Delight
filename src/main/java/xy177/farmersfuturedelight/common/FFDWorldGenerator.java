@@ -76,6 +76,7 @@ public class FFDWorldGenerator implements IWorldGenerator {
             WorldGenModernFlowers.generate(flowerRandom, chunkX, chunkZ, world,
                     world.getBiome(chunkOrigin.add(8, 0, 8)));
             FFDOceanStructures.generate(world, chunkX, chunkZ);
+            xy177.farmersfuturedelight.common.worldgen.MapGenFFDRuinedPortal.generate(world, chunkX, chunkZ);
             xy177.farmersfuturedelight.common.worldgen.FFDModernStructures.generate(world, chunkX, chunkZ);
             if (!FFDHeightHooks.isExtended(world)) {
                 new WorldGenModernIcebergs(world.getSeed()).generate(world, chunkX, chunkZ);

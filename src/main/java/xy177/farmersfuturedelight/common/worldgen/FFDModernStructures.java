@@ -10,7 +10,6 @@ import java.util.WeakHashMap;
 import javax.annotation.Nullable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldType;
@@ -19,21 +18,28 @@ import net.minecraft.world.gen.ChunkGeneratorOverworld;
 import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraft.world.gen.structure.MapGenStructureData;
 import net.minecraft.world.gen.structure.MapGenStructureIO;
+import net.minecraft.world.gen.structure.MapGenVillage;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.BlockPos;
 import xy177.farmersfuturedelight.core.FFDHeightHooks;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.event.terraingen.InitMapGenEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.FFDCompat;
 import xy177.farmersfuturedelight.common.FFDConfig;
 import xy177.farmersfuturedelight.common.entity.EntityPillager;
 import xy177.farmersfuturedelight.common.registry.FFDEntities;
+import xy177.farmersfuturedelight.common.raid.RaiderSpawnConfiguration;
 import xy177.farmersfuturedelight.common.world.ChunkGeneratorExtended;
+import xy177.farmersfuturedelight.common.world.FFDWorldgenTerrain;
 import xy177.farmersfuturedelight.common.world.FFDWorldTypes;
 
 @Mod.EventBusSubscriber(modid = FarmerFutureDelight.MODID)
@@ -41,7 +47,6 @@ public final class FFDModernStructures {
     private static final Map<World, MapGenFFDPillagerOutpost> OUTPOSTS = new WeakHashMap<>();
     private static final Map<World, Set<FFDJigsawStructureStart>> PENDING = new WeakHashMap<>();
     private static final Set<World> CHANGED = Collections.newSetFromMap(new WeakHashMap<World, Boolean>());
-    private static Biome.SpawnListEntry outpostSpawn;
     private static boolean initialized;
 
     private FFDModernStructures() {
@@ -59,11 +64,14 @@ public final class FFDModernStructures {
     public static synchronized void init() {
         if (initialized) return;
         initialized = true;
+        MinecraftForge.TERRAIN_GEN_BUS.register(FFDModernStructures.class);
+        FFDNetherStructures.init();
+        MapGenFFDRuinedPortal.init();
         MapGenStructureIO.registerStructure(FFDJigsawStructureStart.class, "FFDJigsawStructure");
         MapGenStructureIO.registerStructureComponent(FFDJigsawPlacement.SavedPiece.class, "FFDJigsawPiece");
     }
 
-    private static boolean supported(World world) {
+    static boolean supported(World world) {
         if (!(world instanceof WorldServer) || world.provider.getDimension() != 0
                 || !world.getWorldInfo().isMapFeaturesEnabled()) return false;
         return supported(world, FFDStructureTerrain.generator((WorldServer) world));
@@ -77,7 +85,7 @@ public final class FFDModernStructures {
                 || type == WorldType.LARGE_BIOMES || type == WorldType.AMPLIFIED
                 || type == WorldType.CUSTOMIZED || type == FFDWorldTypes.EXTENDED;
         boolean standardGenerator = generator.getClass() == ChunkGeneratorOverworld.class
-                || generator instanceof ChunkGeneratorExtended;
+                || generator instanceof FFDWorldgenTerrain;
         if (standardWorldType && standardGenerator) return true;
         return "BIOMESOP".equals(type.getName()) && FFDStructureTerrain.supportsBiomesOPlenty(generator);
     }
@@ -117,14 +125,35 @@ public final class FFDModernStructures {
         return outposts.isInsideStructure(position);
     }
 
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onVillageGeneratorInit(InitMapGenEvent event) {
+        if (event.getType() == InitMapGenEvent.EventType.VILLAGE
+                && event.getNewGen().getClass() == MapGenVillage.class
+                && !Loader.isModLoaded("villagenames")) {
+            event.setNewGen(new FFDModernVillageGenerator());
+        }
+    }
+
     @SubscribeEvent
     public static void onWorldLoad(WorldEvent.Load event) {
-        if (!supported(event.getWorld())) return;
-        IChunkGenerator generator = FFDStructureTerrain.generator((WorldServer) event.getWorld());
-        if (generator instanceof ChunkGeneratorOverworld) {
-            FFDStructureHooks.installModernVillage((ChunkGeneratorOverworld) generator);
+        initializeWorld(event.getWorld());
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
+    public static void onCreateSpawnPosition(WorldEvent.CreateSpawnPosition event) {
+        initializeWorld(event.getWorld());
+    }
+
+    private static void initializeWorld(World world) {
+        if (!(world instanceof WorldServer) || world.provider.getDimension() != 0
+                || !world.getWorldInfo().isMapFeaturesEnabled()) return;
+        IChunkGenerator generator = FFDStructureTerrain.generator((WorldServer) world);
+        if (FFDStructureTerrain.supportsVillageTerrain(generator)) {
+            FFDStructureHooks.installModernVillage(generator);
         }
-        if (pillagerType() != null) OUTPOSTS.computeIfAbsent(event.getWorld(), ignored -> new MapGenFFDPillagerOutpost());
+        if (supported(world, generator) && pillagerType() != null) {
+            OUTPOSTS.computeIfAbsent(world, ignored -> new MapGenFFDPillagerOutpost());
+        }
     }
 
     public static void generate(World world, int chunkX, int chunkZ) {
@@ -170,14 +199,11 @@ public final class FFDModernStructures {
     @SubscribeEvent
     public static void onPotentialSpawns(WorldEvent.PotentialSpawns event) {
         MapGenFFDPillagerOutpost outpost = OUTPOSTS.get(event.getWorld());
-        Class<? extends EntityLiving> pillager = pillagerType();
-        if (outpost == null || event.getType() != EnumCreatureType.MONSTER || pillager == null
+        java.util.List<Biome.SpawnListEntry> spawns = RaiderSpawnConfiguration.outpostSpawns(event.getType());
+        if (outpost == null || spawns == null
                 || !outpost.isPositionInStructure(event.getWorld(), event.getPos())) return;
-        if (outpostSpawn == null || outpostSpawn.entityClass != pillager) {
-            outpostSpawn = new Biome.SpawnListEntry(pillager, 1, 1, 1);
-        }
         event.getList().clear();
-        event.getList().add(outpostSpawn);
+        event.getList().addAll(spawns);
     }
 
     @SubscribeEvent

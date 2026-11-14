@@ -6,6 +6,7 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -25,6 +26,7 @@ import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldSettings;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
@@ -42,10 +44,13 @@ import xy177.farmersfuturedelight.common.FFDConfig;
 import xy177.farmersfuturedelight.common.block.BlockSeaPickle;
 import xy177.farmersfuturedelight.api.WaterloggedBlockApi;
 import xy177.farmersfuturedelight.client.model.WaterloggedPlantBakedModel;
+import xy177.farmersfuturedelight.common.world.WorldTypeExtended;
+import xy177.farmersfuturedelight.common.world.modern.ModernGenerationSettings;
 
 public final class FFDClientHeightHooks {
     private static final Logger LOGGER = LogManager.getLogger("FFD Height Core");
     private static final Object SHADER_ALIAS_LOCK = new Object();
+    private static final AtomicBoolean MODERN_CONNECTION_PREPARED = new AtomicBoolean();
     private static LoadingScreenRenderer previousIntegratedWorldLoadingScreen;
     private static FFDLoadingScreenRenderer integratedWorldLoadingScreen;
     private static float previousTerrainFov = Float.NaN;
@@ -296,6 +301,28 @@ public final class FFDClientHeightHooks {
             }
         }
         return genericAlias;
+    }
+
+    public static void prepareIntegratedConnection(WorldSettings settings) {
+        if (settings == null) return;
+        if (settings.getTerrainType() instanceof WorldTypeExtended) {
+            String options = settings.getGeneratorOptions();
+            if (options == null || options.trim().isEmpty()) {
+                settings.setGeneratorOptions("{\"ffdGenerator\":\"" + ModernGenerationSettings.ENGINE + "\"}");
+            }
+            if (ModernGenerationSettings.read(settings.getGeneratorOptions()) == null) return;
+        }
+        if (!MODERN_CONNECTION_PREPARED.compareAndSet(false, true)) return;
+        Thread preparation = new Thread(() -> {
+            try {
+                Class.forName("io.netty.channel.DefaultChannelId", true,
+                        FFDClientHeightHooks.class.getClassLoader());
+            } catch (ClassNotFoundException | LinkageError | RuntimeException failure) {
+                LOGGER.debug("Integrated connection preparation deferred to connection setup", failure);
+            }
+        }, "FFD Connection Preparation");
+        preparation.setDaemon(true);
+        preparation.start();
     }
 
     public static void beginIntegratedWorldLoad(Minecraft minecraft) {

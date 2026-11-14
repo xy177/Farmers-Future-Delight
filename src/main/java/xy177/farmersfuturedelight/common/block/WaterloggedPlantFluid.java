@@ -86,6 +86,10 @@ public final class WaterloggedPlantFluid {
         }
     }
 
+    public static boolean hasRegisteredAdapters() {
+        return adapterSnapshot.length != 0;
+    }
+
     public static synchronized void unregisterAdapter(WaterloggedBlockApi.Adapter adapter) {
         if (ADAPTERS.remove(adapter)) {
             adapterSnapshot = ADAPTERS.toArray(new WaterloggedBlockApi.Adapter[0]);
@@ -660,7 +664,7 @@ public final class WaterloggedPlantFluid {
         IBlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
         Material material = state.getMaterial();
-        if (block instanceof BlockDoor || block == Blocks.STANDING_SIGN
+        if (block instanceof BlockDoor || block instanceof net.minecraft.block.BlockSign
                 || block == Blocks.LADDER || block == Blocks.REEDS) {
             return true;
         }

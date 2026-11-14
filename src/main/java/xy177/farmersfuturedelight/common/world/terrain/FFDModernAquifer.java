@@ -18,6 +18,7 @@ public final class FFDModernAquifer {
     };
 
     private final FFDModernWorldgenData data;
+    private final java.util.function.IntBinaryOperator surfaceSampler;
     private final FFDNoiseRouter router;
     private final FFDXoroshiroRandom.PositionalFactory randomFactory;
     private final FluidStatus[] statusCache;
@@ -38,7 +39,13 @@ public final class FFDModernAquifer {
     private boolean shouldScheduleFluidUpdate;
 
     public FFDModernAquifer(FFDModernWorldgenData data, int chunkX, int chunkZ) {
+        this(data, chunkX, chunkZ, data::preliminarySurfaceLevel);
+    }
+
+    public FFDModernAquifer(FFDModernWorldgenData data, int chunkX, int chunkZ,
+                            java.util.function.IntBinaryOperator surfaceSampler) {
         this.data = data;
+        this.surfaceSampler = surfaceSampler;
         router = data.router();
         randomFactory = data.positionalFactory("minecraft:aquifer");
         int minBlockX = chunkX << 4;
@@ -305,7 +312,7 @@ public final class FFDModernAquifer {
         long key = ((long) quantizedX << 32) ^ (quantizedZ & 0xFFFFFFFFL);
         Integer cached = preliminarySurfaceCache.get(key);
         if (cached == null) {
-            cached = data.preliminarySurfaceLevel(quantizedX, quantizedZ);
+            cached = surfaceSampler.applyAsInt(quantizedX, quantizedZ);
             preliminarySurfaceCache.put(key, cached);
         }
         return cached;

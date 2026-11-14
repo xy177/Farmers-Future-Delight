@@ -1,0 +1,68 @@
+{
+  "elements": [
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "farmers_future_delight:bastion/treasure/extensions/empty",
+        "processors": "farmers_future_delight:treasure_rooms",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "farmers_future_delight:bastion/treasure/extensions/fire_room",
+        "processors": "farmers_future_delight:treasure_rooms",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "farmers_future_delight:bastion/treasure/extensions/empty",
+        "processors": "farmers_future_delight:treasure_rooms",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "farmers_future_delight:bastion/treasure/extensions/small_bridge_0",
+        "processors": "farmers_future_delight:treasure_rooms",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "farmers_future_delight:bastion/treasure/extensions/small_bridge_1",
+        "processors": "farmers_future_delight:treasure_rooms",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "farmers_future_delight:bastion/treasure/extensions/small_bridge_2",
+        "processors": "farmers_future_delight:treasure_rooms",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "farmers_future_delight:bastion/treasure/extensions/small_bridge_3",
+        "processors": "farmers_future_delight:treasure_rooms",
+        "projection": "rigid"
+      },
+      "weight": 1
+    }
+  ],
+  "fallback": "minecraft:empty"
+}

@@ -83,8 +83,7 @@ public final class GuiSmithingTable extends GuiContainer {
     }
 
     private boolean hasRecipeError() {
-        return inventorySlots.getSlot(0).getHasStack() && inventorySlots.getSlot(1).getHasStack()
-                && inventorySlots.getSlot(2).getHasStack() && !inventorySlots.getSlot(3).getHasStack();
+        return ((ContainerSmithingTable) inventorySlots).hasRecipeError();
     }
 
     private void drawPreview() {

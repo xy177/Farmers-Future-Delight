@@ -10,8 +10,11 @@ import net.minecraft.advancements.Advancement;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.item.EntityBoat;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.Item;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemRecord;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.StatList;
@@ -30,8 +33,12 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.advancement.FFDAdvancements;
 import xy177.farmersfuturedelight.common.entity.EntityGoat;
+import xy177.farmersfuturedelight.common.registry.FFDBlocks;
+import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiome;
 import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiomeManager;
+import xy177.farmersfuturedelight.common.world.nether.NetherGeneration;
+import xy177.farmersfuturedelight.common.worldgen.FFDNetherStructures;
 
 @Mod.EventBusSubscriber(modid = FarmerFutureDelight.MODID)
 public final class FFDAdvancementEvents {
@@ -100,6 +107,10 @@ public final class FFDAdvancementEvents {
             FFDAdvancements.BRED_GOAT.trigger(player);
         } else if ("axolotl".equals(childPath)) {
             FFDAdvancements.BRED_AXOLOTL.trigger(player);
+        } else if ("hoglin".equals(childPath)) {
+            FFDAdvancements.BRED_HOGLIN.trigger(player);
+        } else if ("strider".equals(childPath)) {
+            FFDAdvancements.BRED_STRIDER.trigger(player);
         }
     }
 
@@ -117,6 +128,12 @@ public final class FFDAdvancementEvents {
             FFDAdvancements.KILL_PILLAGER.trigger(player);
         } else if ("ravager".equals(path)) {
             FFDAdvancements.KILL_RAVAGER.trigger(player);
+        } else if ("piglin".equals(path)) {
+            FFDAdvancements.KILL_PIGLIN.trigger(player);
+        } else if ("hoglin".equals(path)) {
+            FFDAdvancements.KILL_HOGLIN.trigger(player);
+        } else if ("zoglin".equals(path)) {
+            FFDAdvancements.KILL_ZOGLIN.trigger(player);
         }
     }
 
@@ -134,6 +151,17 @@ public final class FFDAdvancementEvents {
         }
     }
 
+    public static void containerLoot(net.minecraft.tileentity.TileEntityLockableLoot container,
+                                     EntityPlayer player) {
+        ResourceLocation table = container.getLootTable();
+        if (player instanceof EntityPlayerMP && !player.isSpectator() && table != null
+                && (FarmerFutureDelight.MODID.equals(table.getResourceDomain())
+                    || "minecraft".equals(table.getResourceDomain()))
+                && table.getResourcePath().startsWith("chests/bastion_")) {
+            FFDAdvancements.LOOT_BASTION.trigger((EntityPlayerMP) player);
+        }
+    }
+
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if (event.phase != TickEvent.Phase.END || event.player.world.isRemote
@@ -144,8 +172,12 @@ public final class FFDAdvancementEvents {
         checkGoatBoat(player);
         checkWorldHeightFall(player);
         checkWorldHeightTrade(player);
-        FFDAdvancements.triggerVerticalBiome(player,
-                FFDVerticalBiomeManager.getBiome(player.world, player.getPosition()));
+        FFDVerticalBiome vertical = FFDVerticalBiomeManager.getBiome(player.world, player.getPosition());
+        FFDAdvancements.triggerVerticalBiome(player, vertical);
+        if (player.ticksExisted % 20 == 0) {
+            checkInventoryAdvancements(player);
+            checkNetherAdvancements(player, vertical);
+        }
     }
 
     @SubscribeEvent
@@ -162,6 +194,63 @@ public final class FFDAdvancementEvents {
         UUID id = event.player.getUniqueID();
         FALLS.remove(id);
         VILLAGER_TRADES.remove(id);
+    }
+
+    private static void checkNetherAdvancements(EntityPlayerMP player, FFDVerticalBiome biome) {
+        if (player.world.provider.getDimension() != -1 || !NetherGeneration.isModern(player.world)) return;
+        if (biome == FFDVerticalBiome.NETHER_WASTES) FFDAdvancements.VISIT_NETHER_WASTES.trigger(player);
+        if (biome == FFDVerticalBiome.SOUL_SAND_VALLEY) FFDAdvancements.VISIT_SOUL_SAND_VALLEY.trigger(player);
+        if (biome == FFDVerticalBiome.CRIMSON_FOREST) FFDAdvancements.VISIT_CRIMSON_FOREST.trigger(player);
+        if (biome == FFDVerticalBiome.WARPED_FOREST) FFDAdvancements.VISIT_WARPED_FOREST.trigger(player);
+        if (biome == FFDVerticalBiome.BASALT_DELTAS) FFDAdvancements.VISIT_BASALT_DELTAS.trigger(player);
+        if (FFDAdvancements.FIND_BASTION.hasListeners(player)
+                && FFDNetherStructures.inside(player.world, player.getPosition())) {
+            FFDAdvancements.FIND_BASTION.trigger(player);
+        }
+    }
+
+    private static void checkInventoryAdvancements(EntityPlayerMP player) {
+        if (FFDAdvancements.OBTAIN_ANCIENT_DEBRIS.hasListeners(player)
+                && hasInventoryItem(player, FFDItems.ANCIENT_DEBRIS)) {
+            FFDAdvancements.OBTAIN_ANCIENT_DEBRIS.trigger(player);
+        }
+        if (FFDAdvancements.OBTAIN_CRYING_OBSIDIAN.hasListeners(player)
+                && hasInventoryItem(player, FFDItems.CRYING_OBSIDIAN)) {
+            FFDAdvancements.OBTAIN_CRYING_OBSIDIAN.trigger(player);
+        }
+        if (FFDAdvancements.NETHERITE_ARMOR.hasListeners(player) && hasNetheriteArmor(player)) {
+            FFDAdvancements.NETHERITE_ARMOR.trigger(player);
+        }
+        if (FFDAdvancements.OBTAIN_NETHERITE_HOE.hasListeners(player)
+                && hasInventoryItem(player, FFDItems.NETHERITE_HOE)) {
+            FFDAdvancements.OBTAIN_NETHERITE_HOE.trigger(player);
+        }
+        if (FFDAdvancements.OBTAIN_BLACKSTONE.hasListeners(player)
+                && hasInventoryItem(player, Item.getItemFromBlock(FFDBlocks.BLACKSTONE))) {
+            FFDAdvancements.OBTAIN_BLACKSTONE.trigger(player);
+        }
+    }
+
+    private static boolean hasInventoryItem(EntityPlayer player, Item item) {
+        ItemStack expected = FFDItems.effectiveStack(item);
+        if (expected.isEmpty()) return false;
+        for (ItemStack stack : player.inventory.mainInventory) {
+            if (!stack.isEmpty() && stack.getItem() == expected.getItem()) return true;
+        }
+        for (ItemStack stack : player.inventory.armorInventory) {
+            if (!stack.isEmpty() && stack.getItem() == expected.getItem()) return true;
+        }
+        return !player.getHeldItemOffhand().isEmpty()
+                && player.getHeldItemOffhand().getItem() == expected.getItem();
+    }
+
+    private static boolean hasNetheriteArmor(EntityPlayer player) {
+        Item[] required = new Item[] {FFDItems.NETHERITE_HELMET, FFDItems.NETHERITE_CHESTPLATE,
+                FFDItems.NETHERITE_LEGGINGS, FFDItems.NETHERITE_BOOTS};
+        for (Item requiredItem : required) {
+            if (!hasInventoryItem(player, requiredItem)) return false;
+        }
+        return true;
     }
 
     private static void checkGoatBoat(EntityPlayerMP player) {
@@ -226,6 +315,19 @@ public final class FFDAdvancementEvents {
     }
 
     private static void satisfyDisabledCompatibilityCriteria(EntityPlayerMP player) {
+        if (FFDConfig.hoglinMode == FFDConfig.FeatureMode.DISABLED) {
+            FFDAdvancements.BRED_HOGLIN.trigger(player);
+            grantDisabledMobCriterion(player, "hoglin");
+        }
+        if (FFDConfig.striderMode == FFDConfig.FeatureMode.DISABLED) {
+            FFDAdvancements.BRED_STRIDER.trigger(player);
+        }
+        if (FFDConfig.piglinMode == FFDConfig.FeatureMode.DISABLED) {
+            grantDisabledMobCriterion(player, "piglin");
+        }
+        if (FFDConfig.zoglinMode == FFDConfig.FeatureMode.DISABLED) {
+            grantDisabledMobCriterion(player, "zoglin");
+        }
         if (FFDConfig.catMode == FFDConfig.FeatureMode.DISABLED) {
             FFDAdvancements.BRED_CAT.trigger(player);
             FFDAdvancements.completeCatCatalogue(player);

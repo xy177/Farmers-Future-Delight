@@ -52,6 +52,10 @@ public final class FFDModernStructureItemFunction extends LootFunction {
                     enchantment = ForgeRegistries.ENCHANTMENTS.getValue(
                             new ResourceLocation(FarmerFutureDelight.MODID, id.getResourcePath()));
                 }
+                if(enchantment==null&&"soul_speed".equals(id.getResourcePath())) {
+                    for(Enchantment candidate:ForgeRegistries.ENCHANTMENTS.getValuesCollection())if(candidate.getRegistryName()!=null
+                            &&"soul_speed".equals(candidate.getRegistryName().getResourcePath())) {enchantment=candidate;break;}
+                }
                 if (enchantment != null && (stack.getItem() == Items.BOOK || enchantment.canApply(stack))) eligible.add(enchantment);
             }
             if (!eligible.isEmpty()) {

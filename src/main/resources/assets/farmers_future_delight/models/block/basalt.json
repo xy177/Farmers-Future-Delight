@@ -1,0 +1,7 @@
+{
+  "parent": "block/cube_column",
+  "textures": {
+    "end": "farmers_future_delight:blocks/basalt_top",
+    "side": "farmers_future_delight:blocks/basalt_side"
+  }
+}

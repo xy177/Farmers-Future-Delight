@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "hanging=false": {
+      "model": "farmers_future_delight:soul_lantern"
+    },
+    "hanging=true": {
+      "model": "farmers_future_delight:soul_lantern_hanging"
+    }
+  }
+}

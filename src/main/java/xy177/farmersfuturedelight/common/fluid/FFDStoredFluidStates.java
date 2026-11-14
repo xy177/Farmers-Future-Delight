@@ -35,6 +35,7 @@ public final class FFDStoredFluidStates {
     private static final Map<World, Set<Long>> DIRTY = new WeakHashMap<>();
     private static final Set<Block> RENDER_HOSTS =
             Collections.newSetFromMap(new ConcurrentHashMap<Block, Boolean>());
+    private static volatile boolean storedEntriesInitialized;
 
     private FFDStoredFluidStates() {}
 
@@ -43,7 +44,12 @@ public final class FFDStoredFluidStates {
     }
 
     @Nullable
-    public static synchronized IBlockState get(IBlockAccess access, BlockPos pos) {
+    public static IBlockState get(IBlockAccess access, BlockPos pos) {
+        return storedEntriesInitialized ? getStoredState(access, pos) : null;
+    }
+
+    @Nullable
+    private static synchronized IBlockState getStoredState(IBlockAccess access, BlockPos pos) {
         World world = FFDFluidloggedData.resolveWorld(access);
         if (world == null) return null;
         Map<Long, Map<Long, NBTTagCompound>> chunks = DATA.get(world);
@@ -102,6 +108,7 @@ public final class FFDStoredFluidStates {
     }
 
     public static synchronized void put(Chunk chunk, BlockPos pos, IBlockState fluid) {
+        storedEntriesInitialized = true;
         NBTTagCompound entry = new NBTTagCompound();
         entry.setLong("Pos", pos.toLong());
         Block host = chunk.getBlockState(pos).getBlock();
@@ -169,6 +176,7 @@ public final class FFDStoredFluidStates {
         Map<Long, NBTTagCompound> entries = replace ? new LinkedHashMap<>()
                 : chunks.getOrDefault(key(x, z), new LinkedHashMap<>());
         NBTTagList list = root.getTagList("Entries", Constants.NBT.TAG_COMPOUND);
+        if (list.tagCount() > 0) storedEntriesInitialized = true;
         for (int i = 0; i < list.tagCount(); i++) {
             NBTTagCompound entry = list.getCompoundTagAt(i);
             BlockPos pos = BlockPos.fromLong(entry.getLong("Pos"));

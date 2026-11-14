@@ -7,6 +7,7 @@ import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.gen.layer.IntCache;
 import net.minecraft.world.storage.WorldInfo;
 import xy177.farmersfuturedelight.common.world.terrain.FFDModernWorldgenData;
+import xy177.farmersfuturedelight.common.world.modern.ModernGenerationSettings;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -32,13 +33,21 @@ public final class FFDModernBiomeProvider extends BiomeProvider {
             };
 
     public FFDModernBiomeProvider(World world) {
+        this(new WorldInfo(world.getWorldInfo()), world.getSeed());
+    }
+
+    private FFDModernBiomeProvider(WorldInfo info, long seed) {
         super();
-        WorldInfo info = world.getWorldInfo();
         legacyProvider = new BiomeProvider(info);
-        worldgenData = new FFDModernWorldgenData(world.getSeed());
-        resolver = new FFDModernBiomeResolver(worldgenData, world.getSeed());
-        candidateSelector = new FFDBiomeCandidateSelector(world.getSeed());
-        zoomSeed = FFDVerticalBiomeZoomer.obfuscateSeed(world.getSeed());
+        worldgenData = new FFDModernWorldgenData(seed);
+        resolver = new FFDModernBiomeResolver(worldgenData, seed,
+                ModernGenerationSettings.read(info.getGeneratorOptions()) != null);
+        candidateSelector = new FFDBiomeCandidateSelector(seed);
+        zoomSeed = FFDVerticalBiomeZoomer.obfuscateSeed(seed);
+    }
+
+    public static FFDModernBiomeProvider snapshot(World world) {
+        return new FFDModernBiomeProvider(new WorldInfo(world.getWorldInfo()), world.getSeed());
     }
 
     public FFDModernWorldgenData worldgenData() {
@@ -261,6 +270,6 @@ public final class FFDModernBiomeProvider extends BiomeProvider {
     }
 
     private static long chunkKey(int chunkX, int chunkZ) {
-        return (chunkX & 0xFFFFFFFFL) | (long) chunkZ << 32;
+        return it.unimi.dsi.fastutil.HashCommon.mix((chunkX & 0xFFFFFFFFL) | (long) chunkZ << 32);
     }
 }

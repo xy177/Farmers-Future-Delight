@@ -116,6 +116,12 @@
         },
         "bred_axolotl": {
             "trigger": "farmers_future_delight:bred_axolotl"
+        },
+        "bred_hoglin": {
+            "trigger": "farmers_future_delight:bred_hoglin"
+        },
+        "bred_strider": {
+            "trigger": "farmers_future_delight:bred_strider"
         }
     }
 }

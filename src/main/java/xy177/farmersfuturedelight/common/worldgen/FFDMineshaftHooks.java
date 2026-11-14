@@ -27,6 +27,7 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.world.ChunkGeneratorExtended;
+import xy177.farmersfuturedelight.common.world.FFDWorldgenTerrain;
 import xy177.farmersfuturedelight.core.FFDHeightHooks;
 
 public final class FFDMineshaftHooks {
@@ -48,6 +49,13 @@ public final class FFDMineshaftHooks {
                                                    java.util.Random random,
                                                    net.minecraft.world.gen.structure.MapGenMineshaft.Type type,
                                                    ChunkGeneratorExtended extendedGenerator) {
+        adjustModernMineshaftHeight(start, world, random, type, (FFDWorldgenTerrain) extendedGenerator);
+    }
+
+    public static void adjustModernMineshaftHeight(StructureMineshaftStart start, World world,
+                                                   java.util.Random random,
+                                                   net.minecraft.world.gen.structure.MapGenMineshaft.Type type,
+                                                   FFDWorldgenTerrain extendedGenerator) {
         if (start == null || world == null || random == null || !FFDHeightHooks.isExtended(world)) {
             return;
         }

@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
+import net.minecraft.client.gui.advancements.GuiScreenAdvancements;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -60,7 +61,8 @@ public final class FFDModernMenus {
     }
 
     public static boolean supported(GuiScreen screen) {
-        if (screen == null || screen instanceof net.minecraft.client.gui.inventory.GuiContainer) return false;
+        if (screen == null || screen instanceof net.minecraft.client.gui.inventory.GuiContainer
+                || screen instanceof GuiScreenAdvancements) return false;
         String name = screen.getClass().getName();
         return name.startsWith("net.minecraft.client.gui.") && !EXCLUDED.contains(screen.getClass().getSimpleName())
                 || name.equals("xy177.farmersfuturedelight.client.gui.FFDGuiAccessibility")

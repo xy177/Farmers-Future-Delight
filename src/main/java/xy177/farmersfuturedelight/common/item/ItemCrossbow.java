@@ -23,7 +23,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import xy177.farmersfuturedelight.common.entity.EntityCrossbowArrow;
+import xy177.farmersfuturedelight.core.FFDCrossbowArrowHooks;
 import xy177.farmersfuturedelight.common.registry.FFDEnchantments;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
 
@@ -258,7 +258,8 @@ public class ItemCrossbow extends Item {
             float spread = projectiles.tagCount() == 3
                     ? index == 0 ? 0.0F : index == 1 ? -10.0F : 10.0F : 0.0F;
             Vec3d direction = shooter instanceof xy177.farmersfuturedelight.common.entity.EntityPillager
-                    ? getPillagerShotDirection((xy177.farmersfuturedelight.common.entity.EntityPillager) shooter,
+                    || shooter instanceof xy177.farmersfuturedelight.common.entity.EntityPiglin
+                    ? getPillagerShotDirection((net.minecraft.entity.EntityLiving) shooter,
                             spread, projectile.getItem() == Items.FIREWORKS)
                     : getShotDirection(shooter, spread);
             if (projectile.getItem() == Items.FIREWORKS) {
@@ -286,14 +287,11 @@ public class ItemCrossbow extends Item {
     private void shootArrow(World world, EntityLivingBase shooter, ItemStack projectile,
                             ItemStack crossbow, float power, Vec3d direction,
                             boolean multishotSideArrow, boolean intangible) {
-        EntityArrow arrow = projectile.getItem() == Items.ARROW
-                || projectile.getItem() == Items.TIPPED_ARROW
-                || projectile.getItem() == Items.SPECTRAL_ARROW
-                ? new EntityCrossbowArrow(world, shooter, projectile, FFDEnchantments.getPiercing(crossbow))
-                : ((ItemArrow) projectile.getItem()).createArrow(world, projectile, shooter);
+        EntityArrow arrow = ((ItemArrow) projectile.getItem()).createArrow(world, projectile, shooter);
         if (arrow == null) {
             return;
         }
+        FFDCrossbowArrowHooks.configure(arrow, FFDEnchantments.getPiercing(crossbow));
         arrow.setDamage(2.0D);
         arrow.setIsCritical(shooter instanceof EntityPlayer);
         float uncertainty = shooter instanceof xy177.farmersfuturedelight.common.entity.EntityPillager
@@ -352,7 +350,7 @@ public class ItemCrossbow extends Item {
     }
 
     private static Vec3d getPillagerShotDirection(
-            xy177.farmersfuturedelight.common.entity.EntityPillager shooter,
+            net.minecraft.entity.EntityLiving shooter,
             float angleDegrees, boolean firework) {
         EntityLivingBase target = shooter.getAttackTarget();
         if (target == null) {

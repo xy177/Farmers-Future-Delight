@@ -1,0 +1,7 @@
+{
+  "parent": "block/block",
+  "textures": {
+    "particle": "farmers_future_delight:block/crimson_planks"
+  },
+  "elements": []
+}

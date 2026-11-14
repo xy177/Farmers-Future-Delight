@@ -273,6 +273,8 @@ public final class FFDRegistryEvents {
             blocks.add(FFDBlocks.CRIMSON_TRAPDOOR_WATERLOGGED);
             blocks.add(FFDBlocks.CRIMSON_BUTTON);
             blocks.add(FFDBlocks.CRIMSON_PRESSURE_PLATE);
+            blocks.add(FFDBlocks.CRIMSON_SIGN);
+            blocks.add(FFDBlocks.CRIMSON_WALL_SIGN);
         }
         if (FFDItems.isWarpedWoodEnabled()) {
             blocks.add(FFDBlocks.WARPED_STEM);
@@ -291,6 +293,8 @@ public final class FFDRegistryEvents {
             blocks.add(FFDBlocks.WARPED_TRAPDOOR_WATERLOGGED);
             blocks.add(FFDBlocks.WARPED_BUTTON);
             blocks.add(FFDBlocks.WARPED_PRESSURE_PLATE);
+            blocks.add(FFDBlocks.WARPED_SIGN);
+            blocks.add(FFDBlocks.WARPED_WALL_SIGN);
         }
         if (FFDItems.isCrimsonWoodEnabled() || FFDItems.isWarpedWoodEnabled()) {
             blocks.add(FFDBlocks.SHROOMLIGHT);
@@ -302,6 +306,8 @@ public final class FFDRegistryEvents {
         }
         blocks.add(FFDBlocks.BARREL);
         blocks.add(FFDBlocks.CAMPFIRE);
+        Collections.addAll(blocks, FFDBlocks.SOUL_SOIL, FFDBlocks.SOUL_FIRE,
+                FFDBlocks.SOUL_TORCH, FFDBlocks.SOUL_LANTERN, FFDBlocks.SOUL_CAMPFIRE);
         blocks.add(FFDBlocks.SMOKER);
         blocks.add(FFDBlocks.BLAST_FURNACE);
         blocks.add(FFDBlocks.COMPOSTER);
@@ -324,6 +330,9 @@ public final class FFDRegistryEvents {
         if (FFDItems.isCryingObsidianEnabled()) {
             blocks.add(FFDBlocks.CRYING_OBSIDIAN);
         }
+        Collections.addAll(blocks, FFDBlocks.CHISELED_NETHER_BRICKS, FFDBlocks.CRACKED_NETHER_BRICKS);
+        Collections.addAll(blocks, FFDBlocks.TARGET, FFDBlocks.LODESTONE, FFDBlocks.RESPAWN_ANCHOR);
+        Collections.addAll(blocks,FFDBlocks.BASALT,FFDBlocks.POLISHED_BASALT,FFDBlocks.NETHER_GOLD_ORE);
         blocks.removeIf(block -> !FFDItems.shouldRegisterBlock(block));
         event.getRegistry().registerAll(blocks.toArray(new net.minecraft.block.Block[0]));
         WaterloggedBlockApi.prepareUniversalStateCarriers(event.getRegistry());
@@ -579,6 +588,41 @@ public final class FFDRegistryEvents {
                     xy177.farmersfuturedelight.common.entity.EntityTraderLlama.class,
                     net.minecraft.entity.EntityLiving.SpawnPlacementType.ON_GROUND);
         }
+        if (FFDEntities.isLocalPiglinEnabled()) {
+            entities.add(entity(FFDEntities.PIGLIN_ID, xy177.farmersfuturedelight.common.entity.EntityPiglin.class,
+                    "piglin", 25, 80, 3, 0x995F40, 0xF9F3A4));
+            net.minecraft.entity.EntitySpawnPlacementRegistry.setPlacementType(
+                    xy177.farmersfuturedelight.common.entity.EntityPiglin.class,
+                    net.minecraft.entity.EntityLiving.SpawnPlacementType.ON_GROUND);
+        }
+        if (FFDEntities.isLocalPiglinBruteEnabled()) {
+            entities.add(entity(FFDEntities.PIGLIN_BRUTE_ID, xy177.farmersfuturedelight.common.entity.EntityPiglinBrute.class,
+                    "piglin_brute", 26, 80, 3, 0x592A10, 0xF9F3A4));
+        }
+        if (FFDEntities.isLocalStriderEnabled()) {
+            entities.add(entity(FFDEntities.STRIDER_ID,
+                    xy177.farmersfuturedelight.common.entity.EntityStrider.class,
+                    "strider", 24, 100, 3, 0x9C3436, 0x4D494D));
+            net.minecraft.entity.EntitySpawnPlacementRegistry.setPlacementType(
+                    xy177.farmersfuturedelight.common.entity.EntityStrider.class,
+                    xy177.farmersfuturedelight.common.world.nether.NetherSpawns.lavaPlacement());
+        }
+        if (FFDEntities.isLocalHoglinEnabled()) {
+            entities.add(entity(FFDEntities.HOGLIN_ID,
+                    xy177.farmersfuturedelight.common.entity.EntityHoglin.class,
+                    "hoglin", 22, 80, 3, 0xC66E55, 0x5F6464));
+            net.minecraft.entity.EntitySpawnPlacementRegistry.setPlacementType(
+                    xy177.farmersfuturedelight.common.entity.EntityHoglin.class,
+                    net.minecraft.entity.EntityLiving.SpawnPlacementType.ON_GROUND);
+        }
+        if (FFDEntities.isLocalZoglinEnabled()) {
+            entities.add(entity(FFDEntities.ZOGLIN_ID,
+                    xy177.farmersfuturedelight.common.entity.EntityZoglin.class,
+                    "zoglin", 23, 80, 3, 0xC66E55, 0xE6E6E6));
+            net.minecraft.entity.EntitySpawnPlacementRegistry.setPlacementType(
+                    xy177.farmersfuturedelight.common.entity.EntityZoglin.class,
+                    net.minecraft.entity.EntityLiving.SpawnPlacementType.ON_GROUND);
+        }
         if (FFDEntities.isLocalTridentProjectileEnabled()) {
             entities.add(entity(FFDEntities.TRIDENT_ID,
                     xy177.farmersfuturedelight.common.entity.EntityTrident.class,
@@ -755,6 +799,7 @@ public final class FFDRegistryEvents {
         Collections.addAll(items, FFDItems.WHITE_DYE, FFDItems.BLACK_DYE,
                 FFDItems.BLUE_DYE, FFDItems.BROWN_DYE);
         items.add(FFDItems.SUSPICIOUS_STEW);
+        items.add(FFDItems.WARPED_FUNGUS_ON_A_STICK);
         items.add(FFDItems.LEATHER_HORSE_ARMOR);
         if (FFDItems.isBambooEnabled()) {
             items.add(FFDItems.BAMBOO);
@@ -978,6 +1023,7 @@ public final class FFDRegistryEvents {
             items.add(FFDItems.CRIMSON_TRAPDOOR);
             items.add(FFDItems.CRIMSON_BUTTON);
             items.add(FFDItems.CRIMSON_PRESSURE_PLATE);
+            items.add(FFDItems.CRIMSON_SIGN);
         }
         if (FFDItems.isWarpedWoodEnabled()) {
             items.add(FFDItems.WARPED_STEM);
@@ -994,6 +1040,7 @@ public final class FFDRegistryEvents {
             items.add(FFDItems.WARPED_TRAPDOOR);
             items.add(FFDItems.WARPED_BUTTON);
             items.add(FFDItems.WARPED_PRESSURE_PLATE);
+            items.add(FFDItems.WARPED_SIGN);
         }
         if (FFDItems.isCrimsonWoodEnabled() || FFDItems.isWarpedWoodEnabled()) {
             items.add(FFDItems.SHROOMLIGHT);
@@ -1006,6 +1053,8 @@ public final class FFDRegistryEvents {
         }
         items.add(FFDItems.BARREL);
         items.add(FFDItems.CAMPFIRE);
+        Collections.addAll(items, FFDItems.SOUL_SOIL, FFDItems.SOUL_TORCH,
+                FFDItems.SOUL_LANTERN, FFDItems.SOUL_CAMPFIRE);
         items.add(FFDItems.SMOKER);
         items.add(FFDItems.BLAST_FURNACE);
         items.add(FFDItems.COMPOSTER);
@@ -1023,6 +1072,7 @@ public final class FFDRegistryEvents {
         items.add(FFDItems.SKULL_BANNER_PATTERN);
         items.add(FFDItems.MOJANG_BANNER_PATTERN);
         items.add(FFDItems.GLOBE_BANNER_PATTERN);
+        items.add(FFDItems.PIGLIN_BANNER_PATTERN);
         items.add(FFDItems.FIELD_MASONED_BANNER_PATTERN);
         items.add(FFDItems.BORDURE_INDENTED_BANNER_PATTERN);
         java.util.Collections.addAll(items, FFDItems.STONE_DECOR_ITEMS);
@@ -1035,9 +1085,18 @@ public final class FFDRegistryEvents {
         if (FFDItems.isCryingObsidianEnabled()) {
             items.add(FFDItems.CRYING_OBSIDIAN);
         }
+        Collections.addAll(items,FFDItems.BASALT,FFDItems.POLISHED_BASALT,FFDItems.NETHER_GOLD_ORE);
+        Collections.addAll(items, FFDItems.CHISELED_NETHER_BRICKS, FFDItems.CRACKED_NETHER_BRICKS,
+                FFDItems.MUSIC_DISC_PIGSTEP);
+        Collections.addAll(items, FFDItems.TARGET, FFDItems.LODESTONE, FFDItems.RESPAWN_ANCHOR);
         items.removeIf(item -> !FFDItems.shouldRegisterItem(item));
         event.getRegistry().registerAll(items.toArray(new net.minecraft.item.Item[0]));
         FFDDeepslateOreCompat.registerOreDictionary();
+        registerOre("stoneBasalt",FFDItems.BASALT);
+        registerOre("stoneBasalt",FFDItems.POLISHED_BASALT);
+        registerOre("oreGold",FFDItems.NETHER_GOLD_ORE);
+        registerOre("oreNetherGold",FFDItems.NETHER_GOLD_ORE);
+        registerOre("oreNetherrackGold",FFDItems.NETHER_GOLD_ORE);
         if (FFDItems.isNetheriteEnabled()) {
             registerOre("ingotNetherite", FFDItems.NETHERITE_INGOT);
             registerOre("scrapNetherite", FFDItems.NETHERITE_SCRAP);
@@ -1255,6 +1314,12 @@ public final class FFDRegistryEvents {
         FFDCompat.registerHoneycombCompatibility();
         FFDCompat.registerGlowInkCompatibility();
         List<IRecipe> recipes = new ArrayList<>();
+        ItemStack warpedFungus = FFDItems.effectiveStack(FFDItems.WARPED_FUNGUS);
+        if (FFDItems.isItemRegistered(FFDItems.WARPED_FUNGUS_ON_A_STICK) && !warpedFungus.isEmpty()) {
+            recipes.add(new ShapedOreRecipe(null, new ItemStack(FFDItems.WARPED_FUNGUS_ON_A_STICK),
+                    "# ", " X", '#', new ItemStack(Items.FISHING_ROD, 1, net.minecraftforge.oredict.OreDictionary.WILDCARD_VALUE), 'X', warpedFungus)
+                    .setRegistryName(FarmerFutureDelight.MODID, "warped_fungus_on_a_stick"));
+        }
         recipes.add(new ShapedOreRecipe(null, new ItemStack(Items.NAME_TAG),
                 " X", "# ", '#', Items.PAPER, 'X', new FFDMetalNuggetIngredient())
                 .setRegistryName(FarmerFutureDelight.MODID, "name_tag"));
@@ -1295,6 +1360,10 @@ public final class FFDRegistryEvents {
                         new ItemStack(FFDItems.NETHERITE_BLOCK),
                         "###", "###", "###", '#', "ingotNetherite")
                         .setRegistryName(FarmerFutureDelight.MODID, "netherite_block"));
+                recipes.add(new ShapelessOreRecipe(netheriteGroup,
+                        new ItemStack(FFDItems.NETHERITE_INGOT, 9), FFDItems.NETHERITE_BLOCK)
+                        .setRegistryName(FarmerFutureDelight.MODID,
+                                "netherite_ingot_from_netherite_block"));
             }
         }
         ItemStack bamboo = FFDItems.effectiveStack(FFDItems.BAMBOO);
@@ -1384,6 +1453,28 @@ public final class FFDRegistryEvents {
                     new ItemStack(Items.COAL, 1, 1)))
                     .setRegistryName(FarmerFutureDelight.MODID, "campfire"));
         }
+        List<ItemStack> soulBases = new ArrayList<>();
+        soulBases.add(new ItemStack(Blocks.SOUL_SAND));
+        ItemStack soulSoil = FFDItems.effectiveStack(FFDItems.SOUL_SOIL);
+        if (!soulSoil.isEmpty()) soulBases.add(soulSoil);
+        Ingredient soulBase = Ingredient.fromStacks(soulBases.toArray(new ItemStack[0]));
+        if (FFDItems.isItemRegistered(FFDItems.SOUL_TORCH)) {
+            recipes.add(new ShapedOreRecipe(null, new ItemStack(FFDItems.SOUL_TORCH, 4),
+                    "C", "S", "B", 'C', Ingredient.fromStacks(new ItemStack(Items.COAL, 1, 0),
+                    new ItemStack(Items.COAL, 1, 1)), 'S', "stickWood", 'B', soulBase)
+                    .setRegistryName(FarmerFutureDelight.MODID, "soul_torch"));
+        }
+        ItemStack soulTorch = FFDItems.effectiveStack(FFDItems.SOUL_TORCH);
+        if (FFDItems.isItemRegistered(FFDItems.SOUL_LANTERN) && !soulTorch.isEmpty()) {
+            recipes.add(new ShapedOreRecipe(null, new ItemStack(FFDItems.SOUL_LANTERN),
+                    "NNN", "NTN", "NNN", 'N', "nuggetIron", 'T', soulTorch)
+                    .setRegistryName(FarmerFutureDelight.MODID, "soul_lantern"));
+        }
+        if (FFDItems.isItemRegistered(FFDItems.SOUL_CAMPFIRE)) {
+            recipes.add(new ShapedOreRecipe(null, new ItemStack(FFDItems.SOUL_CAMPFIRE),
+                    " S ", "SBS", "LLL", 'S', "stickWood", 'L', "logWood", 'B', soulBase)
+                    .setRegistryName(FarmerFutureDelight.MODID, "soul_campfire"));
+        }
         if (FFDItems.isItemRegistered(FFDItems.SMOKER)) {
             recipes.add(new ShapedOreRecipe(null, new ItemStack(FFDItems.SMOKER),
                     " L ", "LFL", " L ", 'L', "logWood", 'F', net.minecraft.init.Blocks.FURNACE)
@@ -1397,7 +1488,8 @@ public final class FFDRegistryEvents {
         }
         if (FFDItems.isItemRegistered(FFDItems.STONECUTTER)) {
             recipes.add(new ShapedOreRecipe(null, new ItemStack(FFDItems.STONECUTTER),
-                    " I ", "SSS", 'I', Items.IRON_INGOT, 'S', net.minecraft.init.Blocks.STONE)
+                    " I ", "SSS", 'I', Items.IRON_INGOT,
+                    'S', new ItemStack(Blocks.STONE, 1, 0))
                     .setRegistryName(FarmerFutureDelight.MODID, "stonecutter"));
         }
         if (FFDItems.isItemRegistered(FFDItems.GRINDSTONE)) {
@@ -1460,8 +1552,31 @@ public final class FFDRegistryEvents {
             addBlackstoneRecipes(recipes);
             addBlackstoneVanillaRecipes(recipes);
         }
+        if (FFDConfig.basaltMode != FFDConfig.FeatureMode.DISABLED) {
+            addTwoByTwoRecipe(recipes,new ResourceLocation(FarmerFutureDelight.MODID,"basalt"),"polished_basalt",FFDItems.BASALT,FFDItems.POLISHED_BASALT);
+        }
         if (FFDItems.isQuartzBricksEnabled()) {
             addQuartzBricksRecipes(recipes);
+        }
+        if (FFDItems.isItemRegistered(FFDItems.CHISELED_NETHER_BRICKS)) {
+            recipes.add(new ShapedOreRecipe(new ResourceLocation(FarmerFutureDelight.MODID, "nether_bricks"),
+                    new ItemStack(FFDItems.CHISELED_NETHER_BRICKS), "#", "#",
+                    '#', new ItemStack(Blocks.STONE_SLAB, 1, 6))
+                    .setRegistryName(FarmerFutureDelight.MODID, "chiseled_nether_bricks"));
+        }
+        if (FFDItems.isItemRegistered(FFDItems.TARGET)) {
+            recipes.add(new ShapedOreRecipe(null, new ItemStack(FFDItems.TARGET), " R ", "RHR", " R ",
+                    'R', "dustRedstone", 'H', Blocks.HAY_BLOCK).setRegistryName(FarmerFutureDelight.MODID, "target"));
+        }
+        if (FFDItems.isItemRegistered(FFDItems.LODESTONE)) {
+            recipes.add(new ShapedOreRecipe(null, new ItemStack(FFDItems.LODESTONE), "SSS", "SIS", "SSS",
+                    'S', new ItemStack(Blocks.STONEBRICK, 1, 3), 'I', "ingotIron")
+                    .setRegistryName(FarmerFutureDelight.MODID, "lodestone"));
+        }
+        ItemStack cryingObsidian = FFDItems.effectiveStack(FFDItems.CRYING_OBSIDIAN);
+        if (FFDItems.isItemRegistered(FFDItems.RESPAWN_ANCHOR) && !cryingObsidian.isEmpty()) {
+            recipes.add(new ShapedOreRecipe(null, new ItemStack(FFDItems.RESPAWN_ANCHOR), "OOO", "GGG", "OOO",
+                    'O', cryingObsidian, 'G', Blocks.GLOWSTONE).setRegistryName(FarmerFutureDelight.MODID, "respawn_anchor"));
         }
         if (FFDItems.isDeepslateEnabled()) {
             addDeepslateRecipes(recipes);
@@ -1568,8 +1683,7 @@ public final class FFDRegistryEvents {
     private static void addBannerPatternRecipe(List<IRecipe> recipes, net.minecraft.item.Item output,
                                               String name, ItemStack ingredient) {
         if (FFDItems.isItemRegistered(output)) {
-            recipes.add(new ShapedOreRecipe(null, new ItemStack(output), "P", "I",
-                    'P', Items.PAPER, 'I', ingredient)
+            recipes.add(new ShapelessOreRecipe(null, new ItemStack(output), Items.PAPER, ingredient)
                     .setRegistryName(FarmerFutureDelight.MODID, name));
         }
     }
@@ -2179,6 +2293,12 @@ public final class FFDRegistryEvents {
                 .setRegistryName(FarmerFutureDelight.MODID, prefix + "_sticks"));
         addWoodShapeRecipes(recipes, group, prefix, plankStack, stairs, slab, fence,
                 fenceGate, door, trapdoor, button, pressurePlate);
+        net.minecraft.item.Item sign = "crimson".equals(prefix) ? FFDItems.CRIMSON_SIGN : FFDItems.WARPED_SIGN;
+        if (FFDItems.isItemRegistered(sign)) {
+            recipes.add(new ShapedOreRecipe(group, new ItemStack(sign, 3),
+                    "PPP", "PPP", " S ", 'P', plankStack, 'S', Items.STICK)
+                    .setRegistryName(FarmerFutureDelight.MODID, prefix + "_sign"));
+        }
     }
 
     private static void addShapelessConversion(List<IRecipe> recipes, ResourceLocation group,

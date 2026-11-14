@@ -1,0 +1,124 @@
+[
+  {
+    "version": "26.3",
+    "officialMetadata": "https://piston-meta.mojang.com/v1/packages/61fff1316bd50312624a858bbb5eb18fa45208ed/26.3.json",
+    "clientSha1": "e877b6a07acd633fb3bb475002175cec036e7b87",
+    "resources": {
+      "assets/minecraft/textures/gui/menu_background.png": {
+        "target": "assets/farmers_future_delight/textures/gui/menu_background.png",
+        "sha1": "1961d14137773378fbe21698eab707937ba64b87",
+        "sourceKind": "clientJar",
+        "size": [
+          16,
+          16
+        ]
+      },
+      "assets/minecraft/textures/gui/menu_list_background.png": {
+        "target": "assets/farmers_future_delight/textures/gui/menu_list_background.png",
+        "sha1": "0f11ce6b251af82888ddbd87057e4ad1bfdb9752",
+        "sourceKind": "clientJar",
+        "size": [
+          16,
+          16
+        ]
+      },
+      "assets/minecraft/textures/gui/inworld_menu_background.png": {
+        "target": "assets/farmers_future_delight/textures/gui/inworld_menu_background.png",
+        "sha1": "1961d14137773378fbe21698eab707937ba64b87",
+        "sourceKind": "clientJar",
+        "size": [
+          16,
+          16
+        ]
+      },
+      "assets/minecraft/textures/gui/inworld_menu_list_background.png": {
+        "target": "assets/farmers_future_delight/textures/gui/inworld_menu_list_background.png",
+        "sha1": "0f11ce6b251af82888ddbd87057e4ad1bfdb9752",
+        "sourceKind": "clientJar",
+        "size": [
+          16,
+          16
+        ]
+      },
+      "assets/minecraft/textures/gui/header_separator.png": {
+        "target": "assets/farmers_future_delight/textures/gui/header_separator.png",
+        "sha1": "acd9ec13a930b2ca9bc69debad8c48ba9a85a4c3",
+        "sourceKind": "clientJar",
+        "size": [
+          32,
+          2
+        ]
+      },
+      "assets/minecraft/textures/gui/footer_separator.png": {
+        "target": "assets/farmers_future_delight/textures/gui/footer_separator.png",
+        "sha1": "10d7b7a46b1afe490debd217a5b8eeb46e66dbb2",
+        "sourceKind": "clientJar",
+        "size": [
+          32,
+          2
+        ]
+      },
+      "assets/minecraft/textures/gui/inworld_header_separator.png": {
+        "target": "assets/farmers_future_delight/textures/gui/inworld_header_separator.png",
+        "sha1": "acd9ec13a930b2ca9bc69debad8c48ba9a85a4c3",
+        "sourceKind": "clientJar",
+        "size": [
+          32,
+          2
+        ]
+      },
+      "assets/minecraft/textures/gui/inworld_footer_separator.png": {
+        "target": "assets/farmers_future_delight/textures/gui/inworld_footer_separator.png",
+        "sha1": "10d7b7a46b1afe490debd217a5b8eeb46e66dbb2",
+        "sourceKind": "clientJar",
+        "size": [
+          32,
+          2
+        ]
+      },
+      "assets/minecraft/textures/gui/tab_header_background.png": {
+        "target": "assets/farmers_future_delight/textures/gui/tab_header_background.png",
+        "sha1": "98e9996971bfd30fcf88186e6aba2ddc0ff28d9f",
+        "sourceKind": "clientJar",
+        "size": [
+          16,
+          16
+        ]
+      },
+      "assets/minecraft/textures/misc/credits_vignette.png": {
+        "target": "assets/farmers_future_delight/textures/misc/credits_vignette.png",
+        "sha1": "8cff97b4edd92334e3f4be13524a9d3584e8f62d",
+        "sourceKind": "clientJar",
+        "size": [
+          256,
+          256
+        ]
+      },
+      "assets/minecraft/textures/environment/end_sky.png": {
+        "target": "assets/farmers_future_delight/textures/environment/end_sky.png",
+        "sha1": "b9da532dd98befc1a7cbd6420c17532239485788",
+        "sourceKind": "clientJar",
+        "size": [
+          128,
+          128
+        ]
+      },
+      "assets/minecraft/textures/entity/end_portal/end_portal.png": {
+        "target": "assets/farmers_future_delight/textures/entity/end_portal/end_portal.png",
+        "sha1": "04099306b075ead427f5c95d8a8d896715c5bde6",
+        "sourceKind": "clientJar",
+        "size": [
+          256,
+          256
+        ]
+      }
+    },
+    "assetIndex": {
+      "id": "34",
+      "sha1": "0c8f43b28f837869c1e54a6aeb22c396a1548946",
+      "size": 597035,
+      "totalSize": 484894038,
+      "url": "https://piston-meta.mojang.com/v1/packages/0c8f43b28f837869c1e54a6aeb22c396a1548946/34.json"
+    }
+  }
+]

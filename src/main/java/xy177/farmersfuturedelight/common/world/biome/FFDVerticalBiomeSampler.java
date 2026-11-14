@@ -3,6 +3,8 @@ package xy177.farmersfuturedelight.common.world.biome;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import xy177.farmersfuturedelight.api.biome.VerticalBiomeDefinition;
+import xy177.farmersfuturedelight.api.biome.VerticalBiomeSample;
 import xy177.farmersfuturedelight.common.world.terrain.FFDModernWorldgenData;
 import xy177.farmersfuturedelight.common.world.terrain.FFDNoiseRouter;
 
@@ -28,12 +30,6 @@ public final class FFDVerticalBiomeSampler {
     private static final double HIGH_END = 0.56666666D;
     private static final double PEAK_END = 0.7666667D;
     private static final double OUTER_HIGH_END = 0.93333334D;
-
-    private static final double UNDERGROUND_DEPTH_MIN = 0.2D;
-    private static final double UNDERGROUND_DEPTH_MAX = 0.9D;
-    private static final double LUSH_HUMIDITY_MIN = 0.7D;
-    private static final double DRIPSTONE_CONTINENTALNESS_MIN = 0.8D;
-    private static final int CAVE_SURFACE_BUFFER = 12;
 
     private final FFDNoiseRouter router;
     private final FFDModernWorldgenData worldgenData;
@@ -76,7 +72,7 @@ public final class FFDVerticalBiomeSampler {
     }
 
     private FFDVerticalBiomeData generateChunk(int chunkX, int chunkZ) {
-        byte[] sampled = new byte[FFDVerticalBiomeData.ENTRY_COUNT];
+        int[] sampled = new int[FFDVerticalBiomeData.ENTRY_COUNT];
         int startX = chunkX << 4;
         int startZ = chunkZ << 4;
         for (int cellX = 0; cellX < FFDVerticalBiomeData.CELLS_X; cellX++) {
@@ -101,15 +97,32 @@ public final class FFDVerticalBiomeSampler {
 
     private FFDVerticalBiome sampleAtBlock(int blockX, int blockY, int blockZ,
                                            ColumnClimate climate) {
-        if (blockY <= climate.surfaceY - CAVE_SURFACE_BUFFER) {
-            double depth = quantize(sampleDepth(blockX, blockY, blockZ));
-            FFDVerticalBiome underground = sampleUndergroundBiome(
-                    climate.humidity, climate.continentalness, depth);
-            if (underground != FFDVerticalBiome.NONE) {
-                return underground;
+        if (blockY < FFDModernWorldgenData.MIN_Y
+                || blockY >= FFDModernWorldgenData.MIN_Y + FFDModernWorldgenData.HEIGHT) {
+            return FFDVerticalBiome.NONE;
+        }
+        climate.blockY = blockY;
+        climate.depthSampled = false;
+        FFDVerticalBiome selected = climate.surfaceBiome;
+        double bestFitness = Double.POSITIVE_INFINITY;
+        int priority = Integer.MIN_VALUE;
+        for (FFDVerticalBiome biome : FFDVerticalBiome.samplingEntries()) {
+            VerticalBiomeDefinition definition = biome.definition();
+            if (definition.getCategory() == VerticalBiomeDefinition.Category.NETHER) continue;
+            double fitness = definition.getSelectionRule().applyAsDouble(climate);
+            if (!Double.isFinite(fitness) || fitness < 0.0D) {
+                continue;
+            }
+            double depth = climate.getDepth();
+            double surfaceFitness = Math.min(square(depth), square(depth - 1.0D));
+            if (fitness < surfaceFitness && (definition.getPriority() > priority
+                    || definition.getPriority() == priority && fitness < bestFitness)) {
+                bestFitness = fitness;
+                priority = definition.getPriority();
+                selected = biome;
             }
         }
-        return climate.surfaceBiome;
+        return selected;
     }
 
     private ColumnClimate sampleColumnClimate(int blockX, int blockZ) {
@@ -118,40 +131,14 @@ public final class FFDVerticalBiomeSampler {
         double continentalness = quantize(router.continents.sample(blockX, 0, blockZ));
         double erosion = quantize(router.erosion.sample(blockX, 0, blockZ));
         double weirdness = quantize(router.ridges.sample(blockX, 0, blockZ));
-        return new ColumnClimate(humidity, continentalness,
+        return new ColumnClimate(blockX, blockZ, temperature, humidity,
+                continentalness, erosion, weirdness,
                 worldgenData.preliminarySurfaceLevel(blockX, blockZ),
                 sampleSurfaceBiome(temperature, humidity, continentalness, erosion, weirdness));
     }
 
     private static long chunkKey(int chunkX, int chunkZ) {
         return chunkX & 0xFFFFFFFFL | (long) chunkZ << 32;
-    }
-
-    private static FFDVerticalBiome sampleUndergroundBiome(double humidity,
-                                                            double continentalness,
-                                                            double depth) {
-        double surfaceFitness = Math.min(square(depth), square(depth - 1.0D));
-        double depthDistance = distance(depth, UNDERGROUND_DEPTH_MIN,
-                UNDERGROUND_DEPTH_MAX);
-        double undergroundFitness = square(depthDistance);
-        if (undergroundFitness >= surfaceFitness) {
-            return FFDVerticalBiome.NONE;
-        }
-
-        double dripstoneFitness = undergroundFitness
-                + square(distance(continentalness, DRIPSTONE_CONTINENTALNESS_MIN, 1.0D));
-        double lushFitness = undergroundFitness
-                + square(distance(humidity, LUSH_HUMIDITY_MIN, 1.0D));
-        double bestFitness = surfaceFitness;
-        FFDVerticalBiome selected = FFDVerticalBiome.NONE;
-        if (dripstoneFitness < bestFitness) {
-            bestFitness = dripstoneFitness;
-            selected = FFDVerticalBiome.DRIPSTONE_CAVES;
-        }
-        if (lushFitness < bestFitness) {
-            selected = FFDVerticalBiome.LUSH_CAVES;
-        }
-        return selected;
     }
 
     private static FFDVerticalBiome sampleSurfaceBiome(double temperature, double humidity,
@@ -324,13 +311,6 @@ public final class FFDVerticalBiomeSampler {
         return Slice.PEAKS;
     }
 
-    private static double distance(double value, double minimum, double maximum) {
-        if (value < minimum) {
-            return minimum - value;
-        }
-        return value > maximum ? value - maximum : 0.0D;
-    }
-
     private static double square(double value) {
         return value * value;
     }
@@ -351,18 +331,72 @@ public final class FFDVerticalBiomeSampler {
         return (long) ((float) value * 10000.0F) / 10000.0D;
     }
 
-    private static final class ColumnClimate {
+    private final class ColumnClimate implements VerticalBiomeSample {
+        private final int blockX;
+        private final int blockZ;
+        private final double temperature;
         private final double humidity;
         private final double continentalness;
+        private final double erosion;
+        private final double weirdness;
         private final int surfaceY;
         private final FFDVerticalBiome surfaceBiome;
+        private int blockY;
+        private boolean depthSampled;
+        private double depth;
 
-        private ColumnClimate(double humidity, double continentalness, int surfaceY,
+        private ColumnClimate(int blockX, int blockZ, double temperature,
+                              double humidity, double continentalness,
+                              double erosion, double weirdness, int surfaceY,
                               FFDVerticalBiome surfaceBiome) {
+            this.blockX = blockX;
+            this.blockZ = blockZ;
+            this.temperature = temperature;
             this.humidity = humidity;
             this.continentalness = continentalness;
+            this.erosion = erosion;
+            this.weirdness = weirdness;
             this.surfaceY = surfaceY;
             this.surfaceBiome = surfaceBiome;
+        }
+
+        @Override
+        public long getWorldSeed() { return worldgenData.worldSeed(); }
+
+        @Override
+        public int getX() { return blockX; }
+
+        @Override
+        public int getY() { return blockY; }
+
+        @Override
+        public int getZ() { return blockZ; }
+
+        @Override
+        public int getSurfaceY() { return surfaceY; }
+
+        @Override
+        public double getTemperature() { return temperature; }
+
+        @Override
+        public double getHumidity() { return humidity; }
+
+        @Override
+        public double getContinentalness() { return continentalness; }
+
+        @Override
+        public double getErosion() { return erosion; }
+
+        @Override
+        public double getWeirdness() { return weirdness; }
+
+        @Override
+        public double getDepth() {
+            if (!depthSampled) {
+                depth = quantize(sampleDepth(blockX, blockY, blockZ));
+                depthSampled = true;
+            }
+            return depth;
         }
     }
 

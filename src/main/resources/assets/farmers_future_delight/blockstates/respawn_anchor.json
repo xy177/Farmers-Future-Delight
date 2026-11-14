@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "charges=0": {
+      "model": "farmers_future_delight:respawn_anchor_0"
+    },
+    "charges=1": {
+      "model": "farmers_future_delight:respawn_anchor_1"
+    },
+    "charges=2": {
+      "model": "farmers_future_delight:respawn_anchor_2"
+    },
+    "charges=3": {
+      "model": "farmers_future_delight:respawn_anchor_3"
+    },
+    "charges=4": {
+      "model": "farmers_future_delight:respawn_anchor_4"
+    }
+  }
+}

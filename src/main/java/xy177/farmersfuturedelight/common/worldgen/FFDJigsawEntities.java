@@ -7,6 +7,8 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.monster.EntityZombieVillager;
+import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagDouble;
 import net.minecraft.nbt.NBTTagList;
@@ -22,8 +24,11 @@ import net.minecraft.world.gen.structure.template.Template;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import xy177.farmersfuturedelight.common.FFDCompat;
+import xy177.farmersfuturedelight.common.entity.EntityPiglin;
+import xy177.farmersfuturedelight.common.entity.EntityHoglin;
 import xy177.farmersfuturedelight.common.registry.FFDEntities;
 import xy177.farmersfuturedelight.common.registry.FFDZombieVillagerState;
+import xy177.farmersfuturedelight.common.registry.FFDModernItemLookup;
 
 final class FFDJigsawEntities {
     private FFDJigsawEntities() {
@@ -46,8 +51,16 @@ final class FFDJigsawEntities {
                               Rotation rotation, Entity mount, int depth) {
         if (depth > 16) throw new IllegalArgumentException("Structure entity passenger limit exceeded");
         String identifier = data.getString("id");
-        if (FFDEntities.CAT_ID.toString().equals(identifier) && !FFDEntities.isLocalCatEnabled()) {
-            EntityEntry external = FFDCompat.getExternalEntityEntry(FFDCompat.Feature.CAT, "cat");
+        boolean piglin = FFDEntities.PIGLIN_ID.toString().equals(identifier);
+        boolean brute = FFDEntities.PIGLIN_BRUTE_ID.toString().equals(identifier);
+        boolean hoglin = FFDEntities.HOGLIN_ID.toString().equals(identifier);
+        FFDCompat.Feature provider = piglin && !FFDEntities.isLocalPiglinEnabled() ? FFDCompat.Feature.PIGLIN
+                : brute && !FFDEntities.isLocalPiglinBruteEnabled() ? FFDCompat.Feature.PIGLIN_BRUTE
+                : hoglin && !FFDEntities.isLocalHoglinEnabled() ? FFDCompat.Feature.HOGLIN
+                : FFDEntities.CAT_ID.toString().equals(identifier) && !FFDEntities.isLocalCatEnabled()
+                        ? FFDCompat.Feature.CAT : null;
+        if (provider != null) {
+            EntityEntry external = FFDCompat.getExternalEntityEntry(provider, new ResourceLocation(identifier).getResourcePath());
             if (external == null) return;
             data.setString("id", external.getRegistryName().toString());
         }
@@ -82,13 +95,33 @@ final class FFDJigsawEntities {
                     zombie.setForgeProfession(profession);
                 }
                 FFDZombieVillagerState.initializeStructure(zombie, data);
-            } else living.onInitialSpawn(world.getDifficultyForLocation(entity.getPosition()), null);
+            } else {
+                living.onInitialSpawn(world.getDifficultyForLocation(entity.getPosition()), null);
+                if (piglin || brute || hoglin) {
+                    if (data.getBoolean("PersistenceRequired")) living.enablePersistence();
+                    if (living instanceof EntityPiglin) ((EntityPiglin) living).setBaby(data.getBoolean("IsBaby"));
+                    if (living instanceof EntityHoglin) ((EntityHoglin) living).setGrowingAge(data.getInteger("Age"));
+                    restoreEquipment(living, data.getTagList("HandItems", 10), EntityEquipmentSlot.MAINHAND, EntityEquipmentSlot.OFFHAND);
+                    restoreEquipment(living, data.getTagList("ArmorItems", 10), EntityEquipmentSlot.FEET,
+                            EntityEquipmentSlot.LEGS, EntityEquipmentSlot.CHEST, EntityEquipmentSlot.HEAD);
+                }
+            }
         }
         if (!world.spawnEntity(entity)) return;
         if (mount != null) entity.startRiding(mount, true);
         NBTTagList passengers = data.getTagList("Passengers", 10);
         for (int index = 0; index < passengers.tagCount(); index++) {
             spawn(world, passengers.getCompoundTagAt(index).copy(), position, mirror, rotation, entity, depth + 1);
+        }
+    }
+
+    private static void restoreEquipment(EntityLiving entity, NBTTagList equipment, EntityEquipmentSlot... slots) {
+        for (int index = 0; index < slots.length && index < equipment.tagCount(); index++) {
+            NBTTagCompound encoded = equipment.getCompoundTagAt(index);
+            if (!encoded.hasKey("id", 8)) continue;
+            ItemStack stack = new ItemStack(encoded);
+            if (stack.isEmpty()) stack = FFDModernItemLookup.resolve(encoded.getString("id"));
+            if (!stack.isEmpty()) entity.setItemStackToSlot(slots[index], stack);
         }
     }
 

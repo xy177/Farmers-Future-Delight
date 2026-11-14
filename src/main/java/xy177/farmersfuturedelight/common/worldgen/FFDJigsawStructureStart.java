@@ -43,6 +43,17 @@ public final class FFDJigsawStructureStart extends StructureStart {
         return !components.isEmpty();
     }
 
+    FFDJigsawStructureStart(WorldServer world, Random random, int chunkX, int chunkZ,
+                           ResourceLocation pool, int depth, String storage, int height, int maxDistance) {
+        super(chunkX, chunkZ);
+        this.storage = storage;
+        FFDJigsawPlacement.Plan plan = FFDJigsawPlacement.plan(world, pool, null, depth,
+                new BlockPos(chunkX * 16, height, chunkZ * 16), random,
+                (blockX, blockZ) -> height, false, null, maxDistance);
+        components.addAll(plan.components(random));
+        updateBoundingBox();
+    }
+
     @Override
     public void generateStructure(World world, Random random, StructureBoundingBox bounds) {
         super.generateStructure(world, random, new StructureBoundingBox(bounds.minX, FFDHeightHooks.minY(world),

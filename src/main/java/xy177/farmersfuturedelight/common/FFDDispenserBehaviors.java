@@ -19,6 +19,7 @@ import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.registry.FFDSounds;
 import xy177.farmersfuturedelight.common.block.BlockPowderSnow;
 import xy177.farmersfuturedelight.common.block.BlockBeehive;
+import xy177.farmersfuturedelight.common.block.BlockCampfire;
 import xy177.farmersfuturedelight.common.item.ItemAxolotlBucket;
 import xy177.farmersfuturedelight.common.item.ItemFishBucket;
 import xy177.farmersfuturedelight.common.tile.TileEntityBeehive;
@@ -28,10 +29,14 @@ public final class FFDDispenserBehaviors {
     }
 
     public static void register() {
+        registerStriderSaddle();
+        registerMountEquipment();
         registerUnderwaterBonemeal();
         registerWaterBottles();
         registerShearing();
         registerFireworks();
+        registerCampfireIgnition();
+        registerRespawnAnchorCharge();
         for (Item item : new Item[] {FFDItems.COD_BUCKET, FFDItems.SALMON_BUCKET,
                 FFDItems.PUFFERFISH_BUCKET, FFDItems.TROPICAL_FISH_BUCKET}) {
             if (FFDItems.isItemRegistered(item)) {
@@ -125,6 +130,56 @@ public final class FFDDispenserBehaviors {
                         return stack;
                     }
                 });
+    }
+
+    private static void registerCampfireIgnition() {
+        final IBehaviorDispenseItem previous =
+                BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.getObject(Items.FLINT_AND_STEEL);
+        BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.putObject(Items.FLINT_AND_STEEL, (source, stack) -> {
+            EnumFacing facing = source.getBlockState().getValue(BlockDispenser.FACING);
+            BlockPos target = source.getBlockPos().offset(facing);
+            World world = source.getWorld();
+            net.minecraft.block.state.IBlockState state = world.getBlockState(target);
+            if (!(state.getBlock() instanceof BlockCampfire) || state.getValue(BlockCampfire.LIT)
+                    || BlockCampfire.hasContainedFluid(world, target)) return previous.dispense(source, stack);
+            world.setBlockState(target, state.withProperty(BlockCampfire.LIT, true), 11);
+            if (stack.attemptDamageItem(1, world.rand, null)) stack.setCount(0);
+            world.playEvent(1000, source.getBlockPos(), 0);
+            world.playEvent(2000, source.getBlockPos(), particleData(facing));
+            return stack;
+        });
+    }
+
+    private static void registerRespawnAnchorCharge() {
+        final Item glowstone = Item.getItemFromBlock(net.minecraft.init.Blocks.GLOWSTONE);
+        final IBehaviorDispenseItem previous =
+                BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.getObject(glowstone);
+        BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.putObject(glowstone, (source, stack) -> {
+            EnumFacing facing = source.getBlockState().getValue(BlockDispenser.FACING);
+            BlockPos target = source.getBlockPos().offset(facing);
+            World world = source.getWorld();
+            if (!FFDItems.isBlockRegistered(FFDBlocks.RESPAWN_ANCHOR)
+                    || world.getBlockState(target).getBlock() != FFDBlocks.RESPAWN_ANCHOR) {
+                return previous.dispense(source, stack);
+            }
+            net.minecraft.block.state.IBlockState state = world.getBlockState(target);
+            int charge = state.getValue(
+                    xy177.farmersfuturedelight.common.block.BlockRespawnAnchor.CHARGE);
+            if (charge >= 4) {
+                world.playEvent(1001, source.getBlockPos(), 0);
+                world.playEvent(2000, source.getBlockPos(), particleData(facing));
+                return stack;
+            }
+            world.setBlockState(target, state.withProperty(
+                    xy177.farmersfuturedelight.common.block.BlockRespawnAnchor.CHARGE,
+                    charge + 1), 3);
+            stack.shrink(1);
+            world.playSound(null, target, FFDSounds.RESPAWN_ANCHOR_CHARGE,
+                    SoundCategory.BLOCKS, 1.0F, 1.0F);
+            world.playEvent(1000, source.getBlockPos(), 0);
+            world.playEvent(2000, source.getBlockPos(), particleData(facing));
+            return stack;
+        });
     }
 
     private static void registerFireworks() {
@@ -236,6 +291,8 @@ public final class FFDDispenserBehaviors {
                 return previous.dispense(source, stack);
             }
             world.playEvent(2005, target, 0);
+            world.playSound(null, target, FFDSounds.BONE_MEAL_USE,
+                    SoundCategory.BLOCKS, 1.0F, 1.0F);
             world.playEvent(1000, source.getBlockPos(), 0);
             world.playEvent(2000, source.getBlockPos(), particleData(facing));
             return stack;
@@ -325,6 +382,99 @@ public final class FFDDispenserBehaviors {
                     BlockDispenser.getDispensePosition(source));
         }
         return stack;
+    }
+
+    private static void registerStriderSaddle() {
+        final IBehaviorDispenseItem previous = BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.getObject(Items.SADDLE);
+        BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.putObject(Items.SADDLE, (source, stack) -> {
+            EnumFacing facing = source.getBlockState().getValue(BlockDispenser.FACING);
+            BlockPos target = source.getBlockPos().offset(facing);
+            for (xy177.farmersfuturedelight.common.entity.EntityStrider strider : source.getWorld().getEntitiesWithinAABB(
+                    xy177.farmersfuturedelight.common.entity.EntityStrider.class,
+                    new net.minecraft.util.math.AxisAlignedBB(target),
+                    entity -> entity.isEntityAlive() && !entity.isChild() && !entity.isSaddled())) {
+                strider.equipSaddle(stack);
+                stack.shrink(1);
+                source.getWorld().playEvent(1000, source.getBlockPos(), 0);
+                source.getWorld().playEvent(2000, source.getBlockPos(), particleData(facing));
+                return stack;
+            }
+            for (net.minecraft.entity.passive.EntityPig pig : source.getWorld().getEntitiesWithinAABB(
+                    net.minecraft.entity.passive.EntityPig.class, new net.minecraft.util.math.AxisAlignedBB(target),
+                    entity -> entity.isEntityAlive() && !entity.isChild() && !entity.getSaddled())) {
+                pig.setSaddled(true);
+                pig.playSound(net.minecraft.init.SoundEvents.ENTITY_PIG_SADDLE, 0.5F, 1.0F);
+                stack.shrink(1);
+                dispenseFeedback(source, facing);
+                return stack;
+            }
+            for (net.minecraft.entity.passive.AbstractHorse horse : source.getWorld().getEntitiesWithinAABB(
+                    net.minecraft.entity.passive.AbstractHorse.class, new net.minecraft.util.math.AxisAlignedBB(target),
+                    entity -> entity.isEntityAlive() && entity.isTame() && !entity.isChild()
+                            && entity.canBeSaddled() && !entity.isHorseSaddled())) {
+                if (horse.replaceItemInInventory(400, copyOne(stack))) {
+                    stack.shrink(1);
+                    dispenseFeedback(source, facing);
+                    return stack;
+                }
+            }
+            return previous.dispense(source, stack);
+        });
+    }
+
+    private static ItemStack copyOne(ItemStack stack) {
+        ItemStack copy = stack.copy();
+        copy.setCount(1);
+        return copy;
+    }
+
+    private static void dispenseFeedback(IBlockSource source, EnumFacing facing) {
+        source.getWorld().playEvent(1000, source.getBlockPos(), 0);
+        source.getWorld().playEvent(2000, source.getBlockPos(), particleData(facing));
+    }
+
+    private static void registerMountEquipment() {
+        for (Item item : net.minecraftforge.fml.common.registry.ForgeRegistries.ITEMS) {
+            if (item == Item.getItemFromBlock(net.minecraft.init.Blocks.CARPET)
+                    || item == Item.getItemFromBlock(net.minecraft.init.Blocks.CHEST)
+                    || item == Item.getItemFromBlock(net.minecraft.init.Blocks.TRAPPED_CHEST)
+                    || item.getHorseArmorType(new ItemStack(item)) != net.minecraft.entity.passive.HorseArmorType.NONE) {
+                registerMountItem(item);
+            }
+        }
+    }
+
+    private static void registerMountItem(Item item) {
+        IBehaviorDispenseItem previous = BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.getObject(item);
+        BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.putObject(item, (source, stack) -> {
+            EnumFacing facing = source.getBlockState().getValue(BlockDispenser.FACING);
+            BlockPos target = source.getBlockPos().offset(facing);
+            for (net.minecraft.entity.passive.AbstractHorse horse : source.getWorld().getEntitiesWithinAABB(
+                    net.minecraft.entity.passive.AbstractHorse.class, new net.minecraft.util.math.AxisAlignedBB(target),
+                    entity -> entity.isEntityAlive() && entity.isTame() && !entity.isChild())) {
+                boolean chest = item == Item.getItemFromBlock(net.minecraft.init.Blocks.CHEST)
+                        || item == Item.getItemFromBlock(net.minecraft.init.Blocks.TRAPPED_CHEST);
+                if (chest) {
+                    if (!(horse instanceof net.minecraft.entity.passive.AbstractChestHorse)
+                            || ((net.minecraft.entity.passive.AbstractChestHorse) horse).hasChest()) continue;
+                    if (!horse.replaceItemInInventory(499, copyOne(stack))) continue;
+                    horse.playSound(horse instanceof net.minecraft.entity.passive.EntityLlama
+                            ? net.minecraft.init.SoundEvents.ENTITY_LLAMA_CHEST
+                            : horse instanceof net.minecraft.entity.passive.EntityMule
+                            ? net.minecraft.init.SoundEvents.ENTITY_MULE_CHEST
+                            : net.minecraft.init.SoundEvents.ENTITY_DONKEY_CHEST, 1.0F, 1.0F);
+                } else {
+                    net.minecraft.inventory.IInventory inventory = net.minecraftforge.fml.common.ObfuscationReflectionHelper
+                            .getPrivateValue(net.minecraft.entity.passive.AbstractHorse.class, horse, "field_110296_bG");
+                    if (inventory.getSizeInventory() < 2 || !inventory.getStackInSlot(1).isEmpty()
+                            || !horse.isArmor(stack) || !horse.replaceItemInInventory(401, copyOne(stack))) continue;
+                }
+                stack.shrink(1);
+                dispenseFeedback(source, facing);
+                return stack;
+            }
+            return previous.dispense(source, stack);
+        });
     }
 
     private static int particleData(EnumFacing facing) {

@@ -1,0 +1,28 @@
+{
+  "conditions": [
+    {
+      "type": "farmers_future_delight:feature_enabled",
+      "feature": "strider"
+    }
+  ],
+  "parent": "minecraft:nether/root",
+  "display": {
+    "description": {
+      "translate": "advancements.nether.ride_strider.description"
+    },
+    "icon": {
+      "item": "farmers_future_delight:warped_fungus_on_a_stick"
+    },
+    "title": {
+      "translate": "advancements.nether.ride_strider.title"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "ride_strider": {
+      "trigger": "farmers_future_delight:ride_strider"
+    }
+  }
+}

@@ -217,9 +217,23 @@ public class ClientProxy extends CommonProxy {
         registerModel(FFDItems.SWEET_BERRIES, "sweet_berries");
         registerModel(FFDItems.SUSPICIOUS_STEW, "suspicious_stew");
         registerModel(FFDItems.LEATHER_HORSE_ARMOR, "leather_horse_armor");
+        registerModel(FFDItems.WARPED_FUNGUS_ON_A_STICK, "warped_fungus_on_a_stick");
         registerModel(FFDItems.LANTERN, "lantern");
         registerModel(FFDItems.BARREL, "barrel");
         registerModel(FFDItems.CAMPFIRE, "campfire");
+        registerModel(FFDItems.SOUL_SOIL, "soul_soil");
+        registerModel(FFDItems.SOUL_TORCH, "soul_torch");
+        registerModel(FFDItems.SOUL_LANTERN, "soul_lantern");
+        registerModel(FFDItems.SOUL_CAMPFIRE, "soul_campfire");
+        registerStateMapper(FFDBlocks.SOUL_CAMPFIRE, new StateMap.Builder()
+                .ignore(xy177.farmersfuturedelight.common.block.BlockCampfire.SIGNAL_FIRE,
+                        xy177.farmersfuturedelight.common.block.BlockCampfire.WATERLOGGED).build());
+        registerStateMapper(FFDBlocks.SOUL_LANTERN, new StateMap.Builder()
+                .ignore(xy177.farmersfuturedelight.common.block.BlockLantern.WATERLOGGED).build());
+        registerStateMapper(FFDBlocks.SOUL_FIRE, new StateMap.Builder()
+                .ignore(net.minecraft.block.BlockFire.AGE, net.minecraft.block.BlockFire.NORTH,
+                        net.minecraft.block.BlockFire.SOUTH, net.minecraft.block.BlockFire.EAST,
+                        net.minecraft.block.BlockFire.WEST, net.minecraft.block.BlockFire.UPPER).build());
         registerStateMapper(FFDBlocks.CAMPFIRE, new StateMap.Builder()
                 .ignore(xy177.farmersfuturedelight.common.block.BlockCampfire.SIGNAL_FIRE,
                         xy177.farmersfuturedelight.common.block.BlockCampfire.WATERLOGGED).build());
@@ -247,6 +261,7 @@ public class ClientProxy extends CommonProxy {
         registerModel(FFDItems.SKULL_BANNER_PATTERN, "skull_banner_pattern");
         registerModel(FFDItems.MOJANG_BANNER_PATTERN, "mojang_banner_pattern");
         registerModel(FFDItems.GLOBE_BANNER_PATTERN, "globe_banner_pattern");
+        registerModel(FFDItems.PIGLIN_BANNER_PATTERN, "piglin_banner_pattern");
         registerModel(FFDItems.FIELD_MASONED_BANNER_PATTERN, "field_masoned_banner_pattern");
         registerModel(FFDItems.BORDURE_INDENTED_BANNER_PATTERN, "bordure_indented_banner_pattern");
         registerModel(FFDItems.CORNFLOWER, "cornflower");
@@ -478,6 +493,9 @@ public class ClientProxy extends CommonProxy {
             registerModel(FFDItems.POLISHED_BLACKSTONE_SLAB, "polished_blackstone_slab");
             registerModel(FFDItems.POLISHED_BLACKSTONE_BRICK_SLAB, "polished_blackstone_brick_slab");
         }
+        registerModel(FFDItems.BASALT,"basalt");
+        registerModel(FFDItems.POLISHED_BASALT,"polished_basalt");
+        registerModel(FFDItems.NETHER_GOLD_ORE,"nether_gold_ore");
         if (FFDItems.isQuartzBricksEnabled()) {
             registerModel(FFDItems.QUARTZ_BRICKS, "quartz_bricks");
         }
@@ -693,7 +711,15 @@ public class ClientProxy extends CommonProxy {
                 FFDBlocks.WARPED_DOUBLE_SLAB);
         registerCustomRawOreModels();
         registerModels(xy177.farmersfuturedelight.common.registry.FFDItems.STONE_DECOR_ITEMS);
+        registerModel(FFDItems.CHISELED_NETHER_BRICKS, "chiseled_nether_bricks");
+        registerModel(FFDItems.CRACKED_NETHER_BRICKS, "cracked_nether_bricks");
+        registerModel(FFDItems.MUSIC_DISC_PIGSTEP, "music_disc_pigstep");
+        registerModel(FFDItems.TARGET, "target");
+        registerModel(FFDItems.LODESTONE, "lodestone");
+        registerModel(FFDItems.RESPAWN_ANCHOR, "respawn_anchor");
         registerModels(FFDItems.WOOD_SIGN_ITEMS);
+        registerModel(FFDItems.CRIMSON_SIGN, "crimson_sign");
+        registerModel(FFDItems.WARPED_SIGN, "warped_sign");
         registerWaterloggedShapeMappers(xy177.farmersfuturedelight.common.registry.FFDStoneDecor
                 .blocks().toArray(new net.minecraft.block.Block[0]));
         registerCustomStrippedWoodModels();
@@ -872,6 +898,23 @@ public class ClientProxy extends CommonProxy {
         RenderingRegistry.registerEntityRenderingHandler(EntityGoat.class, RenderGoat::new);
         RenderingRegistry.registerEntityRenderingHandler(EntityCat.class, RenderCat::new);
         RenderingRegistry.registerEntityRenderingHandler(EntityFox.class, RenderFox::new);
+        RenderingRegistry.registerEntityRenderingHandler(
+                xy177.farmersfuturedelight.common.entity.EntityPiglin.class, xy177.farmersfuturedelight.client.render.RenderPiglin::new);
+        RenderingRegistry.registerEntityRenderingHandler(
+                xy177.farmersfuturedelight.common.entity.EntityPiglinBrute.class, xy177.farmersfuturedelight.client.render.RenderPiglin::new);
+        if (xy177.farmersfuturedelight.common.FFDPiglinEvents.modernZombified()) {
+            RenderingRegistry.registerEntityRenderingHandler(net.minecraft.entity.monster.EntityPigZombie.class,
+                    xy177.farmersfuturedelight.client.render.RenderPiglin::new);
+        }
+        RenderingRegistry.registerEntityRenderingHandler(
+                xy177.farmersfuturedelight.common.entity.EntityStrider.class,
+                xy177.farmersfuturedelight.client.render.RenderStrider::new);
+        RenderingRegistry.registerEntityRenderingHandler(
+                xy177.farmersfuturedelight.common.entity.EntityHoglin.class,
+                manager -> new xy177.farmersfuturedelight.client.render.RenderHoglin<>(manager));
+        RenderingRegistry.registerEntityRenderingHandler(
+                xy177.farmersfuturedelight.common.entity.EntityZoglin.class,
+                manager -> new xy177.farmersfuturedelight.client.render.RenderHoglin<>(manager));
         RenderingRegistry.registerEntityRenderingHandler(EntityPanda.class, RenderPanda::new);
         RenderingRegistry.registerEntityRenderingHandler(EntityPillager.class, RenderPillager::new);
         RenderingRegistry.registerEntityRenderingHandler(EntityRavager.class, RenderRavager::new);
@@ -907,7 +950,10 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void init() {
-        xy177.farmersfuturedelight.client.FFDCreativeInventory.install();
+        if (FFDItems.isBlockRegistered(FFDBlocks.LODESTONE)) {
+            xy177.farmersfuturedelight.client.FFDLodestoneNeedle.install();
+        }
+        xy177.farmersfuturedelight.client.FFDCreativeInventory.refreshTabSnapshot();
         xy177.farmersfuturedelight.client.FFDModernMenus.install();
         xy177.farmersfuturedelight.client.friends.FFDFriendsMenu.install();
         AquaAcrobaticsWaterCompat.registerBiomeColors();
@@ -961,6 +1007,10 @@ public class ClientProxy extends CommonProxy {
         double y = squid.posY + squid.getRNG().nextDouble() * squid.height;
         double z = squid.posZ + (squid.getRNG().nextDouble() * 2.0D - 1.0D) * 0.6D * squid.width;
         Minecraft.getMinecraft().effectRenderer.addEffect(ParticleGlowSquid.ambient(squid.world, x, y, z));
+    }
+
+    @Override public void spawnSoulParticle(net.minecraft.entity.EntityLivingBase entity) {
+        Minecraft.getMinecraft().effectRenderer.addEffect(new xy177.farmersfuturedelight.client.particle.ParticleSoul(entity));
     }
 
     @Override
@@ -1048,6 +1098,14 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
+    public void spawnReversePortalParticle(net.minecraft.world.World world, double x, double y, double z, double speed) {
+        Minecraft minecraft = Minecraft.getMinecraft();
+        if (minecraft.world == world && minecraft.effectRenderer != null && minecraft.gameSettings.particleSetting < 2) {
+            minecraft.effectRenderer.addEffect(new xy177.farmersfuturedelight.client.particle.ParticleReversePortal(world, x, y, z, speed));
+        }
+    }
+
+    @Override
     public void spawnCryingObsidianParticle(net.minecraft.world.World world, double x, double y,
                                             double z) {
         Minecraft.getMinecraft().effectRenderer.addEffect(
@@ -1066,6 +1124,17 @@ public class ClientProxy extends CommonProxy {
             return;
         }
         minecraft.effectRenderer.addEffect(ParticleSmallFlame.create(world, x, y, z));
+    }
+
+    @Override
+    public void spawnSoulFlameParticle(net.minecraft.world.World world, double x, double y, double z) {
+        Minecraft minecraft = Minecraft.getMinecraft();
+        int setting = minecraft.gameSettings.particleSetting;
+        if (setting == 2 || setting == 1 && world.rand.nextInt(3) == 0
+                || minecraft.getRenderViewEntity() == null
+                || minecraft.getRenderViewEntity().getDistanceSq(x, y, z) > 1024.0D) return;
+        minecraft.effectRenderer.addEffect(
+                xy177.farmersfuturedelight.client.particle.ParticleSoulFlame.create(world, x, y, z));
     }
 
     @Override
@@ -1111,7 +1180,8 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
-    public void handleVerticalBiomes(int dimension, int chunkX, int chunkZ, byte[] biomes) {
+    public void handleVerticalBiomes(int dimension, int chunkX, int chunkZ,
+                                    xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiomeData biomes) {
         Minecraft.getMinecraft().addScheduledTask(() -> {
             net.minecraft.world.World world = Minecraft.getMinecraft().world;
             if (world != null && world.provider.getDimension() == dimension) {
@@ -1183,6 +1253,21 @@ public class ClientProxy extends CommonProxy {
                 xy177.farmersfuturedelight.common.entity.FFDMooshroomData.setBrown(
                         (net.minecraft.entity.passive.EntityMooshroom) entity, brown);
             }
+        });
+    }
+
+    @Override
+    public boolean isRedstoneDot(BlockPos pos) {
+        net.minecraft.world.World world = Minecraft.getMinecraft().world;
+        return world != null && xy177.farmersfuturedelight.common.FFDRedstoneWire.isDot(world, pos);
+    }
+
+    @Override
+    public void handleRedstoneDots(int dimension, int chunkX, int chunkZ, long[] positions) {
+        Minecraft.getMinecraft().addScheduledTask(() -> {
+            net.minecraft.world.World world = Minecraft.getMinecraft().world;
+            if (world != null && world.provider.getDimension() == dimension)
+                xy177.farmersfuturedelight.common.FFDRedstoneWire.apply(world, chunkX, chunkZ, positions);
         });
     }
 

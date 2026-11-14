@@ -3,12 +3,10 @@ package xy177.farmersfuturedelight.common.worldgen;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -51,12 +49,7 @@ final class FFDStructureProcessors {
                         : FFDStructureProcessors.class.getResourceAsStream("/assets/" + id.getResourceDomain()
                                 + "/processor_lists/" + path + ".json")) {
                     if (input == null) throw new IllegalArgumentException("Unknown processor list " + id);
-                    byte[] bytes = new byte[1048577];
-                    int used = 0;
-                    int count;
-                    while (used < bytes.length && (count = input.read(bytes, used, bytes.length - used)) != -1) used += count;
-                    if (used == bytes.length) throw new IllegalArgumentException("Oversized processor list " + id);
-                    object = new JsonParser().parse(new String(bytes, 0, used, StandardCharsets.UTF_8)).getAsJsonObject();
+                    object = FFDStructureResources.readJson(input, "Oversized processor list " + id);
                 } catch (IOException exception) {
                     throw new IllegalArgumentException("Cannot load processor list " + id, exception);
                 }
@@ -81,7 +74,8 @@ final class FFDStructureProcessors {
                     Random random = random(position);
                     IBlockState location = level.getBlockState(position);
                     for (Rule rule : parsed) {
-                        if (rule.input.test(block.blockState, random) && rule.location.test(location, random)) {
+                        if (rule.input.test(block.blockState, random) && rule.location.test(location, random)
+                                && rule.position.test(block.pos, random)) {
                             return new Template.BlockInfo(block.pos, rule.output,
                                     rule.output.getBlock() == block.blockState.getBlock() ? block.tileentityData
                                             : FFDStructureBlockStates.tileData(level, rule.output, block.tileentityData));
@@ -132,15 +126,42 @@ final class FFDStructureProcessors {
     private static final class Rule {
         private final BiPredicate<IBlockState, Random> input;
         private final BiPredicate<IBlockState, Random> location;
+        private final BiPredicate<BlockPos, Random> position;
         private final IBlockState output;
 
         private Rule(JsonObject definition) {
-            if (definition.has("position_predicate") || definition.has("block_entity_modifier")) {
+            if (definition.has("block_entity_modifier")) {
                 throw new IllegalArgumentException("Unsupported structure rule extension");
             }
             input = predicate(definition.getAsJsonObject("input_predicate"));
             location = predicate(definition.getAsJsonObject("location_predicate"));
+            position = positionPredicate(definition.getAsJsonObject("position_predicate"));
             output = FFDJigsawPlacement.parseFinalState(definition.get("output_state").getAsString());
         }
+    }
+
+    private static BiPredicate<BlockPos, Random> positionPredicate(JsonObject definition) {
+        if (definition == null || "minecraft:always_true".equals(definition.get("predicate_type").getAsString())) {
+            return (position, random) -> true;
+        }
+        if (!"minecraft:axis_aligned_linear_pos".equals(definition.get("predicate_type").getAsString())) {
+            throw new IllegalArgumentException("Unsupported structure position predicate");
+        }
+        net.minecraft.util.EnumFacing.Axis axis = definition.has("axis")
+                ? net.minecraft.util.EnumFacing.Axis.byName(definition.get("axis").getAsString()) : net.minecraft.util.EnumFacing.Axis.Y;
+        int minimum = definition.has("min_dist") ? definition.get("min_dist").getAsInt() : 0;
+        int maximum = definition.has("max_dist") ? definition.get("max_dist").getAsInt() : 0;
+        float low = definition.has("min_chance") ? definition.get("min_chance").getAsFloat() : 0.0F;
+        float high = definition.has("max_chance") ? definition.get("max_chance").getAsFloat() : 0.0F;
+        if (axis == null || minimum >= maximum || !Float.isFinite(low) || !Float.isFinite(high)
+                || low < 0 || high < 0 || low > 1 || high > 1) {
+            throw new IllegalArgumentException("Invalid structure position predicate");
+        }
+        return (position, random) -> {
+            int distance = Math.abs(axis == net.minecraft.util.EnumFacing.Axis.X ? position.getX()
+                    : axis == net.minecraft.util.EnumFacing.Axis.Z ? position.getZ() : position.getY());
+            float progress = Math.max(0.0F, Math.min(1.0F, (float) (distance - minimum) / (maximum - minimum)));
+            return random.nextFloat() <= low + (high - low) * progress;
+        };
     }
 }

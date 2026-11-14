@@ -6,11 +6,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -66,6 +66,7 @@ public final class FFDJigsawPlacement {
     private static final Field TEMPLATE_BLOCKS = ObfuscationReflectionHelper.findField(Template.class, "field_186270_a");
     private static final Field TEMPLATE_FOLDER = ObfuscationReflectionHelper.findField(TemplateManager.class, "field_186241_b");
     private static final Map<TemplateManager, Map<ResourceLocation, Template>> MATERIAL_TEMPLATES = new java.util.WeakHashMap<>();
+    private static final Map<WorldServer, Map<ResourceLocation, Template>> WORLD_TEMPLATES = new java.util.WeakHashMap<>();
 
     private FFDJigsawPlacement() {
     }
@@ -98,6 +99,13 @@ public final class FFDJigsawPlacement {
     static Plan plan(WorldServer world, ResourceLocation pool, ResourceLocation target, int levels,
                      BlockPos position, Random random, IntBinaryOperator heights, boolean projectStart,
                      FFDVillageExtensions extensions) {
+        return plan(world, pool, target, levels, position, random, heights, projectStart,
+                extensions, projectStart ? 80 : MAX_DISTANCE);
+    }
+
+    static Plan plan(WorldServer world, ResourceLocation pool, ResourceLocation target, int levels,
+                     BlockPos position, Random random, IntBinaryOperator heights, boolean projectStart,
+                     FFDVillageExtensions extensions, int maxDistance) {
         if (levels < 0 || levels > 20) throw new IllegalArgumentException("levels: 0..20");
         Context context = new Context(world, position, heights);
         Pool starting = context.pool(pool);
@@ -130,7 +138,7 @@ public final class FFDJigsawPlacement {
         root.space = context.space;
         context.center = new BlockPos((root.bounds.minX + root.bounds.maxX) / 2,
                 root.bounds.minY + 1, (root.bounds.minZ + root.bounds.maxZ) / 2);
-        context.maxDistance = projectStart ? 80 : MAX_DISTANCE;
+        context.maxDistance = maxDistance;
         context.space.occupied.add(root.bounds);
         context.pieces.add(root);
         PriorityQueue<Expansion> queue = new PriorityQueue<>(Comparator
@@ -778,12 +786,7 @@ public final class FFDJigsawPlacement {
         try (InputStream input = file.isFile() ? new FileInputStream(file)
                 : FFDJigsawPlacement.class.getResourceAsStream(resource)) {
             if (input == null) throw new IllegalArgumentException("Unknown template pool " + id);
-            byte[] bytes = new byte[1048577];
-            int used = 0;
-            int count;
-            while (used < bytes.length && (count = input.read(bytes, used, bytes.length - used)) != -1) used += count;
-            if (used == bytes.length) throw new IllegalArgumentException("Oversized template pool " + id);
-            JsonObject json = new JsonParser().parse(new String(bytes, 0, used, StandardCharsets.UTF_8)).getAsJsonObject();
+            JsonObject json = FFDStructureResources.readJson(input, "Oversized template pool " + id);
             ResourceLocation fallback = json.has("fallback") ? new ResourceLocation(json.get("fallback").getAsString()) : EMPTY;
             JsonArray entries = json.getAsJsonArray("elements");
             if (entries == null || entries.size() > 1024) throw new IllegalArgumentException("Invalid pool elements " + id);
@@ -908,7 +911,6 @@ public final class FFDJigsawPlacement {
                 return;
             }
             source.addBlocksToWorld(world, position, (level, target, block) -> {
-                if (ignoreAir && block.blockState.getBlock() == Blocks.AIR) return null;
                 Template.BlockInfo result = processor == null ? block : processor.processBlock(level, target, block);
                 if (result != null) result = new Template.BlockInfo(result.pos,
                         result.blockState.withMirror(settings.getMirror()).withRotation(settings.getRotation()), result.tileentityData);
@@ -916,6 +918,7 @@ public final class FFDJigsawPlacement {
                     if (result == null) break;
                     result = step.apply(level, target, result);
                 }
+                if (result != null && ignoreAir && result.blockState.getBlock() == Blocks.AIR) return null;
                 if (result != null && result.blockState.getBlock() != Blocks.STRUCTURE_VOID) {
                     if (settings.getBoundingBox() != null && !settings.getBoundingBox().isVecInside(target)) return null;
                     result = deferBed(target, result, settings);
@@ -938,7 +941,6 @@ public final class FFDJigsawPlacement {
                         || target.getZ() < bounds.minZ || target.getZ() > bounds.maxZ)) continue;
                 int height = projectedHeights.computeIfAbsent(columnKey(target.getX(), target.getZ()),
                         ignored -> terrain.applyAsInt(target.getX(), target.getZ()));
-                if (ignoreAir && block.blockState.getBlock() == Blocks.AIR) continue;
                 Template.BlockInfo result = processor == null ? block : processor.processBlock(world, target, block);
                 if (result == null) continue;
                 result = new Template.BlockInfo(result.pos,
@@ -948,7 +950,8 @@ public final class FFDJigsawPlacement {
                     if (result == null) break;
                     result = step.apply(world, target, result);
                 }
-                if (result == null || result.blockState.getBlock() == Blocks.STRUCTURE_VOID) continue;
+                if (result == null || result.blockState.getBlock() == Blocks.STRUCTURE_VOID
+                        || ignoreAir && result.blockState.getBlock() == Blocks.AIR) continue;
                 int projectedY = height - 1 + block.pos.getY();
                 if (projectedY < FFDHeightHooks.minY(world) || projectedY >= FFDHeightHooks.maxYExclusive(world)) continue;
                 BlockPos projectedPosition = new BlockPos(target.getX(), projectedY, target.getZ());
@@ -1029,7 +1032,11 @@ public final class FFDJigsawPlacement {
 
     private static Template readTemplate(WorldServer world, ResourceLocation id) {
         File directory = new File(world.getSaveHandler().getWorldDirectory(), "structures");
-        return readTemplate(world, directory, id);
+        if (templateFile(world, directory, id).isFile()) return readTemplate(world, directory, id);
+        synchronized (WORLD_TEMPLATES) {
+            Map<ResourceLocation, Template> templates = WORLD_TEMPLATES.computeIfAbsent(world, ignored -> new HashMap<>());
+            return templates.computeIfAbsent(id, key -> readTemplate(world, directory, key));
+        }
     }
 
     static Template readTemplate(TemplateManager manager, ResourceLocation id) {
@@ -1045,15 +1052,21 @@ public final class FFDJigsawPlacement {
         }
     }
 
-    private static Template readTemplate(WorldServer world, File directory, ResourceLocation id) {
+    private static File templateFile(WorldServer world, File directory, ResourceLocation id) {
         String path = safePath(id);
         File file = new File(directory, id.getResourceDomain() + "/" + path + ".nbt");
         if (!file.isFile() && (world == null || "minecraft".equals(id.getResourceDomain()))) file = new File(directory, path + ".nbt");
+        return file;
+    }
+
+    private static Template readTemplate(WorldServer world, File directory, ResourceLocation id) {
+        String path = safePath(id);
+        File file = templateFile(world, directory, id);
         String resource = "/assets/" + id.getResourceDomain() + "/structures/" + path + ".nbt";
         try (InputStream input = file.isFile() ? new FileInputStream(file)
                 : FFDJigsawPlacement.class.getResourceAsStream(resource)) {
             if (input == null) throw new IllegalArgumentException("Unknown structure template " + id);
-            try (DataInputStream compressed = new DataInputStream(new GZIPInputStream(input))) {
+            try (DataInputStream compressed = new DataInputStream(new BufferedInputStream(new GZIPInputStream(input)))) {
                 NBTTagCompound data = CompressedStreamTools.read(compressed, new NBTSizeTracker(16777216L));
                 NBTTagList palette = data.getTagList("palette", 10);
                 IBlockState[] states = new IBlockState[palette.tagCount()];

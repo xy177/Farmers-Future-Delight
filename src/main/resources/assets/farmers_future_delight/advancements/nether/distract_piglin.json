@@ -1,0 +1,28 @@
+{
+  "conditions": [
+    {
+      "type": "farmers_future_delight:feature_enabled",
+      "feature": "piglin"
+    }
+  ],
+  "parent": "minecraft:nether/root",
+  "display": {
+    "description": {
+      "translate": "advancements.nether.distract_piglin.description"
+    },
+    "icon": {
+      "item": "minecraft:gold_ingot"
+    },
+    "title": {
+      "translate": "advancements.nether.distract_piglin.title"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "distract_piglin": {
+      "trigger": "farmers_future_delight:distract_piglin"
+    }
+  }
+}

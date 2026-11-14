@@ -12,6 +12,13 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import java.util.Map;
 
 public class CommonProxy {
+    public boolean isRedstoneDot(BlockPos pos) {
+        return false;
+    }
+
+    public void handleRedstoneDots(int dimension, int chunkX, int chunkZ, long[] positions) {
+    }
+
     public void handleAgeLockState(int dimension, int entityId, boolean locked, int timer) {
     }
 
@@ -75,7 +82,13 @@ public class CommonProxy {
     public void spawnSmallFlameParticle(World world, double x, double y, double z) {
     }
 
+    public void spawnSoulFlameParticle(World world, double x, double y, double z) {
+    }
+
     public void spawnCryingObsidianParticle(World world, double x, double y, double z) {
+    }
+
+    public void spawnReversePortalParticle(World world, double x, double y, double z, double speed) {
     }
 
     public void spawnCampfireSmoke(World world, double x, double y, double z,
@@ -94,7 +107,8 @@ public class CommonProxy {
     public void handleDripstoneParticle(double x, double y, double z, boolean lava) {
     }
 
-    public void handleVerticalBiomes(int dimension, int chunkX, int chunkZ, byte[] biomes) {
+    public void handleVerticalBiomes(int dimension, int chunkX, int chunkZ,
+                                    xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiomeData biomes) {
     }
 
     public void handleRiptideState(int entityId, int ticks) {
@@ -135,4 +149,6 @@ public class CommonProxy {
     public String getLanguageCode() {
         return "en_us";
     }
+
+    public void spawnSoulParticle(net.minecraft.entity.EntityLivingBase entity) { }
 }

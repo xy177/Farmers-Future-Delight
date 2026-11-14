@@ -1,0 +1,6 @@
+{
+  "parent": "farmers_future_delight:block/template_hanging_lantern",
+  "textures": {
+    "lantern": "farmers_future_delight:blocks/soul_lantern"
+  }
+}

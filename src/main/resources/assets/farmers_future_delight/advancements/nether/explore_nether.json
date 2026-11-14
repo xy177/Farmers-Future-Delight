@@ -1,0 +1,44 @@
+{
+  "conditions": [
+    {
+      "type": "farmers_future_delight:feature_enabled",
+      "feature": "modern_nether"
+    }
+  ],
+  "parent": "minecraft:nether/root",
+  "display": {
+    "description": {
+      "translate": "advancements.nether.explore_nether.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "item": "minecraft:netherrack"
+    },
+    "title": {
+      "translate": "advancements.nether.explore_nether.title"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "nether_wastes": {
+      "trigger": "farmers_future_delight:visit_nether_wastes"
+    },
+    "soul_sand_valley": {
+      "trigger": "farmers_future_delight:visit_soul_sand_valley"
+    },
+    "crimson_forest": {
+      "trigger": "farmers_future_delight:visit_crimson_forest"
+    },
+    "warped_forest": {
+      "trigger": "farmers_future_delight:visit_warped_forest"
+    },
+    "basalt_deltas": {
+      "trigger": "farmers_future_delight:visit_basalt_deltas"
+    }
+  },
+  "rewards": {
+    "experience": 500
+  }
+}

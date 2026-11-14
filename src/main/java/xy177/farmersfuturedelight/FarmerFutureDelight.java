@@ -48,7 +48,7 @@ import xy177.farmersfuturedelight.proxy.CommonProxy;
 public class FarmerFutureDelight {
     public static final String MODID = "farmers_future_delight";
     public static final String NAME = "Farmer's Future Delight";
-    public static final String VERSION = "1.5.3";
+    public static final String VERSION = "1.6.0";
 
     @Mod.Instance(MODID)
     public static FarmerFutureDelight instance;
@@ -64,10 +64,13 @@ public class FarmerFutureDelight {
         }
         FFDWorldTypes.register();
         xy177.farmersfuturedelight.common.FFDBlockLootTables.registerConditions();
+        xy177.farmersfuturedelight.common.FFDFishing.register();
         FFDConfig.load(event.getSuggestedConfigurationFile());
         xy177.farmersfuturedelight.common.registry.FFDWorkstationDefaults.configure(
                 event.getSuggestedConfigurationFile().getParentFile());
         xy177.farmersfuturedelight.common.raid.RaidEventConfiguration.configure(
+                event.getSuggestedConfigurationFile().getParentFile());
+        xy177.farmersfuturedelight.common.raid.RaiderSpawnConfiguration.configure(
                 event.getSuggestedConfigurationFile().getParentFile());
         FFDCustomRawOres.load(event.getSuggestedConfigurationFile().getParentFile());
         FFDCustomDeepslateOres.load(event.getSuggestedConfigurationFile().getParentFile());
@@ -116,6 +119,11 @@ public class FarmerFutureDelight {
 
     @Mod.EventHandler
     public void loadComplete(FMLLoadCompleteEvent event) {
+        xy177.farmersfuturedelight.common.FFDNetherUpdateGameplay.updateEndermanBlocks();
+        xy177.farmersfuturedelight.common.raid.RaiderSpawnConfiguration.load();
+        MinecraftForge.EVENT_BUS.post(
+                new xy177.farmersfuturedelight.api.biome.VerticalBiomeRegistrationEvent());
+        xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiome.freeze();
         xy177.farmersfuturedelight.common.registry.FFDWorkstationDefaults.finishLoading();
         xy177.farmersfuturedelight.common.raid.RaidEventConfiguration.finishLoading(
                 xy177.farmersfuturedelight.common.raid.FFDRaidManager.defaultDefinitions());

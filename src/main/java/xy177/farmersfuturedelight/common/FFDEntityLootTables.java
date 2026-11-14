@@ -51,6 +51,12 @@ public final class FFDEntityLootTables {
     public static final ResourceLocation GLOW_SQUID = table("glow_squid");
     public static final ResourceLocation PANDA = table("panda");
     public static final ResourceLocation CAT = table("cat");
+    public static final ResourceLocation PIGLIN = table("piglin");
+    public static final ResourceLocation PIGLIN_BRUTE = table("piglin_brute");
+    public static final ResourceLocation PIGLIN_BARTERING = new ResourceLocation(FarmerFutureDelight.MODID, "gameplay/piglin_bartering");
+    public static final ResourceLocation STRIDER = table("strider");
+    public static final ResourceLocation HOGLIN = table("hoglin");
+    public static final ResourceLocation ZOGLIN = table("zoglin");
     public static final ResourceLocation CAT_MORNING_GIFT =
             new ResourceLocation(FarmerFutureDelight.MODID, "gameplay/cat_morning_gift");
     public static final ResourceLocation PANDA_SNEEZE =
@@ -69,7 +75,8 @@ public final class FFDEntityLootTables {
     public static void register() {
         for (ResourceLocation name : new ResourceLocation[]{DROWNED, COD, SALMON, PUFFERFISH,
                 TROPICAL_FISH, DOLPHIN, PHANTOM, TURTLE, GLOW_SQUID, PANDA, CAT, CAT_MORNING_GIFT,
-                PANDA_SNEEZE, RAID_CAPTAIN, CREEPER_MUSIC_DISCS, table("pillager"), table("ravager")}) {
+                PANDA_SNEEZE, RAID_CAPTAIN, CREEPER_MUSIC_DISCS, table("pillager"), table("ravager"),
+                HOGLIN, ZOGLIN, STRIDER, PIGLIN, PIGLIN_BRUTE, PIGLIN_BARTERING}) {
             if (!LootTableList.getAll().contains(name)) LootTableList.register(name);
         }
         LootConditionManager.registerCondition(new DamageType.Serializer());

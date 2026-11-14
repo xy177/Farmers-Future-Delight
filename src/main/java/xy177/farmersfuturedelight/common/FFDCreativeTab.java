@@ -19,7 +19,7 @@ import xy177.farmersfuturedelight.common.registry.FFDDeepslateOreCompat;
 import xy177.farmersfuturedelight.common.registry.FFDEnchantments;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 
-public final class FFDCreativeTab extends CreativeTabs {
+public final class FFDCreativeTab extends FFDDeferredCreativeTab {
     public static final FFDCreativeTab INSTANCE = new FFDCreativeTab();
 
     private FFDCreativeTab() {

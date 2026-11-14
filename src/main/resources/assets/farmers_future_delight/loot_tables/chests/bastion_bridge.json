@@ -1,0 +1,674 @@
+{
+  "pools": [
+    {
+      "name": "pool0",
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "item",
+          "entryName": "bastion_bridge_0_0",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:lodestone"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "pool1",
+      "rolls": {
+        "min": 1,
+        "max": 2
+      },
+      "entries": [
+        {
+          "type": "item",
+          "entryName": "bastion_bridge_1_0",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:crossbow"
+            },
+            {
+              "function": "minecraft:set_damage",
+              "damage": {
+                "min": 0.1,
+                "max": 0.5
+              }
+            },
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "enchantments": [
+                "minecraft:protection",
+                "minecraft:fire_protection",
+                "minecraft:feather_falling",
+                "minecraft:blast_protection",
+                "minecraft:projectile_protection",
+                "minecraft:respiration",
+                "minecraft:aqua_affinity",
+                "minecraft:thorns",
+                "minecraft:depth_strider",
+                "minecraft:sharpness",
+                "minecraft:smite",
+                "minecraft:bane_of_arthropods",
+                "minecraft:knockback",
+                "minecraft:fire_aspect",
+                "minecraft:looting",
+                "minecraft:sweeping_edge",
+                "minecraft:efficiency",
+                "minecraft:silk_touch",
+                "minecraft:unbreaking",
+                "minecraft:fortune",
+                "minecraft:power",
+                "minecraft:punch",
+                "minecraft:flame",
+                "minecraft:infinity",
+                "minecraft:luck_of_the_sea",
+                "minecraft:lure",
+                "minecraft:loyalty",
+                "minecraft:impaling",
+                "minecraft:riptide",
+                "minecraft:channeling",
+                "minecraft:multishot",
+                "minecraft:quick_charge",
+                "minecraft:piercing",
+                "minecraft:density",
+                "minecraft:breach",
+                "minecraft:lunge",
+                "minecraft:binding_curse",
+                "minecraft:vanishing_curse",
+                "minecraft:frost_walker",
+                "minecraft:mending"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "bastion_bridge_1_1",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:spectral_arrow"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 10,
+                "max": 28
+              }
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "bastion_bridge_1_2",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:gilded_blackstone"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 8,
+                "max": 12
+              }
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "bastion_bridge_1_3",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:crying_obsidian"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 3,
+                "max": 8
+              }
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "bastion_bridge_1_4",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:gold_block"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "bastion_bridge_1_5",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:gold_ingot"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 4,
+                "max": 9
+              }
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "bastion_bridge_1_6",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:iron_ingot"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 4,
+                "max": 9
+              }
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "bastion_bridge_1_7",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:golden_sword"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "bastion_bridge_1_8",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:golden_chestplate"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": 1
+            },
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "enchantments": [
+                "minecraft:protection",
+                "minecraft:fire_protection",
+                "minecraft:feather_falling",
+                "minecraft:blast_protection",
+                "minecraft:projectile_protection",
+                "minecraft:respiration",
+                "minecraft:aqua_affinity",
+                "minecraft:thorns",
+                "minecraft:depth_strider",
+                "minecraft:sharpness",
+                "minecraft:smite",
+                "minecraft:bane_of_arthropods",
+                "minecraft:knockback",
+                "minecraft:fire_aspect",
+                "minecraft:looting",
+                "minecraft:sweeping_edge",
+                "minecraft:efficiency",
+                "minecraft:silk_touch",
+                "minecraft:unbreaking",
+                "minecraft:fortune",
+                "minecraft:power",
+                "minecraft:punch",
+                "minecraft:flame",
+                "minecraft:infinity",
+                "minecraft:luck_of_the_sea",
+                "minecraft:lure",
+                "minecraft:loyalty",
+                "minecraft:impaling",
+                "minecraft:riptide",
+                "minecraft:channeling",
+                "minecraft:multishot",
+                "minecraft:quick_charge",
+                "minecraft:piercing",
+                "minecraft:density",
+                "minecraft:breach",
+                "minecraft:lunge",
+                "minecraft:binding_curse",
+                "minecraft:vanishing_curse",
+                "minecraft:frost_walker",
+                "minecraft:mending"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "bastion_bridge_1_9",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:golden_helmet"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": 1
+            },
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "enchantments": [
+                "minecraft:protection",
+                "minecraft:fire_protection",
+                "minecraft:feather_falling",
+                "minecraft:blast_protection",
+                "minecraft:projectile_protection",
+                "minecraft:respiration",
+                "minecraft:aqua_affinity",
+                "minecraft:thorns",
+                "minecraft:depth_strider",
+                "minecraft:sharpness",
+                "minecraft:smite",
+                "minecraft:bane_of_arthropods",
+                "minecraft:knockback",
+                "minecraft:fire_aspect",
+                "minecraft:looting",
+                "minecraft:sweeping_edge",
+                "minecraft:efficiency",
+                "minecraft:silk_touch",
+                "minecraft:unbreaking",
+                "minecraft:fortune",
+                "minecraft:power",
+                "minecraft:punch",
+                "minecraft:flame",
+                "minecraft:infinity",
+                "minecraft:luck_of_the_sea",
+                "minecraft:lure",
+                "minecraft:loyalty",
+                "minecraft:impaling",
+                "minecraft:riptide",
+                "minecraft:channeling",
+                "minecraft:multishot",
+                "minecraft:quick_charge",
+                "minecraft:piercing",
+                "minecraft:density",
+                "minecraft:breach",
+                "minecraft:lunge",
+                "minecraft:binding_curse",
+                "minecraft:vanishing_curse",
+                "minecraft:frost_walker",
+                "minecraft:mending"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "bastion_bridge_1_10",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:golden_leggings"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": 1
+            },
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "enchantments": [
+                "minecraft:protection",
+                "minecraft:fire_protection",
+                "minecraft:feather_falling",
+                "minecraft:blast_protection",
+                "minecraft:projectile_protection",
+                "minecraft:respiration",
+                "minecraft:aqua_affinity",
+                "minecraft:thorns",
+                "minecraft:depth_strider",
+                "minecraft:sharpness",
+                "minecraft:smite",
+                "minecraft:bane_of_arthropods",
+                "minecraft:knockback",
+                "minecraft:fire_aspect",
+                "minecraft:looting",
+                "minecraft:sweeping_edge",
+                "minecraft:efficiency",
+                "minecraft:silk_touch",
+                "minecraft:unbreaking",
+                "minecraft:fortune",
+                "minecraft:power",
+                "minecraft:punch",
+                "minecraft:flame",
+                "minecraft:infinity",
+                "minecraft:luck_of_the_sea",
+                "minecraft:lure",
+                "minecraft:loyalty",
+                "minecraft:impaling",
+                "minecraft:riptide",
+                "minecraft:channeling",
+                "minecraft:multishot",
+                "minecraft:quick_charge",
+                "minecraft:piercing",
+                "minecraft:density",
+                "minecraft:breach",
+                "minecraft:lunge",
+                "minecraft:binding_curse",
+                "minecraft:vanishing_curse",
+                "minecraft:frost_walker",
+                "minecraft:mending"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "bastion_bridge_1_11",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:golden_boots"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": 1
+            },
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "enchantments": [
+                "minecraft:protection",
+                "minecraft:fire_protection",
+                "minecraft:feather_falling",
+                "minecraft:blast_protection",
+                "minecraft:projectile_protection",
+                "minecraft:respiration",
+                "minecraft:aqua_affinity",
+                "minecraft:thorns",
+                "minecraft:depth_strider",
+                "minecraft:sharpness",
+                "minecraft:smite",
+                "minecraft:bane_of_arthropods",
+                "minecraft:knockback",
+                "minecraft:fire_aspect",
+                "minecraft:looting",
+                "minecraft:sweeping_edge",
+                "minecraft:efficiency",
+                "minecraft:silk_touch",
+                "minecraft:unbreaking",
+                "minecraft:fortune",
+                "minecraft:power",
+                "minecraft:punch",
+                "minecraft:flame",
+                "minecraft:infinity",
+                "minecraft:luck_of_the_sea",
+                "minecraft:lure",
+                "minecraft:loyalty",
+                "minecraft:impaling",
+                "minecraft:riptide",
+                "minecraft:channeling",
+                "minecraft:multishot",
+                "minecraft:quick_charge",
+                "minecraft:piercing",
+                "minecraft:density",
+                "minecraft:breach",
+                "minecraft:lunge",
+                "minecraft:binding_curse",
+                "minecraft:vanishing_curse",
+                "minecraft:frost_walker",
+                "minecraft:mending"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "bastion_bridge_1_12",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:golden_axe"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": 1
+            },
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "enchantments": [
+                "minecraft:protection",
+                "minecraft:fire_protection",
+                "minecraft:feather_falling",
+                "minecraft:blast_protection",
+                "minecraft:projectile_protection",
+                "minecraft:respiration",
+                "minecraft:aqua_affinity",
+                "minecraft:thorns",
+                "minecraft:depth_strider",
+                "minecraft:sharpness",
+                "minecraft:smite",
+                "minecraft:bane_of_arthropods",
+                "minecraft:knockback",
+                "minecraft:fire_aspect",
+                "minecraft:looting",
+                "minecraft:sweeping_edge",
+                "minecraft:efficiency",
+                "minecraft:silk_touch",
+                "minecraft:unbreaking",
+                "minecraft:fortune",
+                "minecraft:power",
+                "minecraft:punch",
+                "minecraft:flame",
+                "minecraft:infinity",
+                "minecraft:luck_of_the_sea",
+                "minecraft:lure",
+                "minecraft:loyalty",
+                "minecraft:impaling",
+                "minecraft:riptide",
+                "minecraft:channeling",
+                "minecraft:multishot",
+                "minecraft:quick_charge",
+                "minecraft:piercing",
+                "minecraft:density",
+                "minecraft:breach",
+                "minecraft:lunge",
+                "minecraft:binding_curse",
+                "minecraft:vanishing_curse",
+                "minecraft:frost_walker",
+                "minecraft:mending"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "pool2",
+      "rolls": {
+        "min": 2,
+        "max": 4
+      },
+      "entries": [
+        {
+          "type": "item",
+          "entryName": "bastion_bridge_2_0",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:string"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 6
+              }
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "bastion_bridge_2_1",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:leather"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 3
+              }
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "bastion_bridge_2_2",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:arrow"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 5,
+                "max": 17
+              }
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "bastion_bridge_2_3",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:iron_nugget"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 2,
+                "max": 6
+              }
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "bastion_bridge_2_4",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:gold_nugget"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 2,
+                "max": 6
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "pool3",
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "empty",
+          "entryName": "bastion_bridge_3_0",
+          "weight": 11
+        },
+        {
+          "type": "empty",
+          "entryName": "bastion_bridge_3_1",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "name": "pool4",
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "empty",
+          "entryName": "bastion_bridge_4_0",
+          "weight": 9
+        },
+        {
+          "type": "item",
+          "entryName": "bastion_bridge_4_1",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:netherite_upgrade_smithing_template"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

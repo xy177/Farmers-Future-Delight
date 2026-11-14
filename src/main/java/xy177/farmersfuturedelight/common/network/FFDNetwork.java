@@ -58,8 +58,13 @@ public final class FFDNetwork {
                 PacketCookingBook.class, 17, Side.CLIENT);
         CHANNEL.registerMessage(PacketCookingBook.ServerHandler.class,
                 PacketCookingBook.class, 18, Side.SERVER);
+        CHANNEL.registerMessage(PacketRedstoneDots.Handler.class, PacketRedstoneDots.class, 20, Side.CLIENT);
         CHANNEL.registerMessage(PacketAgeLockState.Handler.class,
                 PacketAgeLockState.class, 19, Side.CLIENT);
+    }
+
+    public static void sendRedstoneDots(EntityPlayerMP player, int chunkX, int chunkZ, long[] positions) {
+        CHANNEL.sendTo(new PacketRedstoneDots(player.dimension, chunkX, chunkZ, positions), player);
     }
 
     public static void sendAgeLockState(net.minecraft.entity.EntityLivingBase entity) {

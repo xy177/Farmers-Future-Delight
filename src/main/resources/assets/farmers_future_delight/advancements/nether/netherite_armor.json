@@ -1,0 +1,32 @@
+{
+  "conditions": [
+    {
+      "type": "farmers_future_delight:feature_enabled",
+      "feature": "netherite"
+    }
+  ],
+  "parent": "farmers_future_delight:nether/obtain_ancient_debris",
+  "display": {
+    "description": {
+      "translate": "advancements.nether.netherite_armor.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "item": "farmers_future_delight:netherite_chestplate"
+    },
+    "title": {
+      "translate": "advancements.nether.netherite_armor.title"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "netherite_armor": {
+      "trigger": "farmers_future_delight:netherite_armor"
+    }
+  },
+  "rewards": {
+    "experience": 100
+  }
+}

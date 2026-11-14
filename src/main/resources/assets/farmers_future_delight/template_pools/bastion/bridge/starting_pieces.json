@@ -1,0 +1,23 @@
+{
+  "elements": [
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "farmers_future_delight:bastion/bridge/starting_pieces/entrance",
+        "processors": "farmers_future_delight:entrance_replacement",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "farmers_future_delight:bastion/bridge/starting_pieces/entrance_face",
+        "processors": "farmers_future_delight:bastion_generic_degradation",
+        "projection": "rigid"
+      },
+      "weight": 1
+    }
+  ],
+  "fallback": "minecraft:empty"
+}

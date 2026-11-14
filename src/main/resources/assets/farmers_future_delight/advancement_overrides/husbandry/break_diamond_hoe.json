@@ -1,0 +1,23 @@
+{
+  "parent": "minecraft:husbandry/plant_seed",
+  "display": {
+    "description": {
+      "translate": "advancements.husbandry.netherite_hoe.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "item": "farmers_future_delight:netherite_hoe"
+    },
+    "title": {
+      "translate": "advancements.husbandry.netherite_hoe.title"
+    }
+  },
+  "rewards": {
+    "experience": 100
+  },
+  "criteria": {
+    "netherite_hoe": {
+      "trigger": "farmers_future_delight:obtain_netherite_hoe"
+    }
+  }
+}

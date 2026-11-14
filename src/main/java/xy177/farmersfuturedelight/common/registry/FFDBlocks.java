@@ -126,9 +126,24 @@ public final class FFDBlocks {
     public static final BlockFutureStone QUARTZ_BRICKS = new BlockFutureStone(
             "quartz_bricks", 0.8F, 4.0F, SoundType.STONE).setMapColor(MapColor.QUARTZ);
     public static final BlockCryingObsidian CRYING_OBSIDIAN = new BlockCryingObsidian();
+    public static final BlockFutureStone CHISELED_NETHER_BRICKS = netherBricks("chiseled_nether_bricks");
+    public static final BlockFutureStone CRACKED_NETHER_BRICKS = netherBricks("cracked_nether_bricks");
+    public static final xy177.farmersfuturedelight.common.block.BlockTarget TARGET =
+            new xy177.farmersfuturedelight.common.block.BlockTarget();
+    public static final xy177.farmersfuturedelight.common.block.BlockLodestone LODESTONE =
+            new xy177.farmersfuturedelight.common.block.BlockLodestone();
+    public static final xy177.farmersfuturedelight.common.block.BlockRespawnAnchor RESPAWN_ANCHOR =
+            new xy177.farmersfuturedelight.common.block.BlockRespawnAnchor();
     public static final BlockBell BELL = new BlockBell();
     public static final xy177.farmersfuturedelight.common.block.BlockJigsaw JIGSAW =
             new xy177.farmersfuturedelight.common.block.BlockJigsaw();
+
+    private static BlockFutureStone netherBricks(String name) {
+        BlockFutureStone block = new BlockFutureStone(name, 2.0F, 6.0F, FFDSounds.NETHER_BRICKS);
+        block.setResistance(10.0F);
+        block.setMapColor(MapColor.NETHERRACK);
+        return block;
+    }
     public static final String[] CANDLE_NAMES = {
             "candle", "white_candle", "orange_candle", "magenta_candle",
             "light_blue_candle", "yellow_candle", "lime_candle", "pink_candle",
@@ -143,6 +158,10 @@ public final class FFDBlocks {
     };
     public static final BlockWoodStandingSign[] WOOD_STANDING_SIGNS = standingWoodSigns();
     public static final BlockWoodWallSign[] WOOD_WALL_SIGNS = wallWoodSigns();
+    public static final BlockWoodStandingSign CRIMSON_SIGN = new BlockWoodStandingSign("crimson");
+    public static final BlockWoodWallSign CRIMSON_WALL_SIGN = new BlockWoodWallSign("crimson");
+    public static final BlockWoodStandingSign WARPED_SIGN = new BlockWoodStandingSign("warped");
+    public static final BlockWoodWallSign WARPED_WALL_SIGN = new BlockWoodWallSign("warped");
     private static final MapColor[] STRIPPED_WOOD_MAP_COLORS = {
             MapColor.WOOD, MapColor.OBSIDIAN, MapColor.SAND,
             MapColor.DIRT, MapColor.ADOBE, MapColor.BROWN
@@ -200,6 +219,9 @@ public final class FFDBlocks {
                     FFDSounds.AMETHYST_CLUSTER, true);
     public static final BlockFutureStone CALCITE =
             new BlockFutureStone("calcite", 0.75F, 0.75F, FFDSounds.CALCITE);
+    public static final xy177.farmersfuturedelight.common.block.BlockBasalt BASALT = new xy177.farmersfuturedelight.common.block.BlockBasalt("basalt");
+    public static final xy177.farmersfuturedelight.common.block.BlockBasalt POLISHED_BASALT = new xy177.farmersfuturedelight.common.block.BlockBasalt("polished_basalt");
+    public static final xy177.farmersfuturedelight.common.block.BlockNetherGoldOre NETHER_GOLD_ORE = new xy177.farmersfuturedelight.common.block.BlockNetherGoldOre();
     public static final BlockFutureStone SMOOTH_BASALT =
             new BlockFutureStone("smooth_basalt", 1.25F, 4.2F, FFDSounds.BASALT);
     public static final BlockTintedGlass TINTED_GLASS = new BlockTintedGlass();
@@ -208,6 +230,15 @@ public final class FFDBlocks {
     public static final BlockPointedDripstone POINTED_DRIPSTONE = new BlockPointedDripstone();
     public static final BlockIronChain IRON_CHAIN = new BlockIronChain();
     public static final BlockLantern LANTERN = new BlockLantern();
+    public static final xy177.farmersfuturedelight.common.block.BlockSoulSoil SOUL_SOIL =
+            new xy177.farmersfuturedelight.common.block.BlockSoulSoil();
+    public static final xy177.farmersfuturedelight.common.block.BlockSoulFire SOUL_FIRE =
+            new xy177.farmersfuturedelight.common.block.BlockSoulFire();
+    public static final xy177.farmersfuturedelight.common.block.BlockSoulTorch SOUL_TORCH =
+            new xy177.farmersfuturedelight.common.block.BlockSoulTorch();
+    public static final BlockLantern SOUL_LANTERN = new BlockLantern(true);
+    public static final xy177.farmersfuturedelight.common.block.BlockCampfire SOUL_CAMPFIRE =
+            new xy177.farmersfuturedelight.common.block.BlockCampfire(true);
     public static final BlockFutureFlower CORNFLOWER = new BlockFutureFlower("cornflower", false);
     public static final BlockFutureFlower LILY_OF_THE_VALLEY = new BlockFutureFlower("lily_of_the_valley", false);
     public static final BlockFutureFlower WITHER_ROSE = new BlockFutureFlower("wither_rose", true);

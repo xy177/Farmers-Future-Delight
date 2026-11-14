@@ -57,7 +57,7 @@ public final class ModernSpawnEggModel extends BakedModelWrapper<IBakedModel> {
         registerModel("minecraft", "zombie_pigman", "zombified_piglin");
         registerModels(FarmerFutureDelight.MODID, "axolotl", "bee", "cat", "cod", "dolphin", "drowned",
                 "fox", "glow_squid", "goat", "panda", "phantom", "pillager", "pufferfish", "ravager",
-                "salmon", "trader_llama", "tropical_fish", "turtle", "wandering_trader");
+                "salmon", "trader_llama", "tropical_fish", "turtle", "wandering_trader", "hoglin", "zoglin", "strider", "piglin", "piglin_brute");
     }
 
     private static void registerModels(String domain, String... names) {

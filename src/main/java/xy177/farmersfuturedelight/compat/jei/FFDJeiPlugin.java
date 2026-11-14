@@ -31,7 +31,8 @@ public final class FFDJeiPlugin implements IModPlugin {
         category(registration, "smithing", FFDBlocks.SMITHING_TABLE);
         category(registration, "smoking", FFDBlocks.SMOKER);
         category(registration, "blasting", FFDBlocks.BLAST_FURNACE);
-        category(registration, "campfire_cooking", FFDBlocks.CAMPFIRE);
+        category(registration, "campfire_cooking", FFDItems.isBlockRegistered(FFDBlocks.CAMPFIRE)
+                ? FFDBlocks.CAMPFIRE : FFDBlocks.SOUL_CAMPFIRE);
         category(registration, "stonecutting", FFDBlocks.STONECUTTER);
         category(registration, "composting", FFDBlocks.COMPOSTER);
         category(registration, "loom", FFDBlocks.LOOM);
@@ -56,7 +57,12 @@ public final class FFDJeiPlugin implements IModPlugin {
         mezz.jei.api.recipe.IStackHelper stacks = registry.getJeiHelpers().getStackHelper();
         register(registry, "smoking", FFDJeiRecipes.workstation(WorkstationRecipes.Type.SMOKING, stacks), FFDBlocks.SMOKER);
         register(registry, "blasting", FFDJeiRecipes.workstation(WorkstationRecipes.Type.BLASTING, stacks), FFDBlocks.BLAST_FURNACE);
-        register(registry, "campfire_cooking", FFDJeiRecipes.workstation(WorkstationRecipes.Type.CAMPFIRE_COOKING, stacks), FFDBlocks.CAMPFIRE);
+        register(registry, "campfire_cooking", FFDJeiRecipes.workstation(WorkstationRecipes.Type.CAMPFIRE_COOKING, stacks),
+                FFDItems.isBlockRegistered(FFDBlocks.CAMPFIRE) ? FFDBlocks.CAMPFIRE : FFDBlocks.SOUL_CAMPFIRE);
+        if (categories.containsKey("campfire_cooking") && FFDItems.isItemRegistered(FFDItems.CAMPFIRE)
+                && FFDItems.isItemRegistered(FFDItems.SOUL_CAMPFIRE)) {
+            registry.addRecipeCatalyst(new ItemStack(FFDItems.SOUL_CAMPFIRE), uid("campfire_cooking"));
+        }
         register(registry, "stonecutting", FFDJeiRecipes.workstation(WorkstationRecipes.Type.STONECUTTING, stacks), FFDBlocks.STONECUTTER);
         register(registry, "smithing", FFDJeiRecipes.workstation(WorkstationRecipes.Type.SMITHING, stacks), FFDBlocks.SMITHING_TABLE);
         register(registry, "composting", FFDJeiRecipes.composting(), FFDBlocks.COMPOSTER);

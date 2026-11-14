@@ -1,0 +1,28 @@
+{
+  "conditions": [
+    {
+      "type": "farmers_future_delight:feature_enabled",
+      "feature": "respawn_anchor"
+    }
+  ],
+  "parent": "minecraft:nether/root",
+  "display": {
+    "description": {
+      "translate": "advancements.nether.charge_respawn_anchor.description"
+    },
+    "icon": {
+      "item": "farmers_future_delight:respawn_anchor"
+    },
+    "title": {
+      "translate": "advancements.nether.charge_respawn_anchor.title"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "charge_respawn_anchor": {
+      "trigger": "farmers_future_delight:charge_respawn_anchor"
+    }
+  }
+}

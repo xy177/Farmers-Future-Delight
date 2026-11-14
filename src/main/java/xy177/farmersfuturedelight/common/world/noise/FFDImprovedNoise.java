@@ -33,7 +33,7 @@ public final class FFDImprovedNoise {
         }
     }
 
-    FFDImprovedNoise(Random random) {
+    public FFDImprovedNoise(Random random) {
         offsetX = random.nextDouble() * 256.0D;
         offsetY = random.nextDouble() * 256.0D;
         offsetZ = random.nextDouble() * 256.0D;
@@ -53,6 +53,10 @@ public final class FFDImprovedNoise {
     }
 
     public strictfp float sampleFloat(double inputX, double inputY, double inputZ) {
+        return sampleFloat(inputX, inputY, inputZ, 0.0D);
+    }
+
+    public strictfp float sampleFloat(double inputX, double inputY, double inputZ, double smearY) {
         double x = wrap(inputX) + offsetX;
         double y = wrap(inputY) + offsetY;
         double z = wrap(inputZ) + offsetZ;
@@ -61,6 +65,12 @@ public final class FFDImprovedNoise {
         int floorZ = floor(z);
         float localX = (float) (x - floorX);
         float localY = (float) (y - floorY);
+        float originalY = localY;
+        if (smearY != 0.0D) {
+            double relativeY = y - floorY;
+            double limit = inputY >= 0.0D && inputY < relativeY ? inputY : relativeY;
+            localY = (float) (relativeY - Math.floor(limit / smearY + (double) 1.0E-7F) * smearY);
+        }
         float localZ = (float) (z - floorZ);
         int x0 = permutations[floorX & 255];
         int x1 = permutations[(floorX + 1) & 255];
@@ -78,7 +88,7 @@ public final class FFDImprovedNoise {
         float d111 = gradientFloat(permutations[(xy11 + floorZ + 1) & 255], localX - 1.0F, localY - 1.0F,
                 localZ - 1.0F);
         float alphaX = smoothstepFloat(localX);
-        float alphaY = smoothstepFloat(localY);
+        float alphaY = smoothstepFloat(originalY);
         float alphaZ = smoothstepFloat(localZ);
         return lerpFloat(alphaZ,
                 lerpFloat(alphaY, lerpFloat(alphaX, d000, d100), lerpFloat(alphaX, d010, d110)),

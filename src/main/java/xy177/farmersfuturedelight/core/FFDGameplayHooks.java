@@ -550,8 +550,9 @@ public final class FFDGameplayHooks {
             return original;
         }
         ItemStack record = ((BlockJukebox.TileEntityJukebox) tile).getRecord();
-        return !record.isEmpty() && record.getItem() == FFDItems.MUSIC_DISC_OTHERSIDE
-                ? 14 : original;
+        if (record.isEmpty()) return original;
+        if (record.getItem() == FFDItems.MUSIC_DISC_OTHERSIDE) return 14;
+        return record.getItem() == FFDItems.MUSIC_DISC_PIGSTEP ? 13 : original;
     }
 
     public static boolean updateBeaconSounds(TileEntityBeacon beacon, boolean active,
@@ -586,6 +587,14 @@ public final class FFDGameplayHooks {
     public static void applyModernBlockProperties() {
         Blocks.WATER.setLightOpacity(1);
         Blocks.FLOWING_WATER.setLightOpacity(1);
+        modernSound(Blocks.NETHERRACK, FFDSounds.NETHERRACK);
+        modernSound(Blocks.QUARTZ_ORE, FFDSounds.NETHER_ORE);
+        modernSound(Blocks.SOUL_SAND, FFDSounds.SOUL_SAND);
+        modernSound(Blocks.NETHER_BRICK, FFDSounds.NETHER_BRICKS);
+        modernSound(Blocks.NETHER_BRICK_FENCE, FFDSounds.NETHER_BRICKS);
+        modernSound(Blocks.NETHER_BRICK_STAIRS, FFDSounds.NETHER_BRICKS);
+        modernSound(Blocks.RED_NETHER_BRICK, FFDSounds.NETHER_BRICKS);
+        modernSound(Blocks.NETHER_WART, FFDSounds.NETHER_WART);
         if (Blocks.ENCHANTING_TABLE != null) {
             Blocks.ENCHANTING_TABLE.setLightLevel(FFDConfig.enchantingTableEmitsLight
                     ? 7.0F / 15.0F : 0.0F);
@@ -594,6 +603,11 @@ public final class FFDGameplayHooks {
             ObfuscationReflectionHelper.setPrivateValue(Block.class, Blocks.NETHER_WART_BLOCK,
                     FFDSounds.WART_BLOCK, "blockSoundType", "field_149762_H");
         }
+    }
+
+    private static void modernSound(Block block, net.minecraft.block.SoundType sound) {
+        ObfuscationReflectionHelper.setPrivateValue(Block.class, block, sound,
+                "blockSoundType", "field_149762_H");
     }
 
     public static boolean canTickGrass(boolean areaLoaded, World world, BlockPos pos) {
@@ -638,7 +652,8 @@ public final class FFDGameplayHooks {
 
     public static boolean blocksFlowingWater(Block liquid, IBlockState targetState,
                                               World world, BlockPos pos) {
-        if (WaterloggedBlockApi.isWaterlogged(world, pos)
+        if (targetState.getBlock() instanceof net.minecraft.block.BlockSign
+                || WaterloggedBlockApi.isWaterlogged(world, pos)
                 || FFDConfig.isAdditionalWaterloggingBlock(world, targetState.getBlock())) return true;
         return liquid == Blocks.FLOWING_WATER && targetState != null
                 && !WaterloggedBlockApi.isWaterlogged(targetState)
@@ -704,6 +719,8 @@ public final class FFDGameplayHooks {
     public static void updateBlockTickWithWaterlogging(Block block, World world, BlockPos pos,
                                                         IBlockState state, Random random) {
         if (!world.isRemote && WaterloggedBlockApi.getFluidForBlock(block) != null) {
+            if (xy177.farmersfuturedelight.common.world.modern.ModernGenerationLifecycle
+                    .deferFluidTick(world, pos, block)) return;
             boolean mixed = xy177.farmersfuturedelight.common.block.WaterloggedPlantFluid
                     .tryMixFluidNeighbors(world, pos, state);
             if (mixed && WaterloggedBlockApi.getFluidForBlock(world.getBlockState(pos).getBlock())
@@ -849,6 +866,9 @@ public final class FFDGameplayHooks {
     }
 
     public static int getFluidloggedLightValue(int light, IBlockAccess world, BlockPos pos) {
+        int prepared = xy177.farmersfuturedelight.common.world.modern.ModernLightAccess
+                .containedLight(light, world, pos);
+        if (prepared >= 0) return prepared;
         if (!WaterloggedBlockApi.isWaterlogged(world, pos) || !(world instanceof World)) {
             return light;
         }

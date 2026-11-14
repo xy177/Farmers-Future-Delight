@@ -1,0 +1,804 @@
+{
+  "pools": [
+    {
+      "name": "pool0",
+      "rolls": {
+        "min": 4,
+        "max": 8
+      },
+      "entries": [
+        {
+          "type": "item",
+          "entryName": "ruined_portal_0_0",
+          "weight": 40,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:obsidian"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 2
+              }
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "ruined_portal_0_1",
+          "weight": 40,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:flint"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 4
+              }
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "ruined_portal_0_2",
+          "weight": 40,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:iron_nugget"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 9,
+                "max": 18
+              }
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "ruined_portal_0_3",
+          "weight": 40,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:flint_and_steel"
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "ruined_portal_0_4",
+          "weight": 40,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:fire_charge"
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "ruined_portal_0_5",
+          "weight": 15,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:golden_apple"
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "ruined_portal_0_6",
+          "weight": 15,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:gold_nugget"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 4,
+                "max": 24
+              }
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "ruined_portal_0_7",
+          "weight": 15,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:golden_sword"
+            },
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "enchantments": [
+                "minecraft:protection",
+                "minecraft:fire_protection",
+                "minecraft:feather_falling",
+                "minecraft:blast_protection",
+                "minecraft:projectile_protection",
+                "minecraft:respiration",
+                "minecraft:aqua_affinity",
+                "minecraft:thorns",
+                "minecraft:depth_strider",
+                "minecraft:sharpness",
+                "minecraft:smite",
+                "minecraft:bane_of_arthropods",
+                "minecraft:knockback",
+                "minecraft:fire_aspect",
+                "minecraft:looting",
+                "minecraft:sweeping_edge",
+                "minecraft:efficiency",
+                "minecraft:silk_touch",
+                "minecraft:unbreaking",
+                "minecraft:fortune",
+                "minecraft:power",
+                "minecraft:punch",
+                "minecraft:flame",
+                "minecraft:infinity",
+                "minecraft:luck_of_the_sea",
+                "minecraft:lure",
+                "minecraft:loyalty",
+                "minecraft:impaling",
+                "minecraft:riptide",
+                "minecraft:channeling",
+                "minecraft:multishot",
+                "minecraft:quick_charge",
+                "minecraft:piercing",
+                "minecraft:density",
+                "minecraft:breach",
+                "minecraft:lunge",
+                "minecraft:binding_curse",
+                "minecraft:vanishing_curse",
+                "minecraft:frost_walker",
+                "minecraft:mending"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "ruined_portal_0_8",
+          "weight": 15,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:golden_axe"
+            },
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "enchantments": [
+                "minecraft:protection",
+                "minecraft:fire_protection",
+                "minecraft:feather_falling",
+                "minecraft:blast_protection",
+                "minecraft:projectile_protection",
+                "minecraft:respiration",
+                "minecraft:aqua_affinity",
+                "minecraft:thorns",
+                "minecraft:depth_strider",
+                "minecraft:sharpness",
+                "minecraft:smite",
+                "minecraft:bane_of_arthropods",
+                "minecraft:knockback",
+                "minecraft:fire_aspect",
+                "minecraft:looting",
+                "minecraft:sweeping_edge",
+                "minecraft:efficiency",
+                "minecraft:silk_touch",
+                "minecraft:unbreaking",
+                "minecraft:fortune",
+                "minecraft:power",
+                "minecraft:punch",
+                "minecraft:flame",
+                "minecraft:infinity",
+                "minecraft:luck_of_the_sea",
+                "minecraft:lure",
+                "minecraft:loyalty",
+                "minecraft:impaling",
+                "minecraft:riptide",
+                "minecraft:channeling",
+                "minecraft:multishot",
+                "minecraft:quick_charge",
+                "minecraft:piercing",
+                "minecraft:density",
+                "minecraft:breach",
+                "minecraft:lunge",
+                "minecraft:binding_curse",
+                "minecraft:vanishing_curse",
+                "minecraft:frost_walker",
+                "minecraft:mending"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "ruined_portal_0_9",
+          "weight": 15,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:golden_hoe"
+            },
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "enchantments": [
+                "minecraft:protection",
+                "minecraft:fire_protection",
+                "minecraft:feather_falling",
+                "minecraft:blast_protection",
+                "minecraft:projectile_protection",
+                "minecraft:respiration",
+                "minecraft:aqua_affinity",
+                "minecraft:thorns",
+                "minecraft:depth_strider",
+                "minecraft:sharpness",
+                "minecraft:smite",
+                "minecraft:bane_of_arthropods",
+                "minecraft:knockback",
+                "minecraft:fire_aspect",
+                "minecraft:looting",
+                "minecraft:sweeping_edge",
+                "minecraft:efficiency",
+                "minecraft:silk_touch",
+                "minecraft:unbreaking",
+                "minecraft:fortune",
+                "minecraft:power",
+                "minecraft:punch",
+                "minecraft:flame",
+                "minecraft:infinity",
+                "minecraft:luck_of_the_sea",
+                "minecraft:lure",
+                "minecraft:loyalty",
+                "minecraft:impaling",
+                "minecraft:riptide",
+                "minecraft:channeling",
+                "minecraft:multishot",
+                "minecraft:quick_charge",
+                "minecraft:piercing",
+                "minecraft:density",
+                "minecraft:breach",
+                "minecraft:lunge",
+                "minecraft:binding_curse",
+                "minecraft:vanishing_curse",
+                "minecraft:frost_walker",
+                "minecraft:mending"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "ruined_portal_0_10",
+          "weight": 15,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:golden_shovel"
+            },
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "enchantments": [
+                "minecraft:protection",
+                "minecraft:fire_protection",
+                "minecraft:feather_falling",
+                "minecraft:blast_protection",
+                "minecraft:projectile_protection",
+                "minecraft:respiration",
+                "minecraft:aqua_affinity",
+                "minecraft:thorns",
+                "minecraft:depth_strider",
+                "minecraft:sharpness",
+                "minecraft:smite",
+                "minecraft:bane_of_arthropods",
+                "minecraft:knockback",
+                "minecraft:fire_aspect",
+                "minecraft:looting",
+                "minecraft:sweeping_edge",
+                "minecraft:efficiency",
+                "minecraft:silk_touch",
+                "minecraft:unbreaking",
+                "minecraft:fortune",
+                "minecraft:power",
+                "minecraft:punch",
+                "minecraft:flame",
+                "minecraft:infinity",
+                "minecraft:luck_of_the_sea",
+                "minecraft:lure",
+                "minecraft:loyalty",
+                "minecraft:impaling",
+                "minecraft:riptide",
+                "minecraft:channeling",
+                "minecraft:multishot",
+                "minecraft:quick_charge",
+                "minecraft:piercing",
+                "minecraft:density",
+                "minecraft:breach",
+                "minecraft:lunge",
+                "minecraft:binding_curse",
+                "minecraft:vanishing_curse",
+                "minecraft:frost_walker",
+                "minecraft:mending"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "ruined_portal_0_11",
+          "weight": 15,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:golden_pickaxe"
+            },
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "enchantments": [
+                "minecraft:protection",
+                "minecraft:fire_protection",
+                "minecraft:feather_falling",
+                "minecraft:blast_protection",
+                "minecraft:projectile_protection",
+                "minecraft:respiration",
+                "minecraft:aqua_affinity",
+                "minecraft:thorns",
+                "minecraft:depth_strider",
+                "minecraft:sharpness",
+                "minecraft:smite",
+                "minecraft:bane_of_arthropods",
+                "minecraft:knockback",
+                "minecraft:fire_aspect",
+                "minecraft:looting",
+                "minecraft:sweeping_edge",
+                "minecraft:efficiency",
+                "minecraft:silk_touch",
+                "minecraft:unbreaking",
+                "minecraft:fortune",
+                "minecraft:power",
+                "minecraft:punch",
+                "minecraft:flame",
+                "minecraft:infinity",
+                "minecraft:luck_of_the_sea",
+                "minecraft:lure",
+                "minecraft:loyalty",
+                "minecraft:impaling",
+                "minecraft:riptide",
+                "minecraft:channeling",
+                "minecraft:multishot",
+                "minecraft:quick_charge",
+                "minecraft:piercing",
+                "minecraft:density",
+                "minecraft:breach",
+                "minecraft:lunge",
+                "minecraft:binding_curse",
+                "minecraft:vanishing_curse",
+                "minecraft:frost_walker",
+                "minecraft:mending"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "ruined_portal_0_12",
+          "weight": 15,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:golden_boots"
+            },
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "enchantments": [
+                "minecraft:protection",
+                "minecraft:fire_protection",
+                "minecraft:feather_falling",
+                "minecraft:blast_protection",
+                "minecraft:projectile_protection",
+                "minecraft:respiration",
+                "minecraft:aqua_affinity",
+                "minecraft:thorns",
+                "minecraft:depth_strider",
+                "minecraft:sharpness",
+                "minecraft:smite",
+                "minecraft:bane_of_arthropods",
+                "minecraft:knockback",
+                "minecraft:fire_aspect",
+                "minecraft:looting",
+                "minecraft:sweeping_edge",
+                "minecraft:efficiency",
+                "minecraft:silk_touch",
+                "minecraft:unbreaking",
+                "minecraft:fortune",
+                "minecraft:power",
+                "minecraft:punch",
+                "minecraft:flame",
+                "minecraft:infinity",
+                "minecraft:luck_of_the_sea",
+                "minecraft:lure",
+                "minecraft:loyalty",
+                "minecraft:impaling",
+                "minecraft:riptide",
+                "minecraft:channeling",
+                "minecraft:multishot",
+                "minecraft:quick_charge",
+                "minecraft:piercing",
+                "minecraft:density",
+                "minecraft:breach",
+                "minecraft:lunge",
+                "minecraft:binding_curse",
+                "minecraft:vanishing_curse",
+                "minecraft:frost_walker",
+                "minecraft:mending"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "ruined_portal_0_13",
+          "weight": 15,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:golden_chestplate"
+            },
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "enchantments": [
+                "minecraft:protection",
+                "minecraft:fire_protection",
+                "minecraft:feather_falling",
+                "minecraft:blast_protection",
+                "minecraft:projectile_protection",
+                "minecraft:respiration",
+                "minecraft:aqua_affinity",
+                "minecraft:thorns",
+                "minecraft:depth_strider",
+                "minecraft:sharpness",
+                "minecraft:smite",
+                "minecraft:bane_of_arthropods",
+                "minecraft:knockback",
+                "minecraft:fire_aspect",
+                "minecraft:looting",
+                "minecraft:sweeping_edge",
+                "minecraft:efficiency",
+                "minecraft:silk_touch",
+                "minecraft:unbreaking",
+                "minecraft:fortune",
+                "minecraft:power",
+                "minecraft:punch",
+                "minecraft:flame",
+                "minecraft:infinity",
+                "minecraft:luck_of_the_sea",
+                "minecraft:lure",
+                "minecraft:loyalty",
+                "minecraft:impaling",
+                "minecraft:riptide",
+                "minecraft:channeling",
+                "minecraft:multishot",
+                "minecraft:quick_charge",
+                "minecraft:piercing",
+                "minecraft:density",
+                "minecraft:breach",
+                "minecraft:lunge",
+                "minecraft:binding_curse",
+                "minecraft:vanishing_curse",
+                "minecraft:frost_walker",
+                "minecraft:mending"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "ruined_portal_0_14",
+          "weight": 15,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:golden_helmet"
+            },
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "enchantments": [
+                "minecraft:protection",
+                "minecraft:fire_protection",
+                "minecraft:feather_falling",
+                "minecraft:blast_protection",
+                "minecraft:projectile_protection",
+                "minecraft:respiration",
+                "minecraft:aqua_affinity",
+                "minecraft:thorns",
+                "minecraft:depth_strider",
+                "minecraft:sharpness",
+                "minecraft:smite",
+                "minecraft:bane_of_arthropods",
+                "minecraft:knockback",
+                "minecraft:fire_aspect",
+                "minecraft:looting",
+                "minecraft:sweeping_edge",
+                "minecraft:efficiency",
+                "minecraft:silk_touch",
+                "minecraft:unbreaking",
+                "minecraft:fortune",
+                "minecraft:power",
+                "minecraft:punch",
+                "minecraft:flame",
+                "minecraft:infinity",
+                "minecraft:luck_of_the_sea",
+                "minecraft:lure",
+                "minecraft:loyalty",
+                "minecraft:impaling",
+                "minecraft:riptide",
+                "minecraft:channeling",
+                "minecraft:multishot",
+                "minecraft:quick_charge",
+                "minecraft:piercing",
+                "minecraft:density",
+                "minecraft:breach",
+                "minecraft:lunge",
+                "minecraft:binding_curse",
+                "minecraft:vanishing_curse",
+                "minecraft:frost_walker",
+                "minecraft:mending"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "ruined_portal_0_15",
+          "weight": 15,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:golden_leggings"
+            },
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "enchantments": [
+                "minecraft:protection",
+                "minecraft:fire_protection",
+                "minecraft:feather_falling",
+                "minecraft:blast_protection",
+                "minecraft:projectile_protection",
+                "minecraft:respiration",
+                "minecraft:aqua_affinity",
+                "minecraft:thorns",
+                "minecraft:depth_strider",
+                "minecraft:sharpness",
+                "minecraft:smite",
+                "minecraft:bane_of_arthropods",
+                "minecraft:knockback",
+                "minecraft:fire_aspect",
+                "minecraft:looting",
+                "minecraft:sweeping_edge",
+                "minecraft:efficiency",
+                "minecraft:silk_touch",
+                "minecraft:unbreaking",
+                "minecraft:fortune",
+                "minecraft:power",
+                "minecraft:punch",
+                "minecraft:flame",
+                "minecraft:infinity",
+                "minecraft:luck_of_the_sea",
+                "minecraft:lure",
+                "minecraft:loyalty",
+                "minecraft:impaling",
+                "minecraft:riptide",
+                "minecraft:channeling",
+                "minecraft:multishot",
+                "minecraft:quick_charge",
+                "minecraft:piercing",
+                "minecraft:density",
+                "minecraft:breach",
+                "minecraft:lunge",
+                "minecraft:binding_curse",
+                "minecraft:vanishing_curse",
+                "minecraft:frost_walker",
+                "minecraft:mending"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "ruined_portal_0_16",
+          "weight": 5,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:glistering_melon_slice"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 4,
+                "max": 12
+              }
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "ruined_portal_0_17",
+          "weight": 5,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:golden_horse_armor"
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "ruined_portal_0_18",
+          "weight": 5,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:light_weighted_pressure_plate"
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "ruined_portal_0_19",
+          "weight": 5,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:golden_carrot"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 4,
+                "max": 12
+              }
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "ruined_portal_0_20",
+          "weight": 5,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:clock"
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "ruined_portal_0_21",
+          "weight": 5,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:gold_ingot"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 2,
+                "max": 8
+              }
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "ruined_portal_0_22",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:bell"
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "ruined_portal_0_23",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:enchanted_golden_apple"
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "entryName": "ruined_portal_0_24",
+          "weight": 1,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:gold_block"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 2
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "pool1",
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "empty",
+          "entryName": "ruined_portal_1_0",
+          "weight": 1
+        },
+        {
+          "type": "item",
+          "entryName": "ruined_portal_1_1",
+          "weight": 2,
+          "name": "minecraft:stone",
+          "functions": [
+            {
+              "function": "farmers_future_delight:modern_structure_item",
+              "item": "minecraft:lodestone"
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 2
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

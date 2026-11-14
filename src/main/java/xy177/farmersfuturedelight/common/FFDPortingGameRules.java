@@ -26,6 +26,8 @@ public final class FFDPortingGameRules {
     public static final String DROWNING_DAMAGE = "minecraft:drowning_damage";
     public static final String FALL_DAMAGE = "minecraft:fall_damage";
     public static final String FIRE_DAMAGE = "minecraft:fire_damage";
+    public static final String UNIVERSAL_ANGER = "minecraft:universal_anger";
+    public static final String FORGIVE_DEAD_PLAYERS = "minecraft:forgive_dead_players";
     private static final Map<EntityPlayerMP, RuleSnapshot> LAST_SENT = new WeakHashMap<>();
 
     private FFDPortingGameRules() {
@@ -37,6 +39,8 @@ public final class FFDPortingGameRules {
         ensureBoolean(rules, DROWNING_DAMAGE, true, "drowningDamage");
         ensureBoolean(rules, FALL_DAMAGE, true, "fallDamage");
         ensureBoolean(rules, FIRE_DAMAGE, true, "fireDamage");
+        ensureBoolean(rules, UNIVERSAL_ANGER, false, "universalAnger");
+        ensureBoolean(rules, FORGIVE_DEAD_PLAYERS, true, "forgiveDeadPlayers");
     }
 
     private static void ensureBoolean(GameRules rules, String name, boolean defaultValue,

@@ -30,8 +30,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityPotion;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemAxe;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemHoe;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemShears;
 import net.minecraft.item.ItemSpade;
@@ -81,6 +81,7 @@ import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.event.world.ChunkDataEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
@@ -132,6 +133,10 @@ import xy177.farmersfuturedelight.core.FFDHeightHooks;
 
 @Mod.EventBusSubscriber(modid = FarmerFutureDelight.MODID)
 public final class FFDGameplayEvents {
+    @SubscribeEvent(priority = net.minecraftforge.fml.common.eventhandler.EventPriority.HIGHEST)
+    public static void onAnchorExplosion(ExplosionEvent.Detonate event) {
+        xy177.farmersfuturedelight.common.block.BlockRespawnAnchor.protectWaterloggedExplosion(event);
+    }
     @SubscribeEvent
     public static void onAnvilContainerOpen(PlayerContainerEvent.Open event) {
         if (!event.getEntityPlayer().world.isRemote
@@ -233,7 +238,7 @@ public final class FFDGameplayEvents {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onNaturalHostileSpawn(LivingSpawnEvent.CheckSpawn event) {
-        if (!FFDConfig.hostileMobsRequireZeroBlockLight || event.isSpawner()
+        if (!FFDConfig.hostileMobsRequireZeroBlockLight || event.isSpawner() || event.getWorld().provider.isNether()
                 || event.getWorld().isRemote
                 || !event.getEntityLiving().isCreatureType(EnumCreatureType.MONSTER, false)) {
             return;
@@ -272,7 +277,7 @@ public final class FFDGameplayEvents {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onVanillaOreHarvested(HarvestDropsEvent event) {
         if (!FFDConfig.oresDropRawMaterials || event.isSilkTouching()
                 || FFDBlockLootTables.hasLootTable(event.getWorld(), event.getState())) {
@@ -1209,6 +1214,9 @@ public final class FFDGameplayEvents {
             return;
         }
         IBlockState state = event.getEntity().world.getBlockState(hit.getBlockPos());
+        if (state.getBlock() == FFDBlocks.TARGET) {
+            FFDBlocks.TARGET.hit(event.getEntity().world, state, hit, event.getEntity());
+        }
         if (state.getBlock() instanceof xy177.farmersfuturedelight.common.block.BlockCampfire
                 && event.getEntity().isBurning()
                 && !state.getValue(xy177.farmersfuturedelight.common.block.BlockCampfire.LIT)

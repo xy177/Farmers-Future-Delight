@@ -159,6 +159,9 @@ public final class WaterloggedBlockApi {
         if (state == null) {
             return false;
         }
+        if (!state.getProperties().containsKey(UNIVERSAL_WATERLOGGED)) {
+            return false;
+        }
         for (IProperty<?> property : state.getPropertyKeys()) {
             if (property == UNIVERSAL_WATERLOGGED) {
                 return true;

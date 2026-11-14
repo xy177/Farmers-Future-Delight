@@ -2,6 +2,8 @@ package xy177.farmersfuturedelight.client.render;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
+import net.minecraft.client.model.ModelOcelot;
+import xy177.farmersfuturedelight.common.FFDConfig;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.entity.passive.EntityOcelot;
@@ -18,6 +20,7 @@ public class LayerCatCollar implements LayerRenderer<EntityOcelot> {
             "farmers_future_delight", "textures/entity/cat/cat_collar_baby.png");
     private final ModelCat adultModel = new ModelCat();
     private final ModelCatBaby babyModel = new ModelCatBaby();
+    private final ModelOcelot legacyBabyModel = new ModelOcelot();
 
     public LayerCatCollar() {
     }
@@ -30,11 +33,13 @@ public class LayerCatCollar implements LayerRenderer<EntityOcelot> {
             return;
         }
         float[] color = ((EntityCat) entity).getCollarColor().getColorComponentValues();
-        ModelBase collarModel = entity.isChild() ? babyModel : adultModel;
+        boolean modernBaby = entity.isChild() && FFDConfig.modernBabyModels;
+        ModelBase collarModel = entity.isChild() ? (modernBaby ? babyModel : legacyBabyModel) : adultModel;
+        collarModel.isChild = entity.isChild();
         collarModel.setLivingAnimations(entity, limbSwing, limbSwingAmount, partialTicks);
         GlStateManager.color(color[0], color[1], color[2], 1.0F);
         Minecraft.getMinecraft().getTextureManager().bindTexture(
-                entity.isChild() ? BABY_COLLAR_TEXTURE : COLLAR_TEXTURE);
+                modernBaby ? BABY_COLLAR_TEXTURE : COLLAR_TEXTURE);
         collarModel.render(entity, limbSwing, limbSwingAmount,
                 ageInTicks, netHeadYaw, headPitch, scale);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);

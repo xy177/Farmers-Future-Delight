@@ -131,6 +131,11 @@ final class FFDModernSurfaceBiomeMap {
 
     static ModernBiome select(long temperature, long humidity, long continentalness,
                               long erosion, long weirdness) {
+        return select(temperature, humidity, continentalness, erosion, weirdness, false);
+    }
+
+    static ModernBiome select(long temperature, long humidity, long continentalness,
+                              long erosion, long weirdness, boolean stableTies) {
         int temperatureIndex = index(temperature, TEMPERATURES);
         if (continentalness <= MUSHROOM_FIELDS.max) {
             return ModernBiome.MUSHROOM_FIELDS;
@@ -141,7 +146,7 @@ final class FFDModernSurfaceBiomeMap {
         if (continentalness <= OCEAN.max) {
             return OCEANS[1][temperatureIndex];
         }
-        return INDEX.nearest(temperature, humidity, continentalness, erosion, weirdness);
+        return INDEX.nearest(temperature, humidity, continentalness, erosion, weirdness, stableTies);
     }
 
     private static List<Entry> buildEntries() {
@@ -548,10 +553,10 @@ final class FFDModernSurfaceBiomeMap {
         }
 
         private ModernBiome nearest(long temperature, long humidity, long continentalness,
-                                    long erosion, long weirdness) {
+                                    long erosion, long weirdness, boolean stableTies) {
             long[] target = {temperature, humidity, continentalness, erosion, weirdness};
-            Leaf leaf = root.search(target, lastResult.get());
-            lastResult.set(leaf);
+            Leaf leaf = root.search(target, stableTies ? null : lastResult.get());
+            if (!stableTies) lastResult.set(leaf);
             return leaf.entry.biome;
         }
 

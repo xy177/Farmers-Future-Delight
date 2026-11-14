@@ -82,9 +82,13 @@ public final class FFDMenuTransitions {
             Minecraft mc = Minecraft.getMinecraft();
             TextureAtlasSprite portal = mc.getTextureMapBlocks().getAtlasSprite("minecraft:blocks/portal");
             mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+            GlStateManager.enableTexture2D();
+            GlStateManager.disableBlend();
+            GlStateManager.disableAlpha();
             GlStateManager.color(1, 1, 1, 1);
             GlStateManager.disableLighting();
             quad(width, height, portal.getMinU(), portal.getMinV(), portal.getMaxU(), portal.getMaxV());
+            GlStateManager.enableAlpha();
         }
         return true;
     }

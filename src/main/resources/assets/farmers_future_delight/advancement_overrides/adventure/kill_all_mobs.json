@@ -200,6 +200,15 @@
         },
         "ravager": {
             "trigger": "farmers_future_delight:kill_ravager"
+        },
+        "piglin": {
+            "trigger": "farmers_future_delight:kill_piglin"
+        },
+        "hoglin": {
+            "trigger": "farmers_future_delight:kill_hoglin"
+        },
+        "zoglin": {
+            "trigger": "farmers_future_delight:kill_zoglin"
         }
     }
 }

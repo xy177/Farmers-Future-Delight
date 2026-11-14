@@ -178,9 +178,26 @@ public final class FFDConfig {
     public static FeatureMode othersideMode;
     public static FeatureMode amethystMode;
     public static FeatureMode netheriteMode;
+    public static FeatureMode hoglinMode;
+    public static FeatureMode zoglinMode;
+    public static FeatureMode striderMode;
+    public static FeatureMode piglinMode;
+    public static FeatureMode piglinBruteMode;
+    public static FeatureMode zombifiedPiglinMode;
+    public static FeatureMode basaltMode;
+    public static FeatureMode netherGoldOreMode;
+    public static FeatureMode modernNetherGenerationMode;
+    public static FeatureMode soulSpeedMode;
     public static FeatureMode blackstoneMode;
     public static FeatureMode quartzBricksMode;
     public static FeatureMode cryingObsidianMode;
+    public static FeatureMode netherBricksMode;
+    public static FeatureMode pigstepMode;
+    public static FeatureMode targetMode;
+    public static FeatureMode lodestoneMode;
+    public static FeatureMode respawnAnchorMode;
+    public static FeatureMode bastionRemnantMode;
+    public static FeatureMode ruinedPortalMode;
     public static FeatureMode deepslateMode;
     public static String[] deepslateCompatToggles;
     public static String[] deepslateCompatGenerationToggles;
@@ -192,6 +209,8 @@ public final class FFDConfig {
     public static FeatureMode lanternMode;
     public static FeatureMode barrelMode;
     public static FeatureMode campfireMode;
+    public static FeatureMode soulFireMode;
+    public static FeatureMode soulCampfireMode;
     public static FeatureMode smokerMode;
     public static FeatureMode blastFurnaceMode;
     public static FeatureMode composterMode;
@@ -242,6 +261,7 @@ public final class FFDConfig {
     public static boolean mainMenuBackgroundBlur;
     public static String menuPanorama = "RESOURCE_PACK";
     public static boolean modernBabyModels = true;
+    public static boolean modernBedSpawn = true;
     public static boolean cavesAndCliffsBackgroundMusic;
     public static boolean shovelCreatesDirtPath;
     public static boolean shearsStopPlantGrowth;
@@ -621,9 +641,25 @@ public final class FFDConfig {
         othersideMode = readMode(config, "othersideMode", "《otherside》音乐唱片内容开关");
         amethystMode = readMode(config, "amethystMode", "紫水晶与紫水晶晶洞内容开关");
         netheriteMode = readMode(config, "netheriteMode", "远古残骸与下界合金内容开关");
+        hoglinMode = readMode(config, "hoglinMode", "疣猪兽内容开关");
+        zoglinMode = readMode(config, "zoglinMode", "僵尸疣猪兽内容开关");
+        striderMode = readMode(config, "striderMode", "炽足兽及诡异菌钓竿内容开关");
+        piglinMode = readMode(config, "piglinMode", "猪灵内容开关");
+        piglinBruteMode = readMode(config, "piglinBruteMode", "猪灵蛮兵内容开关");
+        zombifiedPiglinMode = readMode(config, "zombifiedPiglinMode", "僵尸猪灵模型与声音开关");
+        basaltMode = readMode(config, "basaltMode", "玄武岩与磨制玄武岩内容开关");
+        netherGoldOreMode = readMode(config, "netherGoldOreMode", "下界金矿石内容开关");
+        soulSpeedMode = readMode(config, "soulSpeedMode", "灵魂疾行附魔开关");
         blackstoneMode = readMode(config, "blackstoneMode", "黑石、黑石建筑方块与下界黑石矿团内容开关");
         quartzBricksMode = readMode(config, "quartzBricksMode", "石英砖内容开关");
         cryingObsidianMode = readMode(config, "cryingObsidianMode", "哭泣的黑曜石内容开关");
+        netherBricksMode = readMode(config, "netherBricksMode", "錾制下界砖与裂纹下界砖内容开关");
+        pigstepMode = readMode(config, "pigstepMode", "唱片 Pigstep 内容开关");
+        targetMode = readMode(config, "targetMode", "标靶内容开关");
+        lodestoneMode = readMode(config, "lodestoneMode", "磁石内容开关");
+        respawnAnchorMode = readMode(config, "respawnAnchorMode", "重生锚内容开关");
+        bastionRemnantMode = readMode(config, "bastionRemnantMode", "堡垒遗迹生成开关");
+        ruinedPortalMode = readMode(config, "ruinedPortalMode", "废弃传送门生成开关");
         deepslateMode = readMode(config, "deepslateMode", "深板岩、凝灰岩与深层矿石内容开关");
         deepslateCompatToggles = config.getStringList(
                 "deepslateCompatToggles", CATEGORY_FEATURES,
@@ -669,6 +705,8 @@ public final class FFDConfig {
         lanternMode = readMode(config, "lanternMode", "灯笼内容开关");
         barrelMode = readMode(config, "barrelMode", "木桶内容开关");
         campfireMode = readMode(config, "campfireMode", "营火内容开关");
+        soulFireMode = readMode(config, "soulFireMode", "灵魂火、灵魂土、灵魂火把与灵魂灯笼内容开关");
+        soulCampfireMode = readMode(config, "soulCampfireMode", "灵魂营火内容开关");
         smokerMode = readMode(config, "smokerMode", "烟熏炉内容开关");
         blastFurnaceMode = readMode(config, "blastFurnaceMode", "高炉内容开关");
         composterMode = readMode(config, "composterMode", "堆肥桶内容开关");
@@ -744,9 +782,9 @@ public final class FFDConfig {
                 "pillagerMode",
                 "ravagerMode",
                 "wanderingTraderMode",
-                "amethystMode", "netheriteMode", "blackstoneMode", "quartzBricksMode", "cryingObsidianMode", "deepslateMode", "deepslateCompatToggles", "rawOreMode",
+                "amethystMode", "netheriteMode", "hoglinMode", "zoglinMode", "striderMode", "piglinMode", "piglinBruteMode", "zombifiedPiglinMode", "basaltMode", "netherGoldOreMode", "soulSpeedMode", "blackstoneMode", "quartzBricksMode", "cryingObsidianMode", "deepslateMode", "deepslateCompatToggles", "rawOreMode",
                 "rawOreMaterialToggles", "copperMode", "dripstoneMode",
-                "ironChainMode", "lanternMode", "barrelMode", "campfireMode", "smokerMode", "blastFurnaceMode", "composterMode", "stonecutterMode", "grindstoneMode", "cartographyTableMode", "loomMode", "lecternMode", "fletchingTableMode", "smithingTableMode", "bellMode", "flowersMode", "suspiciousStewMode", "stoneDecorMode", "leatherHorseArmorMode", "bambooMode", "scaffoldingMode", "candleMode", "powderSnowMode", "crimsonMode", "warpedMode",
+                "ironChainMode", "lanternMode", "barrelMode", "campfireMode", "soulFireMode", "soulCampfireMode", "smokerMode", "blastFurnaceMode", "composterMode", "stonecutterMode", "grindstoneMode", "cartographyTableMode", "loomMode", "lecternMode", "fletchingTableMode", "smithingTableMode", "bellMode", "flowersMode", "suspiciousStewMode", "stoneDecorMode", "leatherHorseArmorMode", "bambooMode", "scaffoldingMode", "candleMode", "powderSnowMode", "crimsonMode", "warpedMode",
                 "crimsonWoodMode", "warpedWoodMode", "glowItemFrameMode", "signTextMode", "lightBlockMode",
                 "waterloggingMode", "fluidloggingScope", "fluidloggingFluidList", "waterloggingAdditionalBlocks",
                 "aquaAcrobaticsMode", "conduitFrameBlocks",
@@ -786,6 +824,8 @@ public final class FFDConfig {
                 new String[]{"RESOURCE_PACK", "1.13.2", "1.14.4", "1.15.2", "1.16.5", "1.17.1", "1.18.2", "1.19.4", "1.20.6", "26.1", "26.3"});
         modernBabyModels = config.getBoolean("modernBabyModels", CATEGORY_GAMEPLAY,
                 true, "是否使用新版幼年生物模型。");
+        modernBedSpawn = config.getBoolean("modernBedSpawn", CATEGORY_GAMEPLAY,
+                true, "是否在白天或附近有怪物时通过使用床设置重生点。");
         cavesAndCliffsBackgroundMusic = config.getBoolean("cavesAndCliffsBackgroundMusic",
                 CATEGORY_GAMEPLAY, true,
                 "是否将 1.18 的八首背景音乐加入所有世界类型的生存模式与主菜单音乐池。");
@@ -1436,8 +1476,10 @@ public final class FFDConfig {
                 config.getInt("dripstonePointedMaxAttempts", CATEGORY_WORLDGEN,
                         256, 0, 4000, "每个滴水石洞穴区块生成零散滴水石锥的最多尝试次数，26.3 默认范围为 192-256。"));
 
+        modernNetherGenerationMode = FeatureMode.parse(config.getString("modernNetherGenerationMode", CATEGORY_WORLDGEN,
+                "AUTO", "现代下界生成：ENABLED 使用现代生成器；DISABLED 使用原生成器；AUTO 为新下界采用现代生成器，并与已有下界区块和下界 API 生成器衔接。", new String[]{"ENABLED", "DISABLED", "AUTO"}), FeatureMode.AUTO);
         netherForestBiomeNoiseScale = config.getInt("netherForestBiomeNoiseScale", CATEGORY_WORLDGEN,
-                192, 32, 4096, "绯红森林与诡异森林区域噪声的水平尺度。1.12 无多噪声下界，默认以约 192 格尺度近似 26.3 的连续下界群系分布。");
+                192, 32, 4096, "原下界生成器的绯红森林与诡异森林区域噪声水平尺度。");
         netherForestBiomeThreshold = config.getFloat("netherForestBiomeThreshold", CATEGORY_WORLDGEN,
                 0.20F, 0.0F, 1.0F, "区域噪声达到此阈值时生成绯红或诡异森林。数值越小，两种森林越常见。");
         crimsonForestVegetationAttempts = config.getInt("crimsonForestVegetationAttempts", CATEGORY_WORLDGEN,
@@ -1663,6 +1705,12 @@ public final class FFDConfig {
     }
 
     private static String englishDescription(String category, String key) {
+        if ("soulFireMode".equals(key)) {
+            return "Feature mode for soul fire, soul soil, soul torches and soul lanterns. Defaults to AUTO. Restart required.";
+        }
+        if ("soulCampfireMode".equals(key)) {
+            return "Feature mode for soul campfires. Defaults to AUTO. Restart required.";
+        }
         if ("scheduledFunctionPermissionLevel".equals(key)) {
             return "Maximum command permission level available to functions, including vanilla game-loop functions and functions scheduled by this mod's /schedule command. Defaults to 2; valid range is 0-4. Restart required.";
         }
@@ -1764,6 +1812,21 @@ public final class FFDConfig {
         }
         if ("quartzBricksMode".equals(key)) {
             return "Feature mode for quartz bricks. Defaults to AUTO; yields to Unseens Nether Backport or Netherized when either provides the block. Restart required.";
+        }
+        if ("basaltMode".equals(key)) return "Basalt and polished basalt content mode.";
+        if ("netherGoldOreMode".equals(key)) return "Nether gold ore content mode.";
+        if ("soulSpeedMode".equals(key)) return "Soul Speed enchantment mode.";
+        if ("piglinMode".equals(key)) return "Piglin content mode.";
+        if ("piglinBruteMode".equals(key)) return "Piglin brute content mode.";
+        if ("zombifiedPiglinMode".equals(key)) return "Zombified piglin models and sounds mode.";
+        if ("striderMode".equals(key)) {
+            return "Strider and warped fungus on a stick content mode.";
+        }
+        if ("hoglinMode".equals(key)) {
+            return "Feature mode for hoglins. Options: ENABLED, DISABLED, AUTO. AUTO uses supported external providers. Restart required.";
+        }
+        if ("zoglinMode".equals(key)) {
+            return "Feature mode for zoglins. Options: ENABLED, DISABLED, AUTO. AUTO uses supported external providers. Restart required.";
         }
         if ("cryingObsidianMode".equals(key)) {
             return "Feature mode for crying obsidian. Defaults to AUTO; yields to Future MC or Netherized when either provides the block. Restart required.";
@@ -1889,6 +1952,9 @@ public final class FFDConfig {
         }
         if ("modernBabyModels".equals(key)) {
             return "Whether to use modern baby mob models.";
+        }
+        if ("modernBedSpawn".equals(key)) {
+            return "Set the respawn point by using a bed during daytime or with monsters nearby.";
         }
         if ("legacyDyeCompatibility".equals(key)) {
             return "Allow bone meal, ink sacs, lapis lazuli, and cocoa beans to act as white, black, blue, and brown dyes.";
@@ -2261,6 +2327,8 @@ public final class FFDConfig {
         switch (key) {
             case "barrelMode":
             case "campfireMode":
+            case "soulFireMode":
+            case "soulCampfireMode":
             case "smokerMode":
             case "blastFurnaceMode":
             case "composterMode":

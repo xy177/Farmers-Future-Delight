@@ -20,7 +20,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -28,7 +27,6 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.api.CompostingRules;
 import xy177.farmersfuturedelight.common.FFDCreativeTab;
@@ -152,20 +150,7 @@ public class BlockComposter extends BlockContainer {
                 world.scheduleUpdate(pos, state.getBlock(), 20);
             }
         }
-        world.playSound(null, pos, success ? FFDSounds.COMPOSTER_FILL_SUCCESS
-                : FFDSounds.COMPOSTER_FILL, SoundCategory.BLOCKS, 1.0F, 1.0F);
-        if (world instanceof WorldServer) {
-            double center = Math.max(2, Math.min(15, 1 + (level + (success ? 1 : 0)) * 2))
-                    / 16.0D + 0.03125D;
-            for (int index = 0; index < 10; index++) {
-                ((WorldServer) world).spawnParticle(EnumParticleTypes.VILLAGER_HAPPY,
-                        pos.getX() + 0.1875D + 0.625D * world.rand.nextFloat(),
-                        pos.getY() + center + world.rand.nextFloat() * (1.0D - center),
-                        pos.getZ() + 0.1875D + 0.625D * world.rand.nextFloat(),
-                        0, world.rand.nextGaussian() * 0.02D,
-                        world.rand.nextGaussian() * 0.02D, world.rand.nextGaussian() * 0.02D, 1.0D);
-            }
-        }
+        world.playEvent(1500, pos, success ? 1 : 0);
         return success;
     }
 

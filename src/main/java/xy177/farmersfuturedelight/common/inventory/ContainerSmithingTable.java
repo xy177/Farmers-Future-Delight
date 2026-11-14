@@ -5,12 +5,15 @@ import java.util.List;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.InventoryBasic;
+import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import xy177.farmersfuturedelight.api.WorkstationRecipes;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
+import xy177.farmersfuturedelight.common.registry.FFDSounds;
 
 public class ContainerSmithingTable extends ContainerWorkstation {
     private final InventoryPlayer playerInventory;
@@ -18,6 +21,8 @@ public class ContainerSmithingTable extends ContainerWorkstation {
     private final BlockPos pos;
     private final InventoryBasic inputs = new InventoryBasic("smithing", false, 3);
     private final InventoryBasic output = new InventoryBasic("smithing_result", false, 1);
+    private boolean recipeError;
+    private boolean lastRecipeError;
 
     public ContainerSmithingTable(InventoryPlayer playerInventory, World world, BlockPos pos) {
         super(4);
@@ -52,9 +57,32 @@ public class ContainerSmithingTable extends ContainerWorkstation {
     }
 
     @Override
+    public void addListener(IContainerListener listener) {
+        super.addListener(listener);
+        listener.sendWindowProperty(this, 0, recipeError ? 1 : 0);
+    }
+
+    @Override
     public void detectAndSendChanges() {
         refreshResult();
         super.detectAndSendChanges();
+        if (lastRecipeError != recipeError) {
+            for (IContainerListener listener : listeners) {
+                listener.sendWindowProperty(this, 0, recipeError ? 1 : 0);
+            }
+            lastRecipeError = recipeError;
+        }
+    }
+
+    @Override
+    public void updateProgressBar(int id, int value) {
+        if (id == 0) {
+            recipeError = value != 0;
+        }
+    }
+
+    public boolean hasRecipeError() {
+        return recipeError;
     }
 
     @Override
@@ -162,8 +190,11 @@ public class ContainerSmithingTable extends ContainerWorkstation {
         }
         WorkstationRecipes.Recipe recipe = WorkstationRecipes.find(
                 WorkstationRecipes.Type.SMITHING, stacks);
-        output.setInventorySlotContents(0,
-                recipe == null ? ItemStack.EMPTY : recipe.assemble(stacks));
+        ItemStack result = recipe == null ? ItemStack.EMPTY : recipe.assemble(stacks);
+        output.setInventorySlotContents(0, result);
+        recipeError = !inputs.getStackInSlot(0).isEmpty()
+                && !inputs.getStackInSlot(1).isEmpty()
+                && !inputs.getStackInSlot(2).isEmpty() && result.isEmpty();
     }
 
     private final class OutputSlot extends Slot {
@@ -196,6 +227,8 @@ public class ContainerSmithingTable extends ContainerWorkstation {
                 crafted.onCrafting(player.world, player, 1);
                 net.minecraftforge.fml.common.FMLCommonHandler.instance()
                         .firePlayerCraftingEvent(this.player, crafted, inputs);
+                world.playSound(null, pos, FFDSounds.SMITHING_TABLE_USE,
+                        SoundCategory.BLOCKS, 1.0F, 0.9F + world.rand.nextFloat() * 0.1F);
             }
             refreshResult();
             return super.onTake(player, stack);

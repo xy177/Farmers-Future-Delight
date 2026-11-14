@@ -1,0 +1,32 @@
+{
+  "conditions": [
+    {
+      "type": "farmers_future_delight:feature_enabled",
+      "feature": "target"
+    }
+  ],
+  "parent": "minecraft:adventure/shoot_arrow",
+  "display": {
+    "description": {
+      "translate": "advancements.adventure.bullseye.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "item": "farmers_future_delight:target"
+    },
+    "title": {
+      "translate": "advancements.adventure.bullseye.title"
+    },
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "bullseye": {
+      "trigger": "farmers_future_delight:bullseye"
+    }
+  },
+  "rewards": {
+    "experience": 50
+  }
+}

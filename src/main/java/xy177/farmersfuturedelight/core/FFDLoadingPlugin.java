@@ -13,6 +13,7 @@ public final class FFDLoadingPlugin implements IFMLLoadingPlugin {
     public String[] getASMTransformerClass() {
         if (Boolean.TRUE.equals(Launch.blackboard.get("ffd.cleanMixActive"))) {
             return new String[] {
+                    FFDSoulFireTransformer.class.getName(),
                     FFDRabbitJumpTransformer.class.getName(),
                     FFDCreativeInventoryTransformer.class.getName(),
                     FFDMenuTransformer.class.getName(),
@@ -22,6 +23,7 @@ public final class FFDLoadingPlugin implements IFMLLoadingPlugin {
             };
         }
         return new String[] {
+                FFDSoulFireTransformer.class.getName(),
                 FFDHeightTransformer.class.getName(),
                 FFDRabbitJumpTransformer.class.getName(),
                 FFDCreativeInventoryTransformer.class.getName(),

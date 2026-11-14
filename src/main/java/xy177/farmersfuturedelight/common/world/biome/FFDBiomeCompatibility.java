@@ -15,11 +15,19 @@ public final class FFDBiomeCompatibility {
 
     public static boolean isKnown(ResourceLocation biomeId) {
         return ForgeRegistries.BIOMES.containsKey(biomeId)
+                || FFDVerticalBiome.byRegistryName(biomeId) != FFDVerticalBiome.NONE
                 || "minecraft".equals(biomeId.getResourceDomain())
                 && verticalBiome(biomeId.getResourcePath()) != FFDVerticalBiome.NONE;
     }
 
     public static boolean matches(World world, BlockPos position, ResourceLocation biomeId) {
+        if (FFDHeightHooks.isExtended(world)
+                && FFDVerticalBiome.byRegistryName(biomeId) != FFDVerticalBiome.NONE) {
+            FFDVerticalBiome vertical = FFDVerticalBiomeManager.getBiome(world, position);
+            if (biomeId.equals(vertical.registryName())) {
+                return true;
+            }
+        }
         Biome actual = world.getBiome(position);
         ResourceLocation actualId = Biome.REGISTRY.getNameForObject(actual);
         if (biomeId.equals(actualId) || matchesLegacyBiome(biomeId, actual)) {
@@ -34,6 +42,7 @@ public final class FFDBiomeCompatibility {
             vertical = FFDVerticalBiome.adaptSurface(vertical, actual, position);
         }
         return vertical != FFDVerticalBiome.NONE
+                && "farmers_future_delight".equals(vertical.registryName().getResourceDomain())
                 && biomeId.getResourcePath().equals(vertical.registryPath());
     }
 
@@ -54,11 +63,7 @@ public final class FFDBiomeCompatibility {
     }
 
     private static FFDVerticalBiome verticalBiome(String path) {
-        for (FFDVerticalBiome biome : FFDVerticalBiome.values()) {
-            if (path.equals(biome.registryPath())) {
-                return biome;
-            }
-        }
-        return FFDVerticalBiome.NONE;
+        return FFDVerticalBiome.byRegistryName(
+                new ResourceLocation("farmers_future_delight", path));
     }
 }

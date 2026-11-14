@@ -2,16 +2,21 @@ package xy177.farmersfuturedelight.common.worldgen;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.init.Biomes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeProvider;
+import net.minecraft.world.gen.ChunkGeneratorFlat;
+import net.minecraft.world.gen.FlatGeneratorInfo;
+import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraft.world.gen.structure.MapGenVillage;
 import net.minecraft.world.gen.structure.StructureStart;
 
@@ -20,10 +25,24 @@ import xy177.farmersfuturedelight.common.registry.FFDBiomes;
 import xy177.farmersfuturedelight.common.registry.FFDVillagerTypes;
 import xy177.farmersfuturedelight.common.world.biome.FFDModernBiomeProvider;
 import xy177.farmersfuturedelight.FarmerFutureDelight;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public final class FFDModernVillageGenerator extends MapGenVillage {
     private static final int SEPARATION = 8;
     private static final int SALT = 10387312;
+    private int placementSpacing;
+    private boolean spacingInitialized;
+
+    public FFDModernVillageGenerator() {
+        placementSpacing = Math.max(SEPARATION + 1, FFDConfig.modernVillageSpacing);
+    }
+
+    FFDModernVillageGenerator(Map<String, String> settings) {
+        placementSpacing = settings != null && settings.containsKey("distance")
+                ? MathHelper.getInt(settings.get("distance"), FFDConfig.modernVillageSpacing, SEPARATION + 1)
+                : Math.max(SEPARATION + 1, FFDConfig.modernVillageSpacing);
+        spacingInitialized = true;
+    }
 
     @Override
     protected boolean canSpawnStructureAtCoords(int chunkX, int chunkZ) {
@@ -91,8 +110,20 @@ public final class FFDModernVillageGenerator extends MapGenVillage {
         return new MapGenVillage.Start(world, rand, chunkX, chunkZ, 0);
     }
 
-    private static int spacing() {
-        return Math.max(SEPARATION + 1, FFDConfig.modernVillageSpacing);
+    private int spacing() {
+        if (!spacingInitialized && world instanceof WorldServer) {
+            IChunkGenerator generator = FFDStructureTerrain.generator((WorldServer) world);
+            if (generator instanceof ChunkGeneratorFlat) {
+                FlatGeneratorInfo settings = ObfuscationReflectionHelper.getPrivateValue(
+                        ChunkGeneratorFlat.class, (ChunkGeneratorFlat) generator, "field_82699_e");
+                Map<String, String> village = settings.getWorldFeatures().get("village");
+                if (village != null && village.containsKey("distance")) {
+                    placementSpacing = MathHelper.getInt(village.get("distance"), placementSpacing, SEPARATION + 1);
+                }
+            }
+            spacingInitialized = true;
+        }
+        return placementSpacing;
     }
 
     void addTerrain(int chunkX, int chunkZ, FFDStructureBeard.Builder builder) {
@@ -105,7 +136,7 @@ public final class FFDModernVillageGenerator extends MapGenVillage {
     }
 
     static boolean isPlacementChunk(long seed, int chunkX, int chunkZ) {
-        int distance = spacing();
+        int distance = Math.max(SEPARATION + 1, FFDConfig.modernVillageSpacing);
         int regionX = Math.floorDiv(chunkX, distance);
         int regionZ = Math.floorDiv(chunkZ, distance);
         Random placement = new Random((long) regionX * 341873128712L + (long) regionZ * 132897987541L + seed + SALT);

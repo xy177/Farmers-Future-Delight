@@ -15,10 +15,13 @@ import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.init.Biomes;
 import net.minecraft.world.World;
 import net.minecraft.world.DifficultyInstance;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
+import xy177.farmersfuturedelight.common.registry.FFDSounds;
 import xy177.farmersfuturedelight.common.entity.ai.EntityAICatRelaxOnOwner;
 
 public class EntityCat extends EntityOcelot {
@@ -27,6 +30,8 @@ public class EntityCat extends EntityOcelot {
     private static final DataParameter<Boolean> LYING_WITH_OWNER = EntityDataManager.createKey(
             EntityCat.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Boolean> RELAX_STATE_ONE = EntityDataManager.createKey(
+            EntityCat.class, DataSerializers.BOOLEAN);
+    private static final DataParameter<Boolean> ROYAL_SOUND = EntityDataManager.createKey(
             EntityCat.class, DataSerializers.BOOLEAN);
     private static final String[] COMMON_VARIANTS = {
             "tabby", "black", "red", "siamese", "british_shorthair", "calico",
@@ -42,6 +47,7 @@ public class EntityCat extends EntityOcelot {
     public EntityCat(World world) {
         super(world);
         tasks.addTask(3, new EntityAICatRelaxOnOwner(this));
+        if (!world.isRemote) dataManager.set(ROYAL_SOUND, rand.nextBoolean());
     }
 
     @Override
@@ -55,6 +61,7 @@ public class EntityCat extends EntityOcelot {
         dataManager.register(COLLAR_COLOR, EnumDyeColor.RED.getDyeDamage());
         dataManager.register(LYING_WITH_OWNER, false);
         dataManager.register(RELAX_STATE_ONE, false);
+        dataManager.register(ROYAL_SOUND, false);
     }
 
     @Override
@@ -124,6 +131,22 @@ public class EntityCat extends EntityOcelot {
     @Override
     public void onUpdate() {
         super.onUpdate();
+        if (!world.isRemote) {
+            if (!isTamed() && ticksExisted % 100 == 0) {
+                for (net.minecraft.entity.ai.EntityAITasks.EntityAITaskEntry task : tasks.taskEntries) {
+                    if (task.action instanceof net.minecraft.entity.ai.EntityAITempt
+                            && ((net.minecraft.entity.ai.EntityAITempt) task.action).isRunning()) {
+                        playSound(catSound(FFDSounds.CAT_BEG_FOR_FOOD,
+                                FFDSounds.BABY_CAT_BEG_FOR_FOOD), 1.0F, 1.0F);
+                        break;
+                    }
+                }
+            }
+            if ((isLyingWithOwner() || isRelaxStateOne()) && ticksExisted % 5 == 0) {
+                playSound(catSound(FFDSounds.CAT_PURR, FFDSounds.BABY_CAT_PURR),
+                        0.6F + 0.4F * (rand.nextFloat() - rand.nextFloat()), 1.0F);
+            }
+        }
         previousLieDownAmount = lieDownAmount;
         previousLieDownTailAmount = lieDownTailAmount;
         previousRelaxStateOneAmount = relaxStateOneAmount;
@@ -140,11 +163,59 @@ public class EntityCat extends EntityOcelot {
         return super.isSitting();
     }
 
+    private SoundEvent catSound(SoundEvent adult, SoundEvent baby) {
+        return isChild() ? baby : dataManager.get(ROYAL_SOUND) ? FFDSounds.royalCatSound(adult) : adult;
+    }
+
+    @Override
+    protected SoundEvent getAmbientSound() {
+        if (!isTamed()) {
+            return catSound(FFDSounds.CAT_STRAY_AMBIENT, FFDSounds.BABY_CAT_STRAY_AMBIENT);
+        }
+        if (isInLove()) return catSound(FFDSounds.CAT_PURR, FFDSounds.BABY_CAT_PURR);
+        return rand.nextInt(4) == 0
+                ? catSound(FFDSounds.CAT_PURREOW, FFDSounds.BABY_CAT_PURREOW)
+                : catSound(FFDSounds.CAT_AMBIENT, FFDSounds.BABY_CAT_AMBIENT);
+    }
+
+    @Override
+    protected SoundEvent getHurtSound(DamageSource source) {
+        return catSound(FFDSounds.CAT_HURT, FFDSounds.BABY_CAT_HURT);
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return catSound(FFDSounds.CAT_DEATH, FFDSounds.BABY_CAT_DEATH);
+    }
+
+    @Override
+    protected float getSoundVolume() {
+        return 1.0F;
+    }
+
+    @Override
+    public int getTalkInterval() {
+        return 120;
+    }
+
+    @Override
+    public void playSound(SoundEvent sound, float volume, float pitch) {
+        if (sound == net.minecraft.init.SoundEvents.ENTITY_CAT_HISS) {
+            sound = catSound(FFDSounds.CAT_HISS, FFDSounds.BABY_CAT_HISS);
+        }
+        super.playSound(sound, volume, pitch);
+    }
+
+    private void playEatingSound() {
+        playSound(catSound(FFDSounds.CAT_EAT, FFDSounds.BABY_CAT_EAT), 1.0F, 1.0F);
+    }
+
     @Override
     public boolean processInteract(EntityPlayer player, EnumHand hand) {
         ItemStack held = player.getHeldItem(hand);
         if (!isTamed() && isBreedingItem(held)) {
             if (!world.isRemote) {
+                playEatingSound();
                 if (!player.capabilities.isCreativeMode) held.shrink(1);
                 boolean tamed = rand.nextInt(3) == 0
                         && !net.minecraftforge.event.ForgeEventFactory.onAnimalTame(this, player);
@@ -165,6 +236,7 @@ public class EntityCat extends EntityOcelot {
         if (isTamed() && isOwner(player) && isBreedingItem(held)
                 && getHealth() < getMaxHealth()) {
             if (!world.isRemote) {
+                playEatingSound();
                 heal(2.0F);
                 if (!player.capabilities.isCreativeMode) held.shrink(1);
             }
@@ -182,7 +254,9 @@ public class EntityCat extends EntityOcelot {
         }
         int variant = getTameSkin();
         boolean wasTamed = isTamed();
+        boolean feeding = isBreedingItem(held);
         boolean interacted = super.processInteract(player, hand);
+        if (!world.isRemote && feeding && interacted) playEatingSound();
         setTameSkin(variant);
         if (!world.isRemote && !wasTamed && isTamed() && isOwner(player)
                 && player instanceof net.minecraft.entity.player.EntityPlayerMP) {
@@ -201,12 +275,14 @@ public class EntityCat extends EntityOcelot {
     @Override
     public void writeEntityToNBT(NBTTagCompound compound) {
         super.writeEntityToNBT(compound);
+        compound.setString("sound_variant", dataManager.get(ROYAL_SOUND) ? "minecraft:royal" : "minecraft:classic");
         compound.setByte("CollarColor", (byte) getCollarColor().getDyeDamage());
     }
 
     @Override
     public void readEntityFromNBT(NBTTagCompound compound) {
         super.readEntityFromNBT(compound);
+        dataManager.set(ROYAL_SOUND, "minecraft:royal".equals(compound.getString("sound_variant")));
         int color = compound.hasKey("CollarColor", 99)
                 ? compound.getByte("CollarColor") & 255
                 : EnumDyeColor.RED.getDyeDamage();

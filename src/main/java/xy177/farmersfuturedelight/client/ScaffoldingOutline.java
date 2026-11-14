@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
+import net.minecraft.block.BlockFire;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -20,6 +21,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.block.BlockScaffolding;
+import xy177.farmersfuturedelight.core.FFDSoulFireHooks;
 
 @Mod.EventBusSubscriber(modid = FarmerFutureDelight.MODID, value = Side.CLIENT)
 public final class ScaffoldingOutline {
@@ -37,15 +39,18 @@ public final class ScaffoldingOutline {
         }
         BlockPos pos = target.getBlockPos();
         IBlockState state = player.world.getBlockState(pos);
-        if (!(state.getBlock() instanceof BlockScaffolding)) {
+        if (!(state.getBlock() instanceof BlockScaffolding)
+                && !(state.getBlock() instanceof BlockFire)) {
             return;
         }
         event.setCanceled(true);
         if (!player.world.getWorldBorder().contains(pos)) {
             return;
         }
-        List<AxisAlignedBB> boxes = ((BlockScaffolding) state.getBlock()).outline(state, player.world,
-                pos, FarmerFutureDelight.proxy.isHoldingScaffolding());
+        List<AxisAlignedBB> boxes = state.getBlock() instanceof BlockFire
+                ? FFDSoulFireHooks.fireOutline(state, player.world, pos)
+                : ((BlockScaffolding) state.getBlock()).outline(state, player.world,
+                        pos, FarmerFutureDelight.proxy.isHoldingScaffolding());
         List<double[]> edges = EDGES.computeIfAbsent(boxes, ScaffoldingOutline::edges);
         double partial = event.getPartialTicks();
         double cameraX = player.lastTickPosX + (player.posX - player.lastTickPosX) * partial;

@@ -106,22 +106,22 @@ public final class FFDBiomes {
     }
 
     public static Biome forVerticalBiome(FFDVerticalBiome biome) {
-        switch (biome) {
-            case MEADOW:
-                return MEADOW;
-            case GROVE:
-                return GROVE;
-            case SNOWY_SLOPES:
-                return SNOWY_SLOPES;
-            case JAGGED_PEAKS:
-                return JAGGED_PEAKS;
-            case FROZEN_PEAKS:
-                return FROZEN_PEAKS;
-            case STONY_PEAKS:
-                return STONY_PEAKS;
-            default:
-                return null;
+        if (biome == FFDVerticalBiome.MEADOW) {
+            return MEADOW;
         }
+        if (biome == FFDVerticalBiome.GROVE) {
+            return GROVE;
+        }
+        if (biome == FFDVerticalBiome.SNOWY_SLOPES) {
+            return SNOWY_SLOPES;
+        }
+        if (biome == FFDVerticalBiome.JAGGED_PEAKS) {
+            return JAGGED_PEAKS;
+        }
+        if (biome == FFDVerticalBiome.FROZEN_PEAKS) {
+            return FROZEN_PEAKS;
+        }
+        return biome == FFDVerticalBiome.STONY_PEAKS ? STONY_PEAKS : null;
     }
 
     private FFDBiomes() {

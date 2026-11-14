@@ -13,7 +13,7 @@ public final class PacketVerticalBiomes implements IMessage {
     private int dimension;
     private int chunkX;
     private int chunkZ;
-    private byte[] biomes;
+    private FFDVerticalBiomeData biomes;
 
     public PacketVerticalBiomes() {
     }
@@ -23,7 +23,7 @@ public final class PacketVerticalBiomes implements IMessage {
         this.dimension = dimension;
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
-        biomes = data.toByteArray();
+        biomes = data;
     }
 
     @Override
@@ -31,12 +31,7 @@ public final class PacketVerticalBiomes implements IMessage {
         dimension = buffer.readInt();
         chunkX = buffer.readInt();
         chunkZ = buffer.readInt();
-        int length = ByteBufUtils.readVarInt(buffer, 3);
-        if (length != FFDVerticalBiomeData.ENTRY_COUNT || length > buffer.readableBytes()) {
-            throw new IllegalArgumentException("Invalid vertical biome payload length: " + length);
-        }
-        biomes = new byte[length];
-        buffer.readBytes(biomes);
+        biomes = FFDVerticalBiomeData.fromNBT(ByteBufUtils.readTag(buffer));
     }
 
     @Override
@@ -44,8 +39,7 @@ public final class PacketVerticalBiomes implements IMessage {
         buffer.writeInt(dimension);
         buffer.writeInt(chunkX);
         buffer.writeInt(chunkZ);
-        ByteBufUtils.writeVarInt(buffer, biomes.length, 3);
-        buffer.writeBytes(biomes);
+        ByteBufUtils.writeTag(buffer, biomes.toNBT());
     }
 
     public static final class Handler implements IMessageHandler<PacketVerticalBiomes, IMessage> {

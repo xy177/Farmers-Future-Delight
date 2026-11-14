@@ -3,7 +3,6 @@ package xy177.farmersfuturedelight.common.worldgen;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.BitSet;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -34,6 +33,8 @@ import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
 import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiome;
 import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiomeData;
+import xy177.farmersfuturedelight.common.world.biome.FFDVerticalBiomeGeneration;
+import xy177.farmersfuturedelight.api.biome.VerticalBiomeDefinition.Stage;
 import xy177.farmersfuturedelight.common.world.noise.FFDXoroshiroRandom;
 import xy177.farmersfuturedelight.common.world.terrain.FFDModernWorldgenData;
 
@@ -42,6 +43,7 @@ public final class WorldGenVerticalCaveBiomes {
     private static final boolean TRACE_LARGE_DRIPSTONE =
             Boolean.getBoolean("ffd.worldgen.traceLargeDripstone");
     private static final EnumFacing[] DIRECTIONS = EnumFacing.values();
+    private static final EnumFacing[] LICHEN_DIRECTIONS = createLichenDirections();
     private static final int MIN_Y = FFDModernWorldgenData.MIN_Y;
     private static final int MAX_Y = FFDModernWorldgenData.MIN_Y
             + FFDModernWorldgenData.HEIGHT - 1;
@@ -85,6 +87,8 @@ public final class WorldGenVerticalCaveBiomes {
 
     public void generateLocalModifications(int chunkX, int chunkZ,
                                            FFDVerticalBiomeData biomes, Access access) {
+        FFDVerticalBiomeGeneration.generate(this, worldSeed, chunkX, chunkZ,
+                biomes, access, Stage.LOCAL_MODIFICATIONS);
         if (!FFDItems.isDripstoneEnabled()) {
             return;
         }
@@ -100,6 +104,8 @@ public final class WorldGenVerticalCaveBiomes {
 
     public void generateUndergroundDecoration(int chunkX, int chunkZ,
                                                FFDVerticalBiomeData biomes, Access access) {
+        FFDVerticalBiomeGeneration.generate(this, worldSeed, chunkX, chunkZ,
+                biomes, access, Stage.UNDERGROUND_DECORATION);
         if (!FFDItems.isDripstoneEnabled()) {
             return;
         }
@@ -118,6 +124,12 @@ public final class WorldGenVerticalCaveBiomes {
 
     public void generateVegetation(int chunkX, int chunkZ,
                                    FFDVerticalBiomeData biomes, Access access) {
+        FFDVerticalBiomeGeneration.generate(this, worldSeed, chunkX, chunkZ,
+                biomes, access, Stage.VEGETATION);
+    }
+
+    public void generateLushVegetation(int chunkX, int chunkZ,
+                                      FFDVerticalBiomeData biomes, Access access) {
         long profileStageStart = FFDWorldgenFeatureProfiler.ENABLED ? System.nanoTime() : 0L;
         long[] profileStages = FFDWorldgenFeatureProfiler.ENABLED ? new long[9] : null;
         ProfiledAccess profiledAccess = FFDWorldgenFeatureProfiler.ENABLED
@@ -507,15 +519,21 @@ public final class WorldGenVerticalCaveBiomes {
         if (!canLichenOccupy(access.getState(originX, originY, originZ))) {
             return;
         }
-        List<EnumFacing> searchDirections = lichenDirections();
-        Collections.shuffle(searchDirections, random);
-        if (tryPlaceLichen(access, originX, originY, originZ, searchDirections, random)) {
+        EnumFacing[] searchDirections = shuffledLichenDirections(random);
+        if (tryPlaceLichen(access, originX, originY, originZ,
+                searchDirections, searchDirections.length, random)) {
             return;
         }
+        EnumFacing[] placements = new EnumFacing[LICHEN_DIRECTIONS.length];
         for (EnumFacing search : searchDirections) {
-            List<EnumFacing> placements = lichenDirections();
-            placements.remove(search.getOpposite());
-            Collections.shuffle(placements, random);
+            int placementCount = 0;
+            EnumFacing excluded = search.getOpposite();
+            for (EnumFacing direction : LICHEN_DIRECTIONS) {
+                if (direction != excluded) {
+                    placements[placementCount++] = direction;
+                }
+            }
+            shuffle(placements, placementCount, random);
             for (int distance = 1; distance <= FFDConfig.lushCaveGlowLichenSearchRange; distance++) {
                 int x = originX + search.getDirectionVec().getX() * distance;
                 int y = originY + search.getDirectionVec().getY() * distance;
@@ -523,7 +541,7 @@ public final class WorldGenVerticalCaveBiomes {
                 if (!validY(y) || !canLichenOccupy(access.getState(x, y, z))) {
                     break;
                 }
-                if (tryPlaceLichen(access, x, y, z, placements, random)) {
+                if (tryPlaceLichen(access, x, y, z, placements, placementCount, random)) {
                     return;
                 }
             }
@@ -531,8 +549,9 @@ public final class WorldGenVerticalCaveBiomes {
     }
 
     private boolean tryPlaceLichen(Access access, int x, int y, int z,
-                                   List<EnumFacing> directions, Random random) {
-        for (EnumFacing face : directions) {
+                                   EnumFacing[] directions, int directionCount, Random random) {
+        for (int index = 0; index < directionCount; index++) {
+            EnumFacing face = directions[index];
             int supportX = x + face.getDirectionVec().getX();
             int supportY = y + face.getDirectionVec().getY();
             int supportZ = z + face.getDirectionVec().getZ();
@@ -557,9 +576,8 @@ public final class WorldGenVerticalCaveBiomes {
 
     private void spreadLichen(Access access, int x, int y, int z,
                               EnumFacing sourceFace, Random random) {
-        List<EnumFacing> directions = new ArrayList<>();
-        Collections.addAll(directions, DIRECTIONS);
-        Collections.shuffle(directions, random);
+        EnumFacing[] directions = DIRECTIONS.clone();
+        shuffle(directions, directions.length, random);
         for (EnumFacing direction : directions) {
             if (direction.getAxis() == sourceFace.getAxis()) {
                 continue;
@@ -1434,13 +1452,29 @@ public final class WorldGenVerticalCaveBiomes {
         return !xEdge && !zEdge || random.nextFloat() <= edgeChance;
     }
 
-    private static List<EnumFacing> lichenDirections() {
-        List<EnumFacing> directions = new ArrayList<>();
-        directions.add(EnumFacing.UP);
+    private static EnumFacing[] createLichenDirections() {
+        EnumFacing[] directions = new EnumFacing[5];
+        directions[0] = EnumFacing.UP;
+        int index = 1;
         for (EnumFacing facing : EnumFacing.Plane.HORIZONTAL) {
-            directions.add(facing);
+            directions[index++] = facing;
         }
         return directions;
+    }
+
+    private static EnumFacing[] shuffledLichenDirections(Random random) {
+        EnumFacing[] directions = LICHEN_DIRECTIONS.clone();
+        shuffle(directions, directions.length, random);
+        return directions;
+    }
+
+    private static void shuffle(EnumFacing[] directions, int length, Random random) {
+        for (int index = length; index > 1; index--) {
+            int swap = random.nextInt(index);
+            EnumFacing value = directions[index - 1];
+            directions[index - 1] = directions[swap];
+            directions[swap] = value;
+        }
     }
 
     private static boolean canLichenOccupy(IBlockState state) {

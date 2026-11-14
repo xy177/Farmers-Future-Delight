@@ -42,16 +42,21 @@ public class BlockLantern extends Block implements IWaterloggableBlock {
             10.0D / 16.0D, 9.0D / 16.0D, 10.0D / 16.0D);
 
     public BlockLantern() {
+        this(false);
+    }
+
+    public BlockLantern(boolean soul) {
         super(Material.IRON);
-        setRegistryName(FarmerFutureDelight.MODID, "lantern");
-        setUnlocalizedName(FarmerFutureDelight.MODID + ".lantern");
+        String name = soul ? "soul_lantern" : "lantern";
+        setRegistryName(FarmerFutureDelight.MODID, name);
+        setUnlocalizedName(FarmerFutureDelight.MODID + "." + name);
         setCreativeTab(FFDCreativeTab.INSTANCE);
         setDefaultState(blockState.getBaseState().withProperty(HANGING, false)
                 .withProperty(WATERLOGGED, false));
         setHardness(3.5F);
         setResistance(3.5F / 3.0F);
         setHarvestLevel("pickaxe", 0);
-        setLightLevel(1.0F);
+        setLightLevel(soul ? 10.0F / 15.0F : 1.0F);
         setLightOpacity(0);
         setSoundType(FFDSounds.LANTERN);
     }

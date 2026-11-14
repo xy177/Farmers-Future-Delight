@@ -58,7 +58,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.BitSet;
 
-public final class ChunkGeneratorExtended extends ChunkGeneratorOverworld {
+public final class ChunkGeneratorExtended extends ChunkGeneratorOverworld implements FFDWorldgenTerrain {
     private static final IBlockState STONE = Blocks.STONE.getDefaultState();
     private static final IBlockState WATER = Blocks.WATER.getDefaultState();
     private static final EnumFacing[] DIRECTIONS = EnumFacing.values();
@@ -126,14 +126,37 @@ public final class ChunkGeneratorExtended extends ChunkGeneratorOverworld {
     }
 
     public int structureSurfaceHeight(int blockX, int blockZ, FFDStructureBeard beard) {
+        return structureHeight(blockX, blockZ, beard, false);
+    }
+
+    @Override
+    public int structureFloorHeight(int blockX, int blockZ) {
+        return structureHeight(blockX, blockZ, FFDStructureBeard.EMPTY, true);
+    }
+
+    @Override
+    public IBlockState[] structureBaseColumn(int blockX, int blockZ) {
+        GenerationRegion region = new GenerationRegion(regionGenerationCache, worldgenData, densityGridCache, modernCarvers);
+        TerrainSample sample = region.sample(blockX >> 4, blockZ >> 4);
+        DensitySampler.Column column = sample.densitySampler.new Column(blockX & 15, blockZ & 15);
+        IBlockState[] states = new IBlockState[FFDModernWorldgenData.HEIGHT];
+        for (int offset = 0; offset < states.length; offset++) {
+            int height = FFDModernWorldgenData.MIN_Y + offset;
+            states[offset] = sample.baseStateForDensity(blockX, height, blockZ, column.sample(height), surfaceRules);
+        }
+        return states;
+    }
+
+    private int structureHeight(int blockX, int blockZ, FFDStructureBeard beard, boolean solid) {
         GenerationRegion region = new GenerationRegion(regionGenerationCache, worldgenData, densityGridCache, modernCarvers);
         TerrainSample sample = region.sample(blockX >> 4, blockZ >> 4);
         DensitySampler.Column column = sample.densitySampler.new Column(blockX & 15, blockZ & 15);
         for (int height = FFDModernWorldgenData.MIN_Y + FFDModernWorldgenData.HEIGHT - 1;
              height >= FFDModernWorldgenData.MIN_Y; height--) {
-            if (sample.baseStateForDensity(blockX, height, blockZ,
+            net.minecraft.block.material.Material material = sample.baseStateForDensity(blockX, height, blockZ,
                     column.sample(height) + beard.sample(blockX, height, blockZ), surfaceRules)
-                    .getMaterial() != net.minecraft.block.material.Material.AIR) return height + 1;
+                    .getMaterial();
+            if (solid ? material.blocksMovement() : material != net.minecraft.block.material.Material.AIR) return height + 1;
         }
         return FFDModernWorldgenData.MIN_Y;
     }

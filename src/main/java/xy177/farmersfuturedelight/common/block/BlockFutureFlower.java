@@ -54,7 +54,8 @@ public class BlockFutureFlower extends BlockBush {
                 || support == Blocks.FARMLAND
                 || FFDLushCaveBlockProvider.get().isMossBlock(below)
                 || FFDLushCaveBlockProvider.get().isRootedDirt(below)
-                || witherRose && (support == Blocks.NETHERRACK || support == Blocks.SOUL_SAND)
+                || witherRose && (support == Blocks.NETHERRACK || support == Blocks.SOUL_SAND
+                        || support == FFDItems.effectiveBlock(FFDBlocks.SOUL_SOIL))
                 || support.canSustainPlant(below, world, pos.down(), EnumFacing.UP, this);
     }
 

@@ -308,25 +308,19 @@ public final class WorldGenModernMountainBiomes {
 
     private double temperatureAt(FFDVerticalBiome biome, BlockPos pos) {
         double temperature;
-        switch (biome) {
-            case MEADOW:
-                temperature = 0.5D;
-                break;
-            case GROVE:
-                temperature = -0.2D;
-                break;
-            case SNOWY_SLOPES:
-                temperature = -0.3D;
-                break;
-            case JAGGED_PEAKS:
-            case FROZEN_PEAKS:
-                temperature = -0.7D;
-                break;
-            case STONY_PEAKS:
-                temperature = 1.0D;
-                break;
-            default:
-                return 1.0D;
+        if (biome == FFDVerticalBiome.MEADOW) {
+            temperature = 0.5D;
+        } else if (biome == FFDVerticalBiome.GROVE) {
+            temperature = -0.2D;
+        } else if (biome == FFDVerticalBiome.SNOWY_SLOPES) {
+            temperature = -0.3D;
+        } else if (biome == FFDVerticalBiome.JAGGED_PEAKS
+                || biome == FFDVerticalBiome.FROZEN_PEAKS) {
+            temperature = -0.7D;
+        } else if (biome == FFDVerticalBiome.STONY_PEAKS) {
+            temperature = 1.0D;
+        } else {
+            return 1.0D;
         }
         int snowLevel = FFDModernWorldgenData.SEA_LEVEL + 17;
         if (pos.getY() <= snowLevel) {

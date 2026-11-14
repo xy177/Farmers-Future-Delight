@@ -44,6 +44,11 @@ public final class FFDCoreCompat {
                 + "PluginBlock.class");
     }
 
+    public static boolean isFluidloggedEntityRendererPluginPresent() {
+        return detect("git/jbredwards/fluidlogged_api/mod/asm/plugins/vanilla/client/"
+                + "PluginEntityRenderer.class");
+    }
+
     public static boolean isFutureMcBlockOutlinePresent() {
         return isFutureMcCorePresent() && !detect("org/vivecraft/main/VivecraftMain.class");
     }

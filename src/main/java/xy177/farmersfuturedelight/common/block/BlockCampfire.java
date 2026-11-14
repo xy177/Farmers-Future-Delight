@@ -40,6 +40,7 @@ import xy177.farmersfuturedelight.common.registry.FFDSounds;
 import xy177.farmersfuturedelight.common.tile.TileEntityCampfire;
 
 public class BlockCampfire extends BlockContainer implements IWaterloggableBlock {
+    private final boolean soul;
     public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
     public static final PropertyBool LIT = PropertyBool.create("lit");
     public static final PropertyBool SIGNAL_FIRE = PropertyBool.create("signal_fire");
@@ -47,9 +48,15 @@ public class BlockCampfire extends BlockContainer implements IWaterloggableBlock
     private static final AxisAlignedBB SHAPE = new AxisAlignedBB(0, 0, 0, 1, 0.4375D, 1);
 
     public BlockCampfire() {
+        this(false);
+    }
+
+    public BlockCampfire(boolean soul) {
         super(Material.ROCK);
-        setRegistryName(FarmerFutureDelight.MODID, "campfire");
-        setUnlocalizedName(FarmerFutureDelight.MODID + ".campfire");
+        this.soul = soul;
+        String name = soul ? "soul_campfire" : "campfire";
+        setRegistryName(FarmerFutureDelight.MODID, name);
+        setUnlocalizedName(FarmerFutureDelight.MODID + "." + name);
         setCreativeTab(FFDCreativeTab.INSTANCE);
         setHardness(2.0F);
         setResistance(2.0F / 3.0F);
@@ -107,9 +114,9 @@ public class BlockCampfire extends BlockContainer implements IWaterloggableBlock
 
     @Override
     public void onEntityCollidedWithBlock(World world, BlockPos pos, IBlockState state, Entity entity) {
-        if (!world.isRemote && isLit(state, world, pos)
+        if (!world.isRemote && !entity.isImmuneToFire() && isLit(state, world, pos)
                 && entity instanceof EntityLivingBase) {
-            entity.attackEntityFrom(net.minecraft.util.DamageSource.HOT_FLOOR, 1.0F);
+            entity.attackEntityFrom(net.minecraft.util.DamageSource.HOT_FLOOR, soul ? 2.0F : 1.0F);
         }
     }
 
@@ -240,7 +247,7 @@ public class BlockCampfire extends BlockContainer implements IWaterloggableBlock
     @Override
     public void randomDisplayTick(IBlockState state, World world, BlockPos pos, Random random) {
         if (!isLit(state, world, pos)) return;
-        if (random.nextInt(5) == 0) {
+        if (!soul && random.nextInt(5) == 0) {
             world.spawnParticle(net.minecraft.util.EnumParticleTypes.LAVA,
                     pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D,
                     random.nextFloat() / 2.0F, 0.00005D, random.nextFloat() / 2.0F);
@@ -277,7 +284,7 @@ public class BlockCampfire extends BlockContainer implements IWaterloggableBlock
 
     @Override
     public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
-        return isLit(state, world, pos) ? 15 : 0;
+        return isLit(state, world, pos) ? (soul ? 10 : 15) : 0;
     }
 
     public static boolean isLit(IBlockState state, IBlockAccess world, BlockPos pos) {
@@ -297,17 +304,20 @@ public class BlockCampfire extends BlockContainer implements IWaterloggableBlock
 
     @Override
     public net.minecraft.item.Item getItemDropped(IBlockState state, Random random, int fortune) {
-        return net.minecraft.init.Items.COAL;
+        return soul ? xy177.farmersfuturedelight.common.registry.FFDItems.effectiveStack(
+                xy177.farmersfuturedelight.common.registry.FFDItems.SOUL_SOIL).getItem()
+                : net.minecraft.init.Items.COAL;
     }
 
     @Override
     public int damageDropped(IBlockState state) {
-        return 1;
+        return soul ? xy177.farmersfuturedelight.common.registry.FFDItems.effectiveStack(
+                xy177.farmersfuturedelight.common.registry.FFDItems.SOUL_SOIL).getMetadata() : 1;
     }
 
     @Override
     public int quantityDropped(Random random) {
-        return 2;
+        return soul ? 1 : 2;
     }
 
     @Override

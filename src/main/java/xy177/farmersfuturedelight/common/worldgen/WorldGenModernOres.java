@@ -25,8 +25,7 @@ public final class WorldGenModernOres {
     }
 
     public void generateChunk(int chunkX, int chunkZ, Access access) {
-        int maximumSize = scaledSize(64);
-        int originRadius = Math.max(1, (maximumReach(maximumSize) + 15) / 16);
+        int originRadius = originRadius();
         for (int originChunkX = chunkX - originRadius;
              originChunkX <= chunkX + originRadius; originChunkX++) {
             for (int originChunkZ = chunkZ - originRadius;
@@ -109,6 +108,10 @@ public final class WorldGenModernOres {
                 placeCompatCount(chunkX, chunkZ, generation, access);
             }
         }
+    }
+
+    public static int originRadius() {
+        return Math.max(1, (maximumReach(scaledSize(64)) + 15) / 16);
     }
 
     private void placeCount(int chunkX, int chunkZ, long salt, int count,

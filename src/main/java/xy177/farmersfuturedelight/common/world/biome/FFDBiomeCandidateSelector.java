@@ -220,7 +220,7 @@ final class FFDBiomeCandidateSelector {
     private static double climateScore(Entry entry, Sample sample, Family targetFamily,
                                        Biome fallback) {
         double score = entry.profile.fitness(sample, targetFamily);
-        score -= Math.log1p(entry.weight) * WEIGHT_INFLUENCE;
+        score -= entry.weightInfluence;
         if (entry.biome == fallback) {
             score -= FALLBACK_BONUS;
         }
@@ -715,9 +715,9 @@ final class FFDBiomeCandidateSelector {
                 || sample.role == TerrainRole.RIVER) {
             Biome fallback = sample.fallbackBiome();
             boolean snowy = candidate.isSnowyBiome()
-                    || BiomeDictionary.hasType(candidate, BiomeDictionary.Type.SNOWY);
+                    || FFDModernBiomeResolver.biomeTypes(candidate).contains(BiomeDictionary.Type.SNOWY);
             boolean targetSnowy = fallback.isSnowyBiome()
-                    || BiomeDictionary.hasType(fallback, BiomeDictionary.Type.SNOWY);
+                    || FFDModernBiomeResolver.biomeTypes(fallback).contains(BiomeDictionary.Type.SNOWY);
             return snowy == targetSnowy;
         }
         return true;
@@ -883,7 +883,7 @@ final class FFDBiomeCandidateSelector {
     }
 
     private static long cellKey(int x, int z) {
-        return (x & 0xFFFFFFFFL) | (long) z << 32;
+        return it.unimi.dsi.fastutil.HashCommon.mix((x & 0xFFFFFFFFL) | (long) z << 32);
     }
 
     private enum Family {
@@ -998,12 +998,14 @@ final class FFDBiomeCandidateSelector {
     private static final class Entry {
         private final Biome biome;
         private final int weight;
+        private final double weightInfluence;
         private final Profile profile;
         private final long salt;
 
         private Entry(Biome biome, int weight) {
             this.biome = biome;
             this.weight = weight;
+            weightInfluence = Math.log1p(weight) * WEIGHT_INFLUENCE;
             profile = new Profile(biome);
             salt = stableSalt(biome.getRegistryName());
         }

@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "power=0": {
+      "model": "farmers_future_delight:target"
+    },
+    "power=1": {
+      "model": "farmers_future_delight:target"
+    },
+    "power=2": {
+      "model": "farmers_future_delight:target"
+    },
+    "power=3": {
+      "model": "farmers_future_delight:target"
+    },
+    "power=4": {
+      "model": "farmers_future_delight:target"
+    },
+    "power=5": {
+      "model": "farmers_future_delight:target"
+    },
+    "power=6": {
+      "model": "farmers_future_delight:target"
+    },
+    "power=7": {
+      "model": "farmers_future_delight:target"
+    },
+    "power=8": {
+      "model": "farmers_future_delight:target"
+    },
+    "power=9": {
+      "model": "farmers_future_delight:target"
+    },
+    "power=10": {
+      "model": "farmers_future_delight:target"
+    },
+    "power=11": {
+      "model": "farmers_future_delight:target"
+    },
+    "power=12": {
+      "model": "farmers_future_delight:target"
+    },
+    "power=13": {
+      "model": "farmers_future_delight:target"
+    },
+    "power=14": {
+      "model": "farmers_future_delight:target"
+    },
+    "power=15": {
+      "model": "farmers_future_delight:target"
+    }
+  }
+}

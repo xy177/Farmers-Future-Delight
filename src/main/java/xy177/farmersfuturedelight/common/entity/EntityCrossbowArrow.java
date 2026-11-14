@@ -20,6 +20,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.EntitySelectors;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.init.SoundEvents;
@@ -64,6 +65,15 @@ public class EntityCrossbowArrow extends EntityTippedArrow implements IEntityAdd
 
     public boolean isSpectralArrow() {
         return spectral;
+    }
+
+    @Override
+    public void onUpdate() {
+        super.onUpdate();
+        if (world.isRemote && spectral && !inGround) {
+            world.spawnParticle(EnumParticleTypes.SPELL, posX, posY, posZ,
+                    0.0D, 0.0D, 0.0D);
+        }
     }
 
     @Override

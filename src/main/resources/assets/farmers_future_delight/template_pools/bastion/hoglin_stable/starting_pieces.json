@@ -1,0 +1,50 @@
+{
+  "elements": [
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "farmers_future_delight:bastion/hoglin_stable/starting_pieces/starting_stairs_0",
+        "processors": "farmers_future_delight:stable_degradation",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "farmers_future_delight:bastion/hoglin_stable/starting_pieces/starting_stairs_1",
+        "processors": "farmers_future_delight:stable_degradation",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "farmers_future_delight:bastion/hoglin_stable/starting_pieces/starting_stairs_2",
+        "processors": "farmers_future_delight:stable_degradation",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "farmers_future_delight:bastion/hoglin_stable/starting_pieces/starting_stairs_3",
+        "processors": "farmers_future_delight:stable_degradation",
+        "projection": "rigid"
+      },
+      "weight": 1
+    },
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "farmers_future_delight:bastion/hoglin_stable/starting_pieces/starting_stairs_4",
+        "processors": "farmers_future_delight:stable_degradation",
+        "projection": "rigid"
+      },
+      "weight": 1
+    }
+  ],
+  "fallback": "minecraft:empty"
+}

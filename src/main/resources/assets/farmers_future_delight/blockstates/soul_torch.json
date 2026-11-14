@@ -1,0 +1,22 @@
+{
+  "variants": {
+    "facing=up": {
+      "model": "farmers_future_delight:soul_torch"
+    },
+    "facing=east": {
+      "model": "farmers_future_delight:soul_wall_torch"
+    },
+    "facing=south": {
+      "model": "farmers_future_delight:soul_wall_torch",
+      "y": 90
+    },
+    "facing=west": {
+      "model": "farmers_future_delight:soul_wall_torch",
+      "y": 180
+    },
+    "facing=north": {
+      "model": "farmers_future_delight:soul_wall_torch",
+      "y": 270
+    }
+  }
+}

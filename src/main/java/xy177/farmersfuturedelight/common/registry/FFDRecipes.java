@@ -16,6 +16,12 @@ public final class FFDRecipes {
 
     public static void init() {
         FFDStoneDecor.registerSmelting();
+        if (FFDItems.isItemRegistered(FFDItems.CRACKED_NETHER_BRICKS)) {
+            GameRegistry.addSmelting(net.minecraft.init.Blocks.NETHER_BRICK,
+                    new ItemStack(FFDItems.CRACKED_NETHER_BRICKS), 0.1F);
+        }
+        addSmelting(FFDItems.NETHER_GOLD_ORE,new ItemStack(Items.GOLD_INGOT),1.0F);
+        addSmelting(FFDItems.BASALT,FFDItems.SMOOTH_BASALT,.1F);
         if (FFDItems.isBlackstoneEnabled()) {
             addSmelting(FFDItems.POLISHED_BLACKSTONE_BRICKS, FFDItems.CRACKED_POLISHED_BLACKSTONE_BRICKS, 0.1F);
         }

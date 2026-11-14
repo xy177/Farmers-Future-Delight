@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import xy177.farmersfuturedelight.FarmerFutureDelight;
 import xy177.farmersfuturedelight.common.FFDConfig;
 import xy177.farmersfuturedelight.common.FFDCreativeTab;
+import xy177.farmersfuturedelight.common.FFDDeferredCreativeTab;
 
 @Mod.EventBusSubscriber(modid = FarmerFutureDelight.MODID, value = Side.CLIENT)
 public final class FFDCreativeInventory {
@@ -61,14 +63,18 @@ public final class FFDCreativeInventory {
     private static final Map<String, List<String>> CLASSIC_ORDER = loadOrder("classic_creative_inventory_order.json");
     private static final String[] CLASSIC_NAMES = {"building_blocks", "decorations", "redstone", "transportation",
             "misc", "tools", "combat", "food", "brewing"};
-    private static CreativeTabs spawnEggs;
+    private static FFDDeferredCreativeTab spawnEggs;
     private static boolean gathering;
     private static List<CreativeTabs> extraTabsSnapshot = Collections.emptyList();
+    private static List<CreativeTabs> firstPageSnapshot = Collections.emptyList();
+    private static Map<CreativeTabs, Integer> extraTabIndices = Collections.emptyMap();
+    private static Map<CreativeTabs, Integer> tabPages = Collections.emptyMap();
     private static CreativeTabs[] creativeTabsSnapshot;
     private static FFDConfig.CreativeInventoryMode snapshotMode;
     private static boolean ffdHasItemsSnapshot;
     private static boolean spawnEggsHasItemsSnapshot;
     private static boolean tabSnapshotReady;
+    private static long tabSnapshotGeneration;
 
     private FFDCreativeInventory() {
     }
@@ -79,7 +85,7 @@ public final class FFDCreativeInventory {
 
     public static void install() {
         if (modern() && spawnEggs == null) {
-            spawnEggs = new CreativeTabs("farmers_future_delight.spawn_eggs") {
+            spawnEggs = new FFDDeferredCreativeTab("farmers_future_delight.spawn_eggs") {
                 @Override
                 public ItemStack getTabIconItem() {
                     ItemStack egg = new ItemStack(Items.SPAWN_EGG);
@@ -100,7 +106,7 @@ public final class FFDCreativeInventory {
         if (event.getGui() != null && event.getGui().getClass() == GuiContainerCreative.class) {
             install();
             refreshTabSnapshot();
-            if (modern()) event.setGui(new GuiModernCreativeInventory(Minecraft.getMinecraft().player));
+            event.setGui(new GuiModernCreativeInventory(Minecraft.getMinecraft().player));
         }
     }
 
@@ -150,15 +156,39 @@ public final class FFDCreativeInventory {
         install();
         ffdHasItemsSnapshot = calculateHasItems(FFDCreativeTab.INSTANCE);
         spawnEggsHasItemsSnapshot = modern() && spawnEggs != null && calculateHasItems(spawnEggs);
+        CreativeTabs[] previousTabs = CreativeTabs.CREATIVE_TAB_ARRAY;
+        FFDCreativeTab.INSTANCE.setRegistered(ffdHasItemsSnapshot);
+        if (spawnEggs != null) spawnEggs.setRegistered(spawnEggsHasItemsSnapshot);
+        if (previousTabs != CreativeTabs.CREATIVE_TAB_ARRAY) GuiModernCreativeInventory.restoreSelection(previousTabs);
+        List<CreativeTabs> firstPage = new ArrayList<>();
+        if (modern()) {
+            Collections.addAll(firstPage, MODERN_TABS);
+            if (spawnEggsHasItemsSnapshot) firstPage.add(spawnEggs);
+            Collections.addAll(firstPage, CreativeTabs.HOTBAR, CreativeTabs.SEARCH, CreativeTabs.INVENTORY);
+        } else {
+            for (CreativeTabs tab : CreativeTabs.CREATIVE_TAB_ARRAY) {
+                if (tab != null && tab.getTabIndex() < 12) firstPage.add(tab);
+            }
+        }
         List<CreativeTabs> result = new ArrayList<>();
         for (CreativeTabs tab : CreativeTabs.CREATIVE_TAB_ARRAY) if (tab != null && tab != spawnEggs
-                && (tab != FFDCreativeTab.INSTANCE || ffdHasItemsSnapshot)
-                && modernIndex(tab) < 0 && tab != CreativeTabs.SEARCH && tab != CreativeTabs.HOTBAR
-                && tab != CreativeTabs.INVENTORY) result.add(tab);
-        extraTabsSnapshot = result;
+                && !firstPage.contains(tab)) result.add(tab);
+        Map<CreativeTabs, Integer> indices = new IdentityHashMap<>();
+        Map<CreativeTabs, Integer> pages = new IdentityHashMap<>();
+        for (CreativeTabs tab : firstPage) pages.put(tab, 0);
+        for (int index = 0; index < result.size(); index++) {
+            CreativeTabs tab = result.get(index);
+            indices.put(tab, index);
+            pages.put(tab, 1 + index / 10);
+        }
+        firstPageSnapshot = Collections.unmodifiableList(firstPage);
+        extraTabsSnapshot = Collections.unmodifiableList(result);
+        extraTabIndices = indices;
+        tabPages = pages;
         creativeTabsSnapshot = CreativeTabs.CREATIVE_TAB_ARRAY.clone();
         snapshotMode = FFDConfig.creativeInventoryMode;
         tabSnapshotReady = true;
+        tabSnapshotGeneration++;
     }
 
     private static void ensureTabSnapshot() {
@@ -250,7 +280,7 @@ public final class FFDCreativeInventory {
         if (id.endsWith("_door") || id.endsWith("_trapdoor") || id.endsWith("_button")
                 || id.endsWith("_pressure_plate") || id.endsWith("_fence_gate") || id.equals("target")
                 || id.equals("lightning_rod") || id.equals("lectern")) return CreativeTabs.REDSTONE;
-        if (item instanceof ItemTool || id.endsWith("_hoe") || id.equals("spyglass") || id.equals("goat_horn")
+        if (item instanceof ItemTool || id.endsWith("_hoe") || id.equals("spyglass") || id.equals("goat_horn") || id.equals("warped_fungus_on_a_stick")
                 || id.endsWith("_bucket") || id.endsWith("_sign") || id.endsWith("_music_disc") || id.startsWith("music_disc_")) return CreativeTabs.TOOLS;
         if (item instanceof ItemBlock) {
             Block block = ((ItemBlock)item).getBlock();
@@ -459,32 +489,45 @@ public final class FFDCreativeInventory {
     }
 
     public static int tabPage(int original, CreativeTabs tab) {
+        return pageOf(tab);
+    }
+
+    public static int pageOf(CreativeTabs tab) {
         ensureTabSnapshot();
-        if (!modern() || spawnEggs == null) return original;
-        if (modernIndex(tab) >= 0 || tab == CreativeTabs.SEARCH || tab == CreativeTabs.HOTBAR || tab == CreativeTabs.INVENTORY) return 0;
-        int index = extraTabs().indexOf(tab);
-        return index < 0 ? original : 1 + index / 10;
+        Integer page = tabPages.get(tab);
+        return page == null ? -1 : page;
+    }
+
+    public static int extraIndex(CreativeTabs tab) {
+        ensureTabSnapshot();
+        Integer index = extraTabIndices.get(tab);
+        return index == null ? -1 : index;
+    }
+
+    public static int maxPage() {
+        ensureTabSnapshot();
+        return (extraTabsSnapshot.size() + 9) / 10;
+    }
+
+    public static long tabSnapshotGeneration() {
+        ensureTabSnapshot();
+        return tabSnapshotGeneration;
+    }
+
+    public static CreativeTabs firstTab(int page) {
+        ensureTabSnapshot();
+        int index = (page - 1) * 10;
+        return page > 0 && index < extraTabsSnapshot.size()
+                ? extraTabsSnapshot.get(index) : CreativeTabs.BUILDING_BLOCKS;
     }
 
     public static Object[] pageTabs(Object[] original, int from, int to) {
         ensureTabSnapshot();
-        if (!modern() || spawnEggs == null) {
-            CreativeTabs[] result = Arrays.copyOfRange(original, from, to, CreativeTabs[].class);
-            if (ffdHasItemsSnapshot) return result;
-            List<CreativeTabs> filtered = new ArrayList<>();
-            for (CreativeTabs tab : result) if (tab != FFDCreativeTab.INSTANCE) filtered.add(tab);
-            return filtered.toArray(new CreativeTabs[0]);
-        }
-        int page = from / 10;
-        if (page == 0) {
-            List<CreativeTabs> result = new ArrayList<>(Arrays.asList(MODERN_TABS));
-            if (spawnEggsHasItemsSnapshot) result.add(spawnEggs);
-            Collections.addAll(result, CreativeTabs.HOTBAR, CreativeTabs.SEARCH, CreativeTabs.INVENTORY);
-            return result.toArray(new CreativeTabs[0]);
-        }
-        List<CreativeTabs> extras = extraTabs();
-        int start = Math.min(extras.size(), (page - 1) * 10);
-        return extras.subList(start, Math.min(extras.size(), start + 10)).toArray(new CreativeTabs[0]);
+        int page = Math.max(0, from / 10);
+        if (page == 0) return firstPageSnapshot.toArray(new CreativeTabs[0]);
+        int start = Math.min(extraTabsSnapshot.size(), (page - 1) * 10);
+        return extraTabsSnapshot.subList(start, Math.min(extraTabsSnapshot.size(), start + 10))
+                .toArray(new CreativeTabs[0]);
     }
 
     private static Map<String, List<String>> loadOrder(String file) {

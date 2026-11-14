@@ -1,10 +1,14 @@
 package xy177.farmersfuturedelight.common.worldgen;
 
 import java.lang.reflect.Field;
+import java.util.Map;
 
 import net.minecraft.world.World;
+import net.minecraft.world.gen.ChunkGeneratorFlat;
 import net.minecraft.world.gen.ChunkGeneratorOverworld;
 import net.minecraft.world.gen.ChunkGeneratorSettings;
+import net.minecraft.world.gen.FlatGeneratorInfo;
+import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -13,12 +17,14 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraft.world.gen.structure.MapGenMineshaft;
 import net.minecraft.world.gen.structure.MapGenScatteredFeature;
+import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.MapGenVillage;
 import net.minecraftforge.fml.common.Loader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import xy177.farmersfuturedelight.common.world.ChunkGeneratorExtended;
+import xy177.farmersfuturedelight.common.world.FFDWorldgenTerrain;
 import xy177.farmersfuturedelight.core.FFDHeightHooks;
 
 public final class FFDStructureHooks {
@@ -115,6 +121,8 @@ public final class FFDStructureHooks {
     }
 
     public static BlockPos locate(BlockPos original, World world, String name, BlockPos origin, boolean unexplored) {
+        if (MapGenFFDRuinedPortal.matches(name)) return MapGenFFDRuinedPortal.locate(world, origin, unexplored);
+        if (FFDNetherStructures.isBastion(name)) return FFDNetherStructures.locate(world, origin, unexplored);
         return FFDModernStructures.isOutpost(name) ? FFDModernStructures.locateOutpost(world, origin, unexplored) : original;
     }
 
@@ -122,18 +130,25 @@ public final class FFDStructureHooks {
         if (arguments.length != 1) return original;
         java.util.List<String> result = new java.util.ArrayList<>(original);
         for (String name : net.minecraft.command.CommandBase.getListOfStringsMatchingLastWord(
-                arguments, "Pillager_Outpost")) {
+                arguments, "Pillager_Outpost", "Bastion_Remnant", "Ruined_Portal")) {
             if (!result.contains(name)) result.add(name);
         }
         return result;
     }
 
     public static boolean isInside(boolean original, World world, String name, BlockPos position) {
+        if (MapGenFFDRuinedPortal.matches(name)) return MapGenFFDRuinedPortal.inside(world, position);
+        if (FFDNetherStructures.isBastion(name)) return FFDNetherStructures.inside(world, position);
         return FFDModernStructures.isOutpost(name) ? FFDModernStructures.insideOutpost(world, position) : original;
     }
 
     public static void installModernGenerators(ChunkGeneratorOverworld generator, World world,
                                                ChunkGeneratorExtended extendedGenerator) {
+        installModernGenerators(generator, world, (FFDWorldgenTerrain) extendedGenerator);
+    }
+
+    public static void installModernGenerators(ChunkGeneratorOverworld generator, World world,
+                                               FFDWorldgenTerrain extendedGenerator) {
         if (generator == null || !FFDHeightHooks.isExtended(world)) {
             return;
         }
@@ -151,15 +166,29 @@ public final class FFDStructureHooks {
         return world == null ? 63 : world.getSeaLevel();
     }
 
-    static boolean installModernVillage(ChunkGeneratorOverworld generator) {
+    static boolean installModernVillage(IChunkGenerator generator) {
         if (Loader.isModLoaded("villagenames")) {
             LOGGER.info("Keeping Village Names village layout");
             return false;
         }
+        if (generator instanceof ChunkGeneratorFlat) {
+            Map<String, MapGenStructure> structures = ObfuscationReflectionHelper.getPrivateValue(
+                    ChunkGeneratorFlat.class, (ChunkGeneratorFlat) generator, "field_82696_f");
+            MapGenStructure village = structures.get("Village");
+            if (village == null || village instanceof FFDModernVillageGenerator) return false;
+            if (village.getClass() != MapGenVillage.class) {
+                LOGGER.info("Keeping external village implementation {}", village.getClass().getName());
+                return false;
+            }
+            FlatGeneratorInfo settings = ObfuscationReflectionHelper.getPrivateValue(
+                    ChunkGeneratorFlat.class, (ChunkGeneratorFlat) generator, "field_82699_e");
+            structures.put("Village", new FFDModernVillageGenerator(settings.getWorldFeatures().get("village")));
+            return true;
+        }
         return replaceGenerator(generator, MapGenVillage.class, new FFDModernVillageGenerator());
     }
 
-    private static boolean replaceGenerator(ChunkGeneratorOverworld generator, Class<?> type,
+    private static boolean replaceGenerator(IChunkGenerator generator, Class<?> type,
                                             Object replacement) {
         Class<?> current = generator.getClass();
         while (current != null) {

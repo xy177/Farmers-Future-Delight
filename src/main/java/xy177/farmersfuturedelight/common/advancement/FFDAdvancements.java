@@ -86,6 +86,29 @@ public final class FFDAdvancements {
     public static final SimpleTrigger THROW_TRIDENT = register("throw_trident");
     public static final SimpleTrigger VERY_VERY_FRIGHTENING =
             register("very_very_frightening");
+    public static final SimpleTrigger BULLSEYE = register("bullseye");
+    public static final SimpleTrigger OBTAIN_ANCIENT_DEBRIS = register("obtain_ancient_debris");
+    public static final SimpleTrigger NETHERITE_ARMOR = register("netherite_armor");
+    public static final SimpleTrigger USE_LODESTONE = register("use_lodestone");
+    public static final SimpleTrigger OBTAIN_CRYING_OBSIDIAN = register("obtain_crying_obsidian");
+    public static final SimpleTrigger CHARGE_RESPAWN_ANCHOR = register("charge_respawn_anchor");
+    public static final SimpleTrigger RIDE_STRIDER = register("ride_strider");
+    public static final SimpleTrigger EXPLORE_NETHER = register("explore_nether");
+    public static final SimpleTrigger VISIT_NETHER_WASTES = register("visit_nether_wastes");
+    public static final SimpleTrigger VISIT_SOUL_SAND_VALLEY = register("visit_soul_sand_valley");
+    public static final SimpleTrigger VISIT_CRIMSON_FOREST = register("visit_crimson_forest");
+    public static final SimpleTrigger VISIT_WARPED_FOREST = register("visit_warped_forest");
+    public static final SimpleTrigger VISIT_BASALT_DELTAS = register("visit_basalt_deltas");
+    public static final SimpleTrigger FIND_BASTION = register("find_bastion");
+    public static final SimpleTrigger LOOT_BASTION = register("loot_bastion");
+    public static final SimpleTrigger DISTRACT_PIGLIN = register("distract_piglin");
+    public static final SimpleTrigger OBTAIN_NETHERITE_HOE = register("obtain_netherite_hoe");
+    public static final SimpleTrigger OBTAIN_BLACKSTONE = register("obtain_blackstone");
+    public static final SimpleTrigger BRED_HOGLIN = register("bred_hoglin");
+    public static final SimpleTrigger BRED_STRIDER = register("bred_strider");
+    public static final SimpleTrigger KILL_PIGLIN = register("kill_piglin");
+    public static final SimpleTrigger KILL_HOGLIN = register("kill_hoglin");
+    public static final SimpleTrigger KILL_ZOGLIN = register("kill_zoglin");
 
     private FFDAdvancements() {
     }
@@ -116,33 +139,22 @@ public final class FFDAdvancements {
     }
 
     public static void triggerVerticalBiome(EntityPlayerMP player, FFDVerticalBiome biome) {
-        switch (biome) {
-            case LUSH_CAVES:
-                VISIT_LUSH_CAVES.trigger(player);
-                break;
-            case DRIPSTONE_CAVES:
-                VISIT_DRIPSTONE_CAVES.trigger(player);
-                break;
-            case MEADOW:
-                VISIT_MEADOW.trigger(player);
-                break;
-            case GROVE:
-                VISIT_GROVE.trigger(player);
-                break;
-            case SNOWY_SLOPES:
-                VISIT_SNOWY_SLOPES.trigger(player);
-                break;
-            case JAGGED_PEAKS:
-                VISIT_JAGGED_PEAKS.trigger(player);
-                break;
-            case FROZEN_PEAKS:
-                VISIT_FROZEN_PEAKS.trigger(player);
-                break;
-            case STONY_PEAKS:
-                VISIT_STONY_PEAKS.trigger(player);
-                break;
-            default:
-                break;
+        if (biome == FFDVerticalBiome.LUSH_CAVES) {
+            VISIT_LUSH_CAVES.trigger(player);
+        } else if (biome == FFDVerticalBiome.DRIPSTONE_CAVES) {
+            VISIT_DRIPSTONE_CAVES.trigger(player);
+        } else if (biome == FFDVerticalBiome.MEADOW) {
+            VISIT_MEADOW.trigger(player);
+        } else if (biome == FFDVerticalBiome.GROVE) {
+            VISIT_GROVE.trigger(player);
+        } else if (biome == FFDVerticalBiome.SNOWY_SLOPES) {
+            VISIT_SNOWY_SLOPES.trigger(player);
+        } else if (biome == FFDVerticalBiome.JAGGED_PEAKS) {
+            VISIT_JAGGED_PEAKS.trigger(player);
+        } else if (biome == FFDVerticalBiome.FROZEN_PEAKS) {
+            VISIT_FROZEN_PEAKS.trigger(player);
+        } else if (biome == FFDVerticalBiome.STONY_PEAKS) {
+            VISIT_STONY_PEAKS.trigger(player);
         }
     }
 

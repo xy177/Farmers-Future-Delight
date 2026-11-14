@@ -3,6 +3,7 @@ package xy177.farmersfuturedelight.client.render;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.passive.EntityOcelot;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.math.MathHelper;
 import xy177.farmersfuturedelight.common.entity.EntityCat;
@@ -78,7 +79,7 @@ public class ModelCat extends ModelBase {
     public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks,
                                   float netHeadYaw, float headPitch, float scale,
                                   Entity entity) {
-        EntityCat cat = (EntityCat) entity;
+        EntityOcelot cat = (EntityOcelot) entity;
         head.rotateAngleX = headPitch * 0.017453292F;
         head.rotateAngleY = netHeadYaw * 0.017453292F;
         if (!cat.isSitting()) {
@@ -107,7 +108,7 @@ public class ModelCat extends ModelBase {
                         * MathHelper.cos(limbSwing) * limbSwingAmount;
             }
         }
-        float lying = cat.getLieDownAmount(partialTicks);
+        float lying = (cat instanceof EntityCat ? ((EntityCat) cat).getLieDownAmount(partialTicks) : 0.0F);
         if (lying > 0.0F) {
             head.rotateAngleZ = lerpAngle(lying, head.rotateAngleZ, -1.2707963F);
             head.rotateAngleY = lerpAngle(lying, head.rotateAngleY, 1.2707963F);
@@ -120,19 +121,19 @@ public class ModelCat extends ModelBase {
             backRightLeg.rotateAngleZ = -0.5F;
             backRightLeg.rotationPointX += 0.8F;
             backRightLeg.rotationPointY += 2.0F;
-            tail1.rotateAngleX = lerpAngle(cat.getLieDownTailAmount(partialTicks),
+            tail1.rotateAngleX = lerpAngle((cat instanceof EntityCat ? ((EntityCat) cat).getLieDownTailAmount(partialTicks) : 0.0F),
                     tail1.rotateAngleX, 0.8F);
-            tail2.rotateAngleX = lerpAngle(cat.getLieDownTailAmount(partialTicks),
+            tail2.rotateAngleX = lerpAngle((cat instanceof EntityCat ? ((EntityCat) cat).getLieDownTailAmount(partialTicks) : 0.0F),
                     tail2.rotateAngleX, -0.4F);
         }
-        float relaxed = cat.getRelaxStateOneAmount(partialTicks);
+        float relaxed = (cat instanceof EntityCat ? ((EntityCat) cat).getRelaxStateOneAmount(partialTicks) : 0.0F);
         head.rotateAngleX = lerpAngle(relaxed, head.rotateAngleX, -0.58177644F);
     }
 
     @Override
     public void setLivingAnimations(EntityLivingBase entity, float limbSwing,
                                     float limbSwingAmount, float partialTickTime) {
-        EntityCat cat = (EntityCat) entity;
+        EntityOcelot cat = (EntityOcelot) entity;
         partialTicks = partialTickTime;
         body.rotationPointY = 12.0F;
         body.rotationPointZ = -10.0F;

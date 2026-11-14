@@ -40,6 +40,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import xy177.farmersfuturedelight.api.IWaterloggableBlock;
 import xy177.farmersfuturedelight.api.WaterloggedBlockApi;
+import xy177.farmersfuturedelight.core.FFDHeightHooks;
 
 public final class BlockModernWall extends BlockFutureStone implements IWaterloggableBlock {
     public static final PropertyBool UP = PropertyBool.create("up");
@@ -112,14 +113,18 @@ public final class BlockModernWall extends BlockFutureStone implements IWaterlog
 
     @Override
     public IBlockState getActualState(IBlockState state, IBlockAccess world, BlockPos pos) {
+        int ceiling = world instanceof World ? FFDHeightHooks.maxYExclusive((World) world)
+                : FFDHeightHooks.MAX_Y_EXCLUSIVE;
+        if (pos.getY() >= ceiling) return state;
         List<IBlockState> column = new ArrayList<>();
         BlockPos top = pos.up();
         IBlockState above = world.getBlockState(top);
-        while (above.getBlock() instanceof BlockModernWall) {
+        while (top.getY() < ceiling && above.getBlock() instanceof BlockModernWall) {
             column.add(above);
             top = top.up();
             above = world.getBlockState(top);
         }
+        if (top.getY() >= ceiling) above = Blocks.AIR.getDefaultState();
         if (above.getBlock() instanceof BlockWall) {
             above = above.getActualState(world, top);
         }

@@ -19,7 +19,8 @@ public class BlockWoodWallSign extends BlockWallSign implements IBlockWoodSign {
         setRegistryName(FarmerFutureDelight.MODID, woodName + "_wall_sign");
         setUnlocalizedName(FarmerFutureDelight.MODID + "." + woodName + "_wall_sign");
         setHardness(1.0F);
-        setSoundType(SoundType.WOOD);
+        setSoundType(isNetherWood() ? xy177.farmersfuturedelight.common.registry.FFDSounds.NETHER_WOOD
+                : SoundType.WOOD);
     }
 
     @Override

@@ -9,6 +9,8 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
+import xy177.farmersfuturedelight.common.block.BlockWoodStandingSign;
+import xy177.farmersfuturedelight.common.block.BlockWoodWallSign;
 import net.minecraft.item.Item.ToolMaterial;
 import xy177.farmersfuturedelight.common.item.ItemScaffolding;
 import net.minecraft.item.ItemBlock;
@@ -206,6 +208,7 @@ public final class FFDItems {
             .setCreativeTab(FFDCreativeTab.INSTANCE);
     public static final Item MUSIC_DISC_OTHERSIDE =
             new ItemMusicDisc("otherside", FFDSounds.MUSIC_DISC_OTHERSIDE);
+    public static final Item MUSIC_DISC_PIGSTEP = new ItemMusicDisc("pigstep", FFDSounds.MUSIC_DISC_PIGSTEP);
     public static final Item AMETHYST_BLOCK = blockItem(FFDBlocks.AMETHYST_BLOCK);
     public static final Item BUDDING_AMETHYST = blockItem(FFDBlocks.BUDDING_AMETHYST);
     public static final Item SMALL_AMETHYST_BUD = blockItem(FFDBlocks.SMALL_AMETHYST_BUD);
@@ -213,6 +216,9 @@ public final class FFDItems {
     public static final Item LARGE_AMETHYST_BUD = blockItem(FFDBlocks.LARGE_AMETHYST_BUD);
     public static final Item AMETHYST_CLUSTER = blockItem(FFDBlocks.AMETHYST_CLUSTER);
     public static final Item CALCITE = blockItem(FFDBlocks.CALCITE);
+    public static final Item BASALT = blockItem(FFDBlocks.BASALT);
+    public static final Item POLISHED_BASALT = blockItem(FFDBlocks.POLISHED_BASALT);
+    public static final Item NETHER_GOLD_ORE = blockItem(FFDBlocks.NETHER_GOLD_ORE);
     public static final Item SMOOTH_BASALT = blockItem(FFDBlocks.SMOOTH_BASALT);
     public static final Item TINTED_GLASS = blockItem(FFDBlocks.TINTED_GLASS);
     public static final Item DRIPSTONE_BLOCK = blockItem(FFDBlocks.DRIPSTONE_BLOCK);
@@ -223,6 +229,10 @@ public final class FFDItems {
     public static final Item BLAST_FURNACE = blockItem(FFDBlocks.BLAST_FURNACE);
     public static final Item BARREL = blockItem(FFDBlocks.BARREL);
     public static final Item CAMPFIRE = blockItem(FFDBlocks.CAMPFIRE);
+    public static final Item SOUL_SOIL = blockItem(FFDBlocks.SOUL_SOIL);
+    public static final Item SOUL_TORCH = blockItem(FFDBlocks.SOUL_TORCH);
+    public static final Item SOUL_LANTERN = blockItem(FFDBlocks.SOUL_LANTERN);
+    public static final Item SOUL_CAMPFIRE = blockItem(FFDBlocks.SOUL_CAMPFIRE);
     public static final Item COMPOSTER = blockItem(FFDBlocks.COMPOSTER);
     public static final Item STONECUTTER = blockItem(FFDBlocks.STONECUTTER);
     public static final Item GRINDSTONE = blockItem(FFDBlocks.GRINDSTONE);
@@ -238,6 +248,7 @@ public final class FFDItems {
     public static final Item SKULL_BANNER_PATTERN = bannerPatternItem("skull_banner_pattern", BannerPattern.SKULL);
     public static final Item MOJANG_BANNER_PATTERN = bannerPatternItem("mojang_banner_pattern", BannerPattern.MOJANG);
     public static final Item GLOBE_BANNER_PATTERN = bannerPatternItem("globe_banner_pattern", FFDBannerPatterns.GLOBE);
+    public static final Item PIGLIN_BANNER_PATTERN = bannerPatternItem("piglin_banner_pattern", FFDBannerPatterns.PIGLIN);
     public static final Item FIELD_MASONED_BANNER_PATTERN = bannerPatternItem("field_masoned_banner_pattern", BannerPattern.BRICKS);
     public static final Item BORDURE_INDENTED_BANNER_PATTERN = bannerPatternItem("bordure_indented_banner_pattern", BannerPattern.CURLY_BORDER);
     public static final Item CORNFLOWER = flowerItem(FFDBlocks.CORNFLOWER, FFDBlocks.POTTED_CORNFLOWER);
@@ -296,6 +307,11 @@ public final class FFDItems {
             FFDBlocks.POLISHED_BLACKSTONE_BRICK_SLAB, FFDBlocks.POLISHED_BLACKSTONE_BRICK_DOUBLE_SLAB);
     public static final Item QUARTZ_BRICKS = blockItem(FFDBlocks.QUARTZ_BRICKS);
     public static final Item CRYING_OBSIDIAN = blockItem(FFDBlocks.CRYING_OBSIDIAN);
+    public static final Item TARGET = blockItem(FFDBlocks.TARGET);
+    public static final Item LODESTONE = blockItem(FFDBlocks.LODESTONE);
+    public static final Item RESPAWN_ANCHOR = blockItem(FFDBlocks.RESPAWN_ANCHOR);
+    public static final Item CHISELED_NETHER_BRICKS = blockItem(FFDBlocks.CHISELED_NETHER_BRICKS);
+    public static final Item CRACKED_NETHER_BRICKS = blockItem(FFDBlocks.CRACKED_NETHER_BRICKS);
     public static final Item DEEPSLATE = blockItem(FFDBlocks.DEEPSLATE);
     public static final Item COBBLED_DEEPSLATE = blockItem(FFDBlocks.COBBLED_DEEPSLATE);
     public static final Item POLISHED_DEEPSLATE = blockItem(FFDBlocks.POLISHED_DEEPSLATE);
@@ -416,6 +432,8 @@ public final class FFDItems {
     public static final Item[] OVERWORLD_PRESSURE_PLATE_ITEMS =
             blockItems(FFDBlocks.OVERWORLD_PRESSURE_PLATES);
     public static final Item[] WOOD_SIGN_ITEMS = woodSignItems();
+    public static final Item CRIMSON_SIGN = woodSignItem(FFDBlocks.CRIMSON_SIGN, FFDBlocks.CRIMSON_WALL_SIGN);
+    public static final Item WARPED_SIGN = woodSignItem(FFDBlocks.WARPED_SIGN, FFDBlocks.WARPED_WALL_SIGN);
     public static final Item PUMPKIN = blockItem(FFDBlocks.PUMPKIN);
     public static final Item[] PRISMARINE_STAIR_ITEMS = blockItems(FFDBlocks.PRISMARINE_STAIRS);
     public static final Item[] PRISMARINE_SLAB_ITEMS = slabItems(
@@ -428,6 +446,10 @@ public final class FFDItems {
     public static final Item TRIDENT = new ItemTrident()
             .setRegistryName(FarmerFutureDelight.MODID, "trident")
             .setUnlocalizedName(FarmerFutureDelight.MODID + ".trident")
+            .setCreativeTab(FFDCreativeTab.INSTANCE);
+    public static final Item WARPED_FUNGUS_ON_A_STICK = new xy177.farmersfuturedelight.common.item.ItemWarpedFungusOnAStick()
+            .setRegistryName(FarmerFutureDelight.MODID, "warped_fungus_on_a_stick")
+            .setUnlocalizedName(FarmerFutureDelight.MODID + ".warped_fungus_on_a_stick")
             .setCreativeTab(FFDCreativeTab.INSTANCE);
     public static final Item CROSSBOW = new ItemCrossbow()
             .setRegistryName(FarmerFutureDelight.MODID, "crossbow")
@@ -897,7 +919,9 @@ public final class FFDItems {
         for (Block candidate : FFDStoneDecor.blocks()) {
             if (name.equals(candidate.getRegistryName())) return candidate;
         }
-        for (Block candidate : FFDBlocks.WOOD_WALL_SIGNS) {
+        for (Block candidate : com.google.common.collect.Iterables.concat(
+                java.util.Arrays.asList(FFDBlocks.WOOD_WALL_SIGNS),
+                java.util.Arrays.asList(FFDBlocks.CRIMSON_WALL_SIGN, FFDBlocks.WARPED_WALL_SIGN))) {
             if (name.equals(candidate.getRegistryName())) return candidate;
         }
         return null;
@@ -938,6 +962,13 @@ public final class FFDItems {
     }
 
     private static FeatureBinding blockBinding(Block block) {
+        if (block == FFDBlocks.SOUL_CAMPFIRE) {
+            return binding(FFDConfig.soulCampfireMode, FFDCompat.Feature.SOUL_FIRE);
+        }
+        if (oneOf(block, FFDBlocks.SOUL_SOIL, FFDBlocks.SOUL_FIRE, FFDBlocks.SOUL_TORCH,
+                FFDBlocks.SOUL_LANTERN)) {
+            return binding(FFDConfig.soulFireMode, FFDCompat.Feature.SOUL_FIRE);
+        }
         if (block == FFDBlocks.ANCIENT_DEBRIS || block == FFDBlocks.NETHERITE_BLOCK) {
             return binding(FFDConfig.netheriteMode, FFDCompat.Feature.NETHERITE);
         }
@@ -1051,12 +1082,24 @@ public final class FFDItems {
                 && block.getRegistryName().getResourcePath().contains("blackstone")) {
             return binding(FFDConfig.blackstoneMode, FFDCompat.Feature.BLACKSTONE);
         }
+        if (block == FFDBlocks.BASALT || block == FFDBlocks.POLISHED_BASALT) {
+            return binding(FFDConfig.basaltMode, FFDCompat.Feature.BASALT);
+        }
+        if (block == FFDBlocks.NETHER_GOLD_ORE) {
+            return binding(FFDConfig.netherGoldOreMode, FFDCompat.Feature.NETHER_GOLD_ORE);
+        }
         if (block == FFDBlocks.QUARTZ_BRICKS) {
             return binding(FFDConfig.quartzBricksMode, FFDCompat.Feature.QUARTZ_BRICKS);
         }
         if (block == FFDBlocks.CRYING_OBSIDIAN) {
             return binding(FFDConfig.cryingObsidianMode, FFDCompat.Feature.CRYING_OBSIDIAN);
         }
+        if (block == FFDBlocks.CHISELED_NETHER_BRICKS || block == FFDBlocks.CRACKED_NETHER_BRICKS) {
+            return binding(FFDConfig.netherBricksMode, FFDCompat.Feature.NETHER_COMPLETION);
+        }
+        if (block == FFDBlocks.TARGET) return binding(FFDConfig.targetMode, FFDCompat.Feature.NETHER_DEVICES);
+        if (block == FFDBlocks.LODESTONE) return binding(FFDConfig.lodestoneMode, FFDCompat.Feature.NETHER_DEVICES);
+        if (block == FFDBlocks.RESPAWN_ANCHOR) return binding(FFDConfig.respawnAnchorMode, FFDCompat.Feature.NETHER_DEVICES);
         if (isDeepslateBlock(block)) {
             return binding(FFDConfig.deepslateMode, FFDCompat.Feature.DEEPSLATE);
         }
@@ -1151,13 +1194,14 @@ public final class FFDItems {
     }
 
     private static FeatureBinding itemBinding(Item item) {
+        if (item == WARPED_FUNGUS_ON_A_STICK) return binding(FFDConfig.striderMode, FFDCompat.Feature.STRIDER);
         if (arrayContains(item, NETHERITE_ITEMS)) {
             return binding(FFDConfig.netheriteMode, FFDCompat.Feature.NETHERITE);
         }
         if (item == FLOWER_BANNER_PATTERN || item == CREEPER_BANNER_PATTERN
                 || item == SKULL_BANNER_PATTERN || item == MOJANG_BANNER_PATTERN
                 || item == GLOBE_BANNER_PATTERN || item == FIELD_MASONED_BANNER_PATTERN
-                || item == BORDURE_INDENTED_BANNER_PATTERN) {
+                || item == BORDURE_INDENTED_BANNER_PATTERN || item == PIGLIN_BANNER_PATTERN) {
             return binding(FFDConfig.loomMode, FFDCompat.Feature.LOOM);
         }
         if (item == LEATHER_HORSE_ARMOR) {
@@ -1226,6 +1270,9 @@ public final class FFDItems {
         }
         if (item == MUSIC_DISC_OTHERSIDE) {
             return binding(FFDConfig.othersideMode, FFDCompat.Feature.OTHERSIDE);
+        }
+        if (item == MUSIC_DISC_PIGSTEP) {
+            return binding(FFDConfig.pigstepMode, FFDCompat.Feature.NETHER_COMPLETION);
         }
         if (item == AMETHYST_SHARD) {
             return binding(FFDConfig.amethystMode, FFDCompat.Feature.AMETHYST);
@@ -1350,7 +1397,7 @@ public final class FFDItems {
                 FFDBlocks.CRIMSON_DOUBLE_SLAB, FFDBlocks.CRIMSON_FENCE,
                 FFDBlocks.CRIMSON_FENCE_GATE, FFDBlocks.CRIMSON_DOOR,
                 FFDBlocks.CRIMSON_TRAPDOOR, FFDBlocks.CRIMSON_BUTTON,
-                FFDBlocks.CRIMSON_PRESSURE_PLATE);
+                FFDBlocks.CRIMSON_PRESSURE_PLATE, FFDBlocks.CRIMSON_SIGN, FFDBlocks.CRIMSON_WALL_SIGN);
     }
 
     private static boolean isWarpedWoodBlock(Block block) {
@@ -1361,7 +1408,7 @@ public final class FFDItems {
                 FFDBlocks.WARPED_DOUBLE_SLAB, FFDBlocks.WARPED_FENCE,
                 FFDBlocks.WARPED_FENCE_GATE, FFDBlocks.WARPED_DOOR,
                 FFDBlocks.WARPED_TRAPDOOR, FFDBlocks.WARPED_BUTTON,
-                FFDBlocks.WARPED_PRESSURE_PLATE);
+                FFDBlocks.WARPED_PRESSURE_PLATE, FFDBlocks.WARPED_SIGN, FFDBlocks.WARPED_WALL_SIGN);
     }
 
     private static boolean oneOf(Object target, Object... values) {
@@ -1522,15 +1569,17 @@ public final class FFDItems {
     private static Item[] woodSignItems() {
         Item[] items = new Item[FFDBlocks.WOOD_SIGN_NAMES.length];
         for (int i = 0; i < items.length; i++) {
-            String name = FFDBlocks.WOOD_SIGN_NAMES[i];
-            ItemWoodSign item = new ItemWoodSign(
-                    FFDBlocks.WOOD_STANDING_SIGNS[i], FFDBlocks.WOOD_WALL_SIGNS[i]);
-            item.setRegistryName(FarmerFutureDelight.MODID, name + "_sign");
-            item.setUnlocalizedName(FarmerFutureDelight.MODID + "." + name + "_sign");
-            item.setCreativeTab(FFDCreativeTab.INSTANCE);
-            items[i] = rememberBlockItem(item, FFDBlocks.WOOD_STANDING_SIGNS[i]);
+            items[i] = woodSignItem(FFDBlocks.WOOD_STANDING_SIGNS[i], FFDBlocks.WOOD_WALL_SIGNS[i]);
         }
         return items;
+    }
+
+    private static Item woodSignItem(BlockWoodStandingSign standing, BlockWoodWallSign wall) {
+        ItemWoodSign item = new ItemWoodSign(standing, wall);
+        item.setRegistryName(standing.getRegistryName());
+        item.setUnlocalizedName(FarmerFutureDelight.MODID + "." + standing.getWoodName() + "_sign");
+        item.setCreativeTab(FFDCreativeTab.INSTANCE);
+        return rememberBlockItem(item, standing);
     }
 
     private static Item[] rawOreItems() {

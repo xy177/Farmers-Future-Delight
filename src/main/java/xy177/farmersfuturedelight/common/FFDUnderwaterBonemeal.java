@@ -16,12 +16,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import xy177.farmersfuturedelight.api.WaterloggedBlockApi;
 import xy177.farmersfuturedelight.common.block.BlockCoralWallFan;
 import xy177.farmersfuturedelight.common.registry.FFDBlocks;
 import xy177.farmersfuturedelight.common.registry.FFDItems;
+import xy177.farmersfuturedelight.common.registry.FFDSounds;
 import xy177.farmersfuturedelight.common.worldgen.WorldGenCoralReefs;
 
 public final class FFDUnderwaterBonemeal {
@@ -45,6 +47,8 @@ public final class FFDUnderwaterBonemeal {
         }
         if (!world.isRemote) {
             world.playEvent(2005, target, 0);
+            world.playSound(null, target, FFDSounds.BONE_MEAL_USE,
+                    SoundCategory.BLOCKS, 1.0F, 1.0F);
         }
         return EnumActionResult.SUCCESS;
     }

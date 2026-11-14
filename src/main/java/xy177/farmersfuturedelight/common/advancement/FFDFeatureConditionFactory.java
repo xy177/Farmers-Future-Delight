@@ -30,6 +30,29 @@ public final class FFDFeatureConditionFactory implements IConditionFactory {
                         || FFDEntities.isLocalTropicalFishEnabled();
             case "honey":
                 return FFDItems::isHoneyEnabled;
+            case "target":
+                return () -> FFDItems.isItemRegistered(FFDItems.TARGET);
+            case "ancient_debris":
+                return () -> FFDItems.isItemRegistered(FFDItems.ANCIENT_DEBRIS);
+            case "netherite":
+                return () -> FFDItems.isItemRegistered(FFDItems.NETHERITE_CHESTPLATE);
+            case "crying_obsidian":
+                return () -> FFDItems.isItemRegistered(FFDItems.CRYING_OBSIDIAN);
+            case "lodestone":
+                return () -> FFDItems.isItemRegistered(FFDItems.LODESTONE);
+            case "respawn_anchor":
+                return () -> FFDItems.isItemRegistered(FFDItems.RESPAWN_ANCHOR);
+            case "strider":
+                return () -> FFDEntities.isLocalStriderEnabled()
+                        && FFDItems.isItemRegistered(FFDItems.WARPED_FUNGUS_ON_A_STICK);
+            case "piglin":
+                return FFDEntities::isLocalPiglinEnabled;
+            case "modern_nether":
+                return () -> xy177.farmersfuturedelight.common.FFDConfig.modernNetherGenerationMode
+                        != xy177.farmersfuturedelight.common.FFDConfig.FeatureMode.DISABLED;
+            case "bastion":
+                return () -> xy177.farmersfuturedelight.common.FFDConfig.bastionRemnantMode
+                        != xy177.farmersfuturedelight.common.FFDConfig.FeatureMode.DISABLED;
             case "trident":
                 return () -> FFDItems.isItemRegistered(FFDItems.TRIDENT);
             default:

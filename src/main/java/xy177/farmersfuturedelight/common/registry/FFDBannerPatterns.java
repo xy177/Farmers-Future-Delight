@@ -11,7 +11,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public final class FFDBannerPatterns {
-    public static final BannerPattern GLOBE = globe();
+    public static final BannerPattern GLOBE = register("FFD_GLOBE", "globe", "glb");
+    public static final BannerPattern PIGLIN = register("FFD_PIGLIN", "piglin", "pig");
     private static final Logger LOGGER = LogManager.getLogger("FFD Banner Patterns");
     private static Method quarkLayerCount;
     private static boolean checkedQuark;
@@ -54,14 +55,14 @@ public final class FFDBannerPatterns {
         return 6;
     }
 
-    private static BannerPattern globe() {
+    private static BannerPattern register(String identifier, String name, String hash) {
         for (BannerPattern pattern : BannerPattern.values()) {
-            if ("glb".equals(pattern.getHashname())) {
+            if (hash.equals(pattern.getHashname())) {
                 return pattern;
             }
         }
-        return EnumHelper.addEnum(BannerPattern.class, "FFD_GLOBE",
+        return EnumHelper.addEnum(BannerPattern.class, identifier,
                 new Class<?>[] {String.class, String.class, ItemStack.class},
-                "globe", "glb", ItemStack.EMPTY);
+                name, hash, ItemStack.EMPTY);
     }
 }

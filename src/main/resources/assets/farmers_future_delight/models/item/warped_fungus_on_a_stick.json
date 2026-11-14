@@ -1,0 +1,4 @@
+{
+  "parent": "item/handheld_rod",
+  "textures": {"layer0": "farmers_future_delight:items/warped_fungus_on_a_stick"}
+}

@@ -91,6 +91,10 @@ public final class RenderModernBaby extends RenderLiving<EntityLiving> {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void renderBaby(RenderLivingEvent.Pre<?> event) {
         boolean adultRabbit = event.getEntity().getClass() == EntityRabbit.class && !event.getEntity().isChild();
+        if (event.getEntity().getClass() == EntityOcelot.class && !event.getEntity().isChild()) {
+            RenderModernOcelot.renderOcelot(event);
+            return;
+        }
         if ((!adultRabbit && (!FFDConfig.modernBabyModels || !event.getEntity().isChild()))
                 || !(event.getEntity() instanceof EntityLiving)
                 || event.getRenderer() instanceof RenderModernBaby

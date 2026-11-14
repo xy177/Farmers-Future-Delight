@@ -1,0 +1,6 @@
+{
+  "parent": "farmers_future_delight:block/soul_template_torch",
+  "textures": {
+    "torch": "farmers_future_delight:blocks/soul_torch"
+  }
+}

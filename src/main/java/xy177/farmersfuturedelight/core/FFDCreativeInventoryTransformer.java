@@ -33,6 +33,13 @@ public final class FFDCreativeInventoryTransformer implements IClassTransformer 
             for (AbstractInsnNode instruction : method.instructions.toArray()) {
                 if (gui && instruction instanceof MethodInsnNode) {
                     MethodInsnNode call = (MethodInsnNode) instruction;
+                    if (TAB.equals(call.owner) && "getTabPage".equals(call.name) && "()I".equals(call.desc)) {
+                        call.setOpcode(Opcodes.INVOKESTATIC);
+                        call.owner = HOOK;
+                        call.name = "pageOf";
+                        call.desc = "(L" + TAB + ";)I";
+                        changed = true;
+                    }
                     if ("net/minecraft/item/Item".equals(call.owner)
                             && ("getCreativeTab".equals(call.name) || "func_77640_w".equals(call.name))
                             && ("renderToolTip".equals(method.name) || "func_146285_a".equals(method.name))) {

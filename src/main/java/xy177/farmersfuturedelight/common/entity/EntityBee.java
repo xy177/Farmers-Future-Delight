@@ -273,6 +273,14 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
         return true;
     }
 
+    public UUID getAngerTarget() {
+        return angerTarget;
+    }
+
+    public void setAngerTarget(UUID target) {
+        angerTarget = target;
+    }
+
     private void restoreAngerTarget() {
         EntityPlayer player = world.getPlayerEntityByUUID(angerTarget);
         if (player != null) {
@@ -826,8 +834,9 @@ public class EntityBee extends EntityAnimal implements EntityFlying {
 
         private BeeTargetGoal(EntityBee bee) {
             super(bee, EntityPlayer.class, 10, true, false,
-                    player -> bee.angerTarget != null
+                    player -> (bee.angerTarget != null
                             && bee.angerTarget.equals(player.getUniqueID())
+                            || xy177.farmersfuturedelight.common.FFDNeutralAnger.universal(bee))
                             && canBecomeAngryAt(player));
             this.bee = bee;
         }

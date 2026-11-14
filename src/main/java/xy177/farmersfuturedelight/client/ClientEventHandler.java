@@ -184,6 +184,15 @@ public final class ClientEventHandler {
     }
 
     @SubscribeEvent
+    public static void hideTerrainLoadingOverlay(RenderGameOverlayEvent.Pre event) {
+        GuiScreen screen = Minecraft.getMinecraft().currentScreen;
+        if (event.getType() == RenderGameOverlayEvent.ElementType.ALL && (screen instanceof FFDDownloadTerrainScreen
+                || FFDConfig.modernMenuVisuals && screen instanceof net.minecraft.client.gui.GuiDownloadTerrain)) {
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
     public static void replaceChatScreen(GuiOpenEvent event) {
         if (!FFDConfig.isCommandCompletionEnabled()) {
             return;
@@ -251,6 +260,8 @@ public final class ClientEventHandler {
     public static void stitchParticles(TextureStitchEvent.Pre event) {
         event.getMap().registerSprite(id("block/powder_snow"));
         event.getMap().registerSprite(id("particle/glow"));
+        event.getMap().registerSprite(id("particle/soul_fire_flame"));
+        for(int frame=0;frame<11;frame++)event.getMap().registerSprite(id("particle/soul_"+frame));
         event.getMap().registerSprite(id("particle/drip_hang"));
         event.getMap().registerSprite(id("particle/drip_fall"));
         event.getMap().registerSprite(id("particle/age_lock_glint"));
@@ -317,10 +328,13 @@ public final class ClientEventHandler {
                         new TridentBakedModel(flat, hand, throwing));
             }
         }
-        String[] woods = {"spruce", "birch", "jungle", "acacia", "dark_oak"};
+        String[] woods = {"spruce", "birch", "jungle", "acacia", "dark_oak", "crimson", "warped"};
         for (String wood : woods) {
             TextureAtlasSprite particle = event.getModelManager().getTextureMap().getAtlasSprite(
-                    new ResourceLocation("minecraft", "blocks/planks_" + (wood.equals("dark_oak") ? "big_oak" : wood)).toString());
+                    (wood.equals("crimson") || wood.equals("warped")
+                            ? new ResourceLocation(FarmerFutureDelight.MODID, "block/" + wood + "_planks")
+                            : new ResourceLocation("minecraft", "blocks/planks_"
+                                    + (wood.equals("dark_oak") ? "big_oak" : wood))).toString());
             for (String suffix : new String[] {"_sign", "_wall_sign"}) {
                 ResourceLocation id = new ResourceLocation(FarmerFutureDelight.MODID, wood + suffix);
                 for (ModelResourceLocation location : event.getModelRegistry().getKeys()) {
@@ -889,9 +903,8 @@ public final class ClientEventHandler {
             return;
         }
 
-        String verticalId = FarmerFutureDelight.MODID + ":" + vertical.registryPath();
-        String verticalName = I18n.format("biome." + FarmerFutureDelight.MODID
-                + "." + vertical.registryPath());
+        String verticalId = vertical.registryName().toString();
+        String verticalName = I18n.format(vertical.definition().getTranslationKey());
         String line = I18n.format("debug.farmers_future_delight.biome",
                 verticalName, verticalId);
         int biomeLine = findBiomeLine(event.getLeft());

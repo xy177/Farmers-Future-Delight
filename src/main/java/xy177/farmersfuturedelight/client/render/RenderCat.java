@@ -4,6 +4,8 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderOcelot;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.client.model.ModelOcelot;
+import xy177.farmersfuturedelight.common.FFDConfig;
 import net.minecraft.entity.passive.EntityOcelot;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
@@ -14,6 +16,7 @@ import xy177.farmersfuturedelight.common.entity.EntityCat;
 public class RenderCat extends RenderOcelot {
     private final ModelCat adultModel = new ModelCat();
     private final ModelCatBaby babyModel = new ModelCatBaby();
+    private final ModelOcelot legacyBabyModel = new ModelOcelot();
 
     public RenderCat(RenderManager manager) {
         super(manager);
@@ -23,8 +26,15 @@ public class RenderCat extends RenderOcelot {
     @Override
     public void doRender(EntityOcelot entity, double x, double y, double z,
                          float entityYaw, float partialTicks) {
-        mainModel = entity.isChild() ? babyModel : adultModel;
+        mainModel = entity.isChild() ? (FFDConfig.modernBabyModels ? babyModel : legacyBabyModel) : adultModel;
         super.doRender(entity, x, y, z, entityYaw, partialTicks);
+    }
+
+    @Override
+    protected void preRenderCallback(EntityOcelot entity, float partialTicks) {
+        if (!entity.isChild() || !FFDConfig.modernBabyModels) {
+            GlStateManager.scale(0.8F, 0.8F, 0.8F);
+        }
     }
 
     @Override
@@ -46,7 +56,7 @@ public class RenderCat extends RenderOcelot {
             return super.getEntityTexture(entity);
         }
         String variant = "cat_" + ((EntityCat) entity).getVariantName();
-        if (entity.isChild()) {
+        if (entity.isChild() && FFDConfig.modernBabyModels) {
             variant += "_baby";
         }
         return new ResourceLocation("farmers_future_delight", "textures/entity/cat/" + variant + ".png");

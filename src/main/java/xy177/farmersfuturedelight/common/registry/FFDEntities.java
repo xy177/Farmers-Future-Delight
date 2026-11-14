@@ -66,6 +66,14 @@ public final class FFDEntities {
             new ResourceLocation(FarmerFutureDelight.MODID, "cat");
     public static final ResourceLocation FOX_ID =
             new ResourceLocation(FarmerFutureDelight.MODID, "fox");
+    public static final ResourceLocation PIGLIN_ID = new ResourceLocation(FarmerFutureDelight.MODID, "piglin");
+    public static final ResourceLocation PIGLIN_BRUTE_ID = new ResourceLocation(FarmerFutureDelight.MODID, "piglin_brute");
+    public static final ResourceLocation STRIDER_ID =
+            new ResourceLocation(FarmerFutureDelight.MODID, "strider");
+    public static final ResourceLocation HOGLIN_ID =
+            new ResourceLocation(FarmerFutureDelight.MODID, "hoglin");
+    public static final ResourceLocation ZOGLIN_ID =
+            new ResourceLocation(FarmerFutureDelight.MODID, "zoglin");
     public static final ResourceLocation PANDA_ID =
             new ResourceLocation(FarmerFutureDelight.MODID, "panda");
     public static final ResourceLocation PILLAGER_ID =
@@ -234,6 +242,29 @@ public final class FFDEntities {
     public static boolean isLocalFoxEnabled() {
         return FFDCompat.isLocalEntityEnabled(FFDConfig.foxMode,
                 FFDCompat.Feature.FOX, FOX_ID, "fox");
+    }
+
+    public static boolean isLocalPiglinEnabled() {
+        return FFDCompat.isLocalEntityEnabled(FFDConfig.piglinMode, FFDCompat.Feature.PIGLIN, PIGLIN_ID, "piglin");
+    }
+
+    public static boolean isLocalPiglinBruteEnabled() {
+        return FFDCompat.isLocalEntityEnabled(FFDConfig.piglinBruteMode, FFDCompat.Feature.PIGLIN_BRUTE, PIGLIN_BRUTE_ID, "piglin_brute");
+    }
+
+    public static boolean isLocalStriderEnabled() {
+        return FFDCompat.isLocalEntityEnabled(FFDConfig.striderMode,
+                FFDCompat.Feature.STRIDER, STRIDER_ID, "strider");
+    }
+
+    public static boolean isLocalHoglinEnabled() {
+        return FFDCompat.isLocalEntityEnabled(FFDConfig.hoglinMode,
+                FFDCompat.Feature.HOGLIN, HOGLIN_ID, "hoglin");
+    }
+
+    public static boolean isLocalZoglinEnabled() {
+        return FFDCompat.isLocalEntityEnabled(FFDConfig.zoglinMode,
+                FFDCompat.Feature.ZOGLIN, ZOGLIN_ID, "zoglin");
     }
 
     public static boolean isLocalPandaEnabled() {

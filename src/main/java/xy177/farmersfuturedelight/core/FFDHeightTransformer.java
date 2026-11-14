@@ -41,6 +41,8 @@ public final class FFDHeightTransformer implements IClassTransformer {
     private static final String GAMEPLAY_HOOKS = Type.getInternalName(FFDGameplayHooks.class);
     private static final String FIREWORK_HOOKS =
             "xy177/farmersfuturedelight/core/FFDFireworkHooks";
+    private static final String CROSSBOW_ARROW_HOOKS =
+            "xy177/farmersfuturedelight/core/FFDCrossbowArrowHooks";
     private static final String SQUID_AGE_HOOKS =
             "xy177/farmersfuturedelight/core/FFDSquidAgeHooks";
     private static final String SQUID_BEHAVIOR_HOOKS =
@@ -52,6 +54,8 @@ public final class FFDHeightTransformer implements IClassTransformer {
             "xy177/farmersfuturedelight/client/FFDClientOptions";
     private static final String CLIENT_BUBBLE_COLUMN_HOOKS =
             "xy177/farmersfuturedelight/client/FFDClientBubbleColumnHooks";
+    private static final String COMPOSTER_HOOKS =
+            "xy177/farmersfuturedelight/client/FFDComposterClientHooks";
     private static final String PULSAR_HOOKS = Type.getInternalName(FFDPulsarHooks.class);
     private static final String MINESHAFT_HOOKS = Type.getInternalName(FFDMineshaftHooks.class);
     private static final String WEATHER2_HOOKS = Type.getInternalName(FFDWeather2CompatHooks.class);
@@ -160,6 +164,7 @@ public final class FFDHeightTransformer implements IClassTransformer {
             "xbigellx.rbp.internal.physics.BlockOperationScheduler");
     private static final Set<String> CAULDRON_CLASS = names("net.minecraft.block.BlockCauldron");
     private static final Set<String> JUKEBOX_CLASS = names("net.minecraft.block.BlockJukebox");
+    private static final Set<String> COMPASS_BASE_ITEM_CLASS = names("net.minecraft.item.Item");
     private static final Set<String> BEACON_TILE_ENTITY_CLASS = names(
             "net.minecraft.tileentity.TileEntityBeacon");
     private static final Set<String> PLAYER_MP_CLASS = names("net.minecraft.entity.player.EntityPlayerMP");
@@ -185,6 +190,8 @@ public final class FFDHeightTransformer implements IClassTransformer {
     private static final Set<String> HWYLA_BLOCK_HUD_CLASSES = names(
             "mcp.mobius.waila.addons.core.HUDHandlerBlocks");
     private static final Set<String> PLAYER_CHUNK_ENTRY_CLASS = names("net.minecraft.server.management.PlayerChunkMapEntry");
+    private static final Set<String> PLAYER_CHUNK_MAP_CLASS = names("net.minecraft.server.management.PlayerChunkMap");
+    private static final Set<String> STRONGHOLD_GENERATOR_CLASS = names("net.minecraft.world.gen.structure.MapGenStronghold");
     private static final Set<String> MULTI_BLOCK_PACKET_CLASS = names("net.minecraft.network.play.server.SPacketMultiBlockChange");
     private static final Set<String> MULTI_BLOCK_DATA_CLASS = names("net.minecraft.network.play.server.SPacketMultiBlockChange$BlockUpdateData");
     private static final Set<String> STRUCTURE_START_CLASS = names(
@@ -1184,6 +1191,9 @@ public final class FFDHeightTransformer implements IClassTransformer {
         if ("net.minecraft.world.gen.ChunkGeneratorOverworld".equals(transformedName)) {
             return transformOverworldStructures(basicClass);
         }
+        if ("net.minecraft.world.WorldProviderHell".equals(transformedName)) {
+            return transformNetherProvider(basicClass);
+        }
         if ("biomesoplenty.common.world.ChunkGeneratorOverworldBOP".equals(transformedName)) {
             return transformOptionalCompat(transformedName, basicClass,
                     new OptionalTransformer() {
@@ -1287,6 +1297,9 @@ public final class FFDHeightTransformer implements IClassTransformer {
         if (HEIGHT_BOUNDED_COMMAND_CLASSES.contains(transformedName)) {
             return transformHeightBoundedCommand(basicClass,
                     "net.minecraft.command.CommandFill".equals(transformedName) ? 1 : 2);
+        }
+        if ("net.minecraft.server.MinecraftServer".equals(transformedName)) {
+            return transformModernSpawnPreparation(basicClass);
         }
         if (NET_HANDLER_PLAY_SERVER_CLASS.contains(transformedName)) {
             return transformNetHandlerPlayServer(basicClass);
@@ -1417,6 +1430,15 @@ public final class FFDHeightTransformer implements IClassTransformer {
         if (BLOCK_LIQUID_CLASS.contains(transformedName)) {
             return transformLiquid(basicClass);
         }
+        if ("net.minecraft.block.BlockSoulSand".equals(transformedName)) {
+            ClassNode node=read(basicClass);
+            MethodNode collide=findMethod(node,"onEntityCollidedWithBlock","func_180634_a","(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/entity/Entity;)V");
+            LabelNode vanilla=new LabelNode();
+            collide.instructions.insert(list(new VarInsnNode(Opcodes.ALOAD,4),new MethodInsnNode(Opcodes.INVOKESTATIC,
+                    "xy177/farmersfuturedelight/common/FFDNetherMaterials","ignoreSoulSand","(Lnet/minecraft/entity/Entity;)Z",false),
+                    new JumpInsnNode(Opcodes.IFEQ,vanilla),new InsnNode(Opcodes.RETURN),vanilla,new FrameNode(Opcodes.F_SAME,0,null,0,null)));
+            return write(node);
+        }
         if (BLOCK_DYNAMIC_LIQUID_CLASS.contains(transformedName)) {
             return transformDynamicLiquid(basicClass);
         }
@@ -1434,6 +1456,9 @@ public final class FFDHeightTransformer implements IClassTransformer {
         }
         if (ENTITY_ARROW_CLASS.contains(transformedName)) {
             return transformEntityArrow(basicClass);
+        }
+        if ("net.minecraft.entity.projectile.EntitySpectralArrow".equals(transformedName)) {
+            return transformEntitySpectralArrow(basicClass);
         }
         if (ITEM_ARROW_CLASS.contains(transformedName)) {
             return transformItemArrow(basicClass);
@@ -1462,6 +1487,9 @@ public final class FFDHeightTransformer implements IClassTransformer {
         if ("net.minecraft.entity.monster.EntityZombieVillager".equals(transformedName)) {
             return transformVillagerConversion(basicClass, true);
         }
+        if ("net.minecraft.entity.monster.EntityPigZombie".equals(transformedName)) {
+            return transformZombifiedPiglin(basicClass);
+        }
         if ("net.minecraft.entity.passive.EntitySquid".equals(transformedName)) {
             return transformSquid(basicClass);
         }
@@ -1477,6 +1505,9 @@ public final class FFDHeightTransformer implements IClassTransformer {
         }
         if ("net.minecraft.entity.passive.EntityHorse".equals(transformedName)) {
             return FFDHorseSoundTransformer.transformArmor(basicClass);
+        }
+        if ("net.minecraft.entity.passive.EntityOcelot".equals(transformedName)) {
+            return FFDOcelotSoundTransformer.transform(basicClass);
         }
         if (ENTITY_BAT_CLASS.contains(transformedName)) {
             return transformEntityBat(basicClass);
@@ -1514,6 +1545,24 @@ public final class FFDHeightTransformer implements IClassTransformer {
         if (JUKEBOX_CLASS.contains(transformedName)) {
             return transformJukebox(basicClass);
         }
+        if ("net.minecraft.entity.projectile.EntityFishHook".equals(transformedName)) {
+            ClassNode node = read(basicClass);
+            FFDNetherUpdateTransformer.fishing(node);
+            return write(node);
+        }
+        if ("net.minecraft.block.BlockRedstoneWire".equals(transformedName)) {
+            ClassNode node = read(basicClass);
+            FFDNetherUpdateTransformer.redstone(node);
+            return write(node);
+        }
+        if ("net.minecraft.tileentity.TileEntityLockableLoot".equals(transformedName)) {
+            ClassNode node = read(basicClass);
+            FFDNetherUpdateTransformer.containerLoot(node);
+            return write(node);
+        }
+        if (COMPASS_BASE_ITEM_CLASS.contains(transformedName)) {
+            return transformCompassBaseItem(basicClass);
+        }
         if (BEACON_TILE_ENTITY_CLASS.contains(transformedName)) {
             return transformBeaconTileEntity(basicClass);
         }
@@ -1549,6 +1598,12 @@ public final class FFDHeightTransformer implements IClassTransformer {
         }
         if (PLAYER_CHUNK_ENTRY_CLASS.contains(transformedName)) {
             return transformPlayerChunkMapEntry(basicClass);
+        }
+        if (PLAYER_CHUNK_MAP_CLASS.contains(transformedName)) {
+            return transformModernPlayerChunkMap(basicClass);
+        }
+        if (STRONGHOLD_GENERATOR_CLASS.contains(transformedName)) {
+            return transformModernStrongholdPreparation(basicClass);
         }
         if (MULTI_BLOCK_PACKET_CLASS.contains(transformedName)) {
             return transformMultiBlockPacket(basicClass);
@@ -5526,6 +5581,13 @@ public final class FFDHeightTransformer implements IClassTransformer {
 
     private static byte[] transformLiquid(byte[] basicClass) {
         ClassNode node = read(basicClass);
+        MethodNode mixing=findMethod(node,"checkForMixing","func_176365_e","(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;)Z");
+        LabelNode legacyMixing=new LabelNode();
+        mixing.instructions.insert(list(new VarInsnNode(Opcodes.ALOAD,1),new VarInsnNode(Opcodes.ALOAD,2),new VarInsnNode(Opcodes.ALOAD,3),
+                new MethodInsnNode(Opcodes.INVOKESTATIC,"xy177/farmersfuturedelight/common/FFDNetherMaterials","basalt",
+                "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;)Z",false),
+                new JumpInsnNode(Opcodes.IFEQ,legacyMixing),new InsnNode(Opcodes.ICONST_1),new InsnNode(Opcodes.IRETURN),legacyMixing,
+                new FrameNode(Opcodes.F_SAME,0,null,0,null)));
         MethodNode method = findMethod(node, "getDepth", "func_189542_i",
                 "(Lnet/minecraft/block/state/IBlockState;)I");
         LabelNode vanilla = new LabelNode();
@@ -6893,6 +6955,27 @@ public final class FFDHeightTransformer implements IClassTransformer {
         return write(node);
     }
 
+    private static byte[] transformZombifiedPiglin(byte[] basicClass) {
+        ClassNode node=read(basicClass);
+        MethodNode eye=findMethodOptional(node,"getEyeHeight","func_70047_e","()F");
+        if(eye!=null) {
+            for(AbstractInsnNode instruction:eye.instructions.toArray())if(instruction.getOpcode()==Opcodes.FRETURN)eye.instructions.insertBefore(instruction,
+                    list(new VarInsnNode(Opcodes.ALOAD,0),new MethodInsnNode(Opcodes.INVOKESTATIC,
+                    "xy177/farmersfuturedelight/common/FFDPiglinEvents","eyeHeight",
+                    "(FLnet/minecraft/entity/monster/EntityPigZombie;)F",false)));
+            return write(node);
+        }
+        boolean mcp=node.methods.stream().anyMatch(method->"initEntityAI".equals(method.name));
+        eye=new MethodNode(Opcodes.ACC_PUBLIC,mcp?"getEyeHeight":"func_70047_e","()F",null,null);
+        eye.instructions.add(list(new VarInsnNode(Opcodes.ALOAD,0),
+                new MethodInsnNode(Opcodes.INVOKESPECIAL,node.superName,eye.name,"()F",false),
+                new VarInsnNode(Opcodes.ALOAD,0),new MethodInsnNode(Opcodes.INVOKESTATIC,
+                "xy177/farmersfuturedelight/common/FFDPiglinEvents","eyeHeight",
+                "(FLnet/minecraft/entity/monster/EntityPigZombie;)F",false),new InsnNode(Opcodes.FRETURN)));
+        eye.maxStack=2;eye.maxLocals=1;node.methods.add(eye);
+        return write(node);
+    }
+
     private static byte[] transformVillageGolems(byte[] basicClass) {
         ClassNode node = read(basicClass);
         MethodNode tick = findMethod(node, "tick", "func_75560_a", "(I)V");
@@ -7230,6 +7313,7 @@ public final class FFDHeightTransformer implements IClassTransformer {
         patchJumpClimbing(node);
         patchWaterSinking(node);
         patchSweetBerryHurtStatus(node);
+        FFDNetherUpdateTransformer.knockBack(node);
         LOGGER.info("Patched entity teleport lower build-height bound, powder-snow jump, conduit breathing and dolphins-grace water drag");
         return write(node);
     }
@@ -8522,7 +8606,7 @@ public final class FFDHeightTransformer implements IClassTransformer {
                 outlineChecks++;
             }
         }
-        require(outlineChecks == 1 || (outlineChecks == 0 && hasFutureMcBlockOutline(worldPass)),
+        require(outlineChecks == 1 || (outlineChecks == 0 && hasExternalBlockOutline(worldPass)),
                 "Expected one underwater block-outline check, patched " + outlineChecks);
         MethodNode fov = findMethod(node, "getFOVModifier", "func_78481_a", "(FZ)F");
         int fovReturns = 0;
@@ -8716,8 +8800,9 @@ public final class FFDHeightTransformer implements IClassTransformer {
         return writeWithFrames(node);
     }
 
-    private static boolean hasFutureMcBlockOutline(MethodNode method) {
-        if (!FFDCoreCompat.isFutureMcBlockOutlinePresent()) {
+    private static boolean hasExternalBlockOutline(MethodNode method) {
+        boolean fluidloggedRenderer = FFDCoreCompat.isFluidloggedEntityRendererPluginPresent();
+        if (!FFDCoreCompat.isFutureMcBlockOutlinePresent() && !fluidloggedRenderer) {
             return false;
         }
         for (AbstractInsnNode instruction = method.instructions.getFirst();
@@ -8727,6 +8812,16 @@ public final class FFDHeightTransformer implements IClassTransformer {
             }
             AbstractInsnNode hit = previousReal(instruction);
             AbstractInsnNode entity = nextReal(instruction);
+            if (fluidloggedRenderer && isIntConstant(entity, 0)) {
+                AbstractInsnNode materialBranch = nextReal(entity);
+                if (!(materialBranch instanceof JumpInsnNode)
+                        || materialBranch.getOpcode() != Opcodes.IFNE
+                        || ((JumpInsnNode) materialBranch).label
+                                != ((JumpInsnNode) instruction).label) {
+                    continue;
+                }
+                entity = nextReal(materialBranch);
+            }
             AbstractInsnNode cast = nextReal(entity);
             if (!(hit instanceof FieldInsnNode) || hit.getOpcode() != Opcodes.GETFIELD
                     || !"Lnet/minecraft/util/math/RayTraceResult;".equals(((FieldInsnNode) hit).desc)
@@ -8857,10 +8952,104 @@ public final class FFDHeightTransformer implements IClassTransformer {
         }
         if (patched == 0) {
             LOGGER.warn("Skipped candle ignition arrow-impact hook because no compatible EntityArrow.onHit call was found");
-            return basicClass;
+        } else {
+            require(patched == 1, "Expected one accepted arrow-impact hook, patched " + patched);
+            LOGGER.info("Patched candle ignition after arrow-impact event cancellation");
         }
-        require(patched == 1, "Expected one accepted arrow-impact hook, patched " + patched);
-        LOGGER.info("Patched candle ignition after arrow-impact event cancellation");
+        MethodNode clinit = findMethod(node, "<clinit>", "<clinit>", "()V");
+        insertBeforeReturns(clinit, list(new MethodInsnNode(Opcodes.INVOKESTATIC,
+                CROSSBOW_ARROW_HOOKS, "initialize", "()V", false)));
+        MethodNode init = findMethod(node, "entityInit", "func_70088_a", "()V");
+        insertBeforeReturns(init, list(new VarInsnNode(Opcodes.ALOAD, 0),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, CROSSBOW_ARROW_HOOKS, "register",
+                        "(Lnet/minecraft/entity/projectile/EntityArrow;)V", false)));
+        method.instructions.insert(list(new VarInsnNode(Opcodes.ALOAD, 0),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, CROSSBOW_ARROW_HOOKS, "tick",
+                        "(Lnet/minecraft/entity/projectile/EntityArrow;)V", false)));
+        String[] mcpNames = {"writeEntityToNBT", "readEntityFromNBT"};
+        String[] srgNames = {"func_70014_b", "func_70037_a"};
+        String[] hooks = {"write", "read"};
+        for (int index = 0; index < hooks.length; index++) {
+            MethodNode data = findMethod(node, mcpNames[index], srgNames[index],
+                    "(Lnet/minecraft/nbt/NBTTagCompound;)V");
+            insertBeforeReturns(data, list(new VarInsnNode(Opcodes.ALOAD, 0),
+                    new VarInsnNode(Opcodes.ALOAD, 1),
+                    new MethodInsnNode(Opcodes.INVOKESTATIC, CROSSBOW_ARROW_HOOKS, hooks[index],
+                            "(Lnet/minecraft/entity/projectile/EntityArrow;"
+                                    + "Lnet/minecraft/nbt/NBTTagCompound;)V", false)));
+        }
+        MethodNode find = findMethod(node, "findEntityOnPath", "func_184551_a",
+                "(Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/entity/Entity;");
+        int targetLists = 0;
+        for (AbstractInsnNode instruction : find.instructions.toArray()) {
+            if (!(instruction instanceof MethodInsnNode)) continue;
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (("getEntitiesInAABBexcluding".equals(call.name) || "func_175674_a".equals(call.name))
+                    && call.desc.endsWith("Ljava/util/List;")) {
+                find.instructions.insert(call, list(new VarInsnNode(Opcodes.ALOAD, 0),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, CROSSBOW_ARROW_HOOKS, "filterTargets",
+                                "(Ljava/util/List;Lnet/minecraft/entity/projectile/EntityArrow;)Ljava/util/List;", false)));
+                targetLists++;
+            }
+        }
+        require(targetLists == 1, "Expected one native arrow target list, patched " + targetLists);
+        MethodNode hit = findMethod(node, "onHit", "func_184549_a",
+                "(Lnet/minecraft/util/math/RayTraceResult;)V");
+        int discards = 0;
+        int sounds = 0;
+        for (AbstractInsnNode instruction : hit.instructions.toArray()) {
+            if (!(instruction instanceof MethodInsnNode)) continue;
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (("setDead".equals(call.name) || "func_70106_y".equals(call.name))
+                    && "()V".equals(call.desc) && discards++ == 0) {
+                hit.instructions.set(call, new MethodInsnNode(Opcodes.INVOKESTATIC, CROSSBOW_ARROW_HOOKS,
+                        "discardAfterHit", "(Lnet/minecraft/entity/projectile/EntityArrow;)V", false));
+            } else if (("playSound".equals(call.name) || "func_184185_a".equals(call.name))
+                    && "(Lnet/minecraft/util/SoundEvent;FF)V".equals(call.desc)) {
+                hit.instructions.set(call, new MethodInsnNode(Opcodes.INVOKESTATIC, CROSSBOW_ARROW_HOOKS,
+                        "playHitSound", "(Lnet/minecraft/entity/projectile/EntityArrow;"
+                                + "Lnet/minecraft/util/SoundEvent;FF)V", false));
+                sounds++;
+            }
+        }
+        require(discards == 2 && sounds == 2,
+                "Unexpected native arrow impact calls: discards=" + discards + ", sounds=" + sounds);
+        insertBeforeReturns(hit, list(new VarInsnNode(Opcodes.ALOAD, 0),
+                new VarInsnNode(Opcodes.ALOAD, 1),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, CROSSBOW_ARROW_HOOKS, "finishHit",
+                        "(Lnet/minecraft/entity/projectile/EntityArrow;"
+                                + "Lnet/minecraft/util/math/RayTraceResult;)V", false)));
+        LabelNode accepted = new LabelNode();
+        hit.instructions.insert(list(new VarInsnNode(Opcodes.ALOAD, 0),
+                new VarInsnNode(Opcodes.ALOAD, 1),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, CROSSBOW_ARROW_HOOKS, "beginHit",
+                        "(Lnet/minecraft/entity/projectile/EntityArrow;"
+                                + "Lnet/minecraft/util/math/RayTraceResult;)Z", false),
+                new JumpInsnNode(Opcodes.IFNE, accepted), new InsnNode(Opcodes.RETURN),
+                accepted, new FrameNode(Opcodes.F_SAME, 0, null, 0, null)));
+        LOGGER.info("Patched native arrow crossbow metadata, piercing, sounds and saved state");
+        return write(node);
+    }
+
+    private static byte[] transformEntitySpectralArrow(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode method = findMethod(node, "onUpdate", "func_70071_h_", "()V");
+        int patched = 0;
+        for (AbstractInsnNode instruction : method.instructions.toArray()) {
+            if (!(instruction instanceof FieldInsnNode)) continue;
+            FieldInsnNode field = (FieldInsnNode) instruction;
+            if (field.getOpcode() == Opcodes.GETSTATIC
+                    && "net/minecraft/util/EnumParticleTypes".equals(field.owner)
+                    && "SPELL_INSTANT".equals(field.name)) {
+                method.instructions.insert(field, list(new VarInsnNode(Opcodes.ALOAD, 0),
+                        new InsnNode(Opcodes.SWAP),
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, CROSSBOW_ARROW_HOOKS, "spectralParticle",
+                                "(Lnet/minecraft/entity/projectile/EntityArrow;"
+                                        + "Lnet/minecraft/util/EnumParticleTypes;)Lnet/minecraft/util/EnumParticleTypes;", false)));
+                patched++;
+            }
+        }
+        require(patched == 1, "Expected one spectral arrow particle, patched " + patched);
         return write(node);
     }
 
@@ -9123,6 +9312,68 @@ public final class FFDHeightTransformer implements IClassTransformer {
         return false;
     }
 
+    private static void patchModernRawLightNeighbors(MethodNode method) {
+        MethodInsnNode retain = null;
+        int emission = -1;
+        int opacity = -1;
+        int facingLoops = 0;
+        int neighborReads = 0;
+        for (AbstractInsnNode instruction : method.instructions.toArray()) {
+            if (!(instruction instanceof MethodInsnNode)) continue;
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            AbstractInsnNode following = nextReal(call);
+            if (GAMEPLAY_HOOKS.equals(call.owner) && "getFluidloggedLightValue".equals(call.name)
+                    && following instanceof VarInsnNode && following.getOpcode() == Opcodes.ISTORE) {
+                emission = ((VarInsnNode) following).var;
+            }
+            if ("net/minecraft/block/Block".equals(call.owner)
+                    && ("getLightOpacity".equals(call.name) || "func_149717_k".equals(call.name))
+                    && "(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;)I".equals(call.desc)
+                    && following instanceof VarInsnNode && following.getOpcode() == Opcodes.ISTORE) {
+                opacity = ((VarInsnNode) following).var;
+            }
+            if ("net/minecraft/util/math/BlockPos$PooledMutableBlockPos".equals(call.owner)
+                    && "()Lnet/minecraft/util/math/BlockPos$PooledMutableBlockPos;".equals(call.desc)) {
+                if (retain != null) return;
+                retain = call;
+            }
+        }
+        if (retain == null || emission < 0 || opacity < 0) return;
+        for (AbstractInsnNode instruction = retain.getNext(); instruction != null;
+                instruction = instruction.getNext()) {
+            if (!(instruction instanceof MethodInsnNode)) continue;
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if ("net/minecraft/util/EnumFacing".equals(call.owner)
+                    && "values".equals(call.name) && "()[Lnet/minecraft/util/EnumFacing;".equals(call.desc)) {
+                facingLoops++;
+            } else if ("net/minecraft/world/World".equals(call.owner)
+                    && ("getLightFor".equals(call.name) || "func_175642_b".equals(call.name))
+                    && "(Lnet/minecraft/world/EnumSkyBlock;Lnet/minecraft/util/math/BlockPos;)I".equals(call.desc)) {
+                neighborReads++;
+            } else if (!"net/minecraft/util/math/BlockPos$PooledMutableBlockPos".equals(call.owner)) {
+                return;
+            }
+        }
+        if (facingLoops != 1 || neighborReads != 1) return;
+        LabelNode fallback = new LabelNode();
+        method.instructions.insertBefore(retain, list(
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new VarInsnNode(Opcodes.ALOAD, 1),
+                new VarInsnNode(Opcodes.ALOAD, 2),
+                new VarInsnNode(Opcodes.ILOAD, emission),
+                new VarInsnNode(Opcodes.ILOAD, opacity),
+                new MethodInsnNode(Opcodes.INVOKESTATIC,
+                        "xy177/farmersfuturedelight/common/world/modern/ModernLightAccess", "neighborLight",
+                        "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/world/EnumSkyBlock;II)I", false),
+                new InsnNode(Opcodes.DUP),
+                new JumpInsnNode(Opcodes.IFLT, fallback),
+                new InsnNode(Opcodes.IRETURN),
+                fallback,
+                new FrameNode(Opcodes.F_SAME1, 0, null, 1, new Object[] {Opcodes.INTEGER}),
+                new InsnNode(Opcodes.POP)));
+        LOGGER.info("Patched scoped World raw-light neighbor access");
+    }
+
     private static byte[] transformWorld(byte[] basicClass) {
         ClassNode node = read(basicClass);
         MethodNode mayPlace = findMethod(node, "mayPlace", "func_190527_a",
@@ -9145,6 +9396,16 @@ public final class FFDHeightTransformer implements IClassTransformer {
         require(replacementChecks > 0, "Expected World block replacement checks");
         MethodNode checkLightFor = findMethod(node, "checkLightFor", "func_180500_c",
                 "(Lnet/minecraft/world/EnumSkyBlock;Lnet/minecraft/util/math/BlockPos;)Z");
+        for (AbstractInsnNode instruction : checkLightFor.instructions.toArray()) {
+            if (instruction.getOpcode() != Opcodes.IRETURN) continue;
+            AbstractInsnNode value = previousReal(instruction);
+            if (value == null || value.getOpcode() != Opcodes.ICONST_0) continue;
+            checkLightFor.instructions.insertBefore(value, list(new VarInsnNode(Opcodes.ALOAD, 0),
+                    new VarInsnNode(Opcodes.ALOAD, 1), new VarInsnNode(Opcodes.ALOAD, 2),
+                    new MethodInsnNode(Opcodes.INVOKESTATIC,
+                            "xy177/farmersfuturedelight/common/world/nether/NetherChunkLighting", "defer",
+                            "(Lnet/minecraft/world/World;Lnet/minecraft/world/EnumSkyBlock;Lnet/minecraft/util/math/BlockPos;)V", false)));
+        }
         MethodNode rawLight = findMethod(node, "getRawLight", "func_175638_a",
                 "(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/world/EnumSkyBlock;)I");
         int fluidloggedLightValues = 0;
@@ -9192,6 +9453,28 @@ public final class FFDHeightTransformer implements IClassTransformer {
             require(fluidloggedLightValues == 1,
                     "Expected one World fluidlogged light value, patched " + fluidloggedLightValues);
         }
+        int scopedLightReads = 0;
+        for (MethodNode lighting : new MethodNode[] {rawLight, checkLightFor}) {
+            for (AbstractInsnNode instruction : lighting.instructions.toArray()) {
+                if (!(instruction instanceof MethodInsnNode)) continue;
+                MethodInsnNode call = (MethodInsnNode) instruction;
+                if (call.getOpcode() != Opcodes.INVOKEVIRTUAL
+                        || !"net/minecraft/world/World".equals(call.owner)) continue;
+                boolean state = ("getBlockState".equals(call.name) || "func_180495_p".equals(call.name))
+                        && "(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/state/IBlockState;".equals(call.desc);
+                boolean sky = ("canSeeSky".equals(call.name) || "func_175678_i".equals(call.name))
+                        && "(Lnet/minecraft/util/math/BlockPos;)Z".equals(call.desc);
+                if (!state && !sky) continue;
+                call.setOpcode(Opcodes.INVOKESTATIC);
+                call.owner = "xy177/farmersfuturedelight/common/world/modern/ModernLightAccess";
+                call.name = state ? "state" : "skyVisible";
+                call.desc = "(Lnet/minecraft/world/World;" + call.desc.substring(1);
+                call.itf = false;
+                scopedLightReads++;
+            }
+        }
+        LOGGER.info("Patched {} scoped World block-state and sky reads", scopedLightReads);
+        patchModernRawLightNeighbors(rawLight);
         MethodNode method = findMethod(node, "isOutsideBuildHeight", "func_189509_E",
                 "(Lnet/minecraft/util/math/BlockPos;)Z");
         replace(method, list(
@@ -9472,6 +9755,21 @@ public final class FFDHeightTransformer implements IClassTransformer {
 
     private static byte[] transformChunkCache(byte[] basicClass) {
         ClassNode node = read(basicClass);
+        MethodNode constructor = findMethod(node, "<init>", "<init>",
+                "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/BlockPos;I)V");
+        int chunkReads = 0;
+        for (AbstractInsnNode instruction : constructor.instructions.toArray()) {
+            if (!(instruction instanceof MethodInsnNode)) continue;
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if (("getChunkFromChunkCoords".equals(call.name) || "func_72964_e".equals(call.name))
+                    && "(II)Lnet/minecraft/world/chunk/Chunk;".equals(call.desc)) {
+                constructor.instructions.set(call, new MethodInsnNode(Opcodes.INVOKESTATIC,
+                        "xy177/farmersfuturedelight/common/world/modern/ModernGenerationLifecycle", "cachedChunk",
+                        "(Lnet/minecraft/world/World;II)Lnet/minecraft/world/chunk/Chunk;", false));
+                chunkReads++;
+            }
+        }
+        require(chunkReads == 1, "Expected one ChunkCache chunk acquisition, patched " + chunkReads);
         String worldField = findField(node, "Lnet/minecraft/world/World;");
         String chunkArrayField = findField(node, "[[Lnet/minecraft/world/chunk/Chunk;");
         java.util.List<String> intFields = findFields(node, "I");
@@ -9586,7 +9884,164 @@ public final class FFDHeightTransformer implements IClassTransformer {
 
         MethodNode update = findMethod(node, "update", "func_187280_d", "()V");
         patchPackedYReads(update);
+        MethodNode provide = findMethod(node, "providePlayerChunk", "func_187268_a", "(Z)Z");
+        int prepared = 0;
+        for (AbstractInsnNode instruction : provide.instructions.toArray()) {
+            if (!(instruction instanceof MethodInsnNode)) continue;
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if ("net/minecraft/world/gen/ChunkProviderServer".equals(call.owner)
+                    && ("provideChunk".equals(call.name) || "func_186025_d".equals(call.name))
+                    && "(II)Lnet/minecraft/world/chunk/Chunk;".equals(call.desc)) {
+                provide.instructions.set(call, new MethodInsnNode(Opcodes.INVOKESTATIC,
+                        "xy177/farmersfuturedelight/common/world/modern/ModernGenerationLifecycle",
+                        "providePlayerChunk",
+                        "(Lnet/minecraft/world/gen/ChunkProviderServer;II)Lnet/minecraft/world/chunk/Chunk;", false));
+                prepared++;
+            }
+        }
+        require(prepared == 1, "Expected one player chunk generation call, patched " + prepared);
         LOGGER.info("Patched PlayerChunkMapEntry for signed-height block changes");
+        return write(node);
+    }
+
+    private static byte[] transformModernPlayerChunkMap(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        String worldField = findField(node, "Lnet/minecraft/world/WorldServer;");
+        MethodNode tick = findMethod(node, "tick", "func_72693_b", "()V");
+        MethodNode create = findMethod(node, "getOrCreateEntry", "func_187302_c",
+                "(II)Lnet/minecraft/server/management/PlayerChunkMapEntry;");
+        List<String> pendingFields = new java.util.ArrayList<>();
+        for (AbstractInsnNode instruction : create.instructions.toArray()) {
+            if (!(instruction instanceof FieldInsnNode)) continue;
+            FieldInsnNode field = (FieldInsnNode) instruction;
+            if (field.getOpcode() == Opcodes.GETFIELD && "Ljava/util/List;".equals(field.desc)
+                    && !pendingFields.contains(field.name)) pendingFields.add(field.name);
+        }
+        require(pendingFields.size() == 3, "Expected player entry and pending lists");
+        tick.instructions.insert(list(new VarInsnNode(Opcodes.ALOAD, 0),
+                new org.objectweb.asm.tree.FieldInsnNode(Opcodes.GETFIELD, node.name,
+                        worldField, "Lnet/minecraft/world/WorldServer;"),
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new FieldInsnNode(Opcodes.GETFIELD, node.name, pendingFields.get(1), "Ljava/util/List;"),
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new FieldInsnNode(Opcodes.GETFIELD, node.name, pendingFields.get(2), "Ljava/util/List;"),
+                new MethodInsnNode(Opcodes.INVOKESTATIC,
+                        "xy177/farmersfuturedelight/common/world/modern/ModernGenerationLifecycle",
+                        "beginPlayerTick", "(Lnet/minecraft/world/WorldServer;Ljava/util/List;Ljava/util/List;)V", false)));
+        LOGGER.info("Patched player chunk preparation for the modern generation scheduler");
+        return write(node);
+    }
+
+    private static byte[] transformModernSpawnPreparation(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode prepare = findMethodOptional(node, "initialWorldChunkLoad", "func_71222_d", "()V");
+        if (prepare == null) return basicClass;
+        LabelNode fallback = new LabelNode();
+        prepare.instructions.insert(list(new VarInsnNode(Opcodes.ALOAD, 0),
+                new MethodInsnNode(Opcodes.INVOKESTATIC,
+                        "xy177/farmersfuturedelight/common/world/modern/ModernSpawnPreparation",
+                        "prepare", "(Lnet/minecraft/server/MinecraftServer;)Z", false),
+                new JumpInsnNode(Opcodes.IFEQ, fallback), new InsnNode(Opcodes.RETURN), fallback,
+                new FrameNode(Opcodes.F_SAME, 0, null, 0, null)));
+        LOGGER.info("Patched initial world loading for the modern generation scheduler");
+        return write(node);
+    }
+
+    private static byte[] transformModernStrongholdPreparation(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode spawn = findMethod(node, "canSpawnStructureAtCoords", "func_75047_a", "(II)Z");
+        MethodNode positions = findMethod(node, "generatePositions", "func_189104_c", "()V");
+        org.objectweb.asm.tree.FieldInsnNode worldField = null;
+        for (AbstractInsnNode instruction : positions.instructions.toArray()) {
+            if (instruction instanceof org.objectweb.asm.tree.FieldInsnNode) {
+                org.objectweb.asm.tree.FieldInsnNode field = (org.objectweb.asm.tree.FieldInsnNode) instruction;
+                if (field.getOpcode() == Opcodes.GETFIELD && "Lnet/minecraft/world/World;".equals(field.desc)) {
+                    worldField = field;
+                    break;
+                }
+            }
+        }
+        require(worldField != null, "Expected the stronghold world field");
+        String checkedField = findField(node, "Z");
+        String distanceField = findField(node, "D");
+        String coordinatesField = findField(node, "[Lnet/minecraft/util/math/ChunkPos;");
+        String spreadField = findField(node, "I");
+        LabelNode fallback = new LabelNode();
+        spawn.instructions.insert(list(new VarInsnNode(Opcodes.ALOAD, 0),
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new org.objectweb.asm.tree.FieldInsnNode(Opcodes.GETFIELD, worldField.owner,
+                        worldField.name, worldField.desc),
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new org.objectweb.asm.tree.FieldInsnNode(Opcodes.GETFIELD, node.name, checkedField, "Z"),
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new org.objectweb.asm.tree.FieldInsnNode(Opcodes.GETFIELD, node.name, distanceField, "D"),
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new FieldInsnNode(Opcodes.GETFIELD, node.name, coordinatesField, "[Lnet/minecraft/util/math/ChunkPos;"),
+                new InsnNode(Opcodes.ARRAYLENGTH),
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new FieldInsnNode(Opcodes.GETFIELD, node.name, spreadField, "I"),
+                new VarInsnNode(Opcodes.ILOAD, 1), new VarInsnNode(Opcodes.ILOAD, 2),
+                new MethodInsnNode(Opcodes.INVOKESTATIC,
+                        "xy177/farmersfuturedelight/common/world/modern/ModernStructurePreparation",
+                        "skipStronghold", "(Lnet/minecraft/world/gen/structure/MapGenStronghold;Lnet/minecraft/world/World;ZDIIII)Z", false),
+                new JumpInsnNode(Opcodes.IFEQ, fallback), new InsnNode(Opcodes.ICONST_0),
+                new InsnNode(Opcodes.IRETURN), fallback,
+                new FrameNode(Opcodes.F_SAME, 0, null, 0, null)));
+        FieldInsnNode structuresField = null;
+        MethodInsnNode initialize = null;
+        for (AbstractInsnNode instruction : positions.instructions.toArray()) {
+            if (instruction instanceof FieldInsnNode) {
+                FieldInsnNode field = (FieldInsnNode) instruction;
+                if (field.getOpcode() == Opcodes.GETFIELD && field.desc.contains("Long2ObjectMap")) structuresField = field;
+            } else if (instruction instanceof MethodInsnNode) {
+                MethodInsnNode call = (MethodInsnNode) instruction;
+                if ("(Lnet/minecraft/world/World;)V".equals(call.desc)) initialize = call;
+            }
+        }
+        require(structuresField != null && initialize != null, "Expected stronghold saved-position initialization");
+        LabelNode originalPositions = new LabelNode();
+        positions.instructions.insert(initialize, list(new VarInsnNode(Opcodes.ALOAD, 0),
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new FieldInsnNode(Opcodes.GETFIELD, worldField.owner, worldField.name, worldField.desc),
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new FieldInsnNode(Opcodes.GETFIELD, node.name, coordinatesField, "[Lnet/minecraft/util/math/ChunkPos;"),
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new FieldInsnNode(Opcodes.GETFIELD, structuresField.owner, structuresField.name, structuresField.desc),
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new FieldInsnNode(Opcodes.GETFIELD, node.name, distanceField, "D"),
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new FieldInsnNode(Opcodes.GETFIELD, node.name, spreadField, "I"),
+                new MethodInsnNode(Opcodes.INVOKESTATIC,
+                        "xy177/farmersfuturedelight/common/world/modern/ModernStructurePreparation", "applyPositions",
+                        "(Lnet/minecraft/world/gen/structure/MapGenStronghold;Lnet/minecraft/world/World;[Lnet/minecraft/util/math/ChunkPos;Ljava/util/Map;DI)Z", false),
+                new JumpInsnNode(Opcodes.IFEQ, originalPositions), new InsnNode(Opcodes.RETURN), originalPositions,
+                new FrameNode(Opcodes.F_SAME, 0, null, 0, null)));
+        LOGGER.info("Patched stronghold preparation for the modern generation scheduler");
+        return write(node);
+    }
+
+    private static byte[] transformNetherProvider(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        MethodNode method = findMethod(node, "createChunkGenerator", "func_186060_c", "()Lnet/minecraft/world/gen/IChunkGenerator;");
+        int replaced = 0;
+        for (AbstractInsnNode instruction : method.instructions.toArray()) {
+            if (instruction.getOpcode() == Opcodes.NEW && instruction instanceof TypeInsnNode
+                    && "net/minecraft/world/gen/ChunkGeneratorHell".equals(((TypeInsnNode) instruction).desc)) {
+                AbstractInsnNode duplicate = instruction.getNext();
+                require(duplicate.getOpcode() == Opcodes.DUP, "Expected Nether generator constructor duplicate");
+                method.instructions.remove(duplicate);
+                method.instructions.remove(instruction);
+            } else if (instruction instanceof MethodInsnNode) {
+                MethodInsnNode call = (MethodInsnNode) instruction;
+                if ("net/minecraft/world/gen/ChunkGeneratorHell".equals(call.owner) && "<init>".equals(call.name)) {
+                    method.instructions.set(call, new MethodInsnNode(Opcodes.INVOKESTATIC,
+                            "xy177/farmersfuturedelight/common/world/nether/NetherGeneration", "create",
+                            "(Lnet/minecraft/world/World;ZJ)Lnet/minecraft/world/gen/IChunkGenerator;", false));
+                    replaced++;
+                }
+            }
+        }
+        require(replaced == 1, "Expected one Nether generator factory, found " + replaced);
         return write(node);
     }
 
@@ -10394,6 +10849,7 @@ public final class FFDHeightTransformer implements IClassTransformer {
         MethodNode recreate = findMethod(node, "recreatePlayerEntity", "func_72368_a",
                 "(Lnet/minecraft/entity/player/EntityPlayerMP;IZ)Lnet/minecraft/entity/player/EntityPlayerMP;");
         int patched = patchLoadedEntityDoubleConstant(recreate, 256.0D, "playerTransferCeiling");
+        patchAnchorRespawn(recreate);
         for (MethodNode method : node.methods) {
             if ("moveToWorld".equals(method.name)
                     && "(Lnet/minecraft/entity/player/EntityPlayerMP;IZLorg/bukkit/Location;Z)"
@@ -10404,6 +10860,75 @@ public final class FFDHeightTransformer implements IClassTransformer {
         require(patched == 1 || patched == 2,
                 "Expected one or two player transfer ceilings, patched " + patched);
         LOGGER.info("Patched player transfer collision ceiling");
+        return write(node);
+    }
+
+    private static void patchAnchorRespawn(MethodNode method) {
+        String bedHooks = Type.getInternalName(FFDBedHooks.class);
+        for (AbstractInsnNode instruction : method.instructions.toArray()) {
+            if (!(instruction instanceof MethodInsnNode)) continue;
+            MethodInsnNode call = (MethodInsnNode) instruction;
+            if ("getBedLocation".equals(call.name) && "(I)Lnet/minecraft/util/math/BlockPos;".equals(call.desc)) {
+                InsnList select = new InsnList();
+                select.add(new InsnNode(Opcodes.SWAP));
+                select.add(new InsnNode(Opcodes.DUP_X1));
+                select.add(new InsnNode(Opcodes.SWAP));
+                select.add(new MethodInsnNode(Opcodes.INVOKESTATIC, bedHooks, "anchorRespawnDimension",
+                        "(Lnet/minecraft/entity/player/EntityPlayerMP;I)I", false));
+                select.add(new InsnNode(Opcodes.DUP));
+                select.add(new VarInsnNode(Opcodes.ISTORE, 2));
+                method.instructions.insertBefore(call, select);
+                method.instructions.set(call, new MethodInsnNode(Opcodes.INVOKESTATIC, bedHooks, "respawnPosition",
+                        "(Lnet/minecraft/entity/player/EntityPlayerMP;I)Lnet/minecraft/util/math/BlockPos;", false));
+            } else if (("getBedSpawnLocation".equals(call.name) || "func_180467_0".equals(call.name)
+                    || "func_180467_a".equals(call.name))
+                    && "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Z)Lnet/minecraft/util/math/BlockPos;".equals(call.desc)) {
+                InsnList context = new InsnList();
+                context.add(new VarInsnNode(Opcodes.ALOAD, 1));
+                context.add(new VarInsnNode(Opcodes.ILOAD, 3));
+                method.instructions.insertBefore(call, context);
+                method.instructions.set(call, new MethodInsnNode(Opcodes.INVOKESTATIC, bedHooks, "findRespawn",
+                        "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;ZLnet/minecraft/entity/player/EntityPlayerMP;Z)Lnet/minecraft/util/math/BlockPos;", false));
+            } else if (("setLocationAndAngles".equals(call.name) || "func_70012_b".equals(call.name))
+                    && "(DDDFF)V".equals(call.desc)) {
+                method.instructions.insertBefore(call, new VarInsnNode(Opcodes.ALOAD, 1));
+                method.instructions.set(call, new MethodInsnNode(Opcodes.INVOKESTATIC, bedHooks, "placeRespawn",
+                        "(Lnet/minecraft/entity/player/EntityPlayerMP;DDDFFLnet/minecraft/entity/player/EntityPlayerMP;)V", false));
+            }
+        }
+    }
+
+    private static byte[] transformCompassBaseItem(byte[] basicClass) {
+        ClassNode node = read(basicClass);
+        FFDNetherUpdateTransformer.item(node);
+        String hooks = Type.getInternalName(xy177.farmersfuturedelight.common.FFDLodestoneCompass.class);
+        MethodNode name = findMethod(node, "getUnlocalizedName", "func_77667_c",
+                "(Lnet/minecraft/item/ItemStack;)Ljava/lang/String;");
+        MethodNode foil = findMethodOptional(node, "hasEffect", "func_77636_d", "(Lnet/minecraft/item/ItemStack;)Z");
+        for (AbstractInsnNode instruction : name.instructions.toArray()) {
+            if (instruction.getOpcode() != Opcodes.ARETURN) continue;
+            InsnList hook = new InsnList();
+            hook.add(new VarInsnNode(Opcodes.ALOAD, 1));
+            hook.add(new MethodInsnNode(Opcodes.INVOKESTATIC, hooks, "name",
+                    "(Ljava/lang/String;Lnet/minecraft/item/ItemStack;)Ljava/lang/String;", false));
+            name.instructions.insertBefore(instruction, hook);
+        }
+        if (foil != null) for (AbstractInsnNode instruction : foil.instructions.toArray()) {
+            if (instruction.getOpcode() != Opcodes.IRETURN) continue;
+            InsnList hook = new InsnList();
+            hook.add(new VarInsnNode(Opcodes.ALOAD, 1));
+            hook.add(new MethodInsnNode(Opcodes.INVOKESTATIC, hooks, "foil", "(ZLnet/minecraft/item/ItemStack;)Z", false));
+            foil.instructions.insertBefore(instruction, hook);
+        }
+        MethodNode update = findMethod(node, "onUpdate", "func_77663_a",
+                "(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/Entity;IZ)V");
+        InsnList hook = new InsnList();
+        hook.add(new VarInsnNode(Opcodes.ALOAD, 1));
+        hook.add(new VarInsnNode(Opcodes.ALOAD, 2));
+        hook.add(new VarInsnNode(Opcodes.ALOAD, 3));
+        hook.add(new MethodInsnNode(Opcodes.INVOKESTATIC, hooks, "tick",
+                "(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/Entity;)V", false));
+        update.instructions.insert(hook);
         return write(node);
     }
 
@@ -10855,8 +11380,15 @@ public final class FFDHeightTransformer implements IClassTransformer {
         patchChunkPacketRead(node);
         patchStorageCoordinateIndices(node);
         patchLegacyWorldGeneratorHeight(node);
-        addPublicBridgeCopy(node, findMethod(node, "checkLight", "func_150809_p", "()V"),
-                "ffd$checkLight");
+        MethodNode initialLight = findMethod(node, "checkLight", "func_150809_p", "()V");
+        addPublicBridgeCopy(node, initialLight, "ffd$checkLight");
+        node.interfaces.add("xy177/farmersfuturedelight/core/FFDChunkLightingAccess");
+        replace(initialLight, list(
+                new VarInsnNode(Opcodes.ALOAD, 0),
+                new MethodInsnNode(Opcodes.INVOKESTATIC,
+                        "xy177/farmersfuturedelight/common/world/modern/ModernChunkLighting",
+                        "checkInitial", "(Lnet/minecraft/world/chunk/Chunk;)V", false),
+                new InsnNode(Opcodes.RETURN)));
         addPublicBridgeCopy(node, findMethod(node, "recheckGaps", "func_150803_c", "(Z)V"),
                 "ffd$recheckGaps");
         LOGGER.info("Patched Chunk section storage, height maps, precipitation, relighting and legacy worldgen height");
@@ -11002,6 +11534,20 @@ public final class FFDHeightTransformer implements IClassTransformer {
         MethodNode playEvent = findMethod(node, "playEvent", "func_180439_a",
                 "(Lnet/minecraft/entity/player/EntityPlayer;I"
                         + "Lnet/minecraft/util/math/BlockPos;I)V");
+        LabelNode vanillaPlayEvent = new LabelNode();
+        playEvent.instructions.insert(list(
+                new VarInsnNode(Opcodes.ALOAD, 1),
+                new VarInsnNode(Opcodes.ILOAD, 2),
+                new VarInsnNode(Opcodes.ALOAD, 3),
+                new VarInsnNode(Opcodes.ILOAD, 4),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, COMPOSTER_HOOKS,
+                        "handleWorldEvent",
+                        "(Lnet/minecraft/entity/player/EntityPlayer;I"
+                                + "Lnet/minecraft/util/math/BlockPos;I)Z", false),
+                new JumpInsnNode(Opcodes.IFEQ, vanillaPlayEvent),
+                new InsnNode(Opcodes.RETURN),
+                vanillaPlayEvent,
+                new FrameNode(Opcodes.F_SAME, 0, null, 0, null)));
         int decodedDestroyStates = 0;
         int destroyParticles = 0;
         for (AbstractInsnNode instruction = playEvent.instructions.getFirst();
@@ -11173,6 +11719,9 @@ public final class FFDHeightTransformer implements IClassTransformer {
         LabelNode loadStart = new LabelNode();
         LabelNode loadEnd = new LabelNode();
         launchIntegratedServer.instructions.insertBefore(launchIntegratedServer.instructions.getFirst(), list(
+                new VarInsnNode(Opcodes.ALOAD, 3),
+                new MethodInsnNode(Opcodes.INVOKESTATIC, CLIENT_HOOKS, "prepareIntegratedConnection",
+                        "(Lnet/minecraft/world/WorldSettings;)V", false),
                 new VarInsnNode(Opcodes.ALOAD, 0),
                 new MethodInsnNode(Opcodes.INVOKESTATIC, CLIENT_HOOKS, "beginIntegratedWorldLoad",
                         "(Lnet/minecraft/client/Minecraft;)V", false), loadStart));

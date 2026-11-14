@@ -24,6 +24,8 @@ public final class FFDLateTweaker implements ITweaker {
         }
         classLoader.registerTransformer(HEIGHT_TRANSFORMER);
         registerTransformerIfMissing(classLoader,
+                "xy177.farmersfuturedelight.core.FFDSoulFireTransformer");
+        registerTransformerIfMissing(classLoader,
                 "xy177.farmersfuturedelight.core.FFDCreativeInventoryTransformer");
         registerTransformerIfMissing(classLoader,
                 "xy177.farmersfuturedelight.core.FFDMenuTransformer");
