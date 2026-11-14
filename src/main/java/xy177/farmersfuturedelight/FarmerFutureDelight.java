@@ -59,6 +59,11 @@ public class FarmerFutureDelight {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+        if (net.minecraftforge.fml.common.Loader.isModLoaded("theoneprobe")) {
+            net.minecraftforge.fml.common.event.FMLInterModComms.sendFunctionMessage(
+                    "theoneprobe", "getTheOneProbe",
+                    "xy177.farmersfuturedelight.common.compat.FFDTopCompat");
+        }
         if (net.minecraftforge.fml.common.Loader.isModLoaded("crafttweaker")) {
             xy177.farmersfuturedelight.common.registry.FFDFutureScriptCompat.register();
         }
